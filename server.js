@@ -69,7 +69,7 @@ const server = http.createServer((req, res) => {
 
   // ── SERVE HTML FILES ──────────────────────────────────────
   let filePath = '.' + req.url;
-  if (filePath === './') filePath = './practice-screen.html';
+  if (filePath === './') filePath = './dashboard.html';
 
   // Strip query strings
   filePath = filePath.split('?')[0];

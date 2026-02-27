@@ -1480,8 +1480,9 @@
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
-      console.log('Speech recognition started');
+      console.log('Speech recognition started successfully');
       document.getElementById('speechNotSupported').style.display = 'none';
+      document.getElementById('recordStatus').textContent = 'Listening… speak now';
     };
 
     recognition.onresult = (event) => {
@@ -1577,7 +1578,15 @@
       interimTranscript = '';
       try {
         recognition.start();
-      } catch(e) { /* already started */ }
+        console.log('Recognition start called successfully');
+      } catch(e) {
+        console.error('Recognition start error:', e);
+        isRecording = false;
+        const errEl = document.getElementById('speechNotSupported');
+        errEl.style.display = 'block';
+        errEl.textContent = '⚠️ Could not start microphone: ' + e.message + '. Try refreshing the page.';
+        return;
+      }
 
       btn.classList.add('recording');
       pulse.classList.add('active');
@@ -2307,7 +2316,11 @@ Grade strictly and return JSON only.`;
 
   // ─── INIT ─────────────────────────────────────────────────
   (function init() {
-    selectTopic('All');
+    const params = new URLSearchParams(window.location.search);
+    const topicParam = params.get('topic');
+    const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
+    const startTopic = validTopics.includes(topicParam) ? topicParam : 'All';
+    selectTopic(startTopic);
   })();
 
 </script>
