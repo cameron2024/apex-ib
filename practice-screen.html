@@ -1062,8 +1062,123 @@
     .content { padding: 16px; }
   }
 </style>
+  <style>
+    /* ── AUTH MODAL ───────────────────────────────────────── */
+    #authOverlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+    }
+    #authOverlay.hidden { display: none; }
+    .auth-modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    }
+    .auth-logo {
+      font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
+      margin-bottom: 6px; color: var(--text-primary);
+    }
+    .auth-logo span { color: var(--accent-blue); }
+    .auth-sub { font-size: 13px; color: var(--text-tertiary); margin-bottom: 28px; }
+    .auth-tabs {
+      display: flex; gap: 4px;
+      background: var(--bg); border-radius: 8px; padding: 4px;
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1; padding: 8px; border: none; background: none;
+      border-radius: 6px; font-size: 13px; font-weight: 500;
+      color: var(--text-tertiary); cursor: pointer; transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .auth-tab.active {
+      background: var(--surface); color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .auth-field { margin-bottom: 14px; }
+    .auth-field label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .auth-field input {
+      width: 100%; padding: 10px 12px; box-sizing: border-box;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-primary);
+      font-size: 14px; font-family: 'DM Sans', sans-serif;
+      outline: none; transition: border-color 0.15s;
+    }
+    .auth-field input:focus { border-color: var(--accent-blue); }
+    .auth-btn {
+      width: 100%; padding: 12px; margin-top: 8px;
+      background: var(--accent-blue); color: white;
+      border: none; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: opacity 0.15s;
+    }
+    .auth-btn:hover { opacity: 0.9; }
+    .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .auth-error {
+      font-size: 13px; color: var(--accent-red);
+      margin-top: 10px; text-align: center; min-height: 18px;
+    }
+    /* ── USER BADGE in header ─────────────────────────────── */
+    #userBadge {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    #userBadge .user-name { font-weight: 500; color: var(--text-primary); }
+    #userBadge .logout-btn {
+      background: none; border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 10px; font-size: 12px;
+      color: var(--text-tertiary); cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+    }
+    #userBadge .logout-btn:hover { color: var(--text-primary); border-color: var(--text-tertiary); }
+    /* ── SAVE INDICATOR ───────────────────────────────────── */
+    #saveIndicator {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px;
+      font-size: 12px; color: var(--text-tertiary);
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
+      z-index: 100;
+    }
+    #saveIndicator.visible { opacity: 1; }
+  </style>
 </head>
 <body>
+
+<!-- AUTH MODAL -->
+<div id="authOverlay">
+  <div class="auth-modal">
+    <div class="auth-logo">Apex <span>IB</span></div>
+    <div class="auth-sub">Your progress is saved across all devices</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+    <div id="authLoginForm">
+      <div class="auth-field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+      <button class="auth-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+    </div>
+    <div id="authRegisterForm" style="display:none">
+      <div class="auth-field"><label>Name</label><input type="text" id="registerName" placeholder="Your name" /></div>
+      <div class="auth-field"><label>Email</label><input type="email" id="registerEmail" placeholder="you@example.com" /></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="registerPassword" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doRegister()" /></div>
+      <button class="auth-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<!-- SAVE INDICATOR -->
+<div id="saveIndicator">✓ Progress saved</div>
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -1159,14 +1274,10 @@
       <span id="topbarTopicPill">All Topics</span>
     </div>
     <div class="topbar-right">
-      <button class="btn-ghost">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Study Guide
-      </button>
-      <button class="btn-ghost">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-        Save
-      </button>
+      <div id="userBadge" style="display:none">
+        <span class="user-name" id="userDisplayName"></span>
+        <button class="logout-btn" onclick="doLogout()">Sign out</button>
+      </div>
     </div>
   </div>
 
@@ -2301,6 +2412,7 @@ Grade strictly and return JSON only.`;
     currentIndex = Math.max(0, Math.min(index, filteredQuestions.length - 1));
     const q = filteredQuestions[currentIndex];
     displayQuestion(q, currentIndex);
+    saveStateToServer();
   }
 
   function loadNextQuestion() {
@@ -2381,19 +2493,199 @@ Grade strictly and return JSON only.`;
   function recordQuestionResult(score) {
     const q = filteredQuestions[currentIndex];
     if (!q) return;
-    if (score >= 95) sessionResults[q.id] = 'mastered';
-    else if (score >= 75) sessionResults[q.id] = 'partial';
-    else sessionResults[q.id] = 'missed';
+    let status;
+    if (score >= 95) status = 'mastered';
+    else if (score >= 75) status = 'partial';
+    else status = 'missed';
+    sessionResults[q.id] = status;
     updateProgressUI();
+    // Persist to server
+    saveResultToServer(q.id, q.topic, status, score);
   }
 
   // ─── INIT ─────────────────────────────────────────────────
   (function init() {
-    const params = new URLSearchParams(window.location.search);
-    const topicParam = params.get('topic');
-    const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
-    const startTopic = validTopics.includes(topicParam) ? topicParam : 'All';
-    selectTopic(startTopic);
+    const token = localStorage.getItem('apex_token');
+    if (token) {
+      // loadProgressFromServer will handle topic/position restoration
+      loadProgressFromServer();
+    } else {
+      // Not logged in — load default view, modal is already showing
+      const params = new URLSearchParams(window.location.search);
+      const topicParam = params.get('topic');
+      const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
+      const startTopic = validTopics.includes(topicParam) ? topicParam : 'All';
+      selectTopic(startTopic);
+    }
+  })();
+
+  // ─── AUTH & PROGRESS ──────────────────────────────────────
+
+  let authToken = null;
+  let currentUser = null;
+  let saveStateTimer = null;
+
+  // ── Auth Modal ──────────────────────────────────────────────
+  function switchAuthTab(tab) {
+    document.getElementById('authLoginForm').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('authRegisterForm').style.display = tab === 'register' ? '' : 'none';
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('authError').textContent = '';
+  }
+
+  async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    if (!email || !password) return showAuthError('Please fill in all fields');
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+      onAuthSuccess(data.token, data.name);
+    } catch(e) {
+      showAuthError(e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign In';
+    }
+  }
+
+  async function doRegister() {
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const btn = document.getElementById('registerBtn');
+    if (!email || !password) return showAuthError('Please fill in all fields');
+    btn.disabled = true; btn.textContent = 'Creating account…';
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      onAuthSuccess(data.token, data.name);
+    } catch(e) {
+      showAuthError(e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Create Account';
+    }
+  }
+
+  function showAuthError(msg) {
+    document.getElementById('authError').textContent = msg;
+  }
+
+  function doLogout() {
+    localStorage.removeItem('apex_token');
+    localStorage.removeItem('apex_user');
+    authToken = null; currentUser = null;
+    document.getElementById('userBadge').style.display = 'none';
+    document.getElementById('authOverlay').classList.remove('hidden');
+    // Reset all progress locally
+    sessionResults = {};
+    updateProgressUI();
+  }
+
+  async function onAuthSuccess(token, name) {
+    authToken = token;
+    currentUser = name;
+    localStorage.setItem('apex_token', token);
+    localStorage.setItem('apex_user', name);
+    document.getElementById('authOverlay').classList.add('hidden');
+    document.getElementById('userBadge').style.display = 'flex';
+    document.getElementById('userDisplayName').textContent = name;
+    await loadProgressFromServer();
+  }
+
+  // ── Progress: Load ──────────────────────────────────────────
+  async function loadProgressFromServer() {
+    if (!authToken) return;
+    try {
+      const res = await fetch('/api/progress/load', {
+        headers: { 'Authorization': 'Bearer ' + authToken }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      // Restore question results into sessionResults
+      if (data.results) {
+        data.results.forEach(r => {
+          sessionResults[r.question_id] = r.status;
+        });
+      }
+
+      // Restore last topic + position (URL param overrides saved state)
+      const params = new URLSearchParams(window.location.search);
+      const topicParam = params.get('topic');
+      const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
+      if (topicParam && validTopics.includes(topicParam)) {
+        selectTopic(topicParam);
+      } else if (data.state) {
+        const savedTopic = validTopics.includes(data.state.last_topic) ? data.state.last_topic : 'All';
+        selectTopic(savedTopic);
+        loadQuestionAt(data.state.last_question_index || 0);
+      }
+
+      updateProgressUI();
+    } catch(e) {
+      console.log('Progress load error:', e.message);
+    }
+  }
+
+  // ── Progress: Save result ───────────────────────────────────
+  async function saveResultToServer(questionId, topic, status, score) {
+    if (!authToken) return;
+    try {
+      await fetch('/api/progress/save-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+        body: JSON.stringify({ questionId, topic, status, score })
+      });
+      showSaveIndicator();
+    } catch(e) {
+      console.log('Save result error:', e.message);
+    }
+  }
+
+  // ── Progress: Save state (debounced) ───────────────────────
+  function saveStateToServer() {
+    if (!authToken) return;
+    clearTimeout(saveStateTimer);
+    saveStateTimer = setTimeout(async () => {
+      try {
+        const q = filteredQuestions[currentIndex];
+        await fetch('/api/progress/save-state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+          body: JSON.stringify({ topic: currentTopic, questionIndex: currentIndex })
+        });
+      } catch(e) {}
+    }, 1500);
+  }
+
+  function showSaveIndicator() {
+    const el = document.getElementById('saveIndicator');
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 2000);
+  }
+
+  // ── Boot: check for saved token ─────────────────────────────
+  (function checkAuth() {
+    const token = localStorage.getItem('apex_token');
+    const name = localStorage.getItem('apex_user');
+    if (token && name) {
+      authToken = token;
+      currentUser = name;
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('userBadge').style.display = 'flex';
+      document.getElementById('userDisplayName').textContent = name;
+    }
   })();
 
 </script>
