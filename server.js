@@ -2,332 +2,183 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'apex-ib-secret-change-in-prod';
+const DB_PATH = process.env.DB_PATH || './db.json';
 
-// ── DATABASE SETUP ────────────────────────────────────────────────────────────
-let db;
-try {
-  const Database = require('better-sqlite3');
-  const DB_PATH = process.env.DB_PATH || './apex_ib.db';
-  db = new Database(DB_PATH);
-  db.pragma('journal_mode = WAL');
-
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      name TEXT,
-      created_at INTEGER DEFAULT (strftime('%s','now'))
-    );
-
-    CREATE TABLE IF NOT EXISTS question_results (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      question_id TEXT NOT NULL,
-      topic TEXT NOT NULL,
-      status TEXT NOT NULL,
-      score INTEGER,
-      updated_at INTEGER DEFAULT (strftime('%s','now')),
-      UNIQUE(user_id, question_id),
-      FOREIGN KEY(user_id) REFERENCES users(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS sessions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      question_id TEXT NOT NULL,
-      topic TEXT NOT NULL,
-      score INTEGER NOT NULL,
-      status TEXT NOT NULL,
-      created_at INTEGER DEFAULT (strftime('%s','now')),
-      FOREIGN KEY(user_id) REFERENCES users(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS activity (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      date TEXT NOT NULL,
-      questions_answered INTEGER DEFAULT 0,
-      UNIQUE(user_id, date),
-      FOREIGN KEY(user_id) REFERENCES users(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS user_state (
-      user_id INTEGER PRIMARY KEY,
-      last_topic TEXT DEFAULT 'All',
-      last_question_index INTEGER DEFAULT 0,
-      updated_at INTEGER DEFAULT (strftime('%s','now')),
-      FOREIGN KEY(user_id) REFERENCES users(id)
-    );
-  `);
-  console.log('✓ Database ready');
-} catch (err) {
-  console.error('Database error:', err.message);
-  db = null;
-}
-
-// ── AUTH HELPERS ──────────────────────────────────────────────────────────────
-let bcrypt, jwt;
-try {
-  bcrypt = require('bcryptjs');
-  jwt = require('jsonwebtoken');
-} catch(e) {
-  console.error('Missing auth deps:', e.message);
-}
-
-function verifyToken(req) {
-  const auth = req.headers['authorization'] || '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
-  if (!token) return null;
+// ── PURE JS DATABASE (JSON file, no native deps) ──────────────
+function loadDB() {
   try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch(e) {
-    return null;
-  }
+    if (fs.existsSync(DB_PATH)) return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+  } catch(e) { console.error('DB load error:', e.message); }
+  return { users: [], question_results: [], sessions: [], activity: [], user_state: [] };
+}
+function saveDB(db) {
+  try { fs.writeFileSync(DB_PATH, JSON.stringify(db)); }
+  catch(e) { console.error('DB save error:', e.message); }
+}
+let db = loadDB();
+console.log('✓ DB loaded, users:', db.users.length);
+
+// ── JWT (no dependency) ───────────────────────────────────────
+function b64url(s) { return Buffer.from(s).toString('base64').replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_'); }
+function signToken(payload) {
+  const h = b64url(JSON.stringify({alg:'HS256',typ:'JWT'}));
+  const p = b64url(JSON.stringify({...payload, exp: Math.floor(Date.now()/1000)+60*60*24*90}));
+  const s = crypto.createHmac('sha256',JWT_SECRET).update(h+'.'+p).digest('base64').replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  return h+'.'+p+'.'+s;
+}
+function verifyToken(token) {
+  try {
+    const [h,p,s] = token.split('.');
+    const expected = crypto.createHmac('sha256',JWT_SECRET).update(h+'.'+p).digest('base64').replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    if (s !== expected) return null;
+    const payload = JSON.parse(Buffer.from(p,'base64').toString());
+    return payload.exp > Math.floor(Date.now()/1000) ? payload : null;
+  } catch(e) { return null; }
+}
+function getUser(req) {
+  const auth = req.headers['authorization']||'';
+  const t = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  return t ? verifyToken(t) : null;
 }
 
-function jsonResponse(res, status, data) {
-  res.writeHead(status, {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': '*',
-  });
+// ── PASSWORD (SHA256+salt, no dependency) ─────────────────────
+function hashPwd(pwd) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  return salt+':'+crypto.createHmac('sha256',salt).update(pwd).digest('hex');
+}
+function checkPwd(pwd, stored) {
+  const [salt,hash] = stored.split(':');
+  return crypto.createHmac('sha256',salt).update(pwd).digest('hex') === hash;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function json(res, status, data) {
+  res.writeHead(status, {'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*'});
   res.end(JSON.stringify(data));
 }
-
 function readBody(req) {
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      try { resolve(JSON.parse(body)); }
-      catch(e) { resolve({}); }
-    });
-    req.on('error', reject);
+  return new Promise(resolve => {
+    let b=''; req.on('data',c=>b+=c); req.on('end',()=>{ try{resolve(JSON.parse(b))}catch(e){resolve({})} });
   });
 }
+const today = () => new Date().toISOString().slice(0,10);
+const nowSec = () => Math.floor(Date.now()/1000);
 
-// ── SERVER ────────────────────────────────────────────────────────────────────
-const server = http.createServer(async (req, res) => {
-
-  // CORS preflight
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': '*',
-      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS'
-    });
-    res.end();
-    return;
+// ── SERVER ────────────────────────────────────────────────────
+http.createServer(async (req, res) => {
+  if (req.method==='OPTIONS') {
+    res.writeHead(200,{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*','Access-Control-Allow-Methods':'POST,GET,OPTIONS'});
+    res.end(); return;
   }
-
   const url = req.url.split('?')[0];
 
-  // ── REGISTER ────────────────────────────────────────────────────────────────
-  if (req.method === 'POST' && url === '/api/auth/register') {
-    if (!db || !bcrypt || !jwt) return jsonResponse(res, 500, { error: 'Server not ready' });
-    const { email, password, name } = await readBody(req);
-    if (!email || !password) return jsonResponse(res, 400, { error: 'Email and password required' });
-    if (password.length < 6) return jsonResponse(res, 400, { error: 'Password must be at least 6 characters' });
-
-    try {
-      const hash = bcrypt.hashSync(password, 10);
-      const stmt = db.prepare('INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)');
-      const result = stmt.run(email.toLowerCase().trim(), hash, name || email.split('@')[0]);
-      const token = jwt.sign({ userId: result.lastInsertRowid, email }, JWT_SECRET, { expiresIn: '90d' });
-      return jsonResponse(res, 200, { token, name: name || email.split('@')[0] });
-    } catch(e) {
-      if (e.message.includes('UNIQUE')) return jsonResponse(res, 409, { error: 'Email already registered' });
-      return jsonResponse(res, 500, { error: 'Registration failed' });
-    }
+  // PING
+  if (url === '/api/ping') {
+    return json(res, 200, { ok: true, users: db.users.length, ts: Date.now() });
   }
 
-  // ── LOGIN ───────────────────────────────────────────────────────────────────
-  if (req.method === 'POST' && url === '/api/auth/login') {
-    if (!db || !bcrypt || !jwt) return jsonResponse(res, 500, { error: 'Server not ready' });
-    const { email, password } = await readBody(req);
-    if (!email || !password) return jsonResponse(res, 400, { error: 'Email and password required' });
-
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase().trim());
-    if (!user || !bcrypt.compareSync(password, user.password_hash)) {
-      return jsonResponse(res, 401, { error: 'Invalid email or password' });
-    }
-    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '90d' });
-    return jsonResponse(res, 200, { token, name: user.name });
+  // DEBUG — shows raw DB state (remove before production)
+  if (url === '/api/debug') {
+    db = loadDB();
+    return json(res, 200, { users: db.users.map(u => ({id:u.id, email:u.email, name:u.name})), userCount: db.users.length });
   }
 
-  // ── SAVE QUESTION RESULT ────────────────────────────────────────────────────
-  if (req.method === 'POST' && url === '/api/progress/save-result') {
-    const user = verifyToken(req);
-    if (!user) return jsonResponse(res, 401, { error: 'Unauthorized' });
-    if (!db) return jsonResponse(res, 500, { error: 'DB not ready' });
-
-    const { questionId, topic, status, score } = await readBody(req);
-    if (!questionId || !status) return jsonResponse(res, 400, { error: 'Missing fields' });
-
-    // Upsert question result
-    db.prepare(`
-      INSERT INTO question_results (user_id, question_id, topic, status, score, updated_at)
-      VALUES (?, ?, ?, ?, ?, strftime('%s','now'))
-      ON CONFLICT(user_id, question_id) DO UPDATE SET
-        status = excluded.status,
-        score = excluded.score,
-        updated_at = strftime('%s','now')
-    `).run(user.userId, questionId, topic, status, score || 0);
-
-    // Log session history
-    db.prepare(`
-      INSERT INTO sessions (user_id, question_id, topic, score, status)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(user.userId, questionId, topic, score || 0, status);
-
-    // Update daily activity
-    const today = new Date().toISOString().slice(0, 10);
-    db.prepare(`
-      INSERT INTO activity (user_id, date, questions_answered)
-      VALUES (?, ?, 1)
-      ON CONFLICT(user_id, date) DO UPDATE SET
-        questions_answered = questions_answered + 1
-    `).run(user.userId, today);
-
-    return jsonResponse(res, 200, { ok: true });
+  // REGISTER
+  if (req.method==='POST' && url==='/api/auth/register') {
+    const {email,password,name} = await readBody(req);
+    if (!email||!password) return json(res,400,{error:'Email and password required'});
+    if (password.length<6) return json(res,400,{error:'Password must be at least 6 characters'});
+    db = loadDB();
+    const emailLower = email.toLowerCase().trim();
+    if (db.users.find(u=>u.email===emailLower)) return json(res,409,{error:'Email already registered'});
+    const id = Date.now();
+    const displayName = name||emailLower.split('@')[0];
+    db.users.push({id, email:emailLower, password_hash:hashPwd(password), name:displayName, created_at:nowSec()});
+    saveDB(db);
+    return json(res,200,{token:signToken({userId:id,email:emailLower}), name:displayName});
   }
 
-  // ── SAVE STATE (topic + position) ───────────────────────────────────────────
-  if (req.method === 'POST' && url === '/api/progress/save-state') {
-    const user = verifyToken(req);
-    if (!user) return jsonResponse(res, 401, { error: 'Unauthorized' });
-    if (!db) return jsonResponse(res, 500, { error: 'DB not ready' });
-
-    const { topic, questionIndex } = await readBody(req);
-    db.prepare(`
-      INSERT INTO user_state (user_id, last_topic, last_question_index, updated_at)
-      VALUES (?, ?, ?, strftime('%s','now'))
-      ON CONFLICT(user_id) DO UPDATE SET
-        last_topic = excluded.last_topic,
-        last_question_index = excluded.last_question_index,
-        updated_at = strftime('%s','now')
-    `).run(user.userId, topic || 'All', questionIndex || 0);
-
-    return jsonResponse(res, 200, { ok: true });
+  // LOGIN
+  if (req.method==='POST' && url==='/api/auth/login') {
+    const {email,password} = await readBody(req);
+    if (!email||!password) return json(res,400,{error:'Email and password required'});
+    db = loadDB();
+    const user = db.users.find(u=>u.email===email.toLowerCase().trim());
+    if (!user||!checkPwd(password,user.password_hash)) return json(res,401,{error:'Invalid email or password'});
+    return json(res,200,{token:signToken({userId:user.id,email:user.email}), name:user.name});
   }
 
-  // ── LOAD ALL PROGRESS ───────────────────────────────────────────────────────
-  if (req.method === 'GET' && url === '/api/progress/load') {
-    const user = verifyToken(req);
-    if (!user) return jsonResponse(res, 401, { error: 'Unauthorized' });
-    if (!db) return jsonResponse(res, 500, { error: 'DB not ready' });
-
-    const results = db.prepare(
-      'SELECT question_id, status, score FROM question_results WHERE user_id = ?'
-    ).all(user.userId);
-
-    const state = db.prepare(
-      'SELECT last_topic, last_question_index FROM user_state WHERE user_id = ?'
-    ).get(user.userId);
-
-    // Session history: last 50
-    const history = db.prepare(`
-      SELECT topic, score, status, created_at
-      FROM sessions WHERE user_id = ?
-      ORDER BY created_at DESC LIMIT 50
-    `).all(user.userId);
-
-    // Activity: last 84 days (12 weeks)
-    const activity = db.prepare(`
-      SELECT date, questions_answered
-      FROM activity WHERE user_id = ?
-      ORDER BY date DESC LIMIT 84
-    `).all(user.userId);
-
-    // Streak calculation
-    let streak = 0;
-    const activityDates = new Set(activity.map(a => a.date));
-    const today = new Date();
-    for (let i = 0; i < 365; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().slice(0, 10);
-      if (activityDates.has(dateStr)) {
-        streak++;
-      } else if (i > 0) {
-        break;
-      }
-    }
-
-    return jsonResponse(res, 200, {
-      results,
-      state: state || { last_topic: 'All', last_question_index: 0 },
-      history,
-      activity,
-      streak
-    });
+  // SAVE RESULT
+  if (req.method==='POST' && url==='/api/progress/save-result') {
+    const user = getUser(req); if (!user) return json(res,401,{error:'Unauthorized'});
+    const {questionId,topic,status,score} = await readBody(req);
+    db = loadDB();
+    const ex = db.question_results.find(r=>r.user_id===user.userId&&r.question_id===questionId);
+    if (ex) { ex.status=status; ex.score=score||0; ex.updated_at=nowSec(); }
+    else db.question_results.push({user_id:user.userId,question_id:questionId,topic,status,score:score||0,updated_at:nowSec()});
+    db.sessions.push({user_id:user.userId,question_id:questionId,topic,score:score||0,status,created_at:nowSec()});
+    const t=today(); const act=db.activity.find(a=>a.user_id===user.userId&&a.date===t);
+    if (act) act.questions_answered++; else db.activity.push({user_id:user.userId,date:t,questions_answered:1});
+    saveDB(db);
+    return json(res,200,{ok:true});
   }
 
-  // ── STREAMING GRADE ─────────────────────────────────────────────────────────
-  if (req.method === 'POST' && url === '/api/grade') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      const parsed = JSON.parse(body);
-      parsed.stream = true;
+  // SAVE STATE
+  if (req.method==='POST' && url==='/api/progress/save-state') {
+    const user = getUser(req); if (!user) return json(res,401,{error:'Unauthorized'});
+    const {topic,questionIndex} = await readBody(req);
+    db = loadDB();
+    const ex = db.user_state.find(s=>s.user_id===user.userId);
+    if (ex) { ex.last_topic=topic||'All'; ex.last_question_index=questionIndex||0; ex.updated_at=nowSec(); }
+    else db.user_state.push({user_id:user.userId,last_topic:topic||'All',last_question_index:questionIndex||0,updated_at:nowSec()});
+    saveDB(db);
+    return json(res,200,{ok:true});
+  }
 
-      const options = {
-        hostname: 'api.anthropic.com',
-        path: '/v1/messages',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-          'anthropic-version': '2023-06-01',
-        }
-      };
+  // LOAD PROGRESS
+  if (req.method==='GET' && url==='/api/progress/load') {
+    const user = getUser(req); if (!user) return json(res,401,{error:'Unauthorized'});
+    db = loadDB();
+    const results = db.question_results.filter(r=>r.user_id===user.userId).map(r=>({question_id:r.question_id,status:r.status,score:r.score}));
+    const stateRow = db.user_state.find(s=>s.user_id===user.userId);
+    const state = stateRow ? {last_topic:stateRow.last_topic,last_question_index:stateRow.last_question_index} : {last_topic:'All',last_question_index:0};
+    const history = db.sessions.filter(s=>s.user_id===user.userId).sort((a,b)=>b.created_at-a.created_at).slice(0,50);
+    const activity = db.activity.filter(a=>a.user_id===user.userId).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,84);
+    const actDates = new Set(activity.map(a=>a.date));
+    let streak=0;
+    for (let i=0;i<365;i++) { const d=new Date(); d.setDate(d.getDate()-i); const ds=d.toISOString().slice(0,10); if(actDates.has(ds))streak++; else if(i>0)break; }
+    return json(res,200,{results,state,history,activity,streak});
+  }
 
-      res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Access-Control-Allow-Origin': '*',
-        'Connection': 'keep-alive',
+  // GRADE (streaming)
+  if (req.method==='POST' && url==='/api/grade') {
+    let body=''; req.on('data',c=>body+=c); req.on('end',()=>{
+      const parsed=JSON.parse(body); parsed.stream=true;
+      res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache','Access-Control-Allow-Origin':'*','Connection':'keep-alive'});
+      const apiReq=https.request({hostname:'api.anthropic.com',path:'/v1/messages',method:'POST',headers:{'Content-Type':'application/json','x-api-key':process.env.ANTHROPIC_API_KEY||'','anthropic-version':'2023-06-01'}},apiRes=>{
+        apiRes.on('data',c=>res.write(c)); apiRes.on('end',()=>res.end());
       });
-
-      const apiReq = https.request(options, apiRes => {
-        apiRes.on('data', chunk => res.write(chunk));
-        apiRes.on('end', () => res.end());
-      });
-
-      apiReq.on('error', err => {
-        res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
-        res.end();
-      });
-
-      apiReq.write(JSON.stringify(parsed));
-      apiReq.end();
-    });
-    return;
+      apiReq.on('error',err=>{res.write(`data: ${JSON.stringify({type:'error',message:err.message})}\n\n`);res.end();});
+      apiReq.write(JSON.stringify(parsed)); apiReq.end();
+    }); return;
   }
 
-  // ── SERVE STATIC FILES ───────────────────────────────────────────────────────
-  let filePath = '.' + req.url.split('?')[0];
-  if (filePath === './') filePath = './dashboard.html';
-
-  const ext = path.extname(filePath);
-  const contentType = ext === '.html' ? 'text/html'
-    : ext === '.js' ? 'application/javascript'
-    : ext === '.css' ? 'text/css'
-    : 'text/plain';
-
-  fs.readFile(filePath, (err, content) => {
+  // STATIC
+  let filePath = '.'+req.url.split('?')[0];
+  if (filePath==='./') filePath='./dashboard.html';
+  const ext=path.extname(filePath);
+  const ct=ext==='.html'?'text/html':ext==='.js'?'application/javascript':ext==='.css'?'text/css':'text/plain';
+  fs.readFile(filePath,(err,content)=>{
     if (err) { res.writeHead(404); res.end('Not found'); return; }
-    res.writeHead(200, { 'Content-Type': contentType, 'Access-Control-Allow-Origin': '*' });
+    res.writeHead(200,{'Content-Type':ct,'Access-Control-Allow-Origin':'*'});
     res.end(content);
   });
-});
 
-server.listen(PORT, () => {
-  console.log(`✓ Server running at http://localhost:${PORT}`);
-  console.log(`✓ API key: ${process.env.ANTHROPIC_API_KEY ? 'SET ✓' : 'MISSING ✗'}`);
-  console.log(`✓ DB: ${db ? 'READY ✓' : 'UNAVAILABLE ✗'}`);
+}).listen(PORT, () => {
+  console.log(`✓ Server on port ${PORT}`);
+  console.log(`✓ API key: ${process.env.ANTHROPIC_API_KEY?'SET':'MISSING'}`);
 });

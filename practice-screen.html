@@ -1174,6 +1174,7 @@
       <button class="auth-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
     </div>
     <div class="auth-error" id="authError"></div>
+    <div id="authServerStatus" style="font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:8px;"></div>
   </div>
 </div>
 
@@ -2540,13 +2541,16 @@ Grade strictly and return JSON only.`;
     const btn = document.getElementById('loginBtn');
     if (!email || !password) return showAuthError('Please fill in all fields');
     btn.disabled = true; btn.textContent = 'Signing in…';
+    showAuthError('');
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed');
+      let data;
+      const text = await res.text();
+      try { data = JSON.parse(text); } catch(e) { throw new Error('Server error: ' + text.slice(0, 100)); }
+      if (!res.ok) throw new Error(data.error || 'Login failed ('+res.status+')');
       onAuthSuccess(data.token, data.name);
     } catch(e) {
       showAuthError(e.message);
@@ -2562,13 +2566,16 @@ Grade strictly and return JSON only.`;
     const btn = document.getElementById('registerBtn');
     if (!email || !password) return showAuthError('Please fill in all fields');
     btn.disabled = true; btn.textContent = 'Creating account…';
+    showAuthError('');
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      let data;
+      const text = await res.text();
+      try { data = JSON.parse(text); } catch(e) { throw new Error('Server error: ' + text.slice(0, 100)); }
+      if (!res.ok) throw new Error(data.error || 'Registration failed ('+res.status+')');
       onAuthSuccess(data.token, data.name);
     } catch(e) {
       showAuthError(e.message);
@@ -2685,6 +2692,15 @@ Grade strictly and return JSON only.`;
       document.getElementById('authOverlay').classList.add('hidden');
       document.getElementById('userBadge').style.display = 'flex';
       document.getElementById('userDisplayName').textContent = name;
+    } else {
+      // Ping server to confirm auth endpoints are live
+      fetch('/api/ping').then(r => r.json()).then(d => {
+        document.getElementById('authServerStatus').textContent = '● Server connected';
+        document.getElementById('authServerStatus').style.color = '#4ade80';
+      }).catch(() => {
+        document.getElementById('authServerStatus').textContent = '● Server unreachable — deploy may still be starting';
+        document.getElementById('authServerStatus').style.color = 'var(--accent-red)';
+      });
     }
   })();
 
