@@ -1300,20 +1300,44 @@
               text-transform: uppercase;
               color: var(--text-tertiary);
               margin-bottom: 8px;
-            ">Live Transcript</div>
-            <!-- Committed (final) text -->
-            <span id="transcriptFinal" style="color: var(--text-primary);"></span>
-            <!-- Interim (in-progress) text -->
-            <span id="transcriptInterim" style="color: var(--text-tertiary); font-style: italic;"></span>
-            <!-- Blinking cursor while recording -->
-            <span id="transcriptCursor" style="
-              display: inline-block;
-              width: 2px; height: 1em;
-              background: var(--recording);
-              margin-left: 2px;
-              vertical-align: text-bottom;
-              animation: blink 1s step-end infinite;
-            "></span>
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            ">
+              <span id="transcriptLabel">Live Transcript</span>
+              <span id="transcriptEditHint" style="display:none; font-size:10px; color:var(--accent-blue); font-weight:500; text-transform:none; letter-spacing:0;">✏️ Click to edit</span>
+            </div>
+            <!-- Live recording view -->
+            <div id="transcriptLive">
+              <span id="transcriptFinal" style="color: var(--text-primary);"></span>
+              <span id="transcriptInterim" style="color: var(--text-tertiary); font-style: italic;"></span>
+              <span id="transcriptCursor" style="
+                display: inline-block;
+                width: 2px; height: 1em;
+                background: var(--recording);
+                margin-left: 2px;
+                vertical-align: text-bottom;
+                animation: blink 1s step-end infinite;
+              "></span>
+            </div>
+            <!-- Editable view (shown after recording stops) -->
+            <div
+              id="transcriptEditable"
+              contenteditable="false"
+              style="
+                display: none;
+                outline: none;
+                min-height: 40px;
+                white-space: pre-wrap;
+                word-break: break-word;
+                cursor: default;
+                border-radius: 4px;
+                padding: 2px 4px;
+                margin: -2px -4px;
+                transition: background 0.15s;
+              "
+              oninput="syncEditableToTranscript()"
+            ></div>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding: 0 2px;">
             <span id="transcriptWordCount" style="font-size:12px; color:var(--text-tertiary);">0 words</span>
@@ -1540,10 +1564,58 @@
     document.getElementById('transcriptWordCount').textContent = `${words} word${words !== 1 ? 's' : ''}`;
   }
 
+  function switchToEditableTranscript() {
+    const live = document.getElementById('transcriptLive');
+    const editable = document.getElementById('transcriptEditable');
+    const editHint = document.getElementById('transcriptEditHint');
+    const label = document.getElementById('transcriptLabel');
+
+    // Populate editable with the final transcript
+    editable.textContent = finalTranscript.trim();
+    editable.contentEditable = 'true';
+    editable.style.display = 'block';
+    editable.style.cursor = 'text';
+    live.style.display = 'none';
+
+    label.textContent = 'Transcript';
+    editHint.style.display = 'inline';
+
+    // Focus and highlight to invite editing
+    editable.style.background = 'rgba(37,99,235,0.04)';
+    setTimeout(() => { editable.style.background = 'transparent'; }, 1200);
+  }
+
+  function switchToLiveTranscript() {
+    const live = document.getElementById('transcriptLive');
+    const editable = document.getElementById('transcriptEditable');
+    const editHint = document.getElementById('transcriptEditHint');
+    const label = document.getElementById('transcriptLabel');
+
+    editable.contentEditable = 'false';
+    editable.style.display = 'none';
+    live.style.display = 'block';
+
+    label.textContent = 'Live Transcript';
+    editHint.style.display = 'none';
+  }
+
+  function syncEditableToTranscript() {
+    // Keep finalTranscript in sync with manual edits
+    finalTranscript = document.getElementById('transcriptEditable').textContent;
+    const words = finalTranscript.trim() ? finalTranscript.trim().split(/\s+/).length : 0;
+    document.getElementById('transcriptWordCount').textContent = `${words} word${words !== 1 ? 's' : ''}`;
+  }
+
   function clearTranscript() {
     finalTranscript = '';
     interimTranscript = '';
     updateTranscriptDisplay();
+    switchToLiveTranscript();
+    document.getElementById('transcriptWrap').style.display = 'none';
+    document.getElementById('recordStatus').textContent = 'Tap to start answering';
+    document.getElementById('recordSub').textContent = 'Speak your answer clearly — just like in a real interview';
+    document.getElementById('micIcon').innerHTML = '<path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>';
+  }
   }
 
   // ─── RECORDING ────────────────────────────────────────────
@@ -1576,6 +1648,8 @@
     if (isRecording) {
       // Clear previous transcript when starting fresh only if nothing committed yet
       interimTranscript = '';
+      // Switch back to live view if coming from edited state
+      switchToLiveTranscript();
       try {
         recognition.start();
         console.log('Recognition start called successfully');
@@ -1609,6 +1683,8 @@
         status.textContent = 'Answer recorded ✓';
         sub.textContent = 'Ready to submit — or tap to re-record';
         micIcon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+        // Switch to editable mode
+        switchToEditableTranscript();
       } else {
         status.textContent = 'Tap to start answering';
         sub.textContent = 'Speak your answer clearly — just like in a real interview';
@@ -1818,20 +1894,18 @@
     const systemPrompt = `You are a senior investment banking technical interviewer grading a candidate's answer. Be strict and precise — mastery requires a near-perfect response.
 
 Grade on exactly 3 dimensions (0-100 each):
-1. technical_accuracy — Are the facts, mechanics, and numbers correct? Any errors here are serious.
-2. completeness — Did they cover ALL the key points a perfect answer requires? Missing even one important piece should reduce this score significantly.
-3. structure — Was the answer logically organized, clear, and delivered in the right order?
+1. technical_accuracy — Are the facts, mechanics, and numbers correct?
+2. completeness — Did they cover ALL key points? Missing even one important piece should reduce this score significantly.
+3. structure — Was the answer logically organized and clear?
 
-Overall score = weighted average: technical(50%) + completeness(35%) + structure(15%).
-Round to nearest whole number.
+Overall score = weighted average: technical(50%) + completeness(35%) + structure(15%). Round to nearest whole number.
+Mastery threshold is 95. Be honest — most answers should score 60-85.
 
-Mastery threshold is 95. Be honest — most answers should score 60-85. A 95+ answer must be genuinely exceptional with nothing missing.
-
-For "correct" and "missed", be extremely specific. Reference the exact things the candidate said or failed to say. Do not be generic.
-
-For "model_answer", write the ideal complete answer an interviewer would want to hear. Be specific with numbers, mechanics, and sequencing.
-
-For "next_question", recommend the most targeted follow-up based on the specific gap identified. If they scored 95+, recommend a harder follow-on question to deepen mastery.
+Rules:
+- "correct": max 3 items. Each must be one short sentence referencing exactly what they said.
+- "missed": max 3 items. Each must be one short sentence referencing exactly what they missed or got wrong. Prefix with "Critical:" or "Minor:" as appropriate.
+- "model_answer": 2-3 sentences MAXIMUM. The essential answer only — no elaboration.
+- "next_question": one targeted follow-up based on their specific gap. If 95+, ask a harder follow-on.
 
 Respond ONLY with valid JSON, no markdown fences:
 {
@@ -1841,12 +1915,12 @@ Respond ONLY with valid JSON, no markdown fences:
     "completeness": 60,
     "structure": 80
   },
-  "correct": ["Specific thing they said that was right", "Another correct point"],
-  "missed": ["Critical: specific thing they missed or got wrong", "Minor: specific thing that was incomplete"],
-  "model_answer": "The complete ideal answer an interviewer wants to hear...",
+  "correct": ["They correctly stated X", "They mentioned Y"],
+  "missed": ["Critical: they missed X", "Minor: they didn't mention Y"],
+  "model_answer": "2-3 sentence ideal answer.",
   "next_question": {
-    "text": "The next question to ask",
-    "reason": "One sentence: exactly why this question targets their gap"
+    "text": "The follow-up question",
+    "reason": "One sentence: why this targets their gap"
   }
 }`;
 
@@ -2031,18 +2105,17 @@ Grade strictly and return JSON only.`;
     });
 
     // Correct points
-    const correct = result.correct || [];
+    const correct = (result.correct || []).slice(0, 3);
     document.getElementById('feedbackCorrect').innerHTML = correct.length
       ? correct.map(p => `<div class="feedback-point"><span class="point-icon">✅</span><span>${p}</span></div>`).join('')
       : `<div class="feedback-point"><span class="point-icon" style="color:var(--text-tertiary)">—</span><span style="color:var(--text-tertiary)">Nothing clearly correct identified.</span></div>`;
 
     // Missed points
-    const missed = result.missed || [];
+    const missed = (result.missed || []).slice(0, 3);
     document.getElementById('feedbackMissed').innerHTML = missed.length
       ? missed.map(p => {
           const isCritical = p.toLowerCase().startsWith('critical');
-          const isMinor = p.toLowerCase().startsWith('minor');
-          const icon = isCritical ? '❌' : isMinor ? '⚠️' : '❌';
+          const icon = isCritical ? '❌' : '⚠️';
           return `<div class="feedback-point"><span class="point-icon">${icon}</span><span>${p}</span></div>`;
         }).join('')
       : `<div class="feedback-point"><span class="point-icon">✅</span><span>No significant gaps — excellent answer.</span></div>`;
@@ -2151,6 +2224,7 @@ Grade strictly and return JSON only.`;
     finalTranscript = '';
     interimTranscript = '';
     updateTranscriptDisplay();
+    switchToLiveTranscript();
     document.getElementById('transcriptWrap').style.display = 'none';
     document.getElementById('transcriptCursor').style.display = 'none';
     document.getElementById('recordBtn').classList.remove('recording');
