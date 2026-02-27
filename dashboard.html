@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --surface: #FFFFFF;
+    --border: #E8E5DF;
+    --border-strong: #D4CFC6;
+    --text-primary: #1A1814;
+    --text-secondary: #6B6560;
+    --text-tertiary: #9E9890;
+    --accent-green: #16A34A;
+    --accent-amber: #D97706;
+    --accent-red: #DC2626;
+    --accent-blue: #2563EB;
+    --sidebar-width: 240px;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── SIDEBAR ─────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 10;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--text-primary);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-mark svg { width: 16px; height: 16px; }
+
+  .logo-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    letter-spacing: -0.3px;
+  }
+
+  .sidebar-nav {
+    padding: 12px 10px;
+    flex: 1;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    padding: 8px 10px 6px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    text-decoration: none;
+    margin-bottom: 1px;
+  }
+
+  .nav-item:hover { background: var(--bg); color: var(--text-primary); }
+  .nav-item.active { background: var(--bg); color: var(--text-primary); font-weight: 500; }
+  .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active svg { opacity: 1; }
+
+  .nav-badge {
+    margin-left: auto;
+    font-size: 11px;
+    background: var(--text-primary);
+    color: white;
+    padding: 1px 7px;
+    border-radius: 20px;
+  }
+
+  .nav-badge.subtle {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-tertiary);
+  }
+
+  .sidebar-bottom {
+    padding: 12px 10px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .user-card {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .user-avatar {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: white;
+    flex-shrink: 0;
+  }
+
+  .user-name { font-size: 13px; font-weight: 500; }
+  .user-plan { font-size: 11px; color: var(--text-tertiary); }
+
+  /* ── MAIN ────────────────────────────────── */
+  .main {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    min-height: 100vh;
+    padding: 40px 44px;
+    max-width: calc(100vw - var(--sidebar-width));
+  }
+
+  /* ── GREETING ────────────────────────────── */
+  .greeting-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .greeting-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .greeting-text p {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .greeting-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 7px 13px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .streak-badge .fire { font-size: 15px; }
+
+  .today-goal {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  /* ── SESSION SUMMARY BAR ─────────────────── */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 36px;
+    animation: fadeUp 0.4s ease 0.05s both;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+
+  .summary-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+  }
+
+  .summary-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+
+  .summary-card.green::after { background: var(--accent-green); }
+  .summary-card.amber::after { background: var(--accent-amber); }
+  .summary-card.blue::after { background: var(--accent-blue); }
+  .summary-card.neutral::after { background: var(--border-strong); }
+
+  .summary-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .summary-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .summary-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  /* ── SECTION HEADER ──────────────────────── */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    letter-spacing: -0.3px;
+  }
+
+  .section-link {
+    font-size: 12.5px;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color 0.15s;
+    cursor: pointer;
+  }
+
+  .section-link:hover { color: var(--text-primary); }
+
+  /* ── TOPIC CARDS GRID ────────────────────── */
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 36px;
+    animation: fadeUp 0.4s ease 0.1s both;
+  }
+
+  .topic-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 22px 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .topic-card:hover {
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(26,24,20,0.07);
+  }
+
+  .topic-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .topic-icon-wrap {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* Mastery ring */
+  .mastery-ring {
+    position: relative;
+    width: 48px; height: 48px;
+    flex-shrink: 0;
+  }
+
+  .mastery-ring svg { transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: var(--border); stroke-width: 4; }
+  .ring-fill {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 126;
+    transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ring-fill.green { stroke: var(--accent-green); }
+  .ring-fill.amber { stroke: var(--accent-amber); }
+  .ring-fill.blue { stroke: var(--accent-blue); }
+  .ring-fill.empty { stroke: var(--border); }
+
+  .ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+
+  .ring-pct {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-primary);
+  }
+
+  .topic-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    letter-spacing: -0.2px;
+    margin-bottom: 4px;
+  }
+
+  .topic-count {
+    font-size: 12.5px;
+    color: var(--text-tertiary);
+    margin-bottom: 14px;
+  }
+
+  /* Mini progress bar */
+  .topic-progress-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .topic-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .topic-progress-fill.green { background: var(--accent-green); }
+  .topic-progress-fill.amber { background: var(--accent-amber); }
+  .topic-progress-fill.blue { background: var(--accent-blue); }
+  .topic-progress-fill.empty { background: var(--border-strong); width: 0 !important; }
+
+  .topic-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topic-mastered {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  .topic-mastered strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .topic-cta {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transition: color 0.15s;
+  }
+
+  .topic-card:hover .topic-cta { color: var(--text-primary); }
+
+  /* "Start" card */
+  .topic-card.start-card {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .topic-card.start-card .topic-name { color: white; }
+  .topic-card.start-card .topic-count { color: rgba(255,255,255,0.5); }
+  .topic-card.start-card .topic-mastered { color: rgba(255,255,255,0.5); }
+  .topic-card.start-card .topic-mastered strong { color: white; }
+  .topic-card.start-card .topic-cta { color: rgba(255,255,255,0.6); }
+  .topic-card.start-card:hover .topic-cta { color: white; }
+  .topic-card.start-card .topic-progress-track { background: rgba(255,255,255,0.15); }
+  .topic-card.start-card .ring-track { stroke: rgba(255,255,255,0.15); }
+  .topic-card.start-card .ring-pct { color: white; }
+
+  /* ── ACTIVITY + RECOMMENDED ROW ──────────── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 36px;
+    animation: fadeUp 0.4s ease 0.15s both;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-title {
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  .panel-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+
+  /* Activity heatmap */
+  .activity-body { padding: 16px 20px; }
+
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .heatmap-col { display: flex; flex-direction: column; gap: 4px; }
+
+  .heat-cell {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 3px;
+    background: var(--border);
+    transition: background 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .heat-cell:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    color: white;
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .heat-cell.l1 { background: #D1FAE5; }
+  .heat-cell.l2 { background: #6EE7B7; }
+  .heat-cell.l3 { background: #10B981; }
+  .heat-cell.l4 { background: #065F46; }
+
+  .heatmap-months {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 4px;
+  }
+
+  .month-label {
+    font-size: 9px;
+    color: var(--text-tertiary);
+    text-align: center;
+  }
+
+  .heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    justify-content: flex-end;
+  }
+
+  .legend-label { font-size: 10px; color: var(--text-tertiary); }
+  .legend-cell {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    background: var(--border);
+  }
+
+  .legend-cell.l1 { background: #D1FAE5; }
+  .legend-cell.l2 { background: #6EE7B7; }
+  .legend-cell.l3 { background: #10B981; }
+  .legend-cell.l4 { background: #065F46; }
+
+  /* Recommended questions */
+  .rec-list { }
+
+  .rec-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .rec-item:last-child { border-bottom: none; }
+  .rec-item:hover { background: var(--bg); }
+
+  .rec-priority {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .rec-priority.high { background: var(--accent-red); }
+  .rec-priority.mid { background: var(--accent-amber); }
+  .rec-priority.low { background: var(--accent-green); }
+
+  .rec-content { flex: 1; }
+
+  .rec-q {
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+  }
+
+  .rec-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .rec-tag {
+    font-size: 10.5px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .rec-tag.accounting { background: #EFF6FF; color: #2563EB; }
+  .rec-tag.valuation { background: #F0FDF4; color: #16A34A; }
+  .rec-tag.lbo { background: #FFF7ED; color: #C2410C; }
+  .rec-tag.ma { background: #FDF4FF; color: #9333EA; }
+
+  .rec-reason {
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+
+  .rec-arrow {
+    flex-shrink: 0;
+    color: var(--text-tertiary);
+    transition: color 0.15s;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+
+  .rec-item:hover .rec-arrow { color: var(--text-primary); }
+
+  /* ── RECENT SESSION ───────────────────────── */
+  .recent-section {
+    animation: fadeUp 0.4s ease 0.2s both;
+    margin-bottom: 36px;
+  }
+
+  .session-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 8px;
+  }
+
+  .session-row:hover {
+    border-color: var(--border-strong);
+    transform: translateX(2px);
+  }
+
+  .session-date {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .session-topic {
+    flex: 1;
+  }
+
+  .session-topic-name {
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .session-topic-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  .session-stats-row {
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  .session-stat {
+    text-align: center;
+  }
+
+  .session-stat-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+  }
+
+  .session-stat-label {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .session-score-pill {
+    padding: 5px 14px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .session-score-pill.high { background: #D1FAE5; color: #065F46; }
+  .session-score-pill.mid { background: #FEF3C7; color: #92400E; }
+  .session-score-pill.low { background: #FEE2E2; color: #991B1B; }
+
+  /* ── ANIMATIONS ───────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ───────────────────────────── */
+  @media (max-width: 1100px) {
+    .topics-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 900px) {
+    .summary-bar { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 24px 20px; }
+    .topics-grid { grid-template-columns: 1fr; }
+    .summary-bar { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none">
+        <path d="M8 2L13 5V11L8 14L3 11V5L8 2Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="8" cy="8" r="2" fill="white"/>
+      </svg>
+    </div>
+    <span class="logo-name">Apex</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item active" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Performance
+    </a>
+
+    <div class="nav-section-label" style="margin-top:10px;">Practice</div>
+    <a class="nav-item" href="practice-screen.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Practice
+      <span class="nav-badge">7 left</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      Saved Questions
+    </a>
+
+    <div class="nav-section-label" style="margin-top:10px;">Topics</div>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Accounting
+      <span class="nav-badge subtle">12/29</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      Valuation
+      <span class="nav-badge subtle">3/49</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Mergers & Acquisitions
+      <span class="nav-badge subtle">0/75</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Leveraged Buyouts
+      <span class="nav-badge subtle">0/76</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">CK</div>
+      <div>
+        <div class="user-name">Chris Karimi</div>
+        <div class="user-plan">Free plan · <a href="#" style="color:var(--accent-blue);text-decoration:none;font-size:11px;">Upgrade</a></div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- GREETING -->
+  <div class="greeting-row">
+    <div class="greeting-text">
+      <h1 id="greetingText">Good morning, Chris.</h1>
+      <p id="greetingSubtext">You have 7 questions left in today's session.</p>
+    </div>
+    <div class="greeting-meta">
+      <div class="streak-badge">
+        <span class="fire">🔥</span>
+        <span>3-day streak</span>
+      </div>
+      <div class="today-goal">Goal: 10 questions · 3 done</div>
+    </div>
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="summary-bar">
+    <div class="summary-card green">
+      <div class="summary-label">Questions Mastered</div>
+      <div class="summary-value">15</div>
+      <div class="summary-sub">of 229 total · +4 this week</div>
+    </div>
+    <div class="summary-card amber">
+      <div class="summary-label">Avg. Score</div>
+      <div class="summary-value">71<span style="font-size:16px;color:var(--text-tertiary)">/100</span></div>
+      <div class="summary-sub">↑ 6pts from last session</div>
+    </div>
+    <div class="summary-card blue">
+      <div class="summary-label">Weakest Area</div>
+      <div class="summary-value" style="font-size:20px;padding-top:4px;">Cash Flow</div>
+      <div class="summary-sub">Missed add-backs 3x this week</div>
+    </div>
+    <div class="summary-card neutral">
+      <div class="summary-label">Sessions</div>
+      <div class="summary-value">12</div>
+      <div class="summary-sub">Across 3 topics · 4h 20m total</div>
+    </div>
+  </div>
+
+  <!-- TOPIC MASTERY -->
+  <div class="section-header">
+    <h2 class="section-title">Topic Mastery</h2>
+    <span class="section-link">View all topics →</span>
+  </div>
+
+  <div class="topics-grid" id="topicsGrid">
+
+    <!-- Accounting -->
+    <a class="topic-card" href="practice-screen.html">
+      <div class="topic-card-top">
+        <div>
+          <div class="topic-name">Accounting</div>
+          <div class="topic-count">29 questions · 12 mastered</div>
+        </div>
+        <div class="mastery-ring">
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle class="ring-track" cx="24" cy="24" r="20"/>
+            <circle class="ring-fill amber" cx="24" cy="24" r="20" id="ring-accounting" style="stroke-dashoffset: 67"/>
+          </svg>
+          <div class="ring-center"><span class="ring-pct">41%</span></div>
+        </div>
+      </div>
+      <div class="topic-progress-track">
+        <div class="topic-progress-fill amber" style="width:41%"></div>
+      </div>
+      <div class="topic-footer">
+        <div class="topic-mastered"><strong>12</strong> / 29 mastered</div>
+        <div class="topic-cta">Continue <span>→</span></div>
+      </div>
+    </a>
+
+    <!-- Valuation -->
+    <a class="topic-card" href="#">
+      <div class="topic-card-top">
+        <div>
+          <div class="topic-name">Valuation</div>
+          <div class="topic-count">49 questions · 3 mastered</div>
+        </div>
+        <div class="mastery-ring">
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle class="ring-track" cx="24" cy="24" r="20"/>
+            <circle class="ring-fill blue" cx="24" cy="24" r="20" style="stroke-dashoffset: 118"/>
+          </svg>
+          <div class="ring-center"><span class="ring-pct">6%</span></div>
+        </div>
+      </div>
+      <div class="topic-progress-track">
+        <div class="topic-progress-fill blue" style="width:6%"></div>
+      </div>
+      <div class="topic-footer">
+        <div class="topic-mastered"><strong>3</strong> / 49 mastered</div>
+        <div class="topic-cta">Start <span>→</span></div>
+      </div>
+    </a>
+
+    <!-- M&A -->
+    <a class="topic-card" href="#">
+      <div class="topic-card-top">
+        <div>
+          <div class="topic-name">Mergers & Acquisitions</div>
+          <div class="topic-count">75 questions · 0 mastered</div>
+        </div>
+        <div class="mastery-ring">
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle class="ring-track" cx="24" cy="24" r="20"/>
+            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
+          </svg>
+          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
+        </div>
+      </div>
+      <div class="topic-progress-track">
+        <div class="topic-progress-fill empty" style="width:0%"></div>
+      </div>
+      <div class="topic-footer">
+        <div class="topic-mastered"><strong>0</strong> / 75 mastered</div>
+        <div class="topic-cta">Begin <span>→</span></div>
+      </div>
+    </a>
+
+    <!-- LBOs -->
+    <a class="topic-card" href="#">
+      <div class="topic-card-top">
+        <div>
+          <div class="topic-name">Leveraged Buyouts</div>
+          <div class="topic-count">76 questions · 0 mastered</div>
+        </div>
+        <div class="mastery-ring">
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle class="ring-track" cx="24" cy="24" r="20"/>
+            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
+          </svg>
+          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
+        </div>
+      </div>
+      <div class="topic-progress-track">
+        <div class="topic-progress-fill empty"></div>
+      </div>
+      <div class="topic-footer">
+        <div class="topic-mastered"><strong>0</strong> / 76 mastered</div>
+        <div class="topic-cta">Begin <span>→</span></div>
+      </div>
+    </a>
+
+    <!-- DCF / Valuation Deep Dive -->
+    <a class="topic-card" href="#">
+      <div class="topic-card-top">
+        <div>
+          <div class="topic-name">Capital Markets</div>
+          <div class="topic-count">105 questions · 0 mastered</div>
+        </div>
+        <div class="mastery-ring">
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle class="ring-track" cx="24" cy="24" r="20"/>
+            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
+          </svg>
+          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
+        </div>
+      </div>
+      <div class="topic-progress-track">
+        <div class="topic-progress-fill empty"></div>
+      </div>
+      <div class="topic-footer">
+        <div class="topic-mastered"><strong>0</strong> / 105 mastered</div>
+        <div class="topic-cta">Begin <span>→</span></div>
+      </div>
+    </a>
+
+    <!-- Resume / Today's Focus — dark CTA card -->
+    <a class="topic-card start-card" href="practice-screen.html">
+      <div>
+        <div style="font-size:22px;margin-bottom:10px;">🎯</div>
+        <div class="topic-name" style="margin-bottom:6px;">Today's Focus</div>
+        <div class="topic-count">Cash Flow Statement · Your weakest area</div>
+      </div>
+      <div>
+        <div class="topic-progress-track" style="margin-bottom:12px;">
+          <div class="topic-progress-fill" style="width:41%;background:rgba(255,255,255,0.4)"></div>
+        </div>
+        <div class="topic-footer">
+          <div class="topic-mastered"><strong style="color:white;">7</strong> questions queued</div>
+          <div class="topic-cta" style="font-weight:600;font-size:13px;">Practice now →</div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ACTIVITY + RECOMMENDED -->
+  <div class="two-col">
+
+    <!-- Activity heatmap -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Practice Activity</span>
+        <span class="panel-label">Past 12 weeks</span>
+      </div>
+      <div class="activity-body">
+        <div class="heatmap-grid" id="heatmap"></div>
+        <div class="heatmap-months" id="heatmapMonths"></div>
+        <div class="heatmap-legend">
+          <span class="legend-label">Less</span>
+          <div class="legend-cell"></div>
+          <div class="legend-cell l1"></div>
+          <div class="legend-cell l2"></div>
+          <div class="legend-cell l3"></div>
+          <div class="legend-cell l4"></div>
+          <span class="legend-label">More</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommended questions -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Recommended for You</span>
+        <span class="panel-label">Based on your gaps</span>
+      </div>
+      <div class="rec-list">
+        <div class="rec-item" onclick="window.location='practice-screen.html'">
+          <div class="rec-priority high"></div>
+          <div class="rec-content">
+            <div class="rec-q">Walk me through the cash flow statement from net income to FCF.</div>
+            <div class="rec-meta">
+              <span class="rec-tag accounting">Accounting</span>
+              <span class="rec-reason">Missed 3x this week</span>
+            </div>
+          </div>
+          <div class="rec-arrow">→</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-priority high"></div>
+          <div class="rec-content">
+            <div class="rec-q">What's the difference between enterprise value and equity value?</div>
+            <div class="rec-meta">
+              <span class="rec-tag valuation">Valuation</span>
+              <span class="rec-reason">Not yet attempted</span>
+            </div>
+          </div>
+          <div class="rec-arrow">→</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-priority mid"></div>
+          <div class="rec-content">
+            <div class="rec-q">Walk me through a DCF. What are its key limitations?</div>
+            <div class="rec-meta">
+              <span class="rec-tag valuation">Valuation</span>
+              <span class="rec-reason">Scored 54 last time</span>
+            </div>
+          </div>
+          <div class="rec-arrow">→</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-priority low"></div>
+          <div class="rec-content">
+            <div class="rec-q">What are the main ways to value a company?</div>
+            <div class="rec-meta">
+              <span class="rec-tag valuation">Valuation</span>
+              <span class="rec-reason">Good to reinforce</span>
+            </div>
+          </div>
+          <div class="rec-arrow">→</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RECENT SESSIONS -->
+  <div class="recent-section">
+    <div class="section-header">
+      <h2 class="section-title">Recent Sessions</h2>
+      <span class="section-link">View history →</span>
+    </div>
+
+    <div class="session-row">
+      <div class="session-date">Today<br><span style="font-size:11px;color:var(--text-tertiary)">Feb 26</span></div>
+      <div class="session-topic">
+        <div class="session-topic-name">Accounting · Three Statements</div>
+        <div class="session-topic-sub">5 questions answered · Voice mode</div>
+      </div>
+      <div class="session-stats-row">
+        <div class="session-stat">
+          <div class="session-stat-val">68</div>
+          <div class="session-stat-label">Avg Score</div>
+        </div>
+        <div class="session-stat">
+          <div class="session-stat-val">3</div>
+          <div class="session-stat-label">Mastered</div>
+        </div>
+        <div class="session-stat">
+          <div class="session-stat-val">22m</div>
+          <div class="session-stat-label">Duration</div>
+        </div>
+      </div>
+      <div class="session-score-pill mid">68/100</div>
+    </div>
+
+    <div class="session-row">
+      <div class="session-date">Yesterday<br><span style="font-size:11px;color:var(--text-tertiary)">Feb 25</span></div>
+      <div class="session-topic">
+        <div class="session-topic-name">Accounting · Income Statement</div>
+        <div class="session-topic-sub">8 questions answered · Text mode</div>
+      </div>
+      <div class="session-stats-row">
+        <div class="session-stat">
+          <div class="session-stat-val">74</div>
+          <div class="session-stat-label">Avg Score</div>
+        </div>
+        <div class="session-stat">
+          <div class="session-stat-val">5</div>
+          <div class="session-stat-label">Mastered</div>
+        </div>
+        <div class="session-stat">
+          <div class="session-stat-val">31m</div>
+          <div class="session-stat-label">Duration</div>
+        </div>
+      </div>
+      <div class="session-score-pill mid">74/100</div>
+    </div>
+
+    <div class="session-row">
+      <div class="session-date">Feb 24<br><span style="font-size:11px;color:var(--text-tertiary)">Mon</span></div>
+      <div class="session-topic">
+        <div class="session-topic-name">Valuation · DCF Fundamentals</div>
+        <div class="session-topic-sub">3 questions answered · Voice mode</div>
+      </div>
+      <div class="session-stats-row">
+        <div class="session-stat">
+          <div class="session-stat-val">54</div>
+          <div class="session-stat-label">Avg Score</div>
+        </div>
+        <div class="session-stat">
+          <div class="session-stat-val">1</div>
+          <div class="session-stat-label">Mastered</div>
+        </div>
+        <div class="session-stat">
+          <div class="session-stat-val">14m</div>
+          <div class="session-stat-label">Duration</div>
+        </div>
+      </div>
+      <div class="session-score-pill low">54/100</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ── GREETING ─────────────────────────────────────────────
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greetingText').textContent = `${greet}, Chris.`;
+
+  // ── HEATMAP ───────────────────────────────────────────────
+  const months = ['Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
+  const heatmapEl = document.getElementById('heatmap');
+  const monthsEl = document.getElementById('heatmapMonths');
+
+  // Generate 12 weeks × 7 days = 84 cells
+  const data = Array.from({length: 12}, (_, wi) =>
+    Array.from({length: 7}, (_, di) => {
+      // simulate activity — more recent = more activity
+      const rand = Math.random();
+      const recency = wi / 12;
+      if (wi < 4) return rand > 0.85 ? 1 : 0;
+      if (wi < 8) return rand > 0.7 ? (rand > 0.85 ? 2 : 1) : 0;
+      return rand > 0.5 ? (rand > 0.75 ? (rand > 0.9 ? 4 : 3) : 2) : 0;
+    })
+  );
+
+  data.forEach((week, wi) => {
+    const col = document.createElement('div');
+    col.className = 'heatmap-col';
+    week.forEach((level, di) => {
+      const cell = document.createElement('div');
+      cell.className = `heat-cell${level > 0 ? ` l${level}` : ''}`;
+      const qs = level === 0 ? 'No questions' : level === 1 ? '1–3 questions' : level === 2 ? '4–7 questions' : level === 3 ? '8–12 questions' : '13+ questions';
+      cell.setAttribute('data-tip', qs);
+      col.appendChild(cell);
+    });
+    heatmapEl.appendChild(col);
+  });
+
+  months.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'month-label';
+    el.textContent = m;
+    monthsEl.appendChild(el);
+  });
+
+  // ── ANIMATE RINGS ON LOAD ─────────────────────────────────
+  // Ring circumference for r=20: 2π×20 ≈ 126
+  // stroke-dashoffset = 126 × (1 - pct)
+  // Already set inline, but animate from 126 to final value
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.ring-fill').forEach(ring => {
+      const target = ring.style.strokeDashoffset;
+      ring.style.strokeDashoffset = '126';
+      setTimeout(() => { ring.style.strokeDashoffset = target; }, 100);
+    });
+    document.querySelectorAll('.topic-progress-fill').forEach(bar => {
+      const target = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(() => { bar.style.width = target; }, 100);
+    });
+  });
+</script>
+
+</body>
+</html>
