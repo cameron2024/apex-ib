@@ -689,8 +689,36 @@
 
   .feedback-point strong { color: var(--text-primary); font-weight: 600; }
 
+  /* MODEL ANSWER TOGGLE */
+  .model-answer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 18px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    width: fit-content;
+  }
+  .model-answer-toggle:hover {
+    background: var(--bg);
+    color: var(--text-primary);
+  }
+  .model-answer-toggle.open {
+    color: var(--text-primary);
+    background: var(--bg);
+  }
+
   /* MODEL ANSWER BOX */
   .model-answer-box {
+    margin-top: 10px;
     background: #F8F7F4;
     border: 1px solid var(--border);
     border-left: 3px solid var(--text-primary);
@@ -699,12 +727,14 @@
     font-size: 13.5px;
     line-height: 1.7;
     color: var(--text-primary);
+    animation: slideUp 0.2s ease;
   }
 
-  /* NEXT QUESTION / ACTIONS */
+  /* NEXT QUESTION — hero */
   .next-section {
-    padding: 18px 24px;
+    padding: 20px 24px;
     background: #FAFAF8;
+    border-bottom: 1px solid var(--border);
   }
 
   .next-label {
@@ -713,10 +743,10 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-tertiary);
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
 
   .next-label-badge {
@@ -735,22 +765,24 @@
   .next-q-preview {
     background: var(--surface);
     border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-blue);
     border-radius: var(--radius-sm);
-    padding: 14px 16px;
+    padding: 16px 18px;
     margin-bottom: 14px;
   }
 
   .next-q-text {
     font-family: 'DM Serif Display', serif;
-    font-size: 15px;
+    font-size: 16px;
     color: var(--text-primary);
-    margin-bottom: 5px;
+    margin-bottom: 7px;
     line-height: 1.4;
   }
 
   .next-q-reason {
     font-size: 12px;
     color: var(--text-tertiary);
+    line-height: 1.5;
   }
 
   .next-actions {
@@ -1528,24 +1560,11 @@
         </div>
       </div>
 
-      <!-- FEEDBACK BODY -->
-      <div class="feedback-body" id="feedbackBody">
-
-        <div class="feedback-section-title">What you got right</div>
-        <div class="feedback-points" id="feedbackCorrect"></div>
-
-        <div class="feedback-section-title" style="margin-top:18px;">What you missed or got wrong</div>
-        <div class="feedback-points" id="feedbackMissed"></div>
-
-        <div class="feedback-section-title" style="margin-top:18px;">Model answer</div>
-        <div class="model-answer-box" id="modelAnswer"></div>
-
-      </div>
-
-      <!-- NEXT QUESTION / ACTIONS -->
+      <!-- NEXT QUESTION — hero section -->
       <div class="next-section" id="nextSection">
         <div class="next-label">
-          Recommended next
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Drill this next
           <span class="next-label-badge" id="nextBadge">Targeting your gap</span>
         </div>
         <div class="next-q-preview" id="nextQPreview">
@@ -1565,6 +1584,24 @@
             ★ Mark as Mastered
           </button>
         </div>
+      </div>
+
+      <!-- FEEDBACK BODY -->
+      <div class="feedback-body" id="feedbackBody">
+
+        <div class="feedback-section-title">What you got right</div>
+        <div class="feedback-points" id="feedbackCorrect"></div>
+
+        <div class="feedback-section-title" style="margin-top:18px;">What you missed or got wrong</div>
+        <div class="feedback-points" id="feedbackMissed"></div>
+
+        <!-- MODEL ANSWER — collapsed by default -->
+        <button class="model-answer-toggle" id="modelAnswerToggle" onclick="toggleModelAnswer()">
+          <span id="modelAnswerToggleIcon">▶</span>
+          Show model answer
+        </button>
+        <div class="model-answer-box" id="modelAnswer" style="display:none"></div>
+
       </div>
 
     </div>
@@ -2114,14 +2151,18 @@ Grade strictly and return JSON only.`;
     document.getElementById('verdictBadge').style.opacity = '0.5';
     document.getElementById('feedbackCorrect').innerHTML = '<div class="feedback-point" style="color:var(--text-tertiary)"><span class="point-icon">·</span><span>Analyzing your answer…</span></div>';
     document.getElementById('feedbackMissed').innerHTML = '<div class="feedback-point" style="color:var(--text-tertiary)"><span class="point-icon">·</span><span>Identifying gaps…</span></div>';
-    document.getElementById('modelAnswer').textContent = 'Generating model answer…';
+    document.getElementById('modelAnswer').textContent = '';
+    document.getElementById('modelAnswer').style.display = 'none';
+    document.getElementById('modelAnswerToggle').textContent = '';
+    document.getElementById('modelAnswerToggle').innerHTML = '<span>▶</span> Show model answer';
+    document.getElementById('modelAnswerToggle').classList.remove('open');
     document.getElementById('nextQText').textContent = 'Selecting next question…';
     document.getElementById('nextQReason').textContent = '';
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function tryStreamRender(text) {
-    // Stream model_answer as it types in
+    // Silently populate model answer (hidden until user toggles it)
     const maMatch = text.match(/"model_answer"\s*:\s*"((?:[^"\\]|\\.)*)"/);
     if (maMatch) {
       document.getElementById('modelAnswer').textContent = maMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
@@ -2236,8 +2277,11 @@ Grade strictly and return JSON only.`;
         }).join('')
       : `<div class="feedback-point"><span class="point-icon">✅</span><span>No significant gaps — excellent answer.</span></div>`;
 
-    // Model answer
+    // Model answer — populate but keep hidden until user toggles
     document.getElementById('modelAnswer').textContent = result.model_answer || '';
+    document.getElementById('modelAnswer').style.display = 'none';
+    document.getElementById('modelAnswerToggle').innerHTML = '<span>▶</span> Show model answer';
+    document.getElementById('modelAnswerToggle').classList.remove('open');
 
     // Next question
     if (result.next_question) {
@@ -2282,6 +2326,21 @@ Grade strictly and return JSON only.`;
   }
 
   // ─── MASTERY ─────────────────────────────────────────────
+  function toggleModelAnswer() {
+    const box = document.getElementById('modelAnswer');
+    const btn = document.getElementById('modelAnswerToggle');
+    const isOpen = box.style.display !== 'none';
+    if (isOpen) {
+      box.style.display = 'none';
+      btn.innerHTML = '<span>▶</span> Show model answer';
+      btn.classList.remove('open');
+    } else {
+      box.style.display = 'block';
+      btn.innerHTML = '<span>▼</span> Hide model answer';
+      btn.classList.add('open');
+    }
+  }
+
   function markMastered() {
     showMasteryCelebration();
     document.getElementById('btnMarkMastered').textContent = '★ Marked as Mastered';
@@ -2384,9 +2443,24 @@ Grade strictly and return JSON only.`;
     'LBO': 'LBO'
   };
 
+  // Smart ordering: missed → partial → unattempted → mastered
+  function smartOrder(questions) {
+    const rank = q => {
+      const s = sessionResults[q.id];
+      if (s === 'missed')  return 0;
+      if (s === 'partial') return 1;
+      if (!s)              return 2;
+      return 3; // mastered — review at end
+    };
+    const tiers = [[], [], [], []];
+    questions.forEach(q => tiers[rank(q)].push(q));
+    tiers.forEach(t => t.sort(() => Math.random() - 0.5));
+    return [...tiers[0], ...tiers[1], ...tiers[2], ...tiers[3]];
+  }
+
   function getFilteredQuestions(topic) {
-    if (topic === 'All') return [...QUESTION_BANK];
-    return QUESTION_BANK.filter(q => q.topic === topic);
+    const base = topic === 'All' ? [...QUESTION_BANK] : QUESTION_BANK.filter(q => q.topic === topic);
+    return smartOrder(base);
   }
 
   function selectTopic(topic) {
@@ -2405,10 +2479,7 @@ Grade strictly and return JSON only.`;
     document.getElementById('breadcrumbTopic').textContent = label;
     document.getElementById('topbarTopicPill').textContent = label;
 
-    // Reset session results for new topic
-    sessionResults = {};
-
-    // Load first question
+    // Preserve sessionResults — do NOT wipe progress on topic switch
     loadQuestionAt(0);
     updateProgressUI();
   }
@@ -2511,16 +2582,27 @@ Grade strictly and return JSON only.`;
 
   // ─── INIT ─────────────────────────────────────────────────
   (function init() {
+    // Set auth state FIRST before anything else runs
     const token = localStorage.getItem('apex_token');
-    if (token) {
-      // loadProgressFromServer will handle topic/position restoration
+    const name = localStorage.getItem('apex_user');
+    if (token && name) {
+      authToken = token;
+      currentUser = name;
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('userBadge').style.display = 'flex';
+      document.getElementById('userDisplayName').textContent = name;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const topicParam = params.get('topic');
+    const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
+    const startTopic = validTopics.includes(topicParam) ? topicParam : 'All';
+
+    if (authToken) {
+      // Logged in: fetch progress first, then render with smart ordering
       loadProgressFromServer();
     } else {
-      // Not logged in — load default view, modal is already showing
-      const params = new URLSearchParams(window.location.search);
-      const topicParam = params.get('topic');
-      const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
-      const startTopic = validTopics.includes(topicParam) ? topicParam : 'All';
+      // Not logged in: render immediately, show auth modal if not already dismissed
       selectTopic(startTopic);
     }
   })();
@@ -2628,21 +2710,31 @@ Grade strictly and return JSON only.`;
         });
       }
 
-      // Restore last topic + position (URL param overrides saved state)
+      // Re-run selectTopic now that sessionResults is populated — this triggers smart ordering
       const params = new URLSearchParams(window.location.search);
       const topicParam = params.get('topic');
       const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
+
       if (topicParam && validTopics.includes(topicParam)) {
+        // URL param takes priority — re-order with progress and start from top
         selectTopic(topicParam);
       } else if (data.state) {
         const savedTopic = validTopics.includes(data.state.last_topic) ? data.state.last_topic : 'All';
         selectTopic(savedTopic);
-        loadQuestionAt(data.state.last_question_index || 0);
+        // Don't restore question index — smart ordering puts most important question first
+      } else {
+        selectTopic(currentTopic);
       }
 
       updateProgressUI();
     } catch(e) {
       console.log('Progress load error:', e.message);
+      // Fallback: show questions even if progress fetch fails
+      const params = new URLSearchParams(window.location.search);
+      const topicParam = params.get('topic');
+      const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
+      const fallbackTopic = validTopics.includes(topicParam) ? topicParam : 'All';
+      selectTopic(fallbackTopic);
     }
   }
 
@@ -2684,26 +2776,16 @@ Grade strictly and return JSON only.`;
   }
 
   // ── Boot: check for saved token ─────────────────────────────
-  (function checkAuth() {
-    const token = localStorage.getItem('apex_token');
-    const name = localStorage.getItem('apex_user');
-    if (token && name) {
-      authToken = token;
-      currentUser = name;
-      document.getElementById('authOverlay').classList.add('hidden');
-      document.getElementById('userBadge').style.display = 'flex';
-      document.getElementById('userDisplayName').textContent = name;
-    } else {
-      // Ping server to confirm auth endpoints are live
-      fetch('/api/ping').then(r => r.json()).then(d => {
-        document.getElementById('authServerStatus').textContent = '● Server connected';
-        document.getElementById('authServerStatus').style.color = '#4ade80';
-      }).catch(() => {
-        document.getElementById('authServerStatus').textContent = '● Server unreachable — deploy may still be starting';
-        document.getElementById('authServerStatus').style.color = 'var(--accent-red)';
-      });
-    }
-  })();
+  // Ping server to show connection status in auth modal (only needed when not logged in)
+  if (!localStorage.getItem('apex_token')) {
+    fetch('/api/ping').then(r => r.json()).then(() => {
+      const el = document.getElementById('authServerStatus');
+      if (el) { el.textContent = '● Server connected'; el.style.color = '#4ade80'; }
+    }).catch(() => {
+      const el = document.getElementById('authServerStatus');
+      if (el) { el.textContent = '● Server unreachable — deploy may still be starting'; el.style.color = 'var(--accent-red)'; }
+    });
+  }
 
 </script>
 
