@@ -1581,6 +1581,11 @@
 
 <script>
   let currentMode = 'voice';
+
+  // ─── AUTH STATE (must be at top — referenced by init) ─────
+  let authToken = null;
+  let currentUser = null;
+  let saveStateTimer = null;
   let isRecording = false;
   let recordingTimer = null;
   let feedbackStyle = 'coach';
@@ -2521,10 +2526,6 @@ Grade strictly and return JSON only.`;
   })();
 
   // ─── AUTH & PROGRESS ──────────────────────────────────────
-
-  let authToken = null;
-  let currentUser = null;
-  let saveStateTimer = null;
 
   // ── Auth Modal ──────────────────────────────────────────────
   function switchAuthTab(tab) {
