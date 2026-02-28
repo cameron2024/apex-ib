@@ -767,9 +767,9 @@
 
   <div class="sidebar-bottom">
     <div class="user-card">
-      <div class="user-avatar">CK</div>
+      <div class="user-avatar" id="userAvatar">?</div>
       <div>
-        <div class="user-name">Chris Karimi</div>
+        <div class="user-name" id="sidebarUserName">Loading…</div>
         <div class="user-plan">Free plan · <a href="#" style="color:var(--accent-blue);text-decoration:none;font-size:11px;">Upgrade</a></div>
       </div>
     </div>
@@ -782,15 +782,15 @@
   <!-- GREETING -->
   <div class="greeting-row">
     <div class="greeting-text">
-      <h1 id="greetingText">Good morning, Chris.</h1>
-      <p id="greetingSubtext">You have 7 questions left in today's session.</p>
+      <h1 id="greetingText">Good morning.</h1>
+      <p id="greetingSubtext">Loading your progress…</p>
     </div>
     <div class="greeting-meta">
       <div class="streak-badge">
         <span class="fire">🔥</span>
-        <span>3-day streak</span>
+        <span id="streakText">— day streak</span>
       </div>
-      <div class="today-goal">Goal: 10 questions · 3 done</div>
+      <div class="today-goal" id="todayGoal">Loading…</div>
     </div>
   </div>
 
@@ -798,23 +798,23 @@
   <div class="summary-bar">
     <div class="summary-card green">
       <div class="summary-label">Questions Mastered</div>
-      <div class="summary-value">15</div>
-      <div class="summary-sub">of 229 total · +4 this week</div>
+      <div class="summary-value" id="statMastered">—</div>
+      <div class="summary-sub" id="statMasteredSub">of 188 total</div>
     </div>
     <div class="summary-card amber">
       <div class="summary-label">Avg. Score</div>
-      <div class="summary-value">71<span style="font-size:16px;color:var(--text-tertiary)">/100</span></div>
-      <div class="summary-sub">↑ 6pts from last session</div>
+      <div class="summary-value" id="statAvgScore">—<span style="font-size:16px;color:var(--text-tertiary)">/100</span></div>
+      <div class="summary-sub" id="statAvgScoreSub">No sessions yet</div>
     </div>
     <div class="summary-card blue">
       <div class="summary-label">Weakest Area</div>
-      <div class="summary-value" style="font-size:20px;padding-top:4px;">Cash Flow</div>
-      <div class="summary-sub">Missed add-backs 3x this week</div>
+      <div class="summary-value" id="statWeakest" style="font-size:20px;padding-top:4px;">—</div>
+      <div class="summary-sub" id="statWeakestSub">Based on your scores</div>
     </div>
     <div class="summary-card neutral">
       <div class="summary-label">Sessions</div>
-      <div class="summary-value">12</div>
-      <div class="summary-sub">Across 3 topics · 4h 20m total</div>
+      <div class="summary-value" id="statSessions">—</div>
+      <div class="summary-sub" id="statSessionsSub">Total questions answered</div>
     </div>
   </div>
 
@@ -825,151 +825,7 @@
   </div>
 
   <div class="topics-grid" id="topicsGrid">
-
-    <!-- Accounting -->
-    <a class="topic-card" href="practice-screen.html?topic=Accounting">
-      <div class="topic-card-top">
-        <div>
-          <div class="topic-name">Accounting</div>
-          <div class="topic-count">42 questions</div>
-        </div>
-        <div class="mastery-ring">
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <circle class="ring-track" cx="24" cy="24" r="20"/>
-            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
-          </svg>
-          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
-        </div>
-      </div>
-      <div class="topic-progress-track">
-        <div class="topic-progress-fill empty" style="width:0%"></div>
-      </div>
-      <div class="topic-footer">
-        <div class="topic-mastered"><strong>0</strong> / 42 mastered</div>
-        <div class="topic-cta">Begin <span>→</span></div>
-      </div>
-    </a>
-
-    <!-- Enterprise Value -->
-    <a class="topic-card" href="practice-screen.html?topic=Enterprise_Value">
-      <div class="topic-card-top">
-        <div>
-          <div class="topic-name">Enterprise Value</div>
-          <div class="topic-count">12 questions</div>
-        </div>
-        <div class="mastery-ring">
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <circle class="ring-track" cx="24" cy="24" r="20"/>
-            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
-          </svg>
-          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
-        </div>
-      </div>
-      <div class="topic-progress-track">
-        <div class="topic-progress-fill empty" style="width:0%"></div>
-      </div>
-      <div class="topic-footer">
-        <div class="topic-mastered"><strong>0</strong> / 12 mastered</div>
-        <div class="topic-cta">Begin <span>→</span></div>
-      </div>
-    </a>
-
-    <!-- Valuation -->
-    <a class="topic-card" href="practice-screen.html?topic=Valuation">
-      <div class="topic-card-top">
-        <div>
-          <div class="topic-name">Valuation</div>
-          <div class="topic-count">38 questions</div>
-        </div>
-        <div class="mastery-ring">
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <circle class="ring-track" cx="24" cy="24" r="20"/>
-            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
-          </svg>
-          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
-        </div>
-      </div>
-      <div class="topic-progress-track">
-        <div class="topic-progress-fill empty" style="width:0%"></div>
-      </div>
-      <div class="topic-footer">
-        <div class="topic-mastered"><strong>0</strong> / 38 mastered</div>
-        <div class="topic-cta">Begin <span>→</span></div>
-      </div>
-    </a>
-
-    <!-- DCF -->
-    <a class="topic-card" href="practice-screen.html?topic=DCF">
-      <div class="topic-card-top">
-        <div>
-          <div class="topic-name">DCF</div>
-          <div class="topic-count">27 questions</div>
-        </div>
-        <div class="mastery-ring">
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <circle class="ring-track" cx="24" cy="24" r="20"/>
-            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
-          </svg>
-          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
-        </div>
-      </div>
-      <div class="topic-progress-track">
-        <div class="topic-progress-fill empty" style="width:0%"></div>
-      </div>
-      <div class="topic-footer">
-        <div class="topic-mastered"><strong>0</strong> / 27 mastered</div>
-        <div class="topic-cta">Begin <span>→</span></div>
-      </div>
-    </a>
-
-    <!-- M&A -->
-    <a class="topic-card" href="practice-screen.html?topic=Mergers_MA">
-      <div class="topic-card-top">
-        <div>
-          <div class="topic-name">Mergers & Acquisitions</div>
-          <div class="topic-count">41 questions</div>
-        </div>
-        <div class="mastery-ring">
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <circle class="ring-track" cx="24" cy="24" r="20"/>
-            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
-          </svg>
-          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
-        </div>
-      </div>
-      <div class="topic-progress-track">
-        <div class="topic-progress-fill empty" style="width:0%"></div>
-      </div>
-      <div class="topic-footer">
-        <div class="topic-mastered"><strong>0</strong> / 41 mastered</div>
-        <div class="topic-cta">Begin <span>→</span></div>
-      </div>
-    </a>
-
-    <!-- LBO -->
-    <a class="topic-card" href="practice-screen.html?topic=LBO">
-      <div class="topic-card-top">
-        <div>
-          <div class="topic-name">Leveraged Buyouts</div>
-          <div class="topic-count">28 questions</div>
-        </div>
-        <div class="mastery-ring">
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <circle class="ring-track" cx="24" cy="24" r="20"/>
-            <circle class="ring-fill empty" cx="24" cy="24" r="20" style="stroke-dashoffset: 126"/>
-          </svg>
-          <div class="ring-center"><span class="ring-pct" style="color:var(--text-tertiary)">0%</span></div>
-        </div>
-      </div>
-      <div class="topic-progress-track">
-        <div class="topic-progress-fill empty" style="width:0%"></div>
-      </div>
-      <div class="topic-footer">
-        <div class="topic-mastered"><strong>0</strong> / 28 mastered</div>
-        <div class="topic-cta">Begin <span>→</span></div>
-      </div>
-    </a>
-
+    <!-- populated by JS -->
   </div>
 
   <!-- ACTIVITY + RECOMMENDED -->
@@ -1058,138 +914,288 @@
       <h2 class="section-title">Recent Sessions</h2>
       <span class="section-link">View history →</span>
     </div>
-
-    <div class="session-row">
-      <div class="session-date">Today<br><span style="font-size:11px;color:var(--text-tertiary)">Feb 26</span></div>
-      <div class="session-topic">
-        <div class="session-topic-name">Accounting · Three Statements</div>
-        <div class="session-topic-sub">5 questions answered · Voice mode</div>
-      </div>
-      <div class="session-stats-row">
-        <div class="session-stat">
-          <div class="session-stat-val">68</div>
-          <div class="session-stat-label">Avg Score</div>
-        </div>
-        <div class="session-stat">
-          <div class="session-stat-val">3</div>
-          <div class="session-stat-label">Mastered</div>
-        </div>
-        <div class="session-stat">
-          <div class="session-stat-val">22m</div>
-          <div class="session-stat-label">Duration</div>
-        </div>
-      </div>
-      <div class="session-score-pill mid">68/100</div>
-    </div>
-
-    <div class="session-row">
-      <div class="session-date">Yesterday<br><span style="font-size:11px;color:var(--text-tertiary)">Feb 25</span></div>
-      <div class="session-topic">
-        <div class="session-topic-name">Accounting · Income Statement</div>
-        <div class="session-topic-sub">8 questions answered · Text mode</div>
-      </div>
-      <div class="session-stats-row">
-        <div class="session-stat">
-          <div class="session-stat-val">74</div>
-          <div class="session-stat-label">Avg Score</div>
-        </div>
-        <div class="session-stat">
-          <div class="session-stat-val">5</div>
-          <div class="session-stat-label">Mastered</div>
-        </div>
-        <div class="session-stat">
-          <div class="session-stat-val">31m</div>
-          <div class="session-stat-label">Duration</div>
-        </div>
-      </div>
-      <div class="session-score-pill mid">74/100</div>
-    </div>
-
-    <div class="session-row">
-      <div class="session-date">Feb 24<br><span style="font-size:11px;color:var(--text-tertiary)">Mon</span></div>
-      <div class="session-topic">
-        <div class="session-topic-name">Valuation · DCF Fundamentals</div>
-        <div class="session-topic-sub">3 questions answered · Voice mode</div>
-      </div>
-      <div class="session-stats-row">
-        <div class="session-stat">
-          <div class="session-stat-val">54</div>
-          <div class="session-stat-label">Avg Score</div>
-        </div>
-        <div class="session-stat">
-          <div class="session-stat-val">1</div>
-          <div class="session-stat-label">Mastered</div>
-        </div>
-        <div class="session-stat">
-          <div class="session-stat-val">14m</div>
-          <div class="session-stat-label">Duration</div>
-        </div>
-      </div>
-      <div class="session-score-pill low">54/100</div>
+    <div id="sessionsList">
+      <!-- populated by JS -->
     </div>
   </div>
 
 </main>
 
 <script>
-  // ── GREETING ─────────────────────────────────────────────
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('greetingText').textContent = `${greet}, Chris.`;
+  // ── TOPIC DEFINITIONS ────────────────────────────────────
+  const TOPICS = [
+    { key: 'Accounting',      label: 'Accounting',            total: 42 },
+    { key: 'Enterprise_Value',label: 'Enterprise Value',      total: 12 },
+    { key: 'Valuation',       label: 'Valuation',             total: 38 },
+    { key: 'DCF',             label: 'DCF',                   total: 27 },
+    { key: 'Mergers_MA',      label: 'Mergers & Acquisitions',total: 41 },
+    { key: 'LBO',             label: 'Leveraged Buyouts',     total: 28 },
+  ];
+  const TOTAL_QS = TOPICS.reduce((s, t) => s + t.total, 0);
+
+  // ── GREETING ──────────────────────────────────────────────
+  function setGreeting(name) {
+    const h = new Date().getHours();
+    const period = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+    const first = name ? name.split(' ')[0] : '';
+    document.getElementById('greetingText').textContent =
+      `Good ${period}${first ? ', ' + first : ''}.`;
+  }
+
+  // ── TOPIC CARDS ───────────────────────────────────────────
+  function buildTopicCards(masteredByTopic) {
+    const grid = document.getElementById('topicsGrid');
+    grid.innerHTML = '';
+    TOPICS.forEach(t => {
+      const mastered = masteredByTopic[t.key] || 0;
+      const pct = Math.round((mastered / t.total) * 100);
+      const offset = Math.round(126 * (1 - pct / 100));
+      const ringClass = pct >= 80 ? 'ring-fill high' : pct >= 40 ? 'ring-fill mid' : pct > 0 ? 'ring-fill low' : 'ring-fill empty';
+      const barClass = pct > 0 ? 'topic-progress-fill' : 'topic-progress-fill empty';
+      const cta = mastered === 0 ? 'Begin' : mastered === t.total ? 'Review' : 'Continue';
+
+      const card = document.createElement('a');
+      card.className = 'topic-card';
+      card.href = `practice-screen.html?topic=${t.key}`;
+      card.innerHTML = `
+        <div class="topic-card-top">
+          <div>
+            <div class="topic-name">${t.label}</div>
+            <div class="topic-count">${t.total} questions</div>
+          </div>
+          <div class="mastery-ring">
+            <svg width="48" height="48" viewBox="0 0 48 48">
+              <circle class="ring-track" cx="24" cy="24" r="20"/>
+              <circle class="${ringClass}" cx="24" cy="24" r="20" style="stroke-dashoffset:${offset}"/>
+            </svg>
+            <div class="ring-center"><span class="ring-pct"${pct === 0 ? ' style="color:var(--text-tertiary)"' : ''}>${pct}%</span></div>
+          </div>
+        </div>
+        <div class="topic-progress-track">
+          <div class="${barClass}" style="width:${pct}%"></div>
+        </div>
+        <div class="topic-footer">
+          <div class="topic-mastered"><strong>${mastered}</strong> / ${t.total} mastered</div>
+          <div class="topic-cta">${cta} <span>→</span></div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  // ── SESSION HISTORY ───────────────────────────────────────
+  function buildSessionsList(history) {
+    const el = document.getElementById('sessionsList');
+    if (!history || history.length === 0) {
+      el.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-tertiary);font-size:13px;">No sessions yet — start practicing to see your history here.</div>`;
+      return;
+    }
+    // Group by day, show last 5 days of activity
+    const byDay = {};
+    history.forEach(s => {
+      const d = new Date(s.created_at * 1000);
+      const key = d.toISOString().slice(0, 10);
+      if (!byDay[key]) byDay[key] = [];
+      byDay[key].push(s);
+    });
+
+    const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+    el.innerHTML = Object.entries(byDay).slice(0, 5).map(([date, sessions]) => {
+      const avgScore = Math.round(sessions.reduce((s, r) => s + r.score, 0) / sessions.length);
+      const mastered = sessions.filter(s => s.status === 'mastered').length;
+      const scoreClass = avgScore >= 85 ? 'high' : avgScore >= 65 ? 'mid' : 'low';
+      const topicCounts = {};
+      sessions.forEach(s => { topicCounts[s.topic] = (topicCounts[s.topic] || 0) + 1; });
+      const topTopic = Object.entries(topicCounts).sort((a,b) => b[1]-a[1])[0];
+      const topicLabel = TOPICS.find(t => t.key === topTopic[0])?.label || topTopic[0];
+
+      const d = new Date(date);
+      const dayLabel = date === today ? 'Today' : date === yesterday ? 'Yesterday'
+        : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dayShort = date === today ? '' : date === yesterday ? ''
+        : d.toLocaleDateString('en-US', { weekday: 'short' });
+
+      return `<div class="session-row">
+        <div class="session-date">${dayLabel}${dayShort ? `<br><span style="font-size:11px;color:var(--text-tertiary)">${dayShort}</span>` : ''}</div>
+        <div class="session-topic">
+          <div class="session-topic-name">${topicLabel}</div>
+          <div class="session-topic-sub">${sessions.length} question${sessions.length !== 1 ? 's' : ''} answered</div>
+        </div>
+        <div class="session-stats-row">
+          <div class="session-stat"><div class="session-stat-val">${avgScore}</div><div class="session-stat-label">Avg Score</div></div>
+          <div class="session-stat"><div class="session-stat-val">${mastered}</div><div class="session-stat-label">Mastered</div></div>
+        </div>
+        <div class="session-score-pill ${scoreClass}">${avgScore}/100</div>
+      </div>`;
+    }).join('');
+  }
 
   // ── HEATMAP ───────────────────────────────────────────────
-  const months = ['Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
-  const heatmapEl = document.getElementById('heatmap');
-  const monthsEl = document.getElementById('heatmapMonths');
+  function buildHeatmap(activityData) {
+    const heatmapEl = document.getElementById('heatmap');
+    const monthsEl = document.getElementById('heatmapMonths');
+    heatmapEl.innerHTML = '';
+    monthsEl.innerHTML = '';
 
-  // Generate 12 weeks × 7 days = 84 cells
-  const data = Array.from({length: 12}, (_, wi) =>
-    Array.from({length: 7}, (_, di) => {
-      // simulate activity — more recent = more activity
-      const rand = Math.random();
-      const recency = wi / 12;
-      if (wi < 4) return rand > 0.85 ? 1 : 0;
-      if (wi < 8) return rand > 0.7 ? (rand > 0.85 ? 2 : 1) : 0;
-      return rand > 0.5 ? (rand > 0.75 ? (rand > 0.9 ? 4 : 3) : 2) : 0;
-    })
-  );
+    // Build lookup: date -> questions_answered
+    const actMap = {};
+    (activityData || []).forEach(a => { actMap[a.date] = a.questions_answered; });
 
-  data.forEach((week, wi) => {
-    const col = document.createElement('div');
-    col.className = 'heatmap-col';
-    week.forEach((level, di) => {
-      const cell = document.createElement('div');
-      cell.className = `heat-cell${level > 0 ? ` l${level}` : ''}`;
-      const qs = level === 0 ? 'No questions' : level === 1 ? '1–3 questions' : level === 2 ? '4–7 questions' : level === 3 ? '8–12 questions' : '13+ questions';
-      cell.setAttribute('data-tip', qs);
-      col.appendChild(cell);
+    // 12 weeks × 7 days, ending today
+    const now = new Date();
+    const weeks = [];
+    for (let w = 11; w >= 0; w--) {
+      const week = [];
+      for (let d = 6; d >= 0; d--) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - (w * 7 + d));
+        const key = date.toISOString().slice(0, 10);
+        const count = actMap[key] || 0;
+        const level = count === 0 ? 0 : count <= 3 ? 1 : count <= 7 ? 2 : count <= 12 ? 3 : 4;
+        week.push({ level, count, date: key });
+      }
+      weeks.push(week);
+    }
+
+    weeks.forEach((week, wi) => {
+      const col = document.createElement('div');
+      col.className = 'heatmap-col';
+      week.forEach(({ level, count, date }) => {
+        const cell = document.createElement('div');
+        cell.className = `heat-cell${level > 0 ? ` l${level}` : ''}`;
+        const tip = count === 0 ? 'No questions' : `${count} question${count !== 1 ? 's' : ''}`;
+        cell.setAttribute('data-tip', `${date}: ${tip}`);
+        col.appendChild(cell);
+      });
+      heatmapEl.appendChild(col);
     });
-    heatmapEl.appendChild(col);
-  });
 
-  months.forEach(m => {
-    const el = document.createElement('div');
-    el.className = 'month-label';
-    el.textContent = m;
-    monthsEl.appendChild(el);
-  });
+    // Month labels
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - (11 - i) * 7);
+      const el = document.createElement('div');
+      el.className = 'month-label';
+      el.textContent = months[d.getMonth()];
+      monthsEl.appendChild(el);
+    }
+  }
 
-  // ── ANIMATE RINGS ON LOAD ─────────────────────────────────
-  // Ring circumference for r=20: 2π×20 ≈ 126
-  // stroke-dashoffset = 126 × (1 - pct)
-  // Already set inline, but animate from 126 to final value
-  window.addEventListener('load', () => {
-    document.querySelectorAll('.ring-fill').forEach(ring => {
-      const target = ring.style.strokeDashoffset;
-      ring.style.strokeDashoffset = '126';
-      setTimeout(() => { ring.style.strokeDashoffset = target; }, 100);
-    });
-    document.querySelectorAll('.topic-progress-fill').forEach(bar => {
-      const target = bar.style.width;
-      bar.style.width = '0%';
-      setTimeout(() => { bar.style.width = target; }, 100);
-    });
-  });
+  // ── SUMMARY STATS ─────────────────────────────────────────
+  function buildSummary(results, history, streak) {
+    const mastered = results.filter(r => r.status === 'mastered').length;
+    document.getElementById('statMastered').textContent = mastered;
+    document.getElementById('statMasteredSub').textContent = `of ${TOTAL_QS} total`;
+
+    if (history && history.length > 0) {
+      const avgScore = Math.round(history.reduce((s, r) => s + r.score, 0) / history.length);
+      document.getElementById('statAvgScore').innerHTML = `${avgScore}<span style="font-size:16px;color:var(--text-tertiary)">/100</span>`;
+      document.getElementById('statAvgScoreSub').textContent = `Across ${history.length} answers`;
+
+      // Weakest topic = lowest avg score among topics with ≥3 attempts
+      const topicScores = {};
+      history.forEach(s => {
+        if (!topicScores[s.topic]) topicScores[s.topic] = [];
+        topicScores[s.topic].push(s.score);
+      });
+      const weakest = Object.entries(topicScores)
+        .filter(([, scores]) => scores.length >= 3)
+        .map(([topic, scores]) => ({ topic, avg: scores.reduce((a,b)=>a+b,0)/scores.length }))
+        .sort((a,b) => a.avg - b.avg)[0];
+      if (weakest) {
+        const label = TOPICS.find(t => t.key === weakest.topic)?.label || weakest.topic;
+        document.getElementById('statWeakest').textContent = label;
+        document.getElementById('statWeakestSub').textContent = `Avg score: ${Math.round(weakest.avg)}/100`;
+      } else {
+        document.getElementById('statWeakest').textContent = '—';
+        document.getElementById('statWeakestSub').textContent = 'Answer 3+ questions per topic';
+      }
+
+      const totalSessions = new Set(history.map(s => new Date(s.created_at * 1000).toISOString().slice(0,10))).size;
+      document.getElementById('statSessions').textContent = totalSessions;
+      document.getElementById('statSessionsSub').textContent = `${history.length} total answers`;
+    }
+
+    // Streak
+    document.getElementById('streakText').textContent = `${streak || 0}-day streak`;
+
+    // Subtext
+    const todayCount = (history || []).filter(s => {
+      const d = new Date(s.created_at * 1000).toISOString().slice(0,10);
+      return d === new Date().toISOString().slice(0,10);
+    }).length;
+    document.getElementById('greetingSubtext').textContent = todayCount > 0
+      ? `${todayCount} question${todayCount !== 1 ? 's' : ''} answered today. Keep going.`
+      : `Ready to practice? Pick a topic below.`;
+    document.getElementById('todayGoal').textContent = `${todayCount} answered today`;
+  }
+
+  // ── BOOT ──────────────────────────────────────────────────
+  async function init() {
+    const token = localStorage.getItem('apex_token');
+    const name = localStorage.getItem('apex_user');
+
+    // Set user identity immediately from localStorage
+    if (name) {
+      setGreeting(name);
+      const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      document.getElementById('userAvatar').textContent = initials;
+      document.getElementById('sidebarUserName').textContent = name;
+    } else {
+      setGreeting('');
+    }
+
+    // Build empty state immediately so page isn't blank
+    buildTopicCards({});
+    buildHeatmap([]);
+    buildSummary([], [], 0);
+    buildSessionsList([]);
+
+    // Fetch live progress if logged in
+    if (token) {
+      try {
+        const res = await fetch('/api/progress/load', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (res.ok) {
+          const data = await res.json();
+
+          // Build mastered count per topic
+          const masteredByTopic = {};
+          (data.results || []).forEach(r => {
+            if (r.status === 'mastered') {
+              masteredByTopic[r.topic] = (masteredByTopic[r.topic] || 0) + 1;
+            }
+          });
+
+          buildTopicCards(masteredByTopic);
+          buildHeatmap(data.activity || []);
+          buildSummary(data.results || [], data.history || [], data.streak || 0);
+          buildSessionsList(data.history || []);
+        }
+      } catch(e) {
+        console.log('Progress load error:', e.message);
+      }
+    }
+
+    // Animate rings after render
+    setTimeout(() => {
+      document.querySelectorAll('.ring-fill').forEach(ring => {
+        const target = ring.style.strokeDashoffset;
+        ring.style.strokeDashoffset = '126';
+        setTimeout(() => { ring.style.strokeDashoffset = target; }, 50);
+      });
+      document.querySelectorAll('.topic-progress-fill').forEach(bar => {
+        const target = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.width = target; }, 50);
+      });
+    }, 100);
+  }
+
+  init();
 </script>
 
 </body>
