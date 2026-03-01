@@ -479,80 +479,102 @@
     color: var(--text-tertiary);
   }
 
-  /* Activity heatmap */
-  .activity-body { padding: 16px 20px; }
+  /* Weak spots panel */
+  .weak-spot-list { }
 
-  .heatmap-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 4px;
-    margin-bottom: 10px;
-  }
-
-  .heatmap-col { display: flex; flex-direction: column; gap: 4px; }
-
-  .heat-cell {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 3px;
-    background: var(--border);
-    transition: background 0.2s;
-    cursor: pointer;
-    position: relative;
-  }
-
-  .heat-cell:hover::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: calc(100% + 4px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--text-primary);
-    color: white;
-    font-size: 10px;
-    padding: 3px 7px;
-    border-radius: 4px;
-    white-space: nowrap;
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .heat-cell.l1 { background: #D1FAE5; }
-  .heat-cell.l2 { background: #6EE7B7; }
-  .heat-cell.l3 { background: #10B981; }
-  .heat-cell.l4 { background: #065F46; }
-
-  .heatmap-months {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 4px;
-  }
-
-  .month-label {
-    font-size: 9px;
-    color: var(--text-tertiary);
-    text-align: center;
-  }
-
-  .heatmap-legend {
+  .weak-spot-item {
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin-top: 10px;
-    justify-content: flex-end;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
   }
 
-  .legend-label { font-size: 10px; color: var(--text-tertiary); }
-  .legend-cell {
-    width: 10px; height: 10px;
-    border-radius: 2px;
-    background: var(--border);
+  .weak-spot-item:last-child { border-bottom: none; }
+  .weak-spot-item:hover { background: var(--bg); }
+
+  .weak-spot-rank {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
   }
 
-  .legend-cell.l1 { background: #D1FAE5; }
-  .legend-cell.l2 { background: #6EE7B7; }
-  .legend-cell.l3 { background: #10B981; }
-  .legend-cell.l4 { background: #065F46; }
+  .weak-spot-rank.rank-1 { background: #FFF1F2; border-color: #FECDD3; color: var(--accent-red); }
+  .weak-spot-rank.rank-2 { background: #FFF7ED; border-color: #FED7AA; color: var(--accent-amber); }
+  .weak-spot-rank.rank-3 { background: #FEFCE8; border-color: #FEF08A; color: #CA8A04; }
+
+  .weak-spot-body { flex: 1; min-width: 0; }
+
+  .weak-spot-q {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .weak-spot-meta {
+    display: flex; align-items: center; gap: 7px;
+  }
+
+  .weak-spot-score {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  .weak-spot-score.bad   { background: #FFF1F2; color: var(--accent-red); }
+  .weak-spot-score.mid   { background: #FFF7ED; color: var(--accent-amber); }
+  .weak-spot-score.unseen { background: var(--bg); color: var(--text-tertiary); border: 1px solid var(--border); }
+
+  .weak-spot-label { font-size: 11px; color: var(--text-tertiary); }
+
+  .weak-spot-arrow {
+    color: var(--text-tertiary);
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .weak-spot-empty {
+    padding: 28px 20px;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .weak-spot-drill-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .weak-spot-drill-btn:hover { opacity: 0.85; }
 
   /* Recommended questions */
   .rec-list { }
@@ -749,7 +771,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard
     </a>
-    <a class="nav-item" href="#">
+    <a class="nav-item" href="performance.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Performance
     </a>
@@ -759,7 +781,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
       Practice All
     </a>
-    <a class="nav-item" href="#">
+    <a class="nav-item" href="saved-questions.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
       Saved Questions
     </a>
@@ -858,24 +880,14 @@
   <!-- ACTIVITY + RECOMMENDED -->
   <div class="two-col">
 
-    <!-- Activity heatmap -->
+    <!-- Weak Spots -->
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">Practice Activity</span>
-        <span class="panel-label">Past 12 weeks</span>
+        <span class="panel-title">Weak Spots</span>
+        <a href="performance.html" class="panel-label" style="text-decoration:none;color:var(--accent-blue);">View all →</a>
       </div>
-      <div class="activity-body">
-        <div class="heatmap-grid" id="heatmap"></div>
-        <div class="heatmap-months" id="heatmapMonths"></div>
-        <div class="heatmap-legend">
-          <span class="legend-label">Less</span>
-          <div class="legend-cell"></div>
-          <div class="legend-cell l1"></div>
-          <div class="legend-cell l2"></div>
-          <div class="legend-cell l3"></div>
-          <div class="legend-cell l4"></div>
-          <span class="legend-label">More</span>
-        </div>
+      <div class="weak-spot-list" id="weakSpotList">
+        <div class="weak-spot-empty">Loading…</div>
       </div>
     </div>
 
@@ -959,6 +971,9 @@
     { key: 'LBO',             label: 'Leveraged Buyouts',     total: 28 },
   ];
   const TOTAL_QS = TOPICS.reduce((s, t) => s + t.total, 0);
+
+  // Compact question text lookup for weak spots panel
+  const Q_TEXT = {"acc_basic_001": "Walk me through the 3 financial statements.", "acc_basic_002": "Can you give examples of major line items on each of the financial statements?", "acc_basic_003": "How do the 3 statements link together?", "acc_basic_004": "If I were stranded on a desert island, only had 1 statement and I wanted to revi", "acc_basic_005": "Let\u2019s say I could only look at 2 statements to assess a company\u2019s prospects \u2013 wh", "acc_basic_006": "Walk me through how Depreciation going up by $10 would affect the statements.", "acc_basic_007": "If Depreciation is a non-cash expense, why does it affect the cash balance?", "acc_basic_009": "What happens when Accrued Compensation goes up by $10?", "acc_basic_010": "What happens when Inventory goes up by $10, assuming you pay for it with cash? N", "acc_basic_011": "Why is the Income Statement not affected by changes in Inventory?", "acc_basic_012": "Let\u2019s say Apple is buying $100 worth of new iPod factories with debt. How are al", "acc_basic_013": "Now let\u2019s go out 1 year, to the start of Year 2. Assume the debt is high-yield s", "acc_basic_014": "At the start of Year 3, the factories all break down and the value of the equipm", "acc_basic_015": "Now let\u2019s look at a different scenario and assume Apple is ordering $10 of addit", "acc_basic_016": "Now let\u2019s say they sell the iPods for revenue of $20, at a cost of $10. Walk me ", "acc_basic_018": "What is working capital? How is it used? Working Capital = Current Assets \u2013 Curr", "acc_basic_020": "Recently, banks have been writing down their assets and taking huge quarterly lo", "acc_basic_021": "Walk me through a $100 \u201cbailout\u201d of a company and how it affects the 3 statement", "acc_basic_022": "Walk me through a $100 write-down of debt \u2013 as in OWED debt, a liability \u2013 on a ", "acc_basic_027": "What\u2019s the difference between cash-based and accrual accounting? Cash-based acco", "acc_basic_028": "Let\u2019s say a customer pays for a TV with a credit card. What would this look like", "acc_basic_029": "How do you decide when to capitalize rather than expense a purchase? If the asse", "acc_basic_030": "Why do companies report both GAAP and non-GAAP (or \u201cPro Forma\u201d) earnings? These ", "acc_basic_032": "Normally Goodwill remains constant on the Balance Sheet \u2013 why would it be impair", "acc_adv_004": "Walk me through how you create an expense model for a company. To do a true bott", "acc_adv_005": "Let\u2019s say we\u2019re trying to create these models but don\u2019t have enough information ", "acc_adv_006": "Walk me through the major items in Shareholders\u2019 Equity. Common items include: \u2022", "acc_adv_007": "Walk me through what flows into Retained Earnings. Retained Earnings = Old Retai", "acc_adv_009": "What is the Statement of Shareholders\u2019 Equity and why do we use it? This stateme", "acc_adv_010": "What are examples of non-recurring charges we need to add back to a company\u2019s EB", "acc_adv_011": "How do you project Balance Sheet items like Accounts Receivable and Accrued Expe", "acc_adv_013": "How do Net Operating Losses (NOLs) affect a company\u2019s 3 statements? The \u201cquick a", "acc_adv_014": "What\u2019s the difference between capital leases and operating leases? Operating lea", "acc_adv_015": "Why would the Depreciation & Amortization number on the Income Statement be diff", "acc_adv_001": "Why do we look at both Enterprise Value and Equity Value? Enterprise Value repre", "acc_adv_003": "What\u2019s the formula for Enterprise Value? EV = Equity Value + Debt + Preferred St", "ev_basic_005": "How do you calculate fully diluted shares? Take the basic share count and add in", "ev_basic_006": "Let\u2019s say a company has 100 shares outstanding, at a share price of $10 each. It", "ev_basic_008": "Why do you subtract cash in the formula for Enterprise Value? Is that always acc", "ev_basic_009": "Is it always accurate to add Debt to Equity Value when calculating Enterprise Va", "ev_basic_013": "How do you account for convertible bonds in the Enterprise Value formula? If the", "ev_basic_014": "A company has 1 million shares outstanding at a value of $100 per share. It also", "ev_basic_015": "What\u2019s the difference between Equity Value and Shareholders\u2019 Equity? Equity Valu", "ev_basic_001": "Are there any problems with the Enterprise Value formula you just gave me? Yes \u2013", "ev_adv_003": "What percentage dilution in Equity Value is \u201ctoo high?\u201d There\u2019s no strict \u201crule\u201d", "ev_adv_002": "Rank the 3 valuation methodologies from highest to lowest expected value. Trick ", "ev_adv_004": "What other Valuation methodologies are there? Other methodologies include: \u2022", "val_basic_005": "When would you use a Liquidation Valuation?", "val_basic_006": "When would you use Sum of the Parts?", "val_basic_007": "When do you use an LBO Analysis as part of your Valuation? Obviously you use thi", "val_basic_008": "What are the most common multiples used in Valuation?", "val_basic_009": "What are some examples of industry-specific multiples? Technology (Internet): EV", "val_basic_010": "When you\u2019re looking at an industry-specific multiple like EV / Scientists or EV ", "val_basic_011": "Would an LBO or DCF give a higher valuation? Technically it could go either way,", "val_basic_012": "How would you present these Valuation methodologies to a company or its investor", "val_basic_013": "How would you value an apple tree? The same way you would value a company: by lo", "val_basic_014": "Why can\u2019t you use Equity Value / EBITDA as a multiple rather than Enterprise Val", "val_basic_015": "When would a Liquidation Valuation produce the highest value?", "val_basic_016": "Let\u2019s go back to 2004 and look at Facebook back when it had no profit and no rev", "val_basic_017": "What would you use in conjunction with Free Cash Flow multiples \u2013 Equity Value o", "val_basic_018": "You never use Equity Value / EBITDA, but are there any cases where you might use", "val_basic_003": "Geography For Precedent Transactions, you often limit the set based on date and ", "val_basic_020": "How do you apply the 3 valuation methodologies to actually get a value for the c", "val_basic_021": "What do you actually use a valuation for? Usually you use it in pitch books and ", "val_basic_022": "Why would a company with similar growth and profitability to its Comparable Comp", "val_basic_023": "What are the flaws with public company comparables? \u2022 No company is 100% compara", "val_basic_026": "You mentioned that Precedent Transactions usually produce a higher value than Co", "val_basic_027": "What are some flaws with precedent transactions? \u2022 Past transactions are rarely ", "val_basic_029": "Why does Warren Buffett prefer EBIT multiples to EBITDA multiples? Warren Buffet", "val_basic_030": "The EV / EBIT, EV / EBITDA, and P / E multiples all measure a company\u2019s profitab", "val_basic_031": "If you were buying a vending machine business, would you pay a higher multiple f", "val_basic_032": "How do you value a private company?", "val_basic_033": "Let\u2019s say we\u2019re valuing a private company. Why might we discount the public comp", "val_basic_034": "Can you use private companies as part of your valuation? Only in the context of ", "val_basic_001": "How do you value banks and financial institutions differently from other compani", "val_adv_003": "I\u2019m looking at financial data for a public company comparable, and it\u2019s April (Q", "val_adv_004": "Get the medians for each set, and then apply them to your company\u2019s current shar", "val_adv_006": "Both M&A premiums analysis and precedent transactions involve looking at previou", "val_adv_007": "Walk me through a Sum-of-the-Parts analysis. In a Sum-of-the-Parts analysis, you", "val_adv_002": "In an acquisition scenario, use Section 382 and multiply the adjusted long-term ", "val_adv_012": "I have one company with a 40% EBITDA margin trading at 8x EBITDA, and another co", "val_adv_013": "Walk me through how we might value an oil & gas company and how it\u2019s different f", "val_adv_014": "Walk me through how we would value a REIT (Real Estate Investment Trust) and how", "val_adv_001": "Walk me through a DCF.", "dcf_basic_006": "How do you calculate WACC? The formula is: Cost of Equity * (% Equity) + Cost of", "dcf_basic_007": "How do you calculate the Cost of Equity? Cost of Equity = Risk-Free Rate + Beta ", "dcf_basic_008": "How do you get to Beta in the Cost of Equity calculation? You look up the Beta f", "dcf_basic_009": "Why do you have to un-lever and re-lever Beta? Again, keep in mind our \u201capples-t", "dcf_basic_012": "If you use Levered Free Cash Flow, what should you use as the Discount Rate?", "dcf_basic_013": "How do you calculate the Terminal Value?", "dcf_basic_014": "Why would you use Gordon Growth rather than the Multiples Method to calculate th", "dcf_basic_015": "What\u2019s an appropriate growth rate to use when calculating the Terminal Value? No", "dcf_basic_016": "How do you select the appropriate exit multiple when calculating Terminal Value?", "dcf_basic_018": "What\u2019s the flaw with basing terminal multiples on what public company comparable", "dcf_basic_019": "How do you know if your DCF is too dependent on future assumptions? The \u201cstandar", "dcf_basic_021": "What about WACC \u2013 will it be higher for a $5 billion or $500 million company?", "dcf_basic_023": "Cost of Equity tells us what kind of return an equity investor can expect for in", "dcf_basic_024": "How can we calculate Cost of Equity WITHOUT using CAPM? There is an alternate fo", "dcf_basic_025": "Two companies are exactly the same, but one has debt and one does not \u2013 which on", "dcf_basic_027": "What about a 1% change in revenue vs. a 1% change in the discount rate?", "dcf_basic_028": "How do you calculate WACC for a private company?", "dcf_basic_029": "What should you do if you don\u2019t believe management\u2019s projections for a DCF model", "dcf_basic_030": "Why would you not use a DCF for a bank or other financial institution? Banks use", "dcf_basic_031": "What types of sensitivity analyses would we look at in a DCF? Example sensitivit", "dcf_basic_032": "A company has a high debt load and is paying off a significant portion of its pr", "dcf_basic_001": "Explain why we would use the mid-year convention in a DCF.", "dcf_basic_002": "What discount period numbers would I use for the mid-year convention if I have a", "dcf_basic_003": "How does the terminal value calculation change when we use the mid-year conventi", "dcf_adv_004": "If I\u2019m working with a public company in a DCF, how do I calculate its per-share ", "dcf_adv_007": "We\u2019re creating a DCF for a company that is planning to buy a factory for $100 in", "dcf_adv_001": "Walk me through a basic merger model.", "ma_basic_004": "Why would an acquisition be dilutive? An acquisition is dilutive if the addition", "ma_basic_005": "Is there a rule of thumb for calculating whether an acquisition will be accretiv", "ma_basic_006": "A company with a higher P/E acquires one with a lower P/E \u2013 is this accretive or", "ma_basic_007": "What is the rule of thumb for assessing whether an M&A deal will be accretive or", "ma_basic_010": "Why would a strategic acquirer typically be willing to pay more for a company th", "ma_basic_011": "Why do Goodwill & Other Intangibles get created in an acquisition? These represe", "ma_basic_012": "What is the difference between Goodwill and Other Intangible Assets? Goodwill ty", "ma_basic_013": "Is there anything else \u201cintangible\u201d besides Goodwill & Other Intangibles that co", "ma_basic_014": "What are synergies, and can you provide a few examples? Synergies refer to cases", "ma_basic_015": "How are synergies used in merger models? Revenue Synergies: Normally you add the", "ma_basic_016": "Are revenue or cost synergies more important? No one in M&A takes revenue synerg", "ma_basic_017": "All else being equal, which method would a company prefer to use when acquiring ", "ma_basic_018": "How much debt could a company issue in a merger or acquisition? Generally you wo", "ma_basic_019": "How do you determine the Purchase Price for the target company in an acquisition", "ma_basic_020": "Let\u2019s say a company overpays for another company \u2013 what typically happens afterw", "ma_basic_021": "A buyer pays $100 million for the seller in an all-stock deal, but a day later t", "ma_basic_022": "Why do most mergers and acquisitions fail? Like so many things, M&A is \u201ceasier s", "ma_basic_023": "What role does a merger model play in deal negotiations? The model is used as a ", "ma_basic_024": "What types of sensitivities would you look at in a merger model? What variables ", "ma_basic_001": "What\u2019s the difference between Purchase Accounting and Pooling Accounting in an M", "ma_basic_002": "Walk me through a concrete example of how to calculate revenue synergies.", "ma_basic_003": "Walk me through an example of how to calculate expense synergies.", "ma_adv_004": "How do you take into account NOLs in an M&A deal? You apply Section 382 to deter", "ma_adv_005": "Why do deferred tax liabilities (DTLs) and deferred tax assets (DTAs) get create", "ma_adv_006": "How do DTLs and DTAs affect the Balance Sheet Adjustment in an M&A deal? You tak", "ma_adv_008": "How do you account for DTLs in forward projections in a merger model? You create", "ma_adv_009": "Explain the complete formula for how to calculate Goodwill in an M&A deal. Goodw", "ma_adv_010": "Explain why we would write down the seller\u2019s existing Deferred Tax Asset in an M", "ma_adv_011": "What\u2019s a Section 338(h)(10) election and why might a company want to use it in a", "ma_adv_012": "What is an exchange ratio and when would companies use it in an M&A deal? An exc", "ma_adv_013": "Walk me through the most important terms of a Purchase Agreement in an M&A deal.", "ma_adv_014": "What\u2019s an Earnout and why would a buyer offer it to a seller in an M&A deal? An ", "ma_adv_015": "How would an accretion / dilution model be different for a private seller? The m", "ma_adv_016": "How would I calculate \u201cbreak-even synergies\u201d in an M&A deal and what does the nu", "ma_adv_017": "Normally in an accretion / dilution model you care most about combining both com", "ma_adv_018": "How do you handle options, convertible debt, and other dilutive securities in a ", "ma_adv_019": "What are the main 3 transaction structures you could use to acquire another comp", "ma_adv_021": "Explain what a contribution analysis is and why we might look at it in a merger ", "ma_adv_022": "How do you account for transaction costs, financing fees, and miscellaneous expe", "ma_adv_001": "Walk me through a basic LBO model.", "lbo_basic_004": "How do you pick purchase multiples and exit multiples in an LBO model? The same ", "lbo_basic_005": "What is an \u201cideal\u201d candidate for an LBO?", "lbo_basic_006": "How do you use an LBO model to value a company, and why do we sometimes say that", "lbo_basic_007": "Give an example of a \u201creal-life\u201d LBO.", "lbo_basic_008": "Can you explain how the Balance Sheet is adjusted in an LBO model?", "lbo_basic_011": "Do you need to project all 3 statements in an LBO model? Are there any", "lbo_basic_013": "Let\u2019s say we\u2019re analyzing how much debt a company can take on, and what the term", "lbo_basic_014": "What is the difference between bank debt and high-yield debt?", "lbo_basic_017": "Why would a private equity firm buy a company in a \u201crisky\u201d industry, such as tec", "lbo_basic_019": "What is meant by the \u201ctax shield\u201d in an LBO?", "lbo_basic_020": "What is a dividend recapitalization (\u201cdividend recap\u201d)? In a dividend recap, the", "lbo_basic_021": "Why would a PE firm choose to do a dividend recap of one of its portfolio compan", "lbo_basic_022": "How would a dividend recap impact the 3 financial statements in an LBO? No chang", "lbo_basic_001": "Tell me about all the different kinds of debt you could use in an LBO and the di", "lbo_adv_002": "How would an asset write-up or write-down affect an LBO model? / Walk me through", "lbo_adv_003": "Normally we care about the IRR for the equity investors in an LBO \u2013 the PE firm ", "lbo_adv_004": "Why might a private equity firm allot some of a company\u2019s new equity in an LBO t", "lbo_adv_005": "Why you would you use PIK (Payment In Kind) debt rather than other types of debt", "lbo_adv_006": "What are some examples of incurrence covenants? Maintenance covenants? Incurrenc", "lbo_adv_007": "Just like a normal M&A deal, you can structure an LBO either as a stock purchase", "lbo_adv_008": "Walk me through how you calculate optional repayments on debt in an LBO model.", "lbo_adv_009": "Explain how a Revolver is used in an LBO model.", "lbo_adv_010": "How would you adjust the Income Statement in an LBO model?", "lbo_adv_011": "In an LBO model, is it possible for debt investors to get a higher return than t", "lbo_adv_012": "Most of the time, increased leverage means an increased IRR. Explain how increas", "lbo_adv_001": "A car drives 60 miles at an average speed of 30 miles per hour. How fast should "};
 
   // ── GREETING ──────────────────────────────────────────────
   function setGreeting(name) {
@@ -1059,59 +1074,81 @@
   }
 
   // ── HEATMAP ───────────────────────────────────────────────
-  function buildHeatmap(activityData) {
-    const heatmapEl = document.getElementById('heatmap');
-    const monthsEl = document.getElementById('heatmapMonths');
-    heatmapEl.innerHTML = '';
-    monthsEl.innerHTML = '';
+  function buildWeakSpots(results, history) {
+    const el = document.getElementById('weakSpotList');
+    if (!el) return;
 
-    // Build lookup: date -> questions_answered
-    const actMap = {};
-    (activityData || []).forEach(a => { actMap[a.date] = a.questions_answered; });
-
-    // 12 weeks × 7 days, ending today
-    const now = new Date();
-    const weeks = [];
-    for (let w = 11; w >= 0; w--) {
-      const week = [];
-      for (let d = 6; d >= 0; d--) {
-        const date = new Date(now);
-        date.setDate(date.getDate() - (w * 7 + d));
-        const key = date.toISOString().slice(0, 10);
-        const count = actMap[key] || 0;
-        const level = count === 0 ? 0 : count <= 3 ? 1 : count <= 7 ? 2 : count <= 12 ? 3 : 4;
-        week.push({ level, count, date: key });
-      }
-      weeks.push(week);
-    }
-
-    weeks.forEach((week, wi) => {
-      const col = document.createElement('div');
-      col.className = 'heatmap-col';
-      week.forEach(({ level, count, date }) => {
-        const cell = document.createElement('div');
-        cell.className = `heat-cell${level > 0 ? ` l${level}` : ''}`;
-        const tip = count === 0 ? 'No questions' : `${count} question${count !== 1 ? 's' : ''}`;
-        cell.setAttribute('data-tip', `${date}: ${tip}`);
-        col.appendChild(cell);
+    // Score each question: use last score from history if available, else status from results
+    const qScores = {}; // qId -> { score, topic, question }
+    if (history && history.length > 0) {
+      // Group by question_id, take the latest attempt's score
+      const byQ = {};
+      history.forEach(h => {
+        if (!byQ[h.question_id]) byQ[h.question_id] = [];
+        byQ[h.question_id].push(h);
       });
-      heatmapEl.appendChild(col);
-    });
-
-    // Month labels
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    for (let i = 0; i < 12; i++) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - (11 - i) * 7);
-      const el = document.createElement('div');
-      el.className = 'month-label';
-      el.textContent = months[d.getMonth()];
-      monthsEl.appendChild(el);
+      Object.entries(byQ).forEach(([qId, attempts]) => {
+        const latest = attempts.sort((a,b) => b.created_at - a.created_at)[0];
+        qScores[qId] = { score: latest.score, topic: latest.topic, attempts: attempts.length };
+      });
     }
+
+    // Combine with results that have no history score
+    if (results && results.length > 0) {
+      results.forEach(r => {
+        if (!qScores[r.question_id]) {
+          const s = r.status === 'missed' ? 40 : r.status === 'partial' ? 70 : 95;
+          qScores[r.question_id] = { score: s, topic: r.topic, attempts: 1 };
+        }
+      });
+    }
+
+    const allQ = Object.entries(qScores)
+      .map(([id, v]) => ({ id, ...v }))
+      .filter(q => q.score < 85)  // only show below mastery threshold
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 5);
+
+    if (allQ.length === 0) {
+      // Check if there's any data at all
+      const hasData = (results && results.length > 0) || (history && history.length > 0);
+      el.innerHTML = hasData
+        ? `<div class="weak-spot-empty">No weak spots detected — great work!<br><span style="font-size:12px;margin-top:4px;display:block;">Keep practicing to maintain your mastery.</span></div>`
+        : `<div class="weak-spot-empty">No attempts yet.<br><span style="font-size:12px;margin-top:4px;display:block;">Start practicing to see your weak spots here.</span></div>`;
+      return;
+    }
+
+    // Look up question text from QUESTION_BANK equivalent on this page
+    const TOPIC_LABELS_LOCAL = {
+      'Accounting': 'Accounting', 'Enterprise_Value': 'Enterprise Value',
+      'Valuation': 'Valuation', 'DCF': 'DCF',
+      'Mergers_MA': 'M&A', 'LBO': 'LBO'
+    };
+
+    const rankClasses = ['rank-1', 'rank-2', 'rank-3', 'rank-4', 'rank-5'];
+
+    el.innerHTML = allQ.map((q, i) => {
+      const scoreClass = q.score < 60 ? 'bad' : 'mid';
+      const scoreLabel = q.score < 60 ? `${q.score}/100` : `${q.score}/100`;
+      const topicLabel = TOPIC_LABELS_LOCAL[q.topic] || q.topic;
+      const attemptsLabel = q.attempts === 1 ? '1 attempt' : `${q.attempts} attempts`;
+      // Short question text - we only have the ID, link to practice that topic
+      const qText = Q_TEXT[q.id] ? Q_TEXT[q.id] : (topicLabel + ' question');
+      return `<a class="weak-spot-item" href="practice-screen.html?topic=${q.topic}" style="text-decoration:none;">
+        <div class="weak-spot-rank ${rankClasses[i]}">${i+1}</div>
+        <div class="weak-spot-body">
+          <div class="weak-spot-q">${qText}</div>
+          <div class="weak-spot-meta">
+            <span class="weak-spot-score ${scoreClass}">${scoreLabel}</span>
+            <span class="weak-spot-label">${attemptsLabel}</span>
+          </div>
+        </div>
+        <span class="weak-spot-arrow">→</span>
+      </a>`;
+    }).join('');
   }
 
-  // ── SUMMARY STATS ─────────────────────────────────────────
-  function buildSummary(results, history, streak) {
+    function buildSummary(results, history, streak) {
     const mastered = results.filter(r => r.status === 'mastered').length;
     document.getElementById('statMastered').textContent = mastered;
     document.getElementById('statMasteredSub').textContent = `of ${TOTAL_QS} total`;
@@ -1184,7 +1221,7 @@
 
     // Build empty state immediately so page isn't blank
     buildTopicCards({});
-    buildHeatmap([]);
+    buildWeakSpots([], []);
     buildSummary([], [], 0);
     buildSessionsList([]);
 
@@ -1206,7 +1243,7 @@
           });
 
           buildTopicCards(masteredByTopic);
-          buildHeatmap(data.activity || []);
+          buildWeakSpots(data.results || [], data.history || []);
           buildSummary(data.results || [], data.history || [], data.streak || 0);
           buildSessionsList(data.history || []);
         }

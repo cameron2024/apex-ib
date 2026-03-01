@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saved Questions — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --surface: #FFFFFF;
+    --border: #E8E5DF;
+    --border-strong: #D4CFC6;
+    --text-primary: #1A1814;
+    --text-secondary: #6B6560;
+    --text-tertiary: #9E9890;
+    --accent-green: #16A34A;
+    --accent-amber: #D97706;
+    --accent-red: #DC2626;
+    --accent-blue: #2563EB;
+    --sidebar-width: 240px;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 10;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--text-primary);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    letter-spacing: -0.3px;
+  }
+
+  .sidebar-nav { padding: 12px 10px; flex: 1; }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    padding: 8px 10px 6px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    text-decoration: none;
+    margin-bottom: 1px;
+  }
+
+  .nav-item:hover { background: var(--bg); color: var(--text-primary); }
+  .nav-item.active { background: var(--bg); color: var(--text-primary); font-weight: 500; }
+  .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active svg { opacity: 1; }
+
+  .sidebar-bottom {
+    padding: 12px 10px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .user-card {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+  }
+
+  .user-avatar {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: white;
+    flex-shrink: 0;
+  }
+
+  .user-name { font-size: 13px; font-weight: 500; }
+  .user-plan { font-size: 11px; color: var(--text-tertiary); }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    min-height: 100vh;
+    padding: 40px 44px;
+    max-width: calc(100vw - var(--sidebar-width));
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    animation: fadeUp 0.35s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  .page-sub { font-size: 14px; color: var(--text-secondary); }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.35s ease 0.05s both;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .filter-btn.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+
+  .filter-count {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text-tertiary);
+  }
+
+  /* ── SAVED QUESTIONS LIST ── */
+  .questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeUp 0.35s ease 0.1s both;
+  }
+
+  .saved-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: border-color 0.15s;
+    cursor: pointer;
+  }
+
+  .saved-card:hover { border-color: var(--border-strong); }
+
+  .saved-card-body { flex: 1; min-width: 0; }
+
+  .saved-q-text {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .saved-q-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .q-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .q-tag.accounting  { background: #EEF2FF; color: #4338CA; }
+  .q-tag.enterprise  { background: #FFF7ED; color: #C2410C; }
+  .q-tag.valuation   { background: #F0FDF4; color: #15803D; }
+  .q-tag.dcf         { background: #EFF6FF; color: #1D4ED8; }
+  .q-tag.mergers     { background: #FDF4FF; color: #7E22CE; }
+  .q-tag.lbo         { background: #FFF1F2; color: #BE123C; }
+  .q-tag.difficulty  { background: var(--bg); color: var(--text-tertiary); }
+
+  .saved-date { font-size: 11.5px; color: var(--text-tertiary); margin-left: auto; }
+
+  .saved-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  .btn-practice-saved {
+    padding: 7px 14px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+
+  .btn-practice-saved:hover { opacity: 0.85; }
+
+  .btn-unsave {
+    padding: 6px 14px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-unsave:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+  /* ── ANSWER DRAWER ── */
+  .answer-drawer {
+    display: none;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    margin: 12px -20px -18px;
+    padding: 16px 20px;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+
+  .answer-drawer.open { display: block; }
+
+  .answer-drawer-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .answer-text {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+  }
+
+  .toggle-answer-btn {
+    background: none;
+    border: none;
+    font-size: 12.5px;
+    color: var(--accent-blue);
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    margin-top: 4px;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--text-tertiary);
+    animation: fadeUp 0.35s ease both;
+  }
+
+  .empty-icon { font-size: 36px; margin-bottom: 16px; }
+  .empty-title { font-size: 17px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; }
+  .empty-sub { font-size: 14px; line-height: 1.6; max-width: 320px; margin: 0 auto 24px; }
+
+  .btn-go-practice {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 20px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .btn-go-practice:hover { opacity: 0.85; }
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+        <circle cx="8" cy="8" r="2" fill="white"/>
+        <circle cx="16" cy="8" r="2" fill="white"/>
+        <circle cx="8" cy="16" r="2" fill="white"/>
+        <circle cx="16" cy="16" r="2" fill="white"/>
+      </svg>
+    </div>
+    <span class="logo-name">Apex</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="performance.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Performance
+    </a>
+
+    <div class="nav-section-label" style="margin-top:10px;">Practice</div>
+    <a class="nav-item" href="practice-screen.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Practice All
+    </a>
+    <a class="nav-item active" href="saved-questions.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      Saved Questions
+    </a>
+
+    <div class="nav-section-label" style="margin-top:10px;">Topics</div>
+    <a class="nav-item" href="practice-screen.html?topic=Accounting">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Accounting
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=Enterprise_Value">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Enterprise Value
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=Valuation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      Valuation
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=DCF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Discounted Cash Flow
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=Mergers_MA">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Mergers &amp; Acquisitions
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=LBO">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Leveraged Buyouts
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebarAvatar">?</div>
+      <div>
+        <div class="user-name" id="sidebarUserName">—</div>
+        <div class="user-plan">Free plan · <a href="#" style="color:var(--accent-blue);text-decoration:none;font-size:11px;">Upgrade</a></div>
+      </div>
+    </div>
+    <button id="signOutBtn" onclick="doLogout()" style="display:none;margin-top:8px;width:100%;background:none;border:1px solid var(--border);color:var(--text-tertiary);border-radius:6px;padding:6px;cursor:pointer;font-size:12px;">Sign out</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Saved Questions</div>
+      <div class="page-sub" id="pageSubtitle">Your personal question bank</div>
+    </div>
+  </div>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" data-filter="Accounting" onclick="setFilter('Accounting', this)">Accounting</button>
+    <button class="filter-btn" data-filter="Enterprise_Value" onclick="setFilter('Enterprise_Value', this)">Enterprise Value</button>
+    <button class="filter-btn" data-filter="Valuation" onclick="setFilter('Valuation', this)">Valuation</button>
+    <button class="filter-btn" data-filter="DCF" onclick="setFilter('DCF', this)">Discounted Cash Flow</button>
+    <button class="filter-btn" data-filter="Mergers_MA" onclick="setFilter('Mergers_MA', this)">M&amp;A</button>
+    <button class="filter-btn" data-filter="LBO" onclick="setFilter('LBO', this)">Leveraged Buyouts</button>
+    <span class="filter-count" id="filterCount"></span>
+  </div>
+
+  <div class="questions-list" id="questionsList"></div>
+
+</main>
+
+<script>
+  // ── AUTH ──
+  const token = localStorage.getItem('apex_token');
+  const name = localStorage.getItem('apex_user');
+  if (name) {
+    const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('sidebarUserName').textContent = name;
+    document.getElementById('signOutBtn').style.display = 'block';
+  }
+
+  function doLogout() {
+    localStorage.removeItem('apex_token');
+    localStorage.removeItem('apex_user');
+    window.location.href = 'dashboard.html';
+  }
+
+  // ── DATA ──
+  const TOPIC_LABELS = {
+    'Accounting': 'Accounting',
+    'Enterprise_Value': 'Enterprise Value',
+    'Valuation': 'Valuation',
+    'DCF': 'Discounted Cash Flow',
+    'Mergers_MA': 'Mergers & Acquisitions',
+    'LBO': 'Leveraged Buyouts'
+  };
+
+  const TOPIC_CLASS = {
+    'Accounting': 'accounting',
+    'Enterprise_Value': 'enterprise',
+    'Valuation': 'valuation',
+    'DCF': 'dcf',
+    'Mergers_MA': 'mergers',
+    'LBO': 'lbo'
+  };
+
+  function getSaved() {
+    try { return JSON.parse(localStorage.getItem('apex_saved_questions') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function unsave(qId) {
+    const saved = getSaved().filter(q => q.id !== qId);
+    localStorage.setItem('apex_saved_questions', JSON.stringify(saved));
+    render();
+  }
+
+  function formatDate(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  let currentFilter = 'all';
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  function toggleAnswer(qId) {
+    const drawer = document.getElementById('drawer-' + qId);
+    const btn = document.getElementById('toggle-' + qId);
+    if (drawer.classList.contains('open')) {
+      drawer.classList.remove('open');
+      btn.textContent = '▶ Show model answer';
+    } else {
+      drawer.classList.add('open');
+      btn.textContent = '▼ Hide model answer';
+    }
+  }
+
+  function practiceThis(qId) {
+    // Navigate to the topic that contains this question, it will load via smart ordering
+    const saved = getSaved();
+    const q = saved.find(s => s.id === qId);
+    if (q) {
+      window.location.href = `practice-screen.html?topic=${q.topic}&focus=${qId}`;
+    }
+  }
+
+  function render() {
+    const all = getSaved();
+    const filtered = currentFilter === 'all' ? all : all.filter(q => q.topic === currentFilter);
+
+    // Update count
+    const countEl = document.getElementById('filterCount');
+    countEl.textContent = filtered.length === 0 ? '' : `${filtered.length} question${filtered.length !== 1 ? 's' : ''}`;
+
+    // Update subtitle
+    document.getElementById('pageSubtitle').textContent =
+      all.length === 0 ? 'Questions you bookmark during practice will appear here' :
+      `${all.length} question${all.length !== 1 ? 's' : ''} saved`;
+
+    const list = document.getElementById('questionsList');
+
+    if (filtered.length === 0) {
+      if (all.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔖</div>
+            <div class="empty-title">No saved questions yet</div>
+            <div class="empty-sub">While practicing, tap the bookmark icon on any question to save it here for focused review.</div>
+            <a class="btn-go-practice" href="practice-screen.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              Start Practicing
+            </a>
+          </div>`;
+      } else {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">No saved questions in this topic</div>
+            <div class="empty-sub">You have ${all.length} saved question${all.length !== 1 ? 's' : ''} in other topics.</div>
+          </div>`;
+      }
+      return;
+    }
+
+    // Sort newest first
+    const sorted = [...filtered].sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+
+    list.innerHTML = sorted.map(q => {
+      const topicLabel = TOPIC_LABELS[q.topic] || q.topic;
+      const topicClass = TOPIC_CLASS[q.topic] || 'accounting';
+      const diffLabel = q.difficulty === 'hard' ? 'Advanced' : 'Basic';
+      const dateStr = q.savedAt ? formatDate(q.savedAt) : '';
+      const safeId = CSS.escape ? CSS.escape(q.id) : q.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const answerId = 'drawer-' + safeId;
+      const toggleId = 'toggle-' + safeId;
+
+      return `
+        <div class="saved-card" id="card-${safeId}">
+          <div class="saved-card-body">
+            <div class="saved-q-text">${escapeHtml(q.question)}</div>
+            <div class="saved-q-meta">
+              <span class="q-tag ${topicClass}">${topicLabel}</span>
+              <span class="q-tag difficulty">${diffLabel}</span>
+              ${dateStr ? `<span class="saved-date">Saved ${dateStr}</span>` : ''}
+            </div>
+            ${q.model_answer ? `
+              <button class="toggle-answer-btn" id="${toggleId}" onclick="toggleAnswer('${safeId}')">▶ Show model answer</button>
+              <div class="answer-drawer" id="${answerId}">
+                <div class="answer-drawer-label">Model Answer</div>
+                <div class="answer-text">${escapeHtml(q.model_answer)}</div>
+              </div>
+            ` : ''}
+          </div>
+          <div class="saved-card-actions">
+            <button class="btn-practice-saved" onclick="practiceThis('${q.id}')">Practice →</button>
+            <button class="btn-unsave" onclick="unsave('${q.id}')">Remove</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Init
+  render();
+</script>
+
+</body>
+</html>

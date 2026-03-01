@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F3; --surface: #FFFFFF;
+    --border: #E8E5DF; --border-strong: #D4CFC6;
+    --text-primary: #1A1814; --text-secondary: #6B6560; --text-tertiary: #9E9890;
+    --accent-green: #16A34A; --accent-amber: #D97706; --accent-red: #DC2626; --accent-blue: #2563EB;
+    --sidebar-width: 240px; --radius: 10px; --radius-sm: 6px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text-primary); min-height:100vh; display:flex; }
+
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-width); background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; height:100vh; z-index:10; overflow-y:auto; }
+  .sidebar-logo { padding:20px 20px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .logo-mark { width:32px; height:32px; background:var(--text-primary); border-radius:8px; display:flex; align-items:center; justify-content:center; }
+  .logo-name { font-family:'DM Serif Display',serif; font-size:17px; letter-spacing:-0.3px; }
+  .sidebar-nav { padding:12px 10px; flex:1; }
+  .nav-section-label { font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-tertiary); padding:8px 10px 6px; }
+  .nav-item { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:var(--radius-sm); cursor:pointer; font-size:13.5px; color:var(--text-secondary); transition:all .15s; text-decoration:none; margin-bottom:1px; }
+  .nav-item:hover { background:var(--bg); color:var(--text-primary); }
+  .nav-item.active { background:var(--bg); color:var(--text-primary); font-weight:500; }
+  .nav-item svg { width:15px; height:15px; flex-shrink:0; opacity:.7; }
+  .nav-item.active svg { opacity:1; }
+  .sidebar-bottom { padding:12px 10px; border-top:1px solid var(--border); flex-shrink:0; }
+  .user-card { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:var(--radius-sm); }
+  .user-avatar { width:28px; height:28px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:white; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:500; }
+  .user-plan { font-size:11px; color:var(--text-tertiary); }
+
+  /* MAIN */
+  .main { margin-left:var(--sidebar-width); flex:1; min-height:100vh; padding:40px 44px; max-width:calc(100vw - var(--sidebar-width)); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .fade-1 { animation: fadeUp .35s ease both; }
+  .fade-2 { animation: fadeUp .35s ease .07s both; }
+  .fade-3 { animation: fadeUp .35s ease .14s both; }
+  .fade-4 { animation: fadeUp .35s ease .21s both; }
+  .fade-5 { animation: fadeUp .35s ease .28s both; }
+
+  /* PAGE HEADER */
+  .page-header { margin-bottom:32px; }
+  .page-title { font-family:'DM Serif Display',serif; font-size:28px; letter-spacing:-.4px; line-height:1.2; margin-bottom:5px; }
+  .page-sub { font-size:14px; color:var(--text-secondary); }
+
+  /* READINESS HERO */
+  .readiness-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .readiness-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(37,99,235,.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .readiness-dial {
+    flex-shrink: 0;
+    position: relative;
+    width: 100px; height: 100px;
+  }
+  .readiness-dial svg { width: 100px; height: 100px; }
+  .dial-track { fill: none; stroke: var(--border); stroke-width: 8; }
+  .dial-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1); transform-origin: center; transform: rotate(-225deg); }
+  .dial-fill.high { stroke: var(--accent-green); }
+  .dial-fill.mid  { stroke: var(--accent-amber); }
+  .dial-fill.low  { stroke: var(--accent-red); }
+  .dial-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .dial-score { font-family:'DM Serif Display',serif; font-size: 28px; letter-spacing: -1px; line-height: 1; }
+  .dial-label { font-size: 9px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-tertiary); margin-top: 2px; }
+  .readiness-body { flex: 1; }
+  .readiness-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; letter-spacing: -.2px; }
+  .readiness-desc { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; max-width: 440px; }
+  .readiness-bars { display: flex; flex-direction: column; gap: 8px; max-width: 380px; }
+  .rbar-row { display: flex; align-items: center; gap: 10px; }
+  .rbar-label { font-size: 12px; color: var(--text-secondary); width: 120px; flex-shrink: 0; }
+  .rbar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .rbar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .rbar-fill.green { background: var(--accent-green); }
+  .rbar-fill.amber { background: var(--accent-amber); }
+  .rbar-fill.red   { background: var(--accent-red); }
+  .rbar-fill.blue  { background: var(--accent-blue); }
+  .rbar-pct { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); width: 34px; text-align: right; flex-shrink: 0; }
+
+  /* TWO-COL LAYOUT */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+  /* PANEL */
+  .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .panel-header { padding:16px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .panel-title { font-size:14px; font-weight:600; letter-spacing:-.15px; }
+  .panel-label { font-size:12px; color:var(--text-tertiary); }
+  .panel-body { padding:20px; }
+
+  /* SCORE TREND */
+  .trend-chart-wrap { position: relative; height: 120px; }
+  .trend-svg { width: 100%; height: 100%; overflow: visible; }
+  .trend-area { fill-opacity: .12; }
+  .trend-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .trend-dot { transition: r .15s; cursor: pointer; }
+  .trend-axis-label { font-size: 10px; fill: var(--text-tertiary, #9E9890); font-family: 'DM Sans', sans-serif; }
+  .trend-gridline { stroke: var(--border, #E8E5DF); stroke-dasharray: 3 3; }
+  .trend-tooltip {
+    position: absolute;
+    background: var(--text-primary);
+    color: white;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .15s;
+    z-index: 10;
+  }
+  .trend-empty { padding:32px 0; text-align:center; color:var(--text-tertiary); font-size:13px; }
+  .trend-stats { display:flex; gap:20px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+  .trend-stat { flex:1; }
+  .trend-stat-val { font-size:18px; font-weight:600; letter-spacing:-.3px; font-family:'DM Serif Display',serif; }
+  .trend-stat-label { font-size:11px; color:var(--text-tertiary); margin-top:1px; }
+
+  /* TOPIC BALANCE (Radar-style bar chart) */
+  .balance-grid { display:flex; flex-direction:column; gap:12px; padding:4px 0; }
+  .balance-row { display:flex; align-items:center; gap:10px; }
+  .balance-topic { font-size:12px; color:var(--text-secondary); width:130px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .balance-track { flex:1; height:8px; background:var(--bg); border-radius:4px; overflow:hidden; position:relative; }
+  .balance-fill { height:100%; border-radius:4px; transition:width 1s ease; position:relative; }
+  .balance-fill::after {
+    content: attr(data-pct);
+    position: absolute;
+    right: -28px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .balance-attempts { font-size:11px; color:var(--text-tertiary); width:60px; text-align:right; flex-shrink:0; }
+
+  /* NEXT SESSION PLANNER */
+  .next-session-list { display:flex; flex-direction:column; }
+  .next-q-item {
+    padding:12px 20px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    transition:background .15s;
+    text-decoration:none;
+    color:inherit;
+  }
+  .next-q-item:last-child { border-bottom:none; }
+  .next-q-item:hover { background:var(--bg); }
+  .next-q-pri {
+    width:6px; height:6px;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .next-q-pri.urgent { background:var(--accent-red); }
+  .next-q-pri.review { background:var(--accent-amber); }
+  .next-q-pri.new    { background:var(--accent-blue); }
+  .next-q-text { flex:1; font-size:13px; line-height:1.45; color:var(--text-primary); }
+  .next-q-tag {
+    font-size:10.5px; font-weight:500;
+    padding:2px 7px; border-radius:4px;
+    flex-shrink:0;
+  }
+  .next-q-tag.accounting  { background:#EEF2FF; color:#4338CA; }
+  .next-q-tag.ev          { background:#FFF7ED; color:#C2410C; }
+  .next-q-tag.valuation   { background:#F0FDF4; color:#15803D; }
+  .next-q-tag.dcf         { background:#EFF6FF; color:#1D4ED8; }
+  .next-q-tag.mergers     { background:#FDF4FF; color:#7E22CE; }
+  .next-q-tag.lbo         { background:#FFF1F2; color:#BE123C; }
+  .next-q-reason { font-size:11px; color:var(--text-tertiary); flex-shrink:0; }
+  .next-session-footer {
+    padding:14px 20px;
+    border-top:1px solid var(--border);
+    background:var(--bg);
+  }
+  .drill-btn {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 18px;
+    background:var(--text-primary); color:white;
+    border:none; border-radius:var(--radius-sm);
+    font-size:13px; font-family:inherit; font-weight:500;
+    cursor:pointer; text-decoration:none;
+    transition:opacity .15s;
+  }
+  .drill-btn:hover { opacity:.85; }
+
+  /* WEAK SPOTS (full table) */
+  .weak-full-table { width:100%; border-collapse:collapse; }
+  .weak-full-table th { font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-tertiary); padding:10px 20px; text-align:left; border-bottom:1px solid var(--border); background:var(--bg); }
+  .weak-full-table td { font-size:13px; padding:12px 20px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  .weak-full-table tr:last-child td { border-bottom:none; }
+  .weak-full-table tr:hover td { background:var(--bg); }
+  .score-chip { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11.5px; font-weight:600; }
+  .score-chip.bad { background:#FFF1F2; color:var(--accent-red); }
+  .score-chip.mid { background:#FFF7ED; color:var(--accent-amber); }
+  .score-chip.new { background:var(--bg); border:1px solid var(--border); color:var(--text-tertiary); }
+
+  .empty-state { padding:52px 0; text-align:center; color:var(--text-tertiary); }
+  .empty-title { font-size:15px; font-weight:500; color:var(--text-secondary); margin-bottom:6px; }
+  .empty-sub { font-size:13px; line-height:1.6; }
+
+  /* FULL-WIDTH SECTION */
+  .full-section { margin-bottom:24px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+        <circle cx="8" cy="8" r="2" fill="white"/><circle cx="16" cy="8" r="2" fill="white"/>
+        <circle cx="8" cy="16" r="2" fill="white"/><circle cx="16" cy="16" r="2" fill="white"/>
+      </svg>
+    </div>
+    <span class="logo-name">Apex</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item active" href="performance.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Performance
+    </a>
+    <div class="nav-section-label" style="margin-top:10px;">Practice</div>
+    <a class="nav-item" href="practice-screen.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Practice All
+    </a>
+    <a class="nav-item" href="saved-questions.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      Saved Questions
+    </a>
+    <div class="nav-section-label" style="margin-top:10px;">Topics</div>
+    <a class="nav-item" href="practice-screen.html?topic=Accounting">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Accounting
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=Enterprise_Value">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Enterprise Value
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=Valuation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      Valuation
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=DCF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Discounted Cash Flow
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=Mergers_MA">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Mergers &amp; Acquisitions
+    </a>
+    <a class="nav-item" href="practice-screen.html?topic=LBO">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Leveraged Buyouts
+    </a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebarAvatar">?</div>
+      <div>
+        <div class="user-name" id="sidebarUserName">—</div>
+        <div class="user-plan">Free plan · <a href="#" style="color:var(--accent-blue);text-decoration:none;font-size:11px;">Upgrade</a></div>
+      </div>
+    </div>
+    <button id="signOutBtn" onclick="doLogout()" style="display:none;margin-top:8px;width:100%;background:none;border:1px solid var(--border);color:var(--text-tertiary);border-radius:6px;padding:6px;cursor:pointer;font-size:12px;">Sign out</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="page-header fade-1">
+    <div class="page-title">Performance</div>
+    <div class="page-sub" id="pageSubtitle">Loading your data…</div>
+  </div>
+
+  <!-- READINESS SCORE -->
+  <div class="readiness-hero fade-2" id="readinessHero">
+    <div class="readiness-dial">
+      <svg viewBox="0 0 100 100">
+        <!-- 270° arc track (from -225° to +45°) -->
+        <circle class="dial-track" cx="50" cy="50" r="38" stroke-dasharray="239.8 239.8" stroke-dashoffset="-59.95" transform="rotate(-225 50 50)"/>
+        <circle class="dial-fill low" id="dialFill" cx="50" cy="50" r="38" stroke-dasharray="239.8 239.8" stroke-dashoffset="239.8" transform="rotate(-225 50 50)"/>
+      </svg>
+      <div class="dial-center">
+        <div class="dial-score" id="dialScore">—</div>
+        <div class="dial-label">Ready</div>
+      </div>
+    </div>
+    <div class="readiness-body">
+      <div class="readiness-title" id="readinessTitle">Interview Readiness Score</div>
+      <div class="readiness-desc" id="readinessDesc">Answer questions to generate your readiness score.</div>
+      <div class="readiness-bars" id="readinessBars"></div>
+    </div>
+  </div>
+
+  <!-- SCORE TREND + TOPIC BALANCE -->
+  <div class="two-col fade-3">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Score Trend</span>
+        <span class="panel-label" id="trendLabel">Last 20 answers</span>
+      </div>
+      <div class="panel-body">
+        <div class="trend-chart-wrap" id="trendWrap">
+          <div class="trend-empty" id="trendEmpty">No answers yet</div>
+          <div class="trend-tooltip" id="trendTooltip"></div>
+        </div>
+        <div class="trend-stats" id="trendStats" style="display:none">
+          <div class="trend-stat">
+            <div class="trend-stat-val" id="trendAvg">—</div>
+            <div class="trend-stat-label">Avg score</div>
+          </div>
+          <div class="trend-stat">
+            <div class="trend-stat-val" id="trendBest">—</div>
+            <div class="trend-stat-label">Best session</div>
+          </div>
+          <div class="trend-stat">
+            <div class="trend-stat-val" id="trendStreak" style="color:var(--accent-amber)">—</div>
+            <div class="trend-stat-label">Day streak</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Topic Balance</span>
+        <span class="panel-label">Mastery by area</span>
+      </div>
+      <div class="panel-body">
+        <div class="balance-grid" id="balanceGrid">
+          <div style="color:var(--text-tertiary);font-size:13px;">Loading…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEXT SESSION PLANNER -->
+  <div class="panel full-section fade-4">
+    <div class="panel-header">
+      <span class="panel-title">Next Session Planner</span>
+      <span class="panel-label">Curated for your gaps</span>
+    </div>
+    <div class="next-session-list" id="nextSessionList">
+      <div style="padding:32px;text-align:center;color:var(--text-tertiary);font-size:13px;">Loading…</div>
+    </div>
+    <div class="next-session-footer">
+      <a class="drill-btn" href="practice-screen.html" id="drillBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Start Drilling These
+      </a>
+    </div>
+  </div>
+
+  <!-- FULL WEAK SPOTS TABLE -->
+  <div class="panel full-section fade-5">
+    <div class="panel-header">
+      <span class="panel-title">All Weak Spots</span>
+      <span class="panel-label" id="weakCountLabel">Sorted by score</span>
+    </div>
+    <table class="weak-full-table">
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Topic</th>
+          <th>Last Score</th>
+          <th>Attempts</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="weakTableBody">
+        <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-tertiary);">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+  // ── DATA ──────────────────────────────────────────────────
+  const TOPICS = [
+    { key:'Accounting',      label:'Accounting',             total:42,  tagClass:'accounting' },
+    { key:'Enterprise_Value',label:'Enterprise Value',       total:12,  tagClass:'ev' },
+    { key:'Valuation',       label:'Valuation',              total:38,  tagClass:'valuation' },
+    { key:'DCF',             label:'Disc. Cash Flow',        total:27,  tagClass:'dcf' },
+    { key:'Mergers_MA',      label:'M&A',                    total:41,  tagClass:'mergers' },
+    { key:'LBO',             label:'Leveraged Buyouts',      total:28,  tagClass:'lbo' },
+  ];
+  const TOTAL_QS = TOPICS.reduce((s,t) => s + t.total, 0);
+
+  const Q_TEXT = {"acc_basic_001": "Walk me through the 3 financial statements.", "acc_basic_002": "Can you give examples of major line items on each of the financial statements?", "acc_basic_003": "How do the 3 statements link together?", "acc_basic_004": "If I were stranded on a desert island, only had 1 statement and I wanted to revi", "acc_basic_005": "Let\u2019s say I could only look at 2 statements to assess a company\u2019s prospects \u2013 wh", "acc_basic_006": "Walk me through how Depreciation going up by $10 would affect the statements.", "acc_basic_007": "If Depreciation is a non-cash expense, why does it affect the cash balance?", "acc_basic_009": "What happens when Accrued Compensation goes up by $10?", "acc_basic_010": "What happens when Inventory goes up by $10, assuming you pay for it with cash? N", "acc_basic_011": "Why is the Income Statement not affected by changes in Inventory?", "acc_basic_012": "Let\u2019s say Apple is buying $100 worth of new iPod factories with debt. How are al", "acc_basic_013": "Now let\u2019s go out 1 year, to the start of Year 2. Assume the debt is high-yield s", "acc_basic_014": "At the start of Year 3, the factories all break down and the value of the equipm", "acc_basic_015": "Now let\u2019s look at a different scenario and assume Apple is ordering $10 of addit", "acc_basic_016": "Now let\u2019s say they sell the iPods for revenue of $20, at a cost of $10. Walk me ", "acc_basic_018": "What is working capital? How is it used? Working Capital = Current Assets \u2013 Curr", "acc_basic_020": "Recently, banks have been writing down their assets and taking huge quarterly lo", "acc_basic_021": "Walk me through a $100 \u201cbailout\u201d of a company and how it affects the 3 statement", "acc_basic_022": "Walk me through a $100 write-down of debt \u2013 as in OWED debt, a liability \u2013 on a ", "acc_basic_027": "What\u2019s the difference between cash-based and accrual accounting? Cash-based acco", "acc_basic_028": "Let\u2019s say a customer pays for a TV with a credit card. What would this look like", "acc_basic_029": "How do you decide when to capitalize rather than expense a purchase? If the asse", "acc_basic_030": "Why do companies report both GAAP and non-GAAP (or \u201cPro Forma\u201d) earnings? These ", "acc_basic_032": "Normally Goodwill remains constant on the Balance Sheet \u2013 why would it be impair", "acc_adv_004": "Walk me through how you create an expense model for a company. To do a true bott", "acc_adv_005": "Let\u2019s say we\u2019re trying to create these models but don\u2019t have enough information ", "acc_adv_006": "Walk me through the major items in Shareholders\u2019 Equity. Common items include: \u2022", "acc_adv_007": "Walk me through what flows into Retained Earnings. Retained Earnings = Old Retai", "acc_adv_009": "What is the Statement of Shareholders\u2019 Equity and why do we use it? This stateme", "acc_adv_010": "What are examples of non-recurring charges we need to add back to a company\u2019s EB", "acc_adv_011": "How do you project Balance Sheet items like Accounts Receivable and Accrued Expe", "acc_adv_013": "How do Net Operating Losses (NOLs) affect a company\u2019s 3 statements? The \u201cquick a", "acc_adv_014": "What\u2019s the difference between capital leases and operating leases? Operating lea", "acc_adv_015": "Why would the Depreciation & Amortization number on the Income Statement be diff", "acc_adv_001": "Why do we look at both Enterprise Value and Equity Value? Enterprise Value repre", "acc_adv_003": "What\u2019s the formula for Enterprise Value? EV = Equity Value + Debt + Preferred St", "ev_basic_005": "How do you calculate fully diluted shares? Take the basic share count and add in", "ev_basic_006": "Let\u2019s say a company has 100 shares outstanding, at a share price of $10 each. It", "ev_basic_008": "Why do you subtract cash in the formula for Enterprise Value? Is that always acc", "ev_basic_009": "Is it always accurate to add Debt to Equity Value when calculating Enterprise Va", "ev_basic_013": "How do you account for convertible bonds in the Enterprise Value formula? If the", "ev_basic_014": "A company has 1 million shares outstanding at a value of $100 per share. It also", "ev_basic_015": "What\u2019s the difference between Equity Value and Shareholders\u2019 Equity? Equity Valu", "ev_basic_001": "Are there any problems with the Enterprise Value formula you just gave me? Yes \u2013", "ev_adv_003": "What percentage dilution in Equity Value is \u201ctoo high?\u201d There\u2019s no strict \u201crule\u201d", "ev_adv_002": "Rank the 3 valuation methodologies from highest to lowest expected value. Trick ", "ev_adv_004": "What other Valuation methodologies are there? Other methodologies include: \u2022", "val_basic_005": "When would you use a Liquidation Valuation?", "val_basic_006": "When would you use Sum of the Parts?", "val_basic_007": "When do you use an LBO Analysis as part of your Valuation? Obviously you use thi", "val_basic_008": "What are the most common multiples used in Valuation?", "val_basic_009": "What are some examples of industry-specific multiples? Technology (Internet): EV", "val_basic_010": "When you\u2019re looking at an industry-specific multiple like EV / Scientists or EV ", "val_basic_011": "Would an LBO or DCF give a higher valuation? Technically it could go either way,", "val_basic_012": "How would you present these Valuation methodologies to a company or its investor", "val_basic_013": "How would you value an apple tree? The same way you would value a company: by lo", "val_basic_014": "Why can\u2019t you use Equity Value / EBITDA as a multiple rather than Enterprise Val", "val_basic_015": "When would a Liquidation Valuation produce the highest value?", "val_basic_016": "Let\u2019s go back to 2004 and look at Facebook back when it had no profit and no rev", "val_basic_017": "What would you use in conjunction with Free Cash Flow multiples \u2013 Equity Value o", "val_basic_018": "You never use Equity Value / EBITDA, but are there any cases where you might use", "val_basic_003": "Geography For Precedent Transactions, you often limit the set based on date and ", "val_basic_020": "How do you apply the 3 valuation methodologies to actually get a value for the c", "val_basic_021": "What do you actually use a valuation for? Usually you use it in pitch books and ", "val_basic_022": "Why would a company with similar growth and profitability to its Comparable Comp", "val_basic_023": "What are the flaws with public company comparables? \u2022 No company is 100% compara", "val_basic_026": "You mentioned that Precedent Transactions usually produce a higher value than Co", "val_basic_027": "What are some flaws with precedent transactions? \u2022 Past transactions are rarely ", "val_basic_029": "Why does Warren Buffett prefer EBIT multiples to EBITDA multiples? Warren Buffet", "val_basic_030": "The EV / EBIT, EV / EBITDA, and P / E multiples all measure a company\u2019s profitab", "val_basic_031": "If you were buying a vending machine business, would you pay a higher multiple f", "val_basic_032": "How do you value a private company?", "val_basic_033": "Let\u2019s say we\u2019re valuing a private company. Why might we discount the public comp", "val_basic_034": "Can you use private companies as part of your valuation? Only in the context of ", "val_basic_001": "How do you value banks and financial institutions differently from other compani", "val_adv_003": "I\u2019m looking at financial data for a public company comparable, and it\u2019s April (Q", "val_adv_004": "Get the medians for each set, and then apply them to your company\u2019s current shar", "val_adv_006": "Both M&A premiums analysis and precedent transactions involve looking at previou", "val_adv_007": "Walk me through a Sum-of-the-Parts analysis. In a Sum-of-the-Parts analysis, you", "val_adv_002": "In an acquisition scenario, use Section 382 and multiply the adjusted long-term ", "val_adv_012": "I have one company with a 40% EBITDA margin trading at 8x EBITDA, and another co", "val_adv_013": "Walk me through how we might value an oil & gas company and how it\u2019s different f", "val_adv_014": "Walk me through how we would value a REIT (Real Estate Investment Trust) and how", "val_adv_001": "Walk me through a DCF.", "dcf_basic_006": "How do you calculate WACC? The formula is: Cost of Equity * (% Equity) + Cost of", "dcf_basic_007": "How do you calculate the Cost of Equity? Cost of Equity = Risk-Free Rate + Beta ", "dcf_basic_008": "How do you get to Beta in the Cost of Equity calculation? You look up the Beta f", "dcf_basic_009": "Why do you have to un-lever and re-lever Beta? Again, keep in mind our \u201capples-t", "dcf_basic_012": "If you use Levered Free Cash Flow, what should you use as the Discount Rate?", "dcf_basic_013": "How do you calculate the Terminal Value?", "dcf_basic_014": "Why would you use Gordon Growth rather than the Multiples Method to calculate th", "dcf_basic_015": "What\u2019s an appropriate growth rate to use when calculating the Terminal Value? No", "dcf_basic_016": "How do you select the appropriate exit multiple when calculating Terminal Value?", "dcf_basic_018": "What\u2019s the flaw with basing terminal multiples on what public company comparable", "dcf_basic_019": "How do you know if your DCF is too dependent on future assumptions? The \u201cstandar", "dcf_basic_021": "What about WACC \u2013 will it be higher for a $5 billion or $500 million company?", "dcf_basic_023": "Cost of Equity tells us what kind of return an equity investor can expect for in", "dcf_basic_024": "How can we calculate Cost of Equity WITHOUT using CAPM? There is an alternate fo", "dcf_basic_025": "Two companies are exactly the same, but one has debt and one does not \u2013 which on", "dcf_basic_027": "What about a 1% change in revenue vs. a 1% change in the discount rate?", "dcf_basic_028": "How do you calculate WACC for a private company?", "dcf_basic_029": "What should you do if you don\u2019t believe management\u2019s projections for a DCF model", "dcf_basic_030": "Why would you not use a DCF for a bank or other financial institution? Banks use", "dcf_basic_031": "What types of sensitivity analyses would we look at in a DCF? Example sensitivit", "dcf_basic_032": "A company has a high debt load and is paying off a significant portion of its pr", "dcf_basic_001": "Explain why we would use the mid-year convention in a DCF.", "dcf_basic_002": "What discount period numbers would I use for the mid-year convention if I have a", "dcf_basic_003": "How does the terminal value calculation change when we use the mid-year conventi", "dcf_adv_004": "If I\u2019m working with a public company in a DCF, how do I calculate its per-share ", "dcf_adv_007": "We\u2019re creating a DCF for a company that is planning to buy a factory for $100 in", "dcf_adv_001": "Walk me through a basic merger model.", "ma_basic_004": "Why would an acquisition be dilutive? An acquisition is dilutive if the addition", "ma_basic_005": "Is there a rule of thumb for calculating whether an acquisition will be accretiv", "ma_basic_006": "A company with a higher P/E acquires one with a lower P/E \u2013 is this accretive or", "ma_basic_007": "What is the rule of thumb for assessing whether an M&A deal will be accretive or", "ma_basic_010": "Why would a strategic acquirer typically be willing to pay more for a company th", "ma_basic_011": "Why do Goodwill & Other Intangibles get created in an acquisition? These represe", "ma_basic_012": "What is the difference between Goodwill and Other Intangible Assets? Goodwill ty", "ma_basic_013": "Is there anything else \u201cintangible\u201d besides Goodwill & Other Intangibles that co", "ma_basic_014": "What are synergies, and can you provide a few examples? Synergies refer to cases", "ma_basic_015": "How are synergies used in merger models? Revenue Synergies: Normally you add the", "ma_basic_016": "Are revenue or cost synergies more important? No one in M&A takes revenue synerg", "ma_basic_017": "All else being equal, which method would a company prefer to use when acquiring ", "ma_basic_018": "How much debt could a company issue in a merger or acquisition? Generally you wo", "ma_basic_019": "How do you determine the Purchase Price for the target company in an acquisition", "ma_basic_020": "Let\u2019s say a company overpays for another company \u2013 what typically happens afterw", "ma_basic_021": "A buyer pays $100 million for the seller in an all-stock deal, but a day later t", "ma_basic_022": "Why do most mergers and acquisitions fail? Like so many things, M&A is \u201ceasier s", "ma_basic_023": "What role does a merger model play in deal negotiations? The model is used as a ", "ma_basic_024": "What types of sensitivities would you look at in a merger model? What variables ", "ma_basic_001": "What\u2019s the difference between Purchase Accounting and Pooling Accounting in an M", "ma_basic_002": "Walk me through a concrete example of how to calculate revenue synergies.", "ma_basic_003": "Walk me through an example of how to calculate expense synergies.", "ma_adv_004": "How do you take into account NOLs in an M&A deal? You apply Section 382 to deter", "ma_adv_005": "Why do deferred tax liabilities (DTLs) and deferred tax assets (DTAs) get create", "ma_adv_006": "How do DTLs and DTAs affect the Balance Sheet Adjustment in an M&A deal? You tak", "ma_adv_008": "How do you account for DTLs in forward projections in a merger model? You create", "ma_adv_009": "Explain the complete formula for how to calculate Goodwill in an M&A deal. Goodw", "ma_adv_010": "Explain why we would write down the seller\u2019s existing Deferred Tax Asset in an M", "ma_adv_011": "What\u2019s a Section 338(h)(10) election and why might a company want to use it in a", "ma_adv_012": "What is an exchange ratio and when would companies use it in an M&A deal? An exc", "ma_adv_013": "Walk me through the most important terms of a Purchase Agreement in an M&A deal.", "ma_adv_014": "What\u2019s an Earnout and why would a buyer offer it to a seller in an M&A deal? An ", "ma_adv_015": "How would an accretion / dilution model be different for a private seller? The m", "ma_adv_016": "How would I calculate \u201cbreak-even synergies\u201d in an M&A deal and what does the nu", "ma_adv_017": "Normally in an accretion / dilution model you care most about combining both com", "ma_adv_018": "How do you handle options, convertible debt, and other dilutive securities in a ", "ma_adv_019": "What are the main 3 transaction structures you could use to acquire another comp", "ma_adv_021": "Explain what a contribution analysis is and why we might look at it in a merger ", "ma_adv_022": "How do you account for transaction costs, financing fees, and miscellaneous expe", "ma_adv_001": "Walk me through a basic LBO model.", "lbo_basic_004": "How do you pick purchase multiples and exit multiples in an LBO model? The same ", "lbo_basic_005": "What is an \u201cideal\u201d candidate for an LBO?", "lbo_basic_006": "How do you use an LBO model to value a company, and why do we sometimes say that", "lbo_basic_007": "Give an example of a \u201creal-life\u201d LBO.", "lbo_basic_008": "Can you explain how the Balance Sheet is adjusted in an LBO model?", "lbo_basic_011": "Do you need to project all 3 statements in an LBO model? Are there any", "lbo_basic_013": "Let\u2019s say we\u2019re analyzing how much debt a company can take on, and what the term", "lbo_basic_014": "What is the difference between bank debt and high-yield debt?", "lbo_basic_017": "Why would a private equity firm buy a company in a \u201crisky\u201d industry, such as tec", "lbo_basic_019": "What is meant by the \u201ctax shield\u201d in an LBO?", "lbo_basic_020": "What is a dividend recapitalization (\u201cdividend recap\u201d)? In a dividend recap, the", "lbo_basic_021": "Why would a PE firm choose to do a dividend recap of one of its portfolio compan", "lbo_basic_022": "How would a dividend recap impact the 3 financial statements in an LBO? No chang", "lbo_basic_001": "Tell me about all the different kinds of debt you could use in an LBO and the di", "lbo_adv_002": "How would an asset write-up or write-down affect an LBO model? / Walk me through", "lbo_adv_003": "Normally we care about the IRR for the equity investors in an LBO \u2013 the PE firm ", "lbo_adv_004": "Why might a private equity firm allot some of a company\u2019s new equity in an LBO t", "lbo_adv_005": "Why you would you use PIK (Payment In Kind) debt rather than other types of debt", "lbo_adv_006": "What are some examples of incurrence covenants? Maintenance covenants? Incurrenc", "lbo_adv_007": "Just like a normal M&A deal, you can structure an LBO either as a stock purchase", "lbo_adv_008": "Walk me through how you calculate optional repayments on debt in an LBO model.", "lbo_adv_009": "Explain how a Revolver is used in an LBO model.", "lbo_adv_010": "How would you adjust the Income Statement in an LBO model?", "lbo_adv_011": "In an LBO model, is it possible for debt investors to get a higher return than t", "lbo_adv_012": "Most of the time, increased leverage means an increased IRR. Explain how increas", "lbo_adv_001": "A car drives 60 miles at an average speed of 30 miles per hour. How fast should "};
+
+  // ── AUTH ──────────────────────────────────────────────────
+  const token = localStorage.getItem('apex_token');
+  const userName = localStorage.getItem('apex_user');
+  if (userName) {
+    const initials = userName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('sidebarUserName').textContent = userName;
+    document.getElementById('signOutBtn').style.display = 'block';
+  }
+  function doLogout() {
+    localStorage.removeItem('apex_token'); localStorage.removeItem('apex_user');
+    window.location.href = 'dashboard.html';
+  }
+
+  // ── READINESS SCORE ───────────────────────────────────────
+  function computeReadiness(results, history) {
+    if (!results.length && !history.length) return null;
+
+    const topicScores = {};
+    TOPICS.forEach(t => { topicScores[t.key] = { mastered:0, total:t.total, attempts:0, scores:[] }; });
+
+    results.forEach(r => {
+      if (topicScores[r.topic]) {
+        if (r.status === 'mastered') topicScores[r.topic].mastered++;
+      }
+    });
+
+    history.forEach(h => {
+      if (topicScores[h.topic]) {
+        topicScores[h.topic].attempts++;
+        topicScores[h.topic].scores.push(h.score);
+      }
+    });
+
+    // Per-topic readiness = weighted avg of mastery% (60%) + avg score% (40%)
+    const topicReadiness = TOPICS.map(t => {
+      const ts = topicScores[t.key];
+      const masteryPct = ts.total > 0 ? (ts.mastered / ts.total) * 100 : 0;
+      const avgScore = ts.scores.length > 0 ? ts.scores.reduce((a,b)=>a+b,0)/ts.scores.length : 0;
+      const score = ts.attempts === 0 ? 0 : Math.round(masteryPct * 0.6 + avgScore * 0.4);
+      return { key: t.key, label: t.label, score, masteryPct: Math.round(masteryPct), attempts: ts.attempts };
+    });
+
+    const attempted = topicReadiness.filter(t => t.attempts > 0);
+    if (attempted.length === 0) return { score: 0, topicReadiness, attempted: 0 };
+
+    const overall = Math.round(attempted.reduce((s,t) => s+t.score, 0) / attempted.length);
+    return { score: overall, topicReadiness, attempted: attempted.length };
+  }
+
+  function renderReadiness(readiness, streak) {
+    if (!readiness || readiness.attempted === 0) {
+      document.getElementById('dialScore').textContent = '—';
+      document.getElementById('readinessTitle').textContent = 'Interview Readiness Score';
+      document.getElementById('readinessDesc').textContent = 'Practice at least one topic to generate your readiness score.';
+      document.getElementById('readinessBars').innerHTML = '';
+      return;
+    }
+
+    const s = readiness.score;
+    const fill = document.getElementById('dialFill');
+    const arc = 239.8; // circumference for 270° arc
+    const offset = arc - (arc * s / 100);
+    fill.style.strokeDashoffset = offset;
+    fill.className = 'dial-fill ' + (s >= 70 ? 'high' : s >= 45 ? 'mid' : 'low');
+    document.getElementById('dialScore').textContent = s;
+
+    const label = s >= 80 ? 'Strong' : s >= 60 ? 'Building' : s >= 40 ? 'Developing' : 'Early Stage';
+    const desc = s >= 80
+      ? `You're in strong shape across ${readiness.attempted} topic${readiness.attempted>1?'s':''}. Focus on any remaining gaps before your interview.`
+      : s >= 60
+      ? `Good progress across ${readiness.attempted} topic${readiness.attempted>1?'s':''}. Drill your weaker areas to push your score higher.`
+      : `You've started ${readiness.attempted} topic${readiness.attempted>1?'s':''} so far. Consistent practice will move this score quickly.`;
+
+    document.getElementById('readinessTitle').textContent = `Readiness: ${label}`;
+    document.getElementById('readinessDesc').textContent = desc;
+
+    const barColors = ['green','blue','amber','red'];
+    const barColorMap = s => s >= 75 ? 'green' : s >= 50 ? 'blue' : s >= 30 ? 'amber' : 'red';
+
+    document.getElementById('readinessBars').innerHTML = readiness.topicReadiness
+      .filter(t => t.attempts > 0)
+      .sort((a,b) => a.score - b.score)
+      .slice(0, 4)
+      .map(t => `
+        <div class="rbar-row">
+          <span class="rbar-label">${t.label}</span>
+          <div class="rbar-track"><div class="rbar-fill ${barColorMap(t.score)}" style="width:${t.score}%"></div></div>
+          <span class="rbar-pct">${t.score}%</span>
+        </div>`).join('');
+  }
+
+  // ── SCORE TREND ───────────────────────────────────────────
+  function renderTrend(history, streak) {
+    const wrap = document.getElementById('trendWrap');
+    const empty = document.getElementById('trendEmpty');
+
+    if (!history || history.length === 0) {
+      empty.style.display = 'block';
+      document.getElementById('trendStats').style.display = 'none';
+      return;
+    }
+
+    empty.style.display = 'none';
+
+    // Take last 20, oldest first
+    const pts = [...history].sort((a,b) => a.created_at - b.created_at).slice(-20);
+    const scores = pts.map(p => p.score);
+    const W = wrap.offsetWidth || 340;
+    const H = 120;
+    const PAD_L = 28, PAD_R = 8, PAD_T = 8, PAD_B = 20;
+    const w = W - PAD_L - PAD_R;
+    const h = H - PAD_T - PAD_B;
+
+    const minS = Math.max(0, Math.min(...scores) - 10);
+    const maxS = Math.min(100, Math.max(...scores) + 10);
+    const xOf = (i) => PAD_L + (i / (scores.length - 1 || 1)) * w;
+    const yOf = (s) => PAD_T + h - ((s - minS) / (maxS - minS || 1)) * h;
+
+    // Build SVG
+    const linePts = scores.map((s,i) => `${xOf(i)},${yOf(s)}`).join(' ');
+    const areaPts = `${xOf(0)},${PAD_T+h} ${scores.map((s,i) => `${xOf(i)},${yOf(s)}`).join(' ')} ${xOf(scores.length-1)},${PAD_T+h}`;
+
+    // Gridlines at 0,50,100
+    const grids = [0, 50, 100].filter(v => v >= minS && v <= maxS);
+
+    const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+    const color = avg >= 75 ? '#16A34A' : avg >= 50 ? '#D97706' : '#DC2626';
+
+    const svg = `<svg class="trend-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      ${grids.map(g => `
+        <line class="trend-gridline" x1="${PAD_L}" y1="${yOf(g)}" x2="${PAD_L+w}" y2="${yOf(g)}"/>
+        <text class="trend-axis-label" x="${PAD_L-4}" y="${yOf(g)+3}" text-anchor="end">${g}</text>
+      `).join('')}
+      <polygon class="trend-area" points="${areaPts}" fill="${color}"/>
+      <polyline class="trend-line" points="${linePts}" stroke="${color}"/>
+      ${scores.map((s,i) => `<circle class="trend-dot" cx="${xOf(i)}" cy="${yOf(s)}" r="3.5" fill="${color}" stroke="white" stroke-width="1.5"
+        onmouseenter="showTip(event,${s},'Q${i+1}')" onmouseleave="hideTip()"/>`).join('')}
+    </svg>`;
+
+    // Remove old SVG if any
+    wrap.querySelectorAll('svg').forEach(e => e.remove());
+    wrap.insertAdjacentHTML('afterbegin', svg);
+
+    // Stats
+    document.getElementById('trendStats').style.display = 'flex';
+    document.getElementById('trendAvg').textContent = avg;
+    document.getElementById('trendBest').textContent = Math.max(...scores);
+    document.getElementById('trendStreak').textContent = (streak || 0) + ' day' + (streak !== 1 ? 's' : '');
+    document.getElementById('trendLabel').textContent = `Last ${scores.length} answer${scores.length!==1?'s':''}`;
+  }
+
+  function showTip(e, score, label) {
+    const tip = document.getElementById('trendTooltip');
+    tip.textContent = `${label}: ${score}/100`;
+    tip.style.opacity = '1';
+    const rect = e.target.closest('.trend-chart-wrap').getBoundingClientRect();
+    tip.style.left = (e.clientX - rect.left + 8) + 'px';
+    tip.style.top = (e.clientY - rect.top - 28) + 'px';
+  }
+  function hideTip() { document.getElementById('trendTooltip').style.opacity = '0'; }
+
+  // ── TOPIC BALANCE ─────────────────────────────────────────
+  function renderBalance(results) {
+    const masteredByTopic = {};
+    results.forEach(r => {
+      if (r.status === 'mastered') masteredByTopic[r.topic] = (masteredByTopic[r.topic]||0)+1;
+    });
+
+    const COLORS = ['#2563EB','#16A34A','#D97706','#9333EA','#BE123C','#0891B2'];
+
+    document.getElementById('balanceGrid').innerHTML = TOPICS.map((t,i) => {
+      const mastered = masteredByTopic[t.key] || 0;
+      const pct = Math.round((mastered / t.total)*100);
+      return `<div class="balance-row">
+        <span class="balance-topic">${t.label}</span>
+        <div class="balance-track">
+          <div class="balance-fill" style="width:${pct}%;background:${COLORS[i]};"></div>
+        </div>
+        <span class="balance-attempts">${mastered}/${t.total}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── NEXT SESSION PLANNER ──────────────────────────────────
+  function renderNextSession(results, history) {
+    const list = document.getElementById('nextSessionList');
+
+    // Score each question
+    const qData = {};
+    if (history) {
+      history.forEach(h => {
+        if (!qData[h.question_id]) qData[h.question_id] = { scores:[], topic:h.topic, attempts:0 };
+        qData[h.question_id].scores.push(h.score);
+        qData[h.question_id].attempts++;
+      });
+    }
+    results.forEach(r => {
+      if (!qData[r.question_id]) {
+        const s = r.status==='missed'?35 : r.status==='partial'?65 : 95;
+        qData[r.question_id] = { scores:[s], topic:r.topic, attempts:1 };
+      }
+    });
+
+    // Classify questions
+    const urgent = [], review = [], newQ = [];
+    const attempted = new Set(Object.keys(qData));
+
+    // Add unattempted questions
+    Object.entries(Q_TEXT).forEach(([id, text]) => {
+      if (!attempted.has(id)) {
+        // Guess topic from id prefix
+        let topic = 'Accounting';
+        if (id.startsWith('ev_')) topic = 'Enterprise_Value';
+        else if (id.startsWith('val_')) topic = 'Valuation';
+        else if (id.startsWith('dcf_')) topic = 'DCF';
+        else if (id.startsWith('ma_')) topic = 'Mergers_MA';
+        else if (id.startsWith('lbo_')) topic = 'LBO';
+        newQ.push({ id, text, topic, score: null, priority: 'new', reason: 'Not yet attempted' });
+      }
+    });
+
+    Object.entries(qData).forEach(([id, d]) => {
+      const lastScore = d.scores[d.scores.length-1];
+      const text = Q_TEXT[id] || id;
+      if (lastScore < 60) urgent.push({ id, text, topic:d.topic, score:lastScore, priority:'urgent', reason:`Scored ${lastScore}/100` });
+      else if (lastScore < 85) review.push({ id, text, topic:d.topic, score:lastScore, priority:'review', reason:`Scored ${lastScore}/100` });
+    });
+
+    // Build curated list: 3 urgent, 3 review, 4 new
+    const plan = [
+      ...urgent.sort((a,b)=>a.score-b.score).slice(0,3),
+      ...review.sort((a,b)=>a.score-b.score).slice(0,3),
+      ...newQ.sort(()=>Math.random()-.5).slice(0,4),
+    ].slice(0,10);
+
+    if (plan.length === 0) {
+      list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-tertiary);font-size:13px;">Start practicing to generate your personalized session plan.</div>';
+      return;
+    }
+
+    const topicTagClass = t => ({ Accounting:'accounting', Enterprise_Value:'ev', Valuation:'valuation', DCF:'dcf', Mergers_MA:'mergers', LBO:'lbo' })[t]||'';
+    const topicLabel = t => ({ Accounting:'Accounting', Enterprise_Value:'EV', Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO' })[t]||t;
+
+    list.innerHTML = plan.map(q => `
+      <a class="next-q-item" href="practice-screen.html?topic=${q.topic}">
+        <div class="next-q-pri ${q.priority}"></div>
+        <div class="next-q-text">${escHtml(q.text)}</div>
+        <span class="next-q-tag ${topicTagClass(q.topic)}">${topicLabel(q.topic)}</span>
+        <span class="next-q-reason">${q.reason}</span>
+      </a>`).join('');
+
+    // Set drill btn to the weakest topic
+    if (urgent.length > 0) {
+      document.getElementById('drillBtn').href = `practice-screen.html?topic=${urgent[0].topic}`;
+    }
+  }
+
+  // ── WEAK SPOTS TABLE ──────────────────────────────────────
+  function renderWeakTable(results, history) {
+    const tbody = document.getElementById('weakTableBody');
+    const qData = {};
+
+    if (history) {
+      history.forEach(h => {
+        if (!qData[h.question_id]) qData[h.question_id] = { scores:[], topic:h.topic, attempts:0, latestScore:0 };
+        qData[h.question_id].scores.push(h.score);
+        qData[h.question_id].attempts++;
+        qData[h.question_id].latestScore = h.score;
+      });
+    }
+    results.forEach(r => {
+      if (!qData[r.question_id]) {
+        const s = r.status==='missed'?35 : r.status==='partial'?65 : 95;
+        qData[r.question_id] = { scores:[s], topic:r.topic, attempts:1, latestScore:s };
+      }
+    });
+
+    const rows = Object.entries(qData)
+      .filter(([,d]) => d.latestScore < 85)
+      .map(([id,d]) => ({ id, ...d }))
+      .sort((a,b) => a.latestScore - b.latestScore);
+
+    document.getElementById('weakCountLabel').textContent = rows.length > 0 ? `${rows.length} question${rows.length!==1?'s':''} below mastery` : 'Sorted by score';
+
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-title">No weak spots yet</div><div class="empty-sub">Practice more questions to see where you need work.</div></div></td></tr>';
+      return;
+    }
+
+    const topicLabel = t => ({ Accounting:'Accounting', Enterprise_Value:'Enterprise Value', Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO' })[t]||t;
+    const chipClass = s => s < 60 ? 'bad' : 'mid';
+
+    tbody.innerHTML = rows.map(q => {
+      const text = Q_TEXT[q.id] || q.id;
+      return `<tr>
+        <td style="max-width:340px;">${escHtml(text)}</td>
+        <td style="color:var(--text-secondary)">${topicLabel(q.topic)}</td>
+        <td><span class="score-chip ${chipClass(q.latestScore)}">${q.latestScore}/100</span></td>
+        <td style="color:var(--text-tertiary)">${q.attempts}</td>
+        <td><a href="practice-screen.html?topic=${q.topic}" style="color:var(--accent-blue);font-size:12px;text-decoration:none;">Drill →</a></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── INIT ──────────────────────────────────────────────────
+  async function init() {
+    // Render empty states first
+    renderReadiness(null, 0);
+    renderBalance([]);
+    renderNextSession([], []);
+    renderWeakTable([], []);
+
+    const firstName = userName ? userName.split(' ')[0] : 'there';
+    document.getElementById('pageSubtitle').textContent = `Your interview prep analytics, ${firstName}`;
+
+    if (!token) return;
+
+    try {
+      const res = await fetch('/api/progress/load', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const results = data.results || [];
+      const history = data.history || [];
+      const streak = data.streak || 0;
+
+      const readiness = computeReadiness(results, history);
+      renderReadiness(readiness, streak);
+      renderTrend(history, streak);
+      renderBalance(results);
+      renderNextSession(results, history);
+      renderWeakTable(results, history);
+
+      document.getElementById('pageSubtitle').textContent =
+        history.length > 0
+          ? `${history.length} answer${history.length!==1?'s':''} recorded · ${readiness?.score ?? '—'}% readiness`
+          : `No answers yet — start practicing to see your analytics`;
+
+    } catch(e) {
+      console.log('Performance load error:', e);
+    }
+
+    // Animate bars
+    setTimeout(() => {
+      document.querySelectorAll('.rbar-fill, .balance-fill').forEach(el => {
+        const w = el.style.width;
+        el.style.width = '0%';
+        setTimeout(() => { el.style.width = w; }, 60);
+      });
+    }, 200);
+  }
+
+  init();
+</script>
+</body>
+</html>
