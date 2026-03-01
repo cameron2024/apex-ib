@@ -766,28 +766,28 @@
 
     <div class="nav-section-label" style="margin-top:10px;">Topics</div>
     <a class="nav-item" href="practice-screen.html?topic=Accounting">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
       Accounting
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Enterprise_Value">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
       Enterprise Value
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Valuation">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
       Valuation
     </a>
     <a class="nav-item" href="practice-screen.html?topic=DCF">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      DCF
+      Discounted Cash Flow
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Mergers_MA">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 012 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
-      M&A
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Mergers &amp; Acquisitions
     </a>
     <a class="nav-item" href="practice-screen.html?topic=LBO">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
-      LBO
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Leveraged Buyouts
     </a>
   </nav>
 
@@ -799,6 +799,7 @@
         <div class="user-plan">Free plan · <a href="#" style="color:var(--accent-blue);text-decoration:none;font-size:11px;">Upgrade</a></div>
       </div>
     </div>
+    <button id="signOutBtn" onclick="doLogout()" style="display:none;margin-top:8px;width:100%;background:none;border:1px solid var(--border);color:var(--text-tertiary);border-radius:6px;padding:6px;cursor:pointer;font-size:12px;">Sign out</button>
   </div>
 </aside>
 
@@ -1159,6 +1160,12 @@
   }
 
   // ── BOOT ──────────────────────────────────────────────────
+  function doLogout() {
+    localStorage.removeItem('apex_token');
+    localStorage.removeItem('apex_user');
+    window.location.reload();
+  }
+
   async function init() {
     const token = localStorage.getItem('apex_token');
     const name = localStorage.getItem('apex_user');
@@ -1169,6 +1176,8 @@
       const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
       document.getElementById('userAvatar').textContent = initials;
       document.getElementById('sidebarUserName').textContent = name;
+      const signOutBtn = document.getElementById('signOutBtn');
+      if (signOutBtn) signOutBtn.style.display = 'block';
     } else {
       setGreeting('');
     }

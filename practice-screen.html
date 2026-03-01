@@ -1237,10 +1237,9 @@
     </a>
 
     <div class="nav-section-label" style="margin-top:10px;">Practice</div>
-    <a class="nav-item active" href="#">
+    <a class="nav-item active" href="practice-screen.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      Practice
-      <span class="nav-badge">7 left</span>
+      Practice All
     </a>
     <a class="nav-item" href="#">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
@@ -1248,11 +1247,7 @@
     </a>
 
     <div class="nav-section-label" style="margin-top:10px;">Topics</div>
-    <a class="nav-item" href="#" onclick="selectTopic('All');return false;" id="nav-All">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
-      All Topics
-      <span class="nav-badge" id="badge-All">—</span>
-    </a>
+
     <a class="nav-item" href="#" onclick="selectTopic('Accounting');return false;" id="nav-Accounting">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
       Accounting
@@ -1270,29 +1265,30 @@
     </a>
     <a class="nav-item" href="#" onclick="selectTopic('DCF');return false;" id="nav-DCF">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      DCF
+      Discounted Cash Flow
       <span class="nav-badge" id="badge-DCF">—</span>
     </a>
     <a class="nav-item" href="#" onclick="selectTopic('Mergers_MA');return false;" id="nav-Mergers_MA">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-      M&A
+      Mergers &amp; Acquisitions
       <span class="nav-badge" id="badge-Mergers_MA">—</span>
     </a>
     <a class="nav-item" href="#" onclick="selectTopic('LBO');return false;" id="nav-LBO">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      LBO
+      Leveraged Buyouts
       <span class="nav-badge" id="badge-LBO">—</span>
     </a>
   </nav>
 
   <div class="sidebar-bottom">
     <div class="user-card">
-      <div class="user-avatar">CK</div>
-      <div class="user-info">
-        <div class="user-name">Chris Karimi</div>
-        <div class="user-plan">Free plan</div>
+      <div class="user-avatar" id="sidebarAvatar">?</div>
+      <div>
+        <div class="user-name" id="sidebarUserName">—</div>
+        <div class="user-plan">Free plan · <a href="#" style="color:var(--accent-blue);text-decoration:none;font-size:11px;">Upgrade</a></div>
       </div>
     </div>
+    <button id="sidebarSignOut" onclick="doLogout()" style="display:none;margin-top:8px;width:100%;background:none;border:1px solid var(--border);color:var(--text-tertiary);border-radius:6px;padding:6px;cursor:pointer;font-size:12px;">Sign out</button>
   </div>
 </aside>
 
@@ -1307,10 +1303,6 @@
       <span id="topbarTopicPill">All Topics</span>
     </div>
     <div class="topbar-right">
-      <div id="userBadge" style="display:none">
-        <span class="user-name" id="userDisplayName"></span>
-        <button class="logout-btn" onclick="doLogout()">Sign out</button>
-      </div>
     </div>
   </div>
 
@@ -2438,9 +2430,9 @@ Grade strictly and return JSON only.`;
     'Accounting': 'Accounting',
     'Enterprise_Value': 'Enterprise Value',
     'Valuation': 'Valuation',
-    'DCF': 'DCF',
-    'Mergers_MA': 'M&A',
-    'LBO': 'LBO'
+    'DCF': 'Discounted Cash Flow',
+    'Mergers_MA': 'Mergers & Acquisitions',
+    'LBO': 'Leveraged Buyouts'
   };
 
   // Smart ordering: missed → partial → unattempted → mastered
@@ -2471,8 +2463,14 @@ Grade strictly and return JSON only.`;
 
     // Update nav active state
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    const navEl = document.getElementById('nav-' + topic);
-    if (navEl) navEl.classList.add('active');
+    if (topic === 'All') {
+      // Highlight "Practice All" nav item
+      const practiceAll = document.querySelector('.nav-item[href="practice-screen.html"]');
+      if (practiceAll) practiceAll.classList.add('active');
+    } else {
+      const navEl = document.getElementById('nav-' + topic);
+      if (navEl) navEl.classList.add('active');
+    }
 
     // Update breadcrumb + pill
     const label = TOPIC_LABELS[topic] || topic;
@@ -2496,10 +2494,12 @@ Grade strictly and return JSON only.`;
     // If AI suggested a specific follow-up question, find closest match in bank
     if (pendingNextQuestion) {
       const suggested = pendingNextQuestion.toLowerCase();
-      // Try to find it in the bank
-      const match = filteredQuestions.find(q => 
-        q.question.toLowerCase().includes(suggested.slice(0, 40)) ||
-        suggested.includes(q.question.toLowerCase().slice(0, 40))
+      // Try to find it in the bank — exclude current question to avoid re-loading same Q
+      const match = filteredQuestions.find((q, i) => 
+        i !== currentIndex && (
+          q.question.toLowerCase().includes(suggested.slice(0, 40)) ||
+          suggested.includes(q.question.toLowerCase().slice(0, 40))
+        )
       );
       if (match) {
         const idx = filteredQuestions.indexOf(match);
@@ -2507,12 +2507,15 @@ Grade strictly and return JSON only.`;
         loadQuestionAt(idx);
         return;
       }
+      // No match found — clear and fall through to normal next
+      pendingNextQuestion = null;
     }
 
-    // Otherwise advance to next unmastered question
+    // Advance to next question — skip mastered ones, but always make progress
     const start = currentIndex + 1;
     for (let i = 0; i < filteredQuestions.length; i++) {
       const idx = (start + i) % filteredQuestions.length;
+      if (idx === currentIndex) continue; // never re-load same question
       const q = filteredQuestions[idx];
       if (sessionResults[q.id] !== 'mastered') {
         pendingNextQuestion = null;
@@ -2521,8 +2524,9 @@ Grade strictly and return JSON only.`;
       }
     }
 
-    // All mastered — loop back
-    loadQuestionAt((currentIndex + 1) % filteredQuestions.length);
+    // All questions mastered — find next that isn't the current one
+    const nextIdx = (currentIndex + 1) % filteredQuestions.length;
+    loadQuestionAt(nextIdx);
   }
 
   function displayQuestion(q, index) {
@@ -2589,8 +2593,14 @@ Grade strictly and return JSON only.`;
       authToken = token;
       currentUser = name;
       document.getElementById('authOverlay').classList.add('hidden');
-      document.getElementById('userBadge').style.display = 'flex';
-      document.getElementById('userDisplayName').textContent = name;
+      // Populate sidebar user info
+      const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      const avatarEl = document.getElementById('sidebarAvatar');
+      const nameEl = document.getElementById('sidebarUserName');
+      const signOutBtn = document.getElementById('sidebarSignOut');
+      if (avatarEl) avatarEl.textContent = initials;
+      if (nameEl) nameEl.textContent = name;
+      if (signOutBtn) signOutBtn.style.display = 'block';
     }
 
     const params = new URLSearchParams(window.location.search);
@@ -2675,7 +2685,13 @@ Grade strictly and return JSON only.`;
     localStorage.removeItem('apex_token');
     localStorage.removeItem('apex_user');
     authToken = null; currentUser = null;
-    document.getElementById('userBadge').style.display = 'none';
+    // Reset sidebar user info
+    const avatarEl = document.getElementById('sidebarAvatar');
+    const nameEl = document.getElementById('sidebarUserName');
+    const signOutBtn = document.getElementById('sidebarSignOut');
+    if (avatarEl) avatarEl.textContent = '?';
+    if (nameEl) nameEl.textContent = '—';
+    if (signOutBtn) signOutBtn.style.display = 'none';
     document.getElementById('authOverlay').classList.remove('hidden');
     // Reset all progress locally
     sessionResults = {};
@@ -2688,8 +2704,14 @@ Grade strictly and return JSON only.`;
     localStorage.setItem('apex_token', token);
     localStorage.setItem('apex_user', name);
     document.getElementById('authOverlay').classList.add('hidden');
-    document.getElementById('userBadge').style.display = 'flex';
-    document.getElementById('userDisplayName').textContent = name;
+    // Populate sidebar with logged-in user info
+    const loginInitials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const loginAvatar = document.getElementById('sidebarAvatar');
+    const loginName = document.getElementById('sidebarUserName');
+    const loginSignOut = document.getElementById('sidebarSignOut');
+    if (loginAvatar) loginAvatar.textContent = loginInitials;
+    if (loginName) loginName.textContent = name;
+    if (loginSignOut) loginSignOut.style.display = 'block';
     await loadProgressFromServer();
   }
 
@@ -2716,14 +2738,11 @@ Grade strictly and return JSON only.`;
       const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
 
       if (topicParam && validTopics.includes(topicParam)) {
-        // URL param takes priority — re-order with progress and start from top
+        // URL param always wins — navigate to the specified topic
         selectTopic(topicParam);
-      } else if (data.state) {
-        const savedTopic = validTopics.includes(data.state.last_topic) ? data.state.last_topic : 'All';
-        selectTopic(savedTopic);
-        // Don't restore question index — smart ordering puts most important question first
       } else {
-        selectTopic(currentTopic);
+        // No URL param = Practice All — always start with 'All', ignore last_topic
+        selectTopic('All');
       }
 
       updateProgressUI();
