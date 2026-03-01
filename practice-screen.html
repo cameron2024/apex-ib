@@ -1118,81 +1118,7 @@
 </style>
   <style>
     /* ── AUTH MODAL ───────────────────────────────────────── */
-    #authOverlay {
-      position: fixed; inset: 0; z-index: 1000;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center;
-    }
-    #authOverlay.hidden { display: none; }
-    .auth-modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 36px;
-      width: 100%; max-width: 400px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
-    }
-    .auth-logo {
-      font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
-      margin-bottom: 6px; color: var(--text-primary);
-    }
-    .auth-logo span { color: var(--accent-blue); }
-    .auth-sub { font-size: 13px; color: var(--text-tertiary); margin-bottom: 28px; }
-    .auth-tabs {
-      display: flex; gap: 4px;
-      background: var(--bg); border-radius: 8px; padding: 4px;
-      margin-bottom: 24px;
-    }
-    .auth-tab {
-      flex: 1; padding: 8px; border: none; background: none;
-      border-radius: 6px; font-size: 13px; font-weight: 500;
-      color: var(--text-tertiary); cursor: pointer; transition: all 0.15s;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .auth-tab.active {
-      background: var(--surface); color: var(--text-primary);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .auth-field { margin-bottom: 14px; }
-    .auth-field label {
-      display: block; font-size: 12px; font-weight: 600;
-      color: var(--text-secondary); margin-bottom: 6px;
-      text-transform: uppercase; letter-spacing: 0.05em;
-    }
-    .auth-field input {
-      width: 100%; padding: 10px 12px; box-sizing: border-box;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text-primary);
-      font-size: 14px; font-family: 'DM Sans', sans-serif;
-      outline: none; transition: border-color 0.15s;
-    }
-    .auth-field input:focus { border-color: var(--accent-blue); }
-    .auth-btn {
-      width: 100%; padding: 12px; margin-top: 8px;
-      background: var(--accent-blue); color: white;
-      border: none; border-radius: 8px; font-size: 14px;
-      font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
-      transition: opacity 0.15s;
-    }
-    .auth-btn:hover { opacity: 0.9; }
-    .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .auth-error {
-      font-size: 13px; color: var(--accent-red);
-      margin-top: 10px; text-align: center; min-height: 18px;
-    }
-    /* ── USER BADGE in header ─────────────────────────────── */
-    #userBadge {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 13px; color: var(--text-secondary);
-    }
-    #userBadge .user-name { font-weight: 500; color: var(--text-primary); }
-    #userBadge .logout-btn {
-      background: none; border: 1px solid var(--border);
-      border-radius: 6px; padding: 4px 10px; font-size: 12px;
-      color: var(--text-tertiary); cursor: pointer;
-      font-family: 'DM Sans', sans-serif; transition: all 0.15s;
-    }
-    #userBadge .logout-btn:hover { color: var(--text-primary); border-color: var(--text-tertiary); }
+    /* Auth handled by auth.html */
     /* ── SAVE INDICATOR ───────────────────────────────────── */
     #saveIndicator {
       position: fixed; bottom: 20px; right: 20px;
@@ -1207,30 +1133,7 @@
 </head>
 <body>
 
-<!-- AUTH MODAL -->
-<div id="authOverlay">
-  <div class="auth-modal">
-    <div class="auth-logo">Apex <span>IB</span></div>
-    <div class="auth-sub">Your progress is saved across all devices</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Sign In</button>
-      <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Create Account</button>
-    </div>
-    <div id="authLoginForm">
-      <div class="auth-field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()" /></div>
-      <div class="auth-field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
-      <button class="auth-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
-    </div>
-    <div id="authRegisterForm" style="display:none">
-      <div class="auth-field"><label>Name</label><input type="text" id="registerName" placeholder="Your name" /></div>
-      <div class="auth-field"><label>Email</label><input type="email" id="registerEmail" placeholder="you@example.com" /></div>
-      <div class="auth-field"><label>Password</label><input type="password" id="registerPassword" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doRegister()" /></div>
-      <button class="auth-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
-    </div>
-    <div class="auth-error" id="authError"></div>
-    <div id="authServerStatus" style="font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:8px;"></div>
-  </div>
-</div>
+
 
 <!-- SAVE INDICATOR -->
 <div id="saveIndicator">✓ Progress saved</div>
@@ -2621,7 +2524,6 @@ Grade strictly and return JSON only.`;
     if (token && name) {
       authToken = token;
       currentUser = name;
-      document.getElementById('authOverlay').classList.add('hidden');
       // Populate sidebar user info
       const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
       const avatarEl = document.getElementById('sidebarAvatar');
@@ -2649,82 +2551,13 @@ Grade strictly and return JSON only.`;
   // ─── AUTH & PROGRESS ──────────────────────────────────────
 
   // ── Auth Modal ──────────────────────────────────────────────
-  function switchAuthTab(tab) {
-    document.getElementById('authLoginForm').style.display = tab === 'login' ? '' : 'none';
-    document.getElementById('authRegisterForm').style.display = tab === 'register' ? '' : 'none';
-    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
-    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-    document.getElementById('authError').textContent = '';
-  }
-
-  async function doLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const btn = document.getElementById('loginBtn');
-    if (!email || !password) return showAuthError('Please fill in all fields');
-    btn.disabled = true; btn.textContent = 'Signing in…';
-    showAuthError('');
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      let data;
-      const text = await res.text();
-      try { data = JSON.parse(text); } catch(e) { throw new Error('Server error: ' + text.slice(0, 100)); }
-      if (!res.ok) throw new Error(data.error || 'Login failed ('+res.status+')');
-      onAuthSuccess(data.token, data.name);
-    } catch(e) {
-      showAuthError(e.message);
-    } finally {
-      btn.disabled = false; btn.textContent = 'Sign In';
-    }
-  }
-
-  async function doRegister() {
-    const name = document.getElementById('registerName').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    const btn = document.getElementById('registerBtn');
-    if (!email || !password) return showAuthError('Please fill in all fields');
-    btn.disabled = true; btn.textContent = 'Creating account…';
-    showAuthError('');
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name })
-      });
-      let data;
-      const text = await res.text();
-      try { data = JSON.parse(text); } catch(e) { throw new Error('Server error: ' + text.slice(0, 100)); }
-      if (!res.ok) throw new Error(data.error || 'Registration failed ('+res.status+')');
-      onAuthSuccess(data.token, data.name);
-    } catch(e) {
-      showAuthError(e.message);
-    } finally {
-      btn.disabled = false; btn.textContent = 'Create Account';
-    }
-  }
-
-  function showAuthError(msg) {
-    document.getElementById('authError').textContent = msg;
-  }
+  function switchAuthTab(tab) { /* handled by auth.html */ }
 
   function doLogout() {
     localStorage.removeItem('apex_token');
     localStorage.removeItem('apex_user');
     authToken = null; currentUser = null;
-    // Reset sidebar user info
-    const avatarEl = document.getElementById('sidebarAvatar');
-    const nameEl = document.getElementById('sidebarUserName');
-    const signOutBtn = document.getElementById('sidebarSignOut');
-    if (avatarEl) avatarEl.textContent = '?';
-    if (nameEl) nameEl.textContent = '—';
-    if (signOutBtn) signOutBtn.style.display = 'none';
-    document.getElementById('authOverlay').classList.remove('hidden');
-    // Reset all progress locally
-    sessionResults = {};
-    updateProgressUI();
+    window.location.href = 'auth.html';
   }
 
   async function onAuthSuccess(token, name) {
@@ -2732,15 +2565,14 @@ Grade strictly and return JSON only.`;
     currentUser = name;
     localStorage.setItem('apex_token', token);
     localStorage.setItem('apex_user', name);
-    document.getElementById('authOverlay').classList.add('hidden');
-    // Populate sidebar with logged-in user info
-    const loginInitials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-    const loginAvatar = document.getElementById('sidebarAvatar');
-    const loginName = document.getElementById('sidebarUserName');
-    const loginSignOut = document.getElementById('sidebarSignOut');
-    if (loginAvatar) loginAvatar.textContent = loginInitials;
-    if (loginName) loginName.textContent = name;
-    if (loginSignOut) loginSignOut.style.display = 'block';
+    // Populate sidebar
+    const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const avatarEl   = document.getElementById('sidebarAvatar');
+    const nameEl     = document.getElementById('sidebarUserName');
+    const signOutBtn = document.getElementById('sidebarSignOut');
+    if (avatarEl)   avatarEl.textContent = initials;
+    if (nameEl)     nameEl.textContent   = name;
+    if (signOutBtn) signOutBtn.style.display = 'block';
     await loadProgressFromServer();
   }
 
@@ -2860,8 +2692,13 @@ Grade strictly and return JSON only.`;
     icon.setAttribute('fill', saved ? 'currentColor' : 'none');
   }
 
-  // Ping server to show connection status in auth modal (only needed when not logged in)
+  // Redirect to auth page if not logged in
   if (!localStorage.getItem('apex_token')) {
+    window.location.href = 'auth.html?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+  }
+
+  // (legacy ping block removed)
+  if (false) {
     fetch('/api/ping').then(r => r.json()).then(() => {
       const el = document.getElementById('authServerStatus');
       if (el) { el.textContent = '● Server connected'; el.style.color = '#4ade80'; }

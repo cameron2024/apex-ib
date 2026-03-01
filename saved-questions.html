@@ -466,7 +466,7 @@
   function doLogout() {
     localStorage.removeItem('apex_token');
     localStorage.removeItem('apex_user');
-    window.location.href = 'dashboard.html';
+    window.location.href = 'auth.html';
   }
 
   // ── DATA ──
@@ -612,6 +612,11 @@
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Redirect if not logged in
+  if (!localStorage.getItem('apex_token')) {
+    window.location.href = 'auth.html?next=' + encodeURIComponent(window.location.pathname);
   }
 
   // Init

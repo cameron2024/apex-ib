@@ -732,6 +732,11 @@
   function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   // ── INIT ──────────────────────────────────────────────────
+  // Redirect if not logged in
+  if (!localStorage.getItem('apex_token')) {
+    window.location.href = 'auth.html?next=' + encodeURIComponent(window.location.pathname);
+  }
+
   async function init() {
     // Render empty states first
     renderReadiness(null, 0);

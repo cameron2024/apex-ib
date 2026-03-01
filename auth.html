@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F7F6F3; --surface:#FFFFFF; --border:#E8E5DF;
+    --text-primary:#1A1814; --text-secondary:#6B6560; --text-tertiary:#9E9890;
+    --accent-blue:#2563EB; --accent-green:#16A34A;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; overflow:hidden; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); display:flex; }
+
+  /* SCROLLING BACKGROUND */
+  .bg-stage {
+    position:fixed; inset:0; z-index:0;
+    display:grid; grid-template-columns:repeat(4,1fr);
+    overflow:hidden; opacity:.14;
+  }
+  .feed-col { display:flex; flex-direction:column; }
+  .feed-col:nth-child(odd)  { animation:scrollUp   36s linear infinite; }
+  .feed-col:nth-child(even) { animation:scrollDown 30s linear infinite; }
+  @keyframes scrollUp   { from{transform:translateY(0)}    to{transform:translateY(-50%)} }
+  @keyframes scrollDown { from{transform:translateY(-50%)} to{transform:translateY(0)}    }
+  .feed-card {
+    padding:13px 15px; border-bottom:1px solid var(--border);
+    background:white; flex-shrink:0;
+  }
+  .feed-bank-row {
+    display:flex; align-items:center; gap:7px;
+    font-size:12px; font-weight:600; color:var(--text-primary);
+    margin-bottom:4px;
+  }
+  .feed-dot { width:6px;height:6px;border-radius:50%;background:var(--accent-green);flex-shrink:0; }
+  .feed-tier {
+    margin-left:auto; font-size:9px; font-weight:700;
+    letter-spacing:.07em; text-transform:uppercase;
+    padding:2px 5px; border-radius:3px;
+  }
+  .feed-tier.elite { background:#1A1814; color:#FDE68A; }
+  .feed-tier.top   { background:#1E3A5F; color:#BAE6FD; }
+  .feed-tier.mid   { background:#F3F4F6; color:#374151; }
+  .feed-text { font-size:11px; color:var(--text-secondary); line-height:1.5; }
+  .feed-text strong { color:var(--text-primary); font-weight:500; }
+
+  /* GRADIENT FADE */
+  .bg-fade {
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:
+      linear-gradient(to right,
+        rgba(247,246,243,.75) 0%,
+        rgba(247,246,243,.15) 22%,
+        rgba(247,246,243,.0)  42%,
+        rgba(247,246,243,.0)  52%,
+        rgba(247,246,243,.88) 70%,
+        rgba(247,246,243,1)   100%
+      ),
+      linear-gradient(to bottom,
+        rgba(247,246,243,.85) 0%,
+        transparent 12%,
+        transparent 88%,
+        rgba(247,246,243,.85) 100%
+      );
+  }
+
+  /* LEFT COPY */
+  .left-copy {
+    position:fixed; z-index:5;
+    left:56px; top:50%; transform:translateY(-50%);
+    max-width:340px;
+    animation:fadeUp .5s ease both;
+  }
+  @keyframes fadeUp {
+    from{opacity:0;transform:translateY(calc(-50% + 14px))}
+    to{opacity:1;transform:translateY(-50%)}
+  }
+  .left-logo {
+    display:flex; align-items:center; gap:9px;
+    margin-bottom:32px;
+  }
+  .logo-mark {
+    width:32px; height:32px; background:var(--text-primary);
+    border-radius:8px; display:flex; align-items:center; justify-content:center;
+  }
+  .logo-name { font-family:'DM Serif Display',serif; font-size:18px; letter-spacing:-.3px; }
+  .left-headline {
+    font-family:'DM Serif Display',serif;
+    font-size:38px; letter-spacing:-1px; line-height:1.15;
+    color:var(--text-primary); margin-bottom:13px;
+  }
+  .left-sub {
+    font-size:14px; color:var(--text-secondary);
+    line-height:1.7; margin-bottom:28px;
+  }
+  .left-stats { display:flex; gap:28px; }
+  .stat-val {
+    font-family:'DM Serif Display',serif;
+    font-size:26px; letter-spacing:-.5px; color:var(--text-primary);
+  }
+  .stat-label {
+    font-size:10.5px; color:var(--text-tertiary); margin-top:1px;
+    text-transform:uppercase; letter-spacing:.07em; font-weight:600;
+  }
+
+  /* AUTH PANEL */
+  .auth-panel {
+    position:relative; z-index:10;
+    margin-left:auto; width:430px; min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:52px 46px;
+    background:rgba(255,255,255,.95);
+    backdrop-filter:blur(20px);
+    border-left:1px solid var(--border);
+    animation:slideIn .4s ease both;
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateX(14px)} to{opacity:1;transform:translateX(0)} }
+
+  .panel-heading {
+    font-family:'DM Serif Display',serif;
+    font-size:24px; letter-spacing:-.4px; margin-bottom:5px;
+  }
+  .panel-sub { font-size:13.5px; color:var(--text-secondary); margin-bottom:28px; line-height:1.5; }
+
+  /* TABS */
+  .tab-row {
+    display:flex; background:var(--bg);
+    border:1px solid var(--border); border-radius:8px;
+    padding:3px; margin-bottom:24px;
+  }
+  .tab-btn {
+    flex:1; padding:8px 12px; border:none; background:none;
+    border-radius:6px; font-size:13.5px; font-weight:500;
+    color:var(--text-tertiary); cursor:pointer;
+    font-family:'DM Sans',sans-serif; transition:all .15s;
+  }
+  .tab-btn.active {
+    background:white; color:var(--text-primary);
+    box-shadow:0 1px 4px rgba(0,0,0,.1);
+  }
+
+  /* FIELDS */
+  .field { margin-bottom:14px; }
+  .field label {
+    display:block; font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.07em;
+    color:var(--text-secondary); margin-bottom:6px;
+  }
+  .field input {
+    width:100%; padding:11px 13px;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; color:var(--text-primary);
+    font-size:14px; font-family:'DM Sans',sans-serif;
+    outline:none; transition:border-color .15s, box-shadow .15s;
+  }
+  .field input:focus {
+    border-color:var(--accent-blue);
+    box-shadow:0 0 0 3px rgba(37,99,235,.1);
+    background:white;
+  }
+
+  /* BUTTON */
+  .submit-btn {
+    width:100%; padding:12px; margin-top:6px;
+    background:var(--text-primary); color:white;
+    border:none; border-radius:8px;
+    font-size:14px; font-weight:600;
+    cursor:pointer; font-family:'DM Sans',sans-serif;
+    transition:opacity .15s, transform .1s; letter-spacing:-.1px;
+  }
+  .submit-btn:hover  { opacity:.86; }
+  .submit-btn:active { transform:scale(.99); }
+  .submit-btn:disabled { opacity:.45; cursor:not-allowed; }
+
+  .auth-error {
+    font-size:13px; color:#DC2626;
+    text-align:center; min-height:18px; margin-top:10px;
+  }
+
+  .switch-row {
+    margin-top:20px; text-align:center;
+    font-size:13px; color:var(--text-tertiary);
+  }
+  .switch-row button {
+    background:none; border:none; padding:0;
+    color:var(--accent-blue); font-size:13px;
+    font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer;
+  }
+  .switch-row button:hover { text-decoration:underline; }
+
+  /* FORM VISIBILITY */
+  .form-body { display:none; animation:formIn .2s ease; }
+  .form-body.active { display:block; }
+  @keyframes formIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+
+<div class="bg-stage" id="bgStage"></div>
+<div class="bg-fade"></div>
+
+<div class="left-copy">
+  <div class="left-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="15" height="15">
+        <circle cx="8" cy="8" r="2" fill="white"/><circle cx="16" cy="8" r="2" fill="white"/>
+        <circle cx="8" cy="16" r="2" fill="white"/><circle cx="16" cy="16" r="2" fill="white"/>
+      </svg>
+    </div>
+    <span class="logo-name">Apex</span>
+  </div>
+  <div class="left-headline">Crack your IB<br>interview.</div>
+  <div class="left-sub">AI-graded practice on every technical question you'll face — accounting, valuation, DCF, M&A, and LBO.</div>
+  <div class="left-stats">
+    <div><div class="stat-val">188</div><div class="stat-label">Questions</div></div>
+    <div><div class="stat-val">6</div><div class="stat-label">Topics</div></div>
+    <div><div class="stat-val">AI</div><div class="stat-label">Graded</div></div>
+  </div>
+</div>
+
+<div class="auth-panel">
+  <div class="panel-heading" id="panelHeading">Welcome back</div>
+  <div class="panel-sub" id="panelSub">Sign in to continue your prep.</div>
+
+  <div class="tab-row">
+    <button class="tab-btn active" id="tabLogin"    onclick="showTab('login')">Sign In</button>
+    <button class="tab-btn"        id="tabRegister" onclick="showTab('register')">Create Account</button>
+  </div>
+
+  <div class="form-body active" id="formLogin">
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="submit-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+  </div>
+
+  <div class="form-body" id="formRegister">
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="registerName" placeholder="Your full name" autocomplete="name"
+             onkeydown="if(event.key==='Enter')doRegister()">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="registerEmail" placeholder="you@example.com" autocomplete="email"
+             onkeydown="if(event.key==='Enter')doRegister()">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="registerPassword" placeholder="Min 6 characters" autocomplete="new-password"
+             onkeydown="if(event.key==='Enter')doRegister()">
+    </div>
+    <button class="submit-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
+  </div>
+
+  <div class="auth-error" id="authError"></div>
+
+  <div class="switch-row">
+    <span id="switchLabel">Don't have an account?</span>&nbsp;
+    <button id="switchBtn" onclick="showTab('register')">Sign up free →</button>
+  </div>
+</div>
+
+<script>
+  // Redirect immediately if already logged in
+  if (localStorage.getItem('apex_token') && localStorage.getItem('apex_user')) {
+    const dest = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
+    window.location.replace(dest);
+  }
+
+  // Start on register tab if ?mode=register
+  if (new URLSearchParams(window.location.search).get('mode') === 'register') {
+    showTab('register');
+  }
+
+  // ── TAB SWITCHING ─────────────────────────────────────────
+  function showTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('tabLogin').classList.toggle('active', isLogin);
+    document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+    document.getElementById('formLogin').classList.toggle('active', isLogin);
+    document.getElementById('formRegister').classList.toggle('active', !isLogin);
+    document.getElementById('panelHeading').textContent = isLogin ? 'Welcome back' : 'Create your account';
+    document.getElementById('panelSub').textContent     = isLogin ? 'Sign in to continue your prep.' : 'Free to use. No credit card required.';
+    document.getElementById('switchLabel').textContent  = isLogin ? "Don't have an account?" : 'Already have an account?';
+    document.getElementById('switchBtn').textContent    = isLogin ? 'Sign up free →' : 'Sign in →';
+    document.getElementById('switchBtn').onclick        = () => showTab(isLogin ? 'register' : 'login');
+    document.getElementById('authError').textContent    = '';
+  }
+
+  // ── AUTH CALLS ────────────────────────────────────────────
+  function showError(msg) { document.getElementById('authError').textContent = msg; }
+
+  async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass  = document.getElementById('loginPassword').value;
+    const btn   = document.getElementById('loginBtn');
+    if (!email || !pass) return showError('Please fill in all fields');
+    btn.disabled = true; btn.textContent = 'Signing in…'; showError('');
+    try {
+      const res  = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pass}) });
+      const text = await res.text();
+      let d; try { d = JSON.parse(text); } catch(e) { throw new Error('Server error'); }
+      if (!res.ok) throw new Error(d.error || 'Login failed');
+      onSuccess(d.token, d.name);
+    } catch(e) { showError(e.message); }
+    finally { btn.disabled = false; btn.textContent = 'Sign In'; }
+  }
+
+  async function doRegister() {
+    const name  = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const pass  = document.getElementById('registerPassword').value;
+    const btn   = document.getElementById('registerBtn');
+    if (!name)           return showError('Please enter your name');
+    if (!email)          return showError('Please enter your email');
+    if (pass.length < 6) return showError('Password must be at least 6 characters');
+    btn.disabled = true; btn.textContent = 'Creating account…'; showError('');
+    try {
+      const res  = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pass, name}) });
+      const text = await res.text();
+      let d; try { d = JSON.parse(text); } catch(e) { throw new Error('Server error'); }
+      if (!res.ok) throw new Error(d.error || 'Registration failed');
+      onSuccess(d.token, d.name);
+    } catch(e) { showError(e.message); }
+    finally { btn.disabled = false; btn.textContent = 'Create Account'; }
+  }
+
+  function onSuccess(token, name) {
+    localStorage.setItem('apex_token', token);
+    localStorage.setItem('apex_user', name);
+    const dest = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
+    window.location.replace(dest);
+  }
+
+  // ── SOCIAL PROOF FEED ─────────────────────────────────────
+  const BANKS = [
+    {name:'Goldman Sachs',tier:'elite'},{name:'Morgan Stanley',tier:'elite'},
+    {name:'JP Morgan',tier:'elite'},{name:'Evercore',tier:'elite'},
+    {name:'Centerview Partners',tier:'elite'},{name:'Lazard',tier:'elite'},
+    {name:'PJT Partners',tier:'elite'},{name:'Moelis & Company',tier:'top'},
+    {name:'Houlihan Lokey',tier:'top'},{name:'Jefferies',tier:'top'},
+    {name:'William Blair',tier:'top'},{name:'Guggenheim Partners',tier:'top'},
+    {name:'Piper Sandler',tier:'top'},{name:'Baird',tier:'top'},
+    {name:'TD Securities',tier:'mid'},{name:'Mizuho',tier:'mid'},
+    {name:'Raymond James',tier:'mid'},{name:'KeyBanc Capital',tier:'mid'},
+    {name:'Stifel Financial',tier:'mid'},{name:'Brown Gibbons Lang',tier:'mid'},
+  ];
+  const SCHOOLS = [
+    'UPenn Wharton','Harvard Business School','Columbia Business School',
+    'NYU Stern','UChicago Booth','Northwestern Kellogg','Duke Fuqua',
+    'Dartmouth Tuck','Michigan Ross','Yale SOM','Georgetown McDonough',
+    'UNC Kenan-Flagler','Cornell Dyson','Emory Goizueta','CMU Tepper',
+    'UCLA Anderson','UT Austin McCombs','Vanderbilt Owen','Indiana Kelley','Notre Dame Mendoza',
+  ];
+  const ADJ  = ['swift','bright','quiet','sharp','clear','crisp','bold','keen','calm','deep','prime','solid','sure','keen','steady'];
+  const NOUN = ['peak','path','edge','rise','wave','tide','flow','core','step','mark','form','base','line','point','reach'];
+  const COL  = ['blue','green','amber','silver','gold','slate','ivory','coral','sage','ruby'];
+  function handle() { return `${ADJ[Math.random()*ADJ.length|0]}-${COL[Math.random()*COL.length|0]}-${NOUN[Math.random()*NOUN.length|0]}-${100+(Math.random()*900|0)}`; }
+
+  function buildFeed() {
+    const stage = document.getElementById('bgStage');
+    for (let c = 0; c < 4; c++) {
+      const col = document.createElement('div');
+      col.className = 'feed-col';
+      const shuffled = [...BANKS].sort(() => Math.random()-.5);
+      const items = [];
+      while (items.length < 28) items.push(...shuffled);
+      items.slice(0,28).forEach(b => {
+        const school = SCHOOLS[Math.random()*SCHOOLS.length|0];
+        const el = document.createElement('div');
+        el.className = 'feed-card';
+        el.innerHTML = `
+          <div class="feed-bank-row">
+            <div class="feed-dot"></div>${b.name}
+            <span class="feed-tier ${b.tier}">${b.tier==='elite'?'Elite Tier':b.tier==='top'?'Top Tier':'Mid Market'}</span>
+          </div>
+          <div class="feed-text"><strong>${handle()}</strong> from<br>${school} accepted an offer at ${b.name}</div>`;
+        col.appendChild(el);
+      });
+      // Clone for seamless infinite scroll
+      [...col.children].forEach(n => col.appendChild(n.cloneNode(true)));
+      stage.appendChild(col);
+    }
+  }
+  buildFeed();
+</script>
+</body>
+</html>
