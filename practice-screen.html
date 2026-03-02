@@ -2625,15 +2625,9 @@ Generate 3 drill questions targeting this exact gap.`;
     document.getElementById('qNumber').textContent = q.ai_generated
       ? (q.ai_type === 'followon' ? '⬆ Follow-on' : '🎯 Drill ' + (drillQueue.length > 0 ? drillQueue.length + ' left' : ''))
       : 'Q' + (index + 1) + ' of ' + filteredQuestions.length;
-    // Show gap hint if available
+    // Show gap hint if this is an AI drill question, otherwise clear it
     const hint = document.getElementById('questionHint');
-    if (q.ai_hint && hint) {
-      hint.textContent = '💡 Focus: ' + q.ai_hint;
-    }
-
-    // Reset hint
-    const hint = document.getElementById('questionHint');
-    if (hint) hint.textContent = '';
+    if (hint) hint.textContent = q.ai_hint ? '💡 Focus: ' + q.ai_hint : '';
 
     // Update save button state for this question
     updateSaveButtonState(q.id);
