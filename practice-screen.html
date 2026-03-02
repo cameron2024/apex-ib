@@ -807,13 +807,11 @@
 
   /* ── SAVE BUTTON ── */
   .btn-save-question {
-    position: absolute;
-    top: 16px;
-    right: 16px;
+    margin-left: auto;
     background: none;
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 5px 8px;
+    padding: 4px 9px;
     cursor: pointer;
     color: var(--text-tertiary);
     display: flex;
@@ -822,6 +820,7 @@
     font-size: 12px;
     font-family: inherit;
     transition: all 0.15s;
+    flex-shrink: 0;
   }
   .btn-save-question:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
   .btn-save-question.saved { border-color: var(--accent-amber, #f59e0b); color: var(--accent-amber, #f59e0b); background: rgba(245,158,11,0.08); }
@@ -1285,14 +1284,14 @@
         <span class="countdown-text" id="countdownText">Question disappearing in <strong id="countdownStrong">10</strong>s — read carefully</span>
       </div>
 
-      <button class="btn-save-question" id="btnSaveQuestion" onclick="toggleSaveQuestion()" title="Save question">
-        <svg id="saveIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-        <span id="saveBtnLabel">Save</span>
-      </button>
       <div class="question-meta">
         <span class="q-tag accounting" id="qTagTopic">Accounting</span>
         <span class="q-tag difficulty" id="qTagDifficulty">Basic</span>
         <span class="q-number" id="qNumber">Q1</span>
+        <button class="btn-save-question" id="btnSaveQuestion" onclick="toggleSaveQuestion()" title="Save question">
+          <svg id="saveIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          <span id="saveBtnLabel">Save</span>
+        </button>
       </div>
       <div class="question-text" id="questionText">
         Loading question…
