@@ -1484,17 +1484,22 @@
       <div class="next-section" id="nextSection">
         <div class="next-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Drill this next
+          <span id="nextLabelText">Up next</span>
           <span class="next-label-badge" id="nextBadge">Targeting your gap</span>
         </div>
         <div class="next-q-preview" id="nextQPreview">
-          <div class="next-q-text" id="nextQText">—</div>
+          <div class="next-q-text" id="nextQText">Generating drill questions…</div>
           <div class="next-q-reason" id="nextQReason"></div>
         </div>
+        <!-- DRILL QUEUE PREVIEW (shown when AI questions are queued) -->
+        <div id="drillQueuePreview" style="display:none;margin-top:10px;padding:10px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:8px;">Drill queue</div>
+          <div id="drillQueueList" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
         <div class="next-actions">
-          <button class="btn-primary" onclick="confirmNextQuestion()">
+          <button class="btn-primary" id="btnLoadNext" onclick="confirmNextQuestion()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-            Load this question
+            <span id="btnLoadNextLabel">Load this question</span>
           </button>
           <button class="btn-ghost" onclick="retryQuestion()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
@@ -1978,7 +1983,8 @@ Rules:
 - "correct": max 3 items. Each must be one short sentence referencing exactly what they said.
 - "missed": max 3 items. Each must be one short sentence referencing exactly what they missed or got wrong. Prefix with "Critical:" or "Minor:" as appropriate.
 - "model_answer": 2-3 sentences MAXIMUM. The essential answer only — no elaboration.
-- "next_question": one targeted follow-up based on their specific gap. If 95+, ask a harder follow-on.
+- "concept_gap": If score < 75, identify the single most important concept the candidate misunderstood or missed. Be specific — not "depreciation" but "how depreciation flows through from EBIT to net income while being added back on the cash flow statement". If score >= 75, set to null.
+- "harder_followon": If score >= 95, write one harder follow-on question that tests a related advanced concept. If score < 95, set to null.
 
 Respond ONLY with valid JSON, no markdown fences:
 {
@@ -1991,10 +1997,8 @@ Respond ONLY with valid JSON, no markdown fences:
   "correct": ["They correctly stated X", "They mentioned Y"],
   "missed": ["Critical: they missed X", "Minor: they didn't mention Y"],
   "model_answer": "2-3 sentence ideal answer.",
-  "next_question": {
-    "text": "The follow-up question",
-    "reason": "One sentence: why this targets their gap"
-  }
+  "concept_gap": "The specific concept they need to drill, or null if score >= 75",
+  "harder_followon": "A harder follow-on question, or null if score < 95"
 }`;
 
     const userPrompt = `Question: "${question}"
@@ -2076,8 +2080,9 @@ Grade strictly and return JSON only.`;
     document.getElementById('modelAnswerToggle').textContent = '';
     document.getElementById('modelAnswerToggle').innerHTML = '<span>▶</span> Show model answer';
     document.getElementById('modelAnswerToggle').classList.remove('open');
-    document.getElementById('nextQText').textContent = 'Selecting next question…';
+    document.getElementById('nextQText').textContent = 'Analyzing your answer…';
     document.getElementById('nextQReason').textContent = '';
+    document.getElementById('drillQueuePreview').style.display = 'none';
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -2203,16 +2208,7 @@ Grade strictly and return JSON only.`;
     document.getElementById('modelAnswerToggle').innerHTML = '<span>▶</span> Show model answer';
     document.getElementById('modelAnswerToggle').classList.remove('open');
 
-    // Next question
-    if (result.next_question) {
-      document.getElementById('nextQText').textContent = result.next_question.text;
-      document.getElementById('nextQReason').textContent = '📍 ' + result.next_question.reason;
-      // Store AI's suggested next question for navigation
-      pendingNextQuestion = result.next_question.text;
-    }
-
-    // Show "Mark as Mastered" button only if score is just below threshold (75-94)
-    // If already mastered (95+), show it too so user can confirm
+    // Show "Mark as Mastered" button
     const btnMastered = document.getElementById('btnMarkMastered');
     if (overall >= 75) {
       btnMastered.style.display = 'inline-flex';
@@ -2222,14 +2218,56 @@ Grade strictly and return JSON only.`;
       btnMastered.style.display = 'none';
     }
 
-    // Update next badge
-    const nextBadge = document.getElementById('nextBadge');
-    if (overall >= 95) {
+    const nextBadge   = document.getElementById('nextBadge');
+    const nextQText   = document.getElementById('nextQText');
+    const nextQReason = document.getElementById('nextQReason');
+    const btnLabel    = document.getElementById('btnLoadNextLabel');
+    const labelText   = document.getElementById('nextLabelText');
+
+    if (overall >= 95 && result.harder_followon) {
+      // Mastered — queue a single harder follow-on as a real AI question
+      const hardQ = {
+        id: 'ai_followon_' + Date.now(),
+        question: result.harder_followon,
+        topic: filteredQuestions[currentIndex]?.topic || currentTopic,
+        difficulty: 'hard',
+        model_answer: '',
+        ai_generated: true,
+        ai_type: 'followon'
+      };
+      drillQueue = [hardQ];
+      inDrillMode = true;
+      drillParentId = filteredQuestions[currentIndex]?.id;
       nextBadge.textContent = 'Harder follow-on';
       nextBadge.className = 'next-label-badge mastered-badge';
-    } else {
-      nextBadge.textContent = 'Targeting your gap';
+      labelText.textContent = 'Up next';
+      nextQText.textContent = result.harder_followon;
+      nextQReason.textContent = '⬆️ You nailed it — here's a harder variation';
+      btnLabel.textContent = 'Load this question';
+      document.getElementById('drillQueuePreview').style.display = 'none';
+    } else if (overall < 75 && result.concept_gap) {
+      // Missed — generate drill questions in background, show loading state
+      nextBadge.textContent = 'AI drilling your gap';
       nextBadge.className = 'next-label-badge';
+      labelText.textContent = 'Drill this gap';
+      nextQText.textContent = 'Generating targeted questions…';
+      nextQReason.textContent = '🎯 Concept: ' + result.concept_gap;
+      btnLabel.textContent = 'Start drilling';
+      document.getElementById('drillQueuePreview').style.display = 'none';
+      // Kick off async generation
+      const currentQ = filteredQuestions[currentIndex];
+      generateDrillQuestions(currentQ, result.concept_gap, result.missed || []);
+    } else {
+      // Mid range (75-94) — just advance normally
+      nextBadge.textContent = 'Next question';
+      nextBadge.className = 'next-label-badge';
+      labelText.textContent = 'Up next';
+      nextQText.textContent = 'Continue to next question in the bank';
+      nextQReason.textContent = overall >= 75 ? '✓ Good answer — keep building' : '';
+      btnLabel.textContent = 'Next question';
+      drillQueue = [];
+      inDrillMode = false;
+      document.getElementById('drillQueuePreview').style.display = 'none';
     }
 
     // Show panel
@@ -2351,7 +2389,9 @@ Grade strictly and return JSON only.`;
   let filteredQuestions = [];
   let currentIndex = 0;
   let sessionResults = {}; // id -> 'mastered' | 'partial' | 'missed'
-  let pendingNextQuestion = null; // AI-suggested next question text
+  let drillQueue = [];          // AI-generated drill questions queued for current gap
+  let inDrillMode = false;      // true when working through AI-generated questions
+  let drillParentId = null;     // id of the hardcoded question that triggered drill mode
 
   const TOPIC_LABELS = {
     'All': 'All Topics',
@@ -2387,7 +2427,9 @@ Grade strictly and return JSON only.`;
     currentTopic = topic;
     filteredQuestions = getFilteredQuestions(topic);
     currentIndex = 0;
-    pendingNextQuestion = null;
+    drillQueue = [];
+    inDrillMode = false;
+    drillParentId = null;
 
     // Update nav active state
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -2418,41 +2460,149 @@ Grade strictly and return JSON only.`;
     saveStateToServer();
   }
 
-  function loadNextQuestion() {
-    // If AI suggested a specific follow-up question, find closest match in bank
-    if (pendingNextQuestion) {
-      const suggested = pendingNextQuestion.toLowerCase();
-      // Try to find it in the bank — exclude current question to avoid re-loading same Q
-      const match = filteredQuestions.find((q, i) => 
-        i !== currentIndex && (
-          q.question.toLowerCase().includes(suggested.slice(0, 40)) ||
-          suggested.includes(q.question.toLowerCase().slice(0, 40))
-        )
-      );
-      if (match) {
-        const idx = filteredQuestions.indexOf(match);
-        pendingNextQuestion = null;
-        loadQuestionAt(idx);
-        return;
+  // ─── AI DRILL QUESTION GENERATION ────────────────────────
+  async function generateDrillQuestions(parentQuestion, conceptGap, missedPoints) {
+    const topic = parentQuestion ? parentQuestion.topic : currentTopic;
+    const topicLabel = TOPIC_LABELS[topic] || topic;
+
+    const systemPrompt = `You are an expert investment banking interviewer and tutor. A candidate just got a question wrong and needs targeted drilling on a specific concept.
+
+Your job: generate exactly 3 short, focused drill questions that isolate and test the specific concept they missed. Each question should:
+- Be answerable in 2-4 sentences — these are micro-drills, not essay questions
+- Progressively build: Q1 tests the basic mechanic, Q2 adds a wrinkle, Q3 tests application
+- Be distinct from the original question but directly address the gap
+- Sound like real IB interview questions — precise, technical, no fluff
+
+Respond ONLY with valid JSON, no markdown:
+{
+  "gap_summary": "One sentence: the exact concept they need to master",
+  "questions": [
+    { "question": "...", "hint": "What to focus on" },
+    { "question": "...", "hint": "What to focus on" },
+    { "question": "...", "hint": "What to focus on" }
+  ]
+}`;
+
+    const originalQ = parentQuestion ? parentQuestion.question : '';
+    const missedStr = missedPoints.slice(0, 2).join('; ');
+    const userPrompt = `Topic: ${topicLabel}
+Original question: "${originalQ}"
+Concept gap identified: "${conceptGap}"
+What they missed: ${missedStr}
+
+Generate 3 drill questions targeting this exact gap.`;
+
+    try {
+      const res = await fetch('/api/grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 800,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+
+      if (!res.ok) throw new Error('Generation failed');
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        for (const line of chunk.split('\n')) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (!data || data === '[DONE]') continue;
+          try {
+            const ev = JSON.parse(data);
+            if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') {
+              fullText += ev.delta.text;
+            }
+          } catch(e) {}
+        }
       }
-      // No match found — clear and fall through to normal next
-      pendingNextQuestion = null;
+
+      const clean = fullText.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      const questions = parsed.questions || [];
+
+      drillQueue = questions.map(function(q, i) {
+        return {
+          id: 'ai_drill_' + Date.now() + '_' + i,
+          question: q.question,
+          topic: topic,
+          difficulty: i < 2 ? 'basic' : 'hard',
+          model_answer: '',
+          ai_generated: true,
+          ai_type: 'drill',
+          ai_hint: q.hint,
+          ai_gap: parsed.gap_summary
+        };
+      });
+
+      inDrillMode = true;
+      drillParentId = parentQuestion ? parentQuestion.id : null;
+
+      const firstQ = drillQueue[0];
+      if (firstQ) {
+        document.getElementById('nextQText').textContent = firstQ.question;
+        document.getElementById('nextQReason').textContent = '\uD83C\uDFAF ' + (parsed.gap_summary || conceptGap);
+        document.getElementById('btnLoadNextLabel').textContent = 'Start drilling (' + drillQueue.length + ' questions)';
+
+        const listEl = document.getElementById('drillQueueList');
+        listEl.innerHTML = drillQueue.map(function(q, i) {
+          return '<div style="display:flex;gap:8px;align-items:flex-start;">' +
+            '<span style="font-size:10px;font-weight:700;color:var(--text-tertiary);padding-top:2px;flex-shrink:0;">Q' + (i+1) + '</span>' +
+            '<span style="font-size:12px;color:var(--text-secondary);line-height:1.5;">' + q.question + '</span>' +
+            '</div>';
+        }).join('');
+        document.getElementById('drillQueuePreview').style.display = 'block';
+      }
+
+    } catch(e) {
+      console.error('Drill generation failed:', e);
+      document.getElementById('nextQText').textContent = 'Continue to next question';
+      document.getElementById('nextQReason').textContent = '';
+      document.getElementById('btnLoadNextLabel').textContent = 'Next question';
+      drillQueue = [];
+      inDrillMode = false;
+    }
+  }
+
+  function loadNextQuestion() {
+    // If there are AI drill questions queued, load the next one
+    if (drillQueue.length > 0) {
+      const nextDrill = drillQueue.shift();
+      // Inject at front of filteredQuestions after currentIndex
+      filteredQuestions.splice(currentIndex + 1, 0, nextDrill);
+      inDrillMode = drillQueue.length > 0; // still in drill mode if more remain
+      loadQuestionAt(currentIndex + 1);
+      return;
+    }
+
+    // Done with drill queue — resume normal bank from parent question's position
+    if (inDrillMode) {
+      inDrillMode = false;
+      drillParentId = null;
     }
 
     // Advance to next question — skip mastered ones, but always make progress
     const start = currentIndex + 1;
     for (let i = 0; i < filteredQuestions.length; i++) {
       const idx = (start + i) % filteredQuestions.length;
-      if (idx === currentIndex) continue; // never re-load same question
+      if (idx === currentIndex) continue;
       const q = filteredQuestions[idx];
-      if (sessionResults[q.id] !== 'mastered') {
-        pendingNextQuestion = null;
+      if (!q.ai_generated && sessionResults[q.id] !== 'mastered') {
         loadQuestionAt(idx);
         return;
       }
     }
 
-    // All questions mastered — find next that isn't the current one
+    // All bank questions mastered — just advance
     const nextIdx = (currentIndex + 1) % filteredQuestions.length;
     loadQuestionAt(nextIdx);
   }
@@ -2463,8 +2613,23 @@ Grade strictly and return JSON only.`;
     // Update meta tags
     const topicLabel = TOPIC_LABELS[q.topic] || q.topic;
     document.getElementById('qTagTopic').textContent = topicLabel;
-    document.getElementById('qTagDifficulty').textContent = q.difficulty === 'hard' ? 'Advanced' : 'Basic';
-    document.getElementById('qNumber').textContent = 'Q' + (index + 1) + ' of ' + filteredQuestions.length;
+    if (q.ai_generated) {
+      document.getElementById('qTagDifficulty').textContent = q.ai_type === 'followon' ? 'AI Follow-on' : 'AI Drill';
+      document.getElementById('qTagDifficulty').style.background = q.ai_type === 'followon' ? '#F0FDF4' : '#FEF2F2';
+      document.getElementById('qTagDifficulty').style.color = q.ai_type === 'followon' ? '#15803D' : '#B91C1C';
+    } else {
+      document.getElementById('qTagDifficulty').textContent = q.difficulty === 'hard' ? 'Advanced' : 'Basic';
+      document.getElementById('qTagDifficulty').style.background = '';
+      document.getElementById('qTagDifficulty').style.color = '';
+    }
+    document.getElementById('qNumber').textContent = q.ai_generated
+      ? (q.ai_type === 'followon' ? '⬆ Follow-on' : '🎯 Drill ' + (drillQueue.length > 0 ? drillQueue.length + ' left' : ''))
+      : 'Q' + (index + 1) + ' of ' + filteredQuestions.length;
+    // Show gap hint if available
+    const hint = document.getElementById('questionHint');
+    if (q.ai_hint && hint) {
+      hint.textContent = '💡 Focus: ' + q.ai_hint;
+    }
 
     // Reset hint
     const hint = document.getElementById('questionHint');
