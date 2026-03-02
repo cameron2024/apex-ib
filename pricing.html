@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex — Pricing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --surface: #FFFFFF;
+    --border: #E8E5DF;
+    --border-strong: #D4CFC6;
+    --text-primary: #1A1814;
+    --text-secondary: #6B6560;
+    --text-tertiary: #9E9890;
+    --accent-blue: #2563EB;
+    --accent-green: #16A34A;
+    --accent-amber: #D97706;
+    --pro-bg: #1A1814;
+    --pro-surface: #242018;
+    --pro-border: #3A3630;
+    --pro-text: #F7F6F3;
+    --pro-text-secondary: #A09890;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(247,246,243,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: center; height: 56px; gap: 32px;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+  .logo-mark {
+    width: 28px; height: 28px; background: var(--text-primary);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; letter-spacing: -.3px; color: var(--text-primary); }
+  .nav-links { display: flex; gap: 24px; margin-left: auto; }
+  .nav-link { font-size: 13.5px; color: var(--text-secondary); text-decoration: none; transition: color .15s; }
+  .nav-link:hover { color: var(--text-primary); }
+  .nav-cta {
+    font-size: 13px; font-weight: 600; padding: 7px 16px;
+    background: var(--text-primary); color: white; border-radius: 7px;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .nav-cta:hover { opacity: .85; }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 96px 24px 72px;
+    max-width: 680px;
+    margin: 0 auto;
+    animation: fadeUp .5s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-tertiary);
+    margin-bottom: 20px;
+  }
+  .hero-eyebrow-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent-green);
+  }
+  .hero-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 52px; line-height: 1.1; letter-spacing: -1.5px;
+    color: var(--text-primary);
+    margin-bottom: 18px;
+  }
+  .hero-headline em {
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+  .hero-sub {
+    font-size: 16px; line-height: 1.7; color: var(--text-secondary);
+    max-width: 480px; margin: 0 auto 32px;
+  }
+
+  /* ── BILLING TOGGLE ── */
+  .billing-toggle {
+    display: inline-flex; align-items: center;
+    background: white; border: 1px solid var(--border);
+    border-radius: 10px; padding: 4px; gap: 2px;
+    margin-bottom: 64px;
+  }
+  .billing-btn {
+    font-size: 13px; font-weight: 500; padding: 7px 16px;
+    border-radius: 7px; border: none; cursor: pointer;
+    background: none; color: var(--text-secondary);
+    font-family: inherit; transition: all .15s;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .billing-btn.active {
+    background: var(--text-primary); color: white;
+  }
+  .billing-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; padding: 2px 6px;
+    background: #D1FAE5; color: #065F46;
+    border-radius: 4px;
+  }
+  .billing-btn.active .billing-badge {
+    background: rgba(255,255,255,.15); color: rgba(255,255,255,.8);
+  }
+
+  /* ── CARDS ── */
+  .cards-wrapper {
+    max-width: 900px; margin: 0 auto;
+    padding: 0 24px 96px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* FREE CARD */
+  .card {
+    border-radius: 16px; overflow: hidden;
+    animation: fadeUp .5s ease both;
+  }
+  .card-free {
+    background: white;
+    border: 1px solid var(--border);
+    animation-delay: .1s;
+  }
+  .card-pro {
+    background: var(--pro-bg);
+    border: 1px solid var(--pro-border);
+    animation-delay: .18s;
+    position: relative;
+  }
+
+  /* Pro glow */
+  .card-pro::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(37,99,235,.18) 0%, transparent 70%);
+    pointer-events: none; border-radius: 16px;
+  }
+
+  .card-header {
+    padding: 32px 32px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-pro .card-header {
+    border-bottom-color: var(--pro-border);
+  }
+
+  .card-tier-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+  }
+  .card-tier-name {
+    font-size: 13px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+  .card-pro .card-tier-name { color: var(--pro-text-secondary); }
+
+  .card-popular-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; padding: 3px 8px;
+    background: var(--accent-blue); color: white;
+    border-radius: 4px;
+  }
+
+  .card-price {
+    display: flex; align-items: baseline; gap: 6px;
+    margin-bottom: 10px;
+  }
+  .price-amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 48px; letter-spacing: -2px; line-height: 1;
+    color: var(--text-primary);
+  }
+  .card-pro .price-amount { color: var(--pro-text); }
+  .price-period {
+    font-size: 14px; color: var(--text-tertiary);
+    padding-bottom: 4px;
+  }
+  .card-pro .price-period { color: var(--pro-text-secondary); }
+  .price-annual-note {
+    font-size: 12px; color: var(--text-tertiary);
+    margin-bottom: 16px; min-height: 18px;
+  }
+  .card-pro .price-annual-note { color: var(--pro-text-secondary); }
+  .price-annual-note .save-pill {
+    display: inline-block;
+    background: #D1FAE5; color: #065F46;
+    font-size: 11px; font-weight: 700;
+    padding: 1px 7px; border-radius: 20px;
+    margin-left: 4px;
+  }
+
+  .card-description {
+    font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;
+  }
+  .card-pro .card-description { color: var(--pro-text-secondary); }
+
+  /* CTA */
+  .card-cta-row { padding: 24px 32px; }
+
+  .btn-cta {
+    width: 100%; padding: 13px;
+    border-radius: 9px; border: none; cursor: pointer;
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    letter-spacing: -.1px; transition: all .15s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .btn-free {
+    background: var(--bg); color: var(--text-primary);
+    border: 1.5px solid var(--border);
+  }
+  .btn-free:hover { border-color: var(--border-strong); background: white; }
+
+  .btn-pro {
+    background: var(--accent-blue); color: white;
+    box-shadow: 0 4px 16px rgba(37,99,235,.3);
+  }
+  .btn-pro:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(37,99,235,.4); transform: translateY(-1px); }
+
+  /* FEATURES */
+  .card-features { padding: 0 32px 32px; }
+
+  .features-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--text-tertiary);
+    margin-bottom: 14px;
+  }
+  .card-pro .features-label { color: var(--pro-text-secondary); }
+
+  .feature-list { display: flex; flex-direction: column; gap: 0; }
+
+  .feature-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+    font-size: 13.5px; line-height: 1.5;
+    color: var(--text-primary);
+  }
+  .card-pro .feature-item { border-top-color: var(--pro-border); color: var(--pro-text); }
+  .feature-item:first-child { border-top: none; }
+
+  .feature-icon {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    font-size: 10px;
+  }
+  .fi-check { background: #D1FAE5; color: #065F46; }
+  .fi-dash { background: var(--bg); color: var(--text-tertiary); }
+  .card-pro .fi-dash { background: var(--pro-surface); color: var(--pro-text-secondary); }
+  .fi-check-pro { background: rgba(37,99,235,.2); color: #93C5FD; }
+
+  .feature-text { flex: 1; }
+  .feature-text strong { font-weight: 600; }
+  .feature-sub {
+    display: block; font-size: 11.5px;
+    color: var(--text-tertiary); margin-top: 2px;
+  }
+  .card-pro .feature-sub { color: var(--pro-text-secondary); }
+
+  /* DIVIDER SECTION */
+  .divider-section {
+    max-width: 900px; margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+  .divider-inner {
+    background: white; border: 1px solid var(--border);
+    border-radius: 16px; padding: 48px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 48px;
+  }
+  .diff-item { text-align: center; }
+  .diff-icon {
+    width: 44px; height: 44px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+  }
+  .diff-icon svg { width: 18px; height: 18px; color: var(--text-primary); }
+  .diff-title {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 7px; letter-spacing: -.15px;
+  }
+  .diff-desc {
+    font-size: 12.5px; color: var(--text-secondary); line-height: 1.65;
+  }
+  .diff-divider {
+    width: 1px; background: var(--border);
+    align-self: stretch;
+    justify-self: center;
+  }
+
+  /* FAQ */
+  .faq-section {
+    max-width: 640px; margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+  .faq-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-tertiary);
+    text-align: center; margin-bottom: 12px;
+  }
+  .faq-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px; letter-spacing: -.5px; line-height: 1.2;
+    text-align: center; color: var(--text-primary);
+    margin-bottom: 40px;
+  }
+  .faq-list { display: flex; flex-direction: column; gap: 0; }
+  .faq-item {
+    border-top: 1px solid var(--border);
+    padding: 18px 0;
+  }
+  .faq-item:last-child { border-bottom: 1px solid var(--border); }
+  .faq-q {
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; gap: 16px;
+  }
+  .faq-q-text {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    letter-spacing: -.1px; line-height: 1.4;
+  }
+  .faq-toggle {
+    width: 22px; height: 22px; flex-shrink: 0;
+    border: 1px solid var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--text-tertiary);
+    transition: all .2s; user-select: none;
+  }
+  .faq-item.open .faq-toggle {
+    background: var(--text-primary); color: white; border-color: var(--text-primary);
+    transform: rotate(45deg);
+  }
+  .faq-answer {
+    font-size: 13.5px; color: var(--text-secondary); line-height: 1.7;
+    max-height: 0; overflow: hidden;
+    transition: max-height .3s ease, padding .3s ease;
+  }
+  .faq-item.open .faq-answer {
+    max-height: 200px; padding-top: 12px;
+  }
+
+  /* BOTTOM CTA */
+  .bottom-cta {
+    background: var(--pro-bg);
+    margin: 0 24px 48px;
+    border-radius: 20px;
+    max-width: 852px;
+    margin-left: auto; margin-right: auto;
+    padding: 64px 48px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .bottom-cta::before {
+    content: '';
+    position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 400px; height: 200px;
+    background: radial-gradient(ellipse, rgba(37,99,235,.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .bottom-cta-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: rgba(255,255,255,.4);
+    margin-bottom: 16px;
+  }
+  .bottom-cta-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px; letter-spacing: -.8px; line-height: 1.2;
+    color: white; margin-bottom: 14px;
+  }
+  .bottom-cta-headline em { font-style: italic; color: rgba(255,255,255,.5); }
+  .bottom-cta-sub {
+    font-size: 14px; color: rgba(255,255,255,.5);
+    margin-bottom: 32px; line-height: 1.6;
+  }
+  .bottom-cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-cta-dark {
+    padding: 12px 28px; border-radius: 9px; border: none;
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all .15s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-cta-primary {
+    background: var(--accent-blue); color: white;
+    box-shadow: 0 4px 20px rgba(37,99,235,.4);
+  }
+  .btn-cta-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+  .btn-cta-ghost {
+    background: rgba(255,255,255,.08); color: rgba(255,255,255,.7);
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .btn-cta-ghost:hover { background: rgba(255,255,255,.13); }
+
+  /* Price switching */
+  .price-monthly, .price-annual { transition: opacity .2s; }
+  body.annual .price-monthly { display: none; }
+  body:not(.annual) .price-annual { display: none; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="dashboard.html" class="nav-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="13" height="13">
+        <circle cx="8" cy="8" r="2" fill="white"/><circle cx="16" cy="8" r="2" fill="white"/>
+        <circle cx="8" cy="16" r="2" fill="white"/><circle cx="16" cy="16" r="2" fill="white"/>
+      </svg>
+    </div>
+    <span class="logo-name">Apex</span>
+  </a>
+  <div class="nav-links">
+    <a href="practice-screen.html" class="nav-link">Practice</a>
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="pricing.html" class="nav-link" style="color:var(--text-primary);font-weight:500;">Pricing</a>
+    <a href="auth.html" class="nav-cta">Get started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="hero-eyebrow-dot"></span>
+    Simple pricing
+  </div>
+  <h1 class="hero-headline">Master every question.<br><em>Not just memorize it.</em></h1>
+  <p class="hero-sub">One plan for serious candidates. Everything you need to walk into your superday and not flinch.</p>
+
+  <!-- Billing toggle -->
+  <div class="billing-toggle">
+    <button class="billing-btn active" id="btnMonthly" onclick="setBilling('monthly')">Monthly</button>
+    <button class="billing-btn" id="btnAnnual" onclick="setBilling('annual')">
+      Annual
+      <span class="billing-badge">2 months free</span>
+    </button>
+  </div>
+</div>
+
+<!-- PRICING CARDS -->
+<div class="cards-wrapper">
+
+  <!-- FREE -->
+  <div class="card card-free">
+    <div class="card-header">
+      <div class="card-tier-row">
+        <span class="card-tier-name">Free</span>
+      </div>
+      <div class="card-price">
+        <span class="price-amount">$0</span>
+        <span class="price-period">/ forever</span>
+      </div>
+      <div class="price-annual-note">&nbsp;</div>
+      <p class="card-description">Start practicing immediately. No card required. See what Apex feels like before you commit.</p>
+    </div>
+
+    <div class="card-cta-row">
+      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register'">
+        Start for free
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div class="card-features">
+      <div class="features-label">What's included</div>
+      <div class="feature-list">
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check">✓</div>
+          <div class="feature-text">
+            <strong>Full question bank access</strong>
+            <span class="feature-sub">All 188 technical questions across 6 topics</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check">✓</div>
+          <div class="feature-text">
+            <strong>5 AI-graded answers per day</strong>
+            <span class="feature-sub">Scored 0–100 with detailed feedback</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check">✓</div>
+          <div class="feature-text">
+            <strong>Model answers</strong>
+            <span class="feature-sub">See what a banker would say after each attempt</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-dash">—</div>
+          <div class="feature-text" style="color:var(--text-tertiary)">
+            AI drill questions
+            <span class="feature-sub">Requires Pro</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-dash">—</div>
+          <div class="feature-text" style="color:var(--text-tertiary)">
+            Performance analytics
+            <span class="feature-sub">Requires Pro</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-dash">—</div>
+          <div class="feature-text" style="color:var(--text-tertiary)">
+            Saved questions & weak spot tracking
+            <span class="feature-sub">Requires Pro</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-dash">—</div>
+          <div class="feature-text" style="color:var(--text-tertiary)">
+            Interview mode
+            <span class="feature-sub">Requires Pro</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PRO -->
+  <div class="card card-pro">
+    <div class="card-header">
+      <div class="card-tier-row">
+        <span class="card-tier-name">Pro</span>
+        <span class="card-popular-badge">Most popular</span>
+      </div>
+      <div class="card-price">
+        <span class="price-amount price-monthly">$19</span>
+        <span class="price-amount price-annual">$16</span>
+        <span class="price-period">/ month</span>
+      </div>
+      <div class="price-annual-note price-monthly">&nbsp;</div>
+      <div class="price-annual-note price-annual">
+        Billed $192/yr &nbsp;<span class="save-pill">Save $36</span>
+      </div>
+      <p class="card-description">Unlimited AI grading. Adaptive drilling. The full mastery system — everything you need to stop guessing and start knowing.</p>
+    </div>
+
+    <div class="card-cta-row">
+      <button class="btn-cta btn-pro" onclick="window.location.href='auth.html?mode=register&plan=pro'">
+        Start 7-day free trial
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div class="card-features">
+      <div class="features-label">Everything in Free, plus</div>
+      <div class="feature-list">
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>Unlimited AI-graded answers</strong>
+            <span class="feature-sub">No daily cap — grade every answer, every session</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>AI drill question generation</strong>
+            <span class="feature-sub">Score below 75? Claude generates 3 targeted questions drilling the exact concept you missed</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>Full performance analytics</strong>
+            <span class="feature-sub">Topic breakdowns, score trends, mastery tracking, weak spot detection</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>Saved questions</strong>
+            <span class="feature-sub">Bookmark anything for focused review sessions</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>Interview mode</strong>
+            <span class="feature-sub">Timed questions, hidden text, pressure simulation</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>Voice answer mode</strong>
+            <span class="feature-sub">Practice speaking your answers out loud, graded just the same</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>Spaced repetition ordering</strong>
+            <span class="feature-sub">Missed questions surface first. Mastered ones wait. Smart by default.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- HOW IT DIFFERS -->
+<div class="divider-section">
+  <div class="divider-inner">
+    <div class="diff-item">
+      <div class="diff-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="diff-title">Active recall, not passive reading</div>
+      <div class="diff-desc">You answer from scratch every time. No multiple choice. No reading first. The only way to actually retain it.</div>
+    </div>
+    <div class="diff-divider"></div>
+    <div class="diff-item">
+      <div class="diff-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="diff-title">Drills the gap, not the topic</div>
+      <div class="diff-desc">When you miss a question, Apex generates 3 new ones targeting the exact concept you got wrong — not just more questions on the same topic.</div>
+    </div>
+    <div class="diff-divider"></div>
+    <div class="diff-item">
+      <div class="diff-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <div class="diff-title">Mastery-gated, not time-gated</div>
+      <div class="diff-desc">You don't finish a topic by spending two hours on it. You finish when you can answer every question cold, consistently.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="faq-label">Common questions</div>
+  <h2 class="faq-title">Everything you need to know</h2>
+  <div class="faq-list">
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">What happens after the 7-day trial?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">After 7 days your Pro trial ends and you're moved to the Free tier automatically — no charge. If you want to keep unlimited grading and AI drills, you can upgrade at any point. No surprise charges.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">Is my progress saved if I downgrade to Free?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">Yes. Your score history, mastery data, and saved questions are all preserved. You just won't be able to generate new AI drill questions or access performance analytics until you upgrade again.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">How does the AI grading actually work?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">Every answer is graded by Claude against a model answer written by IB professionals. You get a score from 0–100 across three dimensions — technical accuracy, completeness, and structure — plus specific feedback on what you got right and what you missed.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">What makes the AI drill questions different from the regular bank?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">The regular question bank is a fixed set of 188 vetted technical questions. When you score below 75, Claude generates 3 completely new questions targeting the specific concept you missed — not a topic, but the exact mechanic (e.g. "how D&A flows through to free cash flow specifically"). These are written fresh for your gap, not pulled from any list.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">Can I cancel anytime?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">Yes. Cancel from your account settings at any point. You keep Pro access until the end of your billing period, then roll to Free with no further charges.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">Is this only for IB? What about PE, consulting, or other finance roles?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">Right now the question bank is focused on investment banking technicals — the core topics (accounting, valuation, DCF, M&A, LBO, enterprise value) that come up in IB and PE first-round interviews. Expansion to other finance roles is on the roadmap.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM CTA -->
+<div class="bottom-cta">
+  <div class="bottom-cta-label">Ready to start?</div>
+  <h2 class="bottom-cta-headline">Your interview is closer<br><em>than you think.</em></h2>
+  <p class="bottom-cta-sub">Most candidates spend weeks passively reading guides.<br>Apex candidates spend hours actually mastering questions.</p>
+  <div class="bottom-cta-actions">
+    <a href="auth.html?mode=register&plan=pro" class="btn-cta-dark btn-cta-primary">
+      Start free trial
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+    <a href="practice-screen.html" class="btn-cta-dark btn-cta-ghost">
+      Try it free first
+    </a>
+  </div>
+</div>
+
+<script>
+  function setBilling(type) {
+    if (type === 'annual') {
+      document.body.classList.add('annual');
+      document.getElementById('btnAnnual').classList.add('active');
+      document.getElementById('btnMonthly').classList.remove('active');
+    } else {
+      document.body.classList.remove('annual');
+      document.getElementById('btnMonthly').classList.add('active');
+      document.getElementById('btnAnnual').classList.remove('active');
+    }
+  }
+
+  function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    // Open this one if it wasn't open
+    if (!isOpen) item.classList.add('open');
+  }
+</script>
+
+</body>
+</html>
