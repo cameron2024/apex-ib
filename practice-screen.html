@@ -2254,18 +2254,61 @@ Grade strictly and return JSON only.`;
       nextQReason.textContent = '⬆️ You nailed it — here\'s a harder variation';
       btnLabel.textContent = 'Load this question';
       document.getElementById('drillQueuePreview').style.display = 'none';
+      const skipElM = document.getElementById('drillSkipLink');
+      if (skipElM) skipElM.style.display = 'none';
     } else if (overall < 75 && result.concept_gap) {
-      // Missed — generate drill questions in background, show loading state
-      nextBadge.textContent = 'AI drilling your gap';
-      nextBadge.className = 'next-label-badge';
-      labelText.textContent = 'Drill this gap';
-      nextQText.textContent = 'Generating targeted questions…';
-      nextQReason.textContent = '🎯 Concept: ' + result.concept_gap;
-      btnLabel.textContent = 'Start drilling';
-      document.getElementById('drillQueuePreview').style.display = 'none';
-      // Kick off async generation
       const currentQ = filteredQuestions[currentIndex];
-      generateDrillQuestions(currentQ, result.concept_gap, result.missed || []);
+      const isAlreadyDrilling = currentQ.ai_generated && currentQ.ai_type === 'drill';
+
+      if (isAlreadyDrilling && drillQueue.length > 0) {
+        // Mid-drill failure — don't spawn new drills, just continue the existing set
+        nextBadge.textContent = 'Continue drill';
+        nextBadge.className = 'next-label-badge';
+        labelText.textContent = 'Keep drilling';
+        nextQText.textContent = 'Continue with the remaining drill questions';
+        nextQReason.textContent = '🎯 ' + drillQueue.length + ' drill question' + (drillQueue.length > 1 ? 's' : '') + ' remaining';
+        btnLabel.textContent = 'Next drill question';
+        document.getElementById('drillQueuePreview').style.display = 'none';
+      } else if (isAlreadyDrilling) {
+        // Last drill question failed — just move on, don't infinite loop
+        nextBadge.textContent = 'Next question';
+        nextBadge.className = 'next-label-badge';
+        labelText.textContent = 'Move on';
+        nextQText.textContent = 'Continue to next question in the bank';
+        nextQReason.textContent = '📌 Review the model answer above before moving on';
+        btnLabel.textContent = 'Next question';
+        drillQueue = [];
+        inDrillMode = false;
+        document.getElementById('drillQueuePreview').style.display = 'none';
+      } else {
+        // Fresh miss on a bank question — offer drill with a skip option
+        nextBadge.textContent = 'AI drilling your gap';
+        nextBadge.className = 'next-label-badge';
+        labelText.textContent = 'Drill this gap';
+        nextQText.textContent = 'Generating targeted questions…';
+        nextQReason.textContent = '🎯 Concept: ' + result.concept_gap;
+        btnLabel.textContent = 'Start drilling (3 questions)';
+        document.getElementById('drillQueuePreview').style.display = 'none';
+        // Show skip link
+        let skipEl = document.getElementById('drillSkipLink');
+        if (!skipEl) {
+          skipEl = document.createElement('div');
+          skipEl.id = 'drillSkipLink';
+          skipEl.style.cssText = 'text-align:center;margin-top:8px;font-size:12px;color:var(--text-tertiary);';
+          skipEl.innerHTML = '<a href="#" id="drillSkipAnchor" style="color:var(--text-tertiary);text-decoration:underline;">Skip drill — next question</a>';
+          document.getElementById('btnLoadNext').parentNode.appendChild(skipEl);
+        }
+        skipEl.style.display = 'block';
+        document.getElementById('drillSkipAnchor').onclick = function(e) {
+          e.preventDefault();
+          drillQueue = [];
+          inDrillMode = false;
+          skipEl.style.display = 'none';
+          loadNextQuestion();
+        };
+        // Kick off async generation
+        generateDrillQuestions(currentQ, result.concept_gap, result.missed || []);
+      }
     } else {
       // Mid range (75-94) — just advance normally
       nextBadge.textContent = 'Next question';
@@ -2277,6 +2320,8 @@ Grade strictly and return JSON only.`;
       drillQueue = [];
       inDrillMode = false;
       document.getElementById('drillQueuePreview').style.display = 'none';
+      const skipEl2 = document.getElementById('drillSkipLink');
+      if (skipEl2) skipEl2.style.display = 'none';
     }
 
     // Show panel
