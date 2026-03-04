@@ -1969,36 +1969,44 @@
 
     const question = document.getElementById('questionText').textContent.trim();
 
-    const systemPrompt = `You are a senior investment banking technical interviewer grading a candidate's answer. Be strict and precise — mastery requires a near-perfect response.
+    const systemPrompt = `You are a supportive but rigorous investment banking technical interviewer grading a candidate's answer. Your goal is to accurately reflect understanding — rewarding genuine grasp of concepts while clearly identifying meaningful gaps.
 
 Grade on exactly 3 dimensions (0-100 each):
-1. technical_accuracy — Are the facts, mechanics, and numbers correct?
-2. completeness — Did they cover ALL key points? Missing even one important piece should reduce this score significantly.
-3. structure — Was the answer logically organized and clear?
+1. technical_accuracy — Are the core facts and mechanics correct? Small imprecisions or missing edge cases are Minor issues. Only wrong mechanics, incorrect numbers, or fundamental misunderstandings are Critical.
+2. completeness — Did they cover the key concepts? A solid answer that captures the core idea scores well even if it omits peripheral details. Only deduct significantly for missing a central concept — not for skipping advanced nuance.
+3. structure — Was the answer clear and logical? A well-reasoned answer in plain prose is fine. Only penalize if the answer is genuinely hard to follow.
 
 Overall score = weighted average: technical(50%) + completeness(35%) + structure(15%). Round to nearest whole number.
-Mastery threshold is 95. Be honest — most answers should score 60-85.
+
+Scoring guidance — be calibrated, not harsh:
+- 90-100: Excellent. Nailed the core concept with accuracy and clarity. Minor omissions are fine at this level.
+- 75-89: Good. Understands the concept, may have missed one secondary point or had a small imprecision.
+- 60-74: Partial. Got the gist but missed something meaningful, or had a factual error on a secondary point.
+- Below 60: Only if the candidate fundamentally misunderstood the concept or got a core mechanic wrong.
+
+Critical errors (reserved for): wrong direction of an effect (e.g. saying depreciation reduces cash), confusing two distinct concepts (e.g. EV and equity value), missing the single most important mechanic of the question.
+Minor errors: omitting a secondary detail, imprecise wording, missing an edge case, not mentioning a nuance.
 
 Rules:
-- "correct": max 3 items. Each must be one short sentence referencing exactly what they said.
-- "missed": max 3 items. Each must be one short sentence referencing exactly what they missed or got wrong. Prefix with "Critical:" or "Minor:" as appropriate.
-- "model_answer": 2-3 sentences MAXIMUM. The essential answer only — no elaboration.
-- "concept_gap": If score < 75, identify the single most important concept the candidate misunderstood or missed. Be specific — not "depreciation" but "how depreciation flows through from EBIT to net income while being added back on the cash flow statement". If score >= 75, set to null.
-- "harder_followon": If score >= 95, write one harder follow-on question that tests a related advanced concept. If score < 95, set to null.
+- "correct": max 3 items. One short sentence each referencing what they actually said.
+- "missed": max 3 items. One short sentence each. Prefix EVERY item with either "Critical:" or "Minor:" — use Critical sparingly, only for the issues above.
+- "model_answer": 2-3 sentences MAX. The essential answer only.
+- "concept_gap": If score < 75, identify the single most important concept they missed or misunderstood. Be specific — not "depreciation" but "why depreciation is added back on the CFS despite reducing Net Income". If score >= 75, set to null.
+- "harder_followon": If score >= 90, write one harder follow-on question testing a related advanced concept. If score < 90, set to null.
 
 Respond ONLY with valid JSON, no markdown fences:
 {
   "scores": {
-    "overall": 72,
-    "technical": 65,
-    "completeness": 60,
-    "structure": 80
+    "overall": 82,
+    "technical": 80,
+    "completeness": 78,
+    "structure": 90
   },
   "correct": ["They correctly stated X", "They mentioned Y"],
   "missed": ["Critical: they missed X", "Minor: they didn't mention Y"],
   "model_answer": "2-3 sentence ideal answer.",
   "concept_gap": "The specific concept they need to drill, or null if score >= 75",
-  "harder_followon": "A harder follow-on question, or null if score < 95"
+  "harder_followon": "A harder follow-on question, or null if score < 90"
 }`;
 
     const userPrompt = `Question: "${question}"
@@ -2111,7 +2119,7 @@ Grade strictly and return JSON only.`;
     const badge = document.getElementById('verdictBadge');
     const icon = document.getElementById('verdictIcon');
     const label = document.getElementById('verdictLabel');
-    if (overall >= 95) { badge.className = 'verdict-badge mastered'; icon.textContent = '★'; label.textContent = 'Mastered'; }
+    if (overall >= 90) { badge.className = 'verdict-badge mastered'; icon.textContent = '★'; label.textContent = 'Mastered'; }
     else if (overall >= 75) { badge.className = 'verdict-badge needs-work'; icon.textContent = '◎'; label.textContent = 'Needs Work'; }
     else { badge.className = 'verdict-badge miss'; icon.textContent = '✕'; label.textContent = 'Miss'; }
   }
@@ -2156,7 +2164,7 @@ Grade strictly and return JSON only.`;
 
     verdictScore.textContent = overall;
 
-    if (overall >= 95) {
+    if (overall >= 90) {
       verdictBadge.className = 'verdict-badge mastered';
       verdictIcon.textContent = '★';
       verdictLabel.textContent = 'Mastered';
@@ -2224,7 +2232,7 @@ Grade strictly and return JSON only.`;
     const btnLabel    = document.getElementById('btnLoadNextLabel');
     const labelText   = document.getElementById('nextLabelText');
 
-    if (overall >= 95 && result.harder_followon) {
+    if (overall >= 90 && result.harder_followon) {
       // Mastered — queue a single harder follow-on as a real AI question
       const hardQ = {
         id: 'ai_followon_' + Date.now(),
@@ -2278,8 +2286,8 @@ Grade strictly and return JSON only.`;
     // Track session result
     recordQuestionResult(overall);
 
-    // Auto-show mastery celebration if 95+
-    if (overall >= 95) {
+    // Auto-show mastery celebration if 90+
+    if (overall >= 90) {
       setTimeout(() => showMasteryCelebration(), 600);
     }
   }
@@ -2649,14 +2657,14 @@ Generate 3 drill questions targeting this exact gap.`;
     document.getElementById('statPartial').textContent = partial;
     document.getElementById('statMissed').textContent = missed;
 
-    // Update nav badges
+    // Update nav badges — show answered (any attempt) / total
     const topics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
     topics.forEach(t => {
       const el = document.getElementById('badge-' + t);
       if (!el) return;
       const tqs = t === 'All' ? QUESTION_BANK : QUESTION_BANK.filter(q => q.topic === t);
-      const tMastered = tqs.filter(q => sessionResults[q.id] === 'mastered').length;
-      el.textContent = tMastered + '/' + tqs.length;
+      const tAnswered = tqs.filter(q => sessionResults[q.id] !== undefined).length;
+      el.textContent = tAnswered + '/' + tqs.length;
     });
   }
 
@@ -2664,7 +2672,7 @@ Generate 3 drill questions targeting this exact gap.`;
     const q = filteredQuestions[currentIndex];
     if (!q) return;
     let status;
-    if (score >= 95) status = 'mastered';
+    if (score >= 90) status = 'mastered';
     else if (score >= 75) status = 'partial';
     else status = 'missed';
     sessionResults[q.id] = status;
