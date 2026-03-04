@@ -143,7 +143,7 @@ http.createServer(async (req, res) => {
   if (req.method==='GET' && url==='/api/progress/load') {
     const user = getUser(req); if (!user) return json(res,401,{error:'Unauthorized'});
     db = loadDB();
-    const results = db.question_results.filter(r=>r.user_id===user.userId).map(r=>({question_id:r.question_id,status:r.status,score:r.score}));
+    const results = db.question_results.filter(r=>r.user_id===user.userId).map(r=>({question_id:r.question_id,topic:r.topic,status:r.status,score:r.score}));
     const stateRow = db.user_state.find(s=>s.user_id===user.userId);
     const state = stateRow ? {last_topic:stateRow.last_topic,last_question_index:stateRow.last_question_index} : {last_topic:'All',last_question_index:0};
     const history = db.sessions.filter(s=>s.user_id===user.userId).sort((a,b)=>b.created_at-a.created_at).slice(0,50);

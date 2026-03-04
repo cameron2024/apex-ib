@@ -2751,7 +2751,7 @@ Generate 3 drill questions targeting this exact gap.`;
 
     if (authToken) {
       // Logged in: fetch progress first, then render with smart ordering
-      loadProgressFromServer();
+      loadProgressFromServer(startTopic);
     } else {
       // Not logged in: render immediately, show auth modal if not already dismissed
       selectTopic(startTopic);
@@ -2787,8 +2787,11 @@ Generate 3 drill questions targeting this exact gap.`;
   }
 
   // ── Progress: Load ──────────────────────────────────────────
-  async function loadProgressFromServer() {
+  async function loadProgressFromServer(startTopic) {
     if (!authToken) return;
+    startTopic = startTopic || 'All';
+    // Show questions immediately so page isn't blank while fetching
+    selectTopic(startTopic);
     try {
       const res = await fetch('/api/progress/load', {
         headers: { 'Authorization': 'Bearer ' + authToken }
@@ -2796,35 +2799,17 @@ Generate 3 drill questions targeting this exact gap.`;
       if (!res.ok) return;
       const data = await res.json();
 
-      // Restore question results into sessionResults
-      if (data.results) {
+      // Restore all historical results into sessionResults
+      if (data.results && data.results.length > 0) {
         data.results.forEach(r => {
           sessionResults[r.question_id] = r.status;
         });
+        // Re-render with progress now loaded — re-run selectTopic to apply smart ordering
+        selectTopic(startTopic);
       }
-
-      // Re-run selectTopic now that sessionResults is populated — this triggers smart ordering
-      const params = new URLSearchParams(window.location.search);
-      const topicParam = params.get('topic');
-      const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
-
-      if (topicParam && validTopics.includes(topicParam)) {
-        // URL param always wins — navigate to the specified topic
-        selectTopic(topicParam);
-      } else {
-        // No URL param = Practice All — always start with 'All', ignore last_topic
-        selectTopic('All');
-      }
-
-      updateProgressUI();
     } catch(e) {
       console.log('Progress load error:', e.message);
-      // Fallback: show questions even if progress fetch fails
-      const params = new URLSearchParams(window.location.search);
-      const topicParam = params.get('topic');
-      const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
-      const fallbackTopic = validTopics.includes(topicParam) ? topicParam : 'All';
-      selectTopic(fallbackTopic);
+      // Already rendered above — nothing more to do
     }
   }
 
