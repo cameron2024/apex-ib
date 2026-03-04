@@ -1,0 +1,812 @@
+[
+  {
+    "id": "ma_001",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Purpose and output of a merger model",
+    "question": "What is a merger model and what does it tell you?",
+    "model_answer": "A merger model analyzes the financial impact of one company acquiring another by combining the two companies' income statements and assessing whether the deal increases or decreases the acquirer's earnings per share. The core output is EPS accretion or dilution — if the combined EPS is higher than the acquirer's standalone EPS, the deal is accretive; if lower, it is dilutive. The model also requires assumptions about purchase price, the mix of cash, debt, and stock used to finance the deal, and any synergies expected to be realized. Beyond EPS, a full merger model also combines balance sheets and shows the creation of goodwill.",
+    "common_mistakes": ["Saying the merger model tells you whether to do the deal — it is a sanity check, not a decision-making tool", "Forgetting that the model also combines balance sheets and creates goodwill, not just combines income statements"]
+  },
+  {
+    "id": "ma_002",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Definition of accretion and dilution",
+    "question": "What does it mean for an acquisition to be accretive versus dilutive?",
+    "model_answer": "An acquisition is accretive if the acquirer's earnings per share increases after the deal closes relative to its standalone EPS. It is dilutive if EPS decreases post-deal. This matters because institutional investors closely track EPS and P/E multiples, so a dilutive deal can cause the acquirer's stock price to fall. Accretion or dilution is driven by the relationship between the cost of the consideration used to fund the deal and the earnings yield of the target company.",
+    "common_mistakes": ["Saying a deal is accretive simply because it adds net income — it depends on whether that net income is sufficient relative to the cost of financing", "Confusing accretive with 'value-creating' — a deal can be accretive in EPS terms but still destroy economic value"]
+  },
+  {
+    "id": "ma_003",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "How to combine income statements in a merger model",
+    "question": "Walk me through how you combine two companies' income statements in a basic merger model.",
+    "model_answer": "You start by adding together all revenue and operating expense line items from both companies. Below operating income, you adjust for acquisition-related items: if cash was used, you subtract foregone interest income on that cash; if debt was raised, you add new interest expense; if stock was issued, you increase the share count. You then apply the acquirer's tax rate to the combined pre-tax income to get combined net income. Finally, you divide combined net income by the new total share count to get the pro forma EPS, which you compare to the acquirer's standalone EPS to determine accretion or dilution.",
+    "common_mistakes": ["Using the average or blended tax rate rather than the acquirer's tax rate", "Forgetting to adjust for foregone interest when cash is used — just adding the two net income figures together"]
+  },
+  {
+    "id": "ma_004",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Why companies pursue acquisitions",
+    "question": "What are the main reasons a company would want to acquire another company?",
+    "model_answer": "Companies acquire others to earn a return on investment, either through literal financial returns or through a higher EPS that boosts shareholder value. Strategic rationales include gaining market share, accelerating growth, acquiring undervalued assets, obtaining the target's customer base for cross-selling, and securing critical technology or intellectual property. Financial rationales include realizing cost synergies from combining overlapping operations, tax synergies from relocating or restructuring, and financing synergies from refinancing the target's debt at a lower rate. In practice, ego and competitive pressure from boards or management also drive M&A activity.",
+    "common_mistakes": ["Listing only financial reasons and ignoring strategic rationale", "Saying acquisitions always create value — empirical evidence shows most acquisitions fail to deliver expected synergies"]
+  },
+  {
+    "id": "ma_005",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Three forms of M&A consideration and their costs",
+    "question": "What are the three ways to fund an acquisition and what is the cost of each?",
+    "model_answer": "Acquisitions can be funded with cash, debt, or stock. The cost of cash is the foregone after-tax interest income that the buyer would have earned — typically the after-tax yield on cash holdings, which is usually the lowest of the three. The cost of debt is the after-tax interest rate on the new borrowings, calculated as the interest rate multiplied by one minus the tax rate. The cost of stock is the acquirer's earnings yield — the reciprocal of its P/E multiple — because issuing new shares dilutes existing shareholders proportionally to the buyer's own earnings relative to share price. Cash is generally cheapest, followed by debt, followed by equity.",
+    "common_mistakes": ["Saying the cost of cash is zero because the company already has it — it has an opportunity cost equal to foregone interest", "Mixing up cost of stock with the stock price rather than treating it as the earnings yield"]
+  },
+  {
+    "id": "ma_006",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Why goodwill is created in an acquisition",
+    "question": "Why is goodwill created in an acquisition and what does it represent?",
+    "model_answer": "Goodwill is created because the acquirer typically pays more than the book value of the target's shareholders' equity. It represents the premium paid for intangible value not captured on the balance sheet — things like brand recognition, customer relationships, employee talent, and competitive advantages. In purchase accounting, the seller's shareholders' equity is wiped out, assets and liabilities are written up or down to fair market value, and goodwill serves as the plug that makes the combined balance sheet balance. Goodwill is not amortized under US GAAP but is tested annually for impairment.",
+    "common_mistakes": ["Confusing goodwill with other intangible assets — goodwill is not amortized while other intangibles like customer lists and patents are amortized", "Saying goodwill equals the premium paid over the share price rather than the premium over book value of equity"]
+  },
+  {
+    "id": "ma_007",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Difference between goodwill and other intangible assets",
+    "question": "What is the difference between goodwill and other intangible assets created in an M&A transaction?",
+    "model_answer": "Goodwill represents the residual premium paid over the fair value of identifiable net assets and is not amortized under US GAAP — it stays on the balance sheet indefinitely unless an impairment charge is recorded. Other intangible assets, such as customer relationships, trade names, technology, and non-compete agreements, are separately identified in purchase price allocation and are amortized over their useful lives, which creates an ongoing income statement charge that reduces pre-tax income. The amortization of other intangibles is a key acquisition effect that can make a deal look dilutive even when the underlying economics are sound. This is why many companies report 'adjusted' or 'cash' EPS that adds back intangible amortization.",
+    "common_mistakes": ["Saying both goodwill and other intangibles are amortized — only other intangibles are amortized under US GAAP", "Saying goodwill impairment is scheduled like amortization — it is tested annually and written down only when impaired"]
+  },
+  {
+    "id": "ma_008",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Rule of thumb for all-stock accretion/dilution",
+    "question": "What is the rule of thumb for determining whether an all-stock acquisition will be accretive or dilutive?",
+    "model_answer": "In an all-stock deal, the rule of thumb is to compare the acquirer's P/E multiple to the effective P/E multiple paid for the target. If the buyer's P/E is higher than the seller's implied P/E at the purchase price, the deal is accretive because the buyer is issuing stock with a low earnings yield to acquire earnings at a higher yield. If the buyer's P/E is lower than the seller's, the deal is dilutive. Intuitively, a higher-P/E buyer is getting more earnings per dollar of stock issued than it gives up, while a lower-P/E buyer gets fewer earnings per dollar issued. This rule only applies cleanly to all-stock deals — cash and debt have their own cost dynamics.",
+    "common_mistakes": ["Applying this rule to cash or debt deals where the buyer's P/E multiple is irrelevant", "Forgetting to use the purchase P/E based on the acquisition price rather than the target's current market P/E"]
+  },
+  {
+    "id": "ma_009",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Revenue vs. cost synergies",
+    "question": "What is the difference between revenue synergies and cost synergies, and which are taken more seriously by investors and bankers?",
+    "model_answer": "Revenue synergies represent incremental sales that the combined company can generate that neither company could achieve independently — for example, cross-selling the target's products to the acquirer's customer base or entering new geographies. Cost synergies represent expense reductions from eliminating duplicate functions, consolidating facilities, and achieving economies of scale. Cost synergies are taken more seriously because they are more predictable and quantifiable — you can point to specific headcount or facilities being eliminated. Revenue synergies are inherently uncertain because they depend on future customer behavior, competitive responses, and execution, so investors and analysts typically discount or ignore them entirely.",
+    "common_mistakes": ["Treating revenue synergies as pure margin additions — they always come with associated costs that must be reflected", "Saying revenue synergies are always larger than cost synergies — cost synergies often drive more near-term value in practice"]
+  },
+  {
+    "id": "ma_010",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Stock purchase vs. asset purchase overview",
+    "question": "What are the three main transaction structures used to acquire a company, and who favors each?",
+    "model_answer": "The three main structures are a stock purchase, an asset purchase, and a Section 338(h)(10) election. In a stock purchase, the buyer acquires all assets and liabilities including off-balance sheet items, assets are not written up for tax purposes, and a deferred tax liability is created — sellers prefer this because they pay capital gains tax only once and shed all liabilities. In an asset purchase, the buyer selects specific assets and liabilities to acquire, assets are stepped up for tax purposes allowing the buyer to deduct higher D&A — buyers prefer this because of the tax benefit. The 338(h)(10) election is a hybrid legally treated as a stock purchase but taxed as an asset purchase, favored by both parties when available because buyers get the tax step-up while the structure remains cleaner.",
+    "common_mistakes": ["Saying buyers always prefer stock purchases — buyers almost always prefer asset purchases for the tax step-up", "Forgetting that 338(h)(10) cannot be used if the seller is a C corporation — it requires specific entity-type qualifications"]
+  },
+  {
+    "id": "ma_011",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Why most M&A deals fail",
+    "question": "Why do most mergers and acquisitions fail to deliver expected value?",
+    "model_answer": "Most deals fail because integration is far harder in practice than it appears on paper — combining different cultures, systems, and processes takes far longer and costs more than anticipated. Synergies are frequently overestimated at the time of announcement to justify a high purchase price, and are then underdelivered post-close. Many deals are also driven by the wrong reasons, including management ego, competitive pressure to act before a rival does, or pressure from boards to deploy capital. Additionally, paying too high a premium means the combined company must generate an unrealistic level of earnings improvement just to break even economically.",
+    "common_mistakes": ["Saying deals fail because of bad financial modeling — the failure is almost always operational and cultural, not quantitative", "Saying the majority of deals create value — empirical evidence consistently shows most M&A deals destroy shareholder value for the acquirer"]
+  },
+  {
+    "id": "ma_012",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Role of a merger model in deal negotiations",
+    "question": "What role does a merger model actually play in an M&A deal decision?",
+    "model_answer": "A merger model is a sanity check and sensitivity analysis tool, not a decision driver. It helps the acquirer understand whether a deal is financially workable at a given price and mix of consideration, and it tests how accretion or dilution changes across different purchase price ranges and synergy assumptions. Boards and management teams use it to frame the conversation around value, but the actual decision to pursue a deal is driven by strategic rationale, competitive dynamics, relationship factors, and management conviction. A company would never say 'the model shows 15% accretion so we should do this deal' — it uses the model to confirm a deal is not obviously destructive.",
+    "common_mistakes": ["Overstating the model's importance — interviews often reveal candidates who think the model drives the decision", "Saying the model is used to negotiate purchase price — it informs internal views but the negotiation is driven by many other factors"]
+  },
+  {
+    "id": "ma_013",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Definition and purpose of purchase price allocation",
+    "question": "What is purchase price allocation and why is it done in an acquisition?",
+    "model_answer": "Purchase price allocation, or PPA, is the process of assigning the acquisition price to the fair market values of the target's individual assets and liabilities on the combined balance sheet. It is required under US GAAP to make the combined balance sheet balance after the deal closes. In PPA, the target's existing book values are replaced with fair market values — assets may be written up or down — the target's shareholders' equity is eliminated, identifiable intangible assets are carved out and valued separately, and any remaining excess price is assigned to goodwill. The process ensures that the premium paid for the target is properly reflected in the balance sheet rather than simply added as a lump sum.",
+    "common_mistakes": ["Saying PPA only creates goodwill — it also separately identifies other intangible assets like customer relationships and patents that must be amortized", "Confusing the equity purchase price with the enterprise value in the PPA context — PPA is based on equity purchase price only"]
+  },
+  {
+    "id": "ma_014",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "What are synergies used for in a merger model",
+    "question": "How are synergies incorporated into a merger model?",
+    "model_answer": "Cost synergies are modeled by reducing the combined company's operating expenses — typically COGS or SG&A — which increases pre-tax income, and after applying the tax rate, increases net income and EPS. Revenue synergies are added to the combined revenue line, but you must also reflect the associated costs at an assumed margin, since incremental revenue always carries some cost. Synergies typically phase in over two to three years rather than appearing fully in year one, so a well-built model includes a ramp schedule. Bankers also back-solve for break-even synergies — the minimum synergy level needed to make a deal neutral to EPS — which tells management how achievable the required savings need to be.",
+    "common_mistakes": ["Adding revenue synergies without reflecting any associated cost — treating them as pure operating income additions", "Assuming synergies are fully realized in the first year post-close rather than phasing them in"]
+  },
+  {
+    "id": "ma_015",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Reasons a company would not use all available cash for an acquisition",
+    "question": "If a company has enough cash to fund an entire acquisition, why might it choose not to use all of it?",
+    "model_answer": "A company may need to maintain a minimum cash balance to meet working capital requirements and avoid operational disruptions. Debt covenants may require a floor on cash holdings, and failure to maintain that balance could trigger technical defaults. The company may also need to preserve cash for other priorities such as R&D investment, capital expenditures, dividend payments, or pending litigation expenses. Finally, management may want to keep dry powder for future acquisitions or organic growth opportunities rather than committing all liquidity to a single transaction.",
+    "common_mistakes": ["Saying a company should always use cash if it has enough — ignoring liquidity risk and covenant constraints", "Forgetting that dividend commitments can constrain cash usage in acquisitions"]
+  },
+  {
+    "id": "ma_016",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Foregone interest on cash in a merger model",
+    "question": "What is foregone interest on cash and how does it appear in a merger model?",
+    "model_answer": "Foregone interest on cash is the interest income the acquirer gives up by spending its cash balance on an acquisition rather than keeping it invested. In the merger model, it is reflected as a reduction to pre-tax income in the combined income statement — you subtract the after-tax foregone interest from the combined pre-tax income line. The cost is calculated as the cash used multiplied by the after-tax interest rate the company would have earned on that cash. This makes cash acquisitions slightly less accretive than they might initially appear, since the acquirer loses a stream of interest income by deploying the cash.",
+    "common_mistakes": ["Forgetting to reflect foregone interest at all when modeling a cash acquisition", "Using the pre-tax interest rate rather than the after-tax rate when calculating the income statement impact"]
+  },
+  {
+    "id": "ma_017",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "EPS accretion/dilution and why it matters to institutional investors",
+    "question": "Why do investment bankers and institutional investors focus so heavily on EPS accretion and dilution?",
+    "model_answer": "Institutional investors use EPS and P/E multiples as primary valuation anchors, so any deal that reduces EPS is likely to be punished with a lower stock price for the acquirer. Even if a deal creates long-term strategic value, a dilutive deal can cause immediate negative stock price reactions that put pressure on management. EPS accretion is also used as a proxy for whether the acquirer is getting sufficient financial return relative to what it paid. That said, EPS accretion is an imperfect metric because it ignores the cost of capital, the quality of earnings, and whether the premium paid is justified by the target's true value.",
+    "common_mistakes": ["Saying EPS accretion proves a deal creates value — it only tells you the mechanical EPS impact, not the economic value created", "Ignoring that non-cash amortization charges from purchase accounting can make economically strong deals look dilutive"]
+  },
+  {
+    "id": "ma_018",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "When a company would prefer to issue stock for an acquisition",
+    "question": "Under what circumstances would an acquirer prefer to issue stock rather than use cash or debt to fund an acquisition?",
+    "model_answer": "An acquirer is most likely to issue stock when its share price is trading at an all-time high or at a very high P/E multiple, making stock a relatively cheap form of currency — the earnings yield (cost of equity) is low when the P/E is high. It would also issue stock when the target is large enough that it cannot raise sufficient debt or spare enough cash to fund the deal otherwise. Stock may also be preferred if the acquirer is already highly leveraged and additional debt would strain its balance sheet or trigger rating downgrades. Finally, stock is sometimes used to share risk with the seller — if the acquirer's stock subsequently underperforms, the seller bears some of that downside.",
+    "common_mistakes": ["Saying stock is always the most expensive form of consideration — at very high P/E multiples, the cost of equity can be lower than the after-tax cost of debt", "Forgetting that issuing stock dilutes existing shareholders, which management teams and boards are typically reluctant to do"]
+  },
+  {
+    "id": "ma_019",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "What is an earnout",
+    "question": "What is an earnout and why would a buyer include one in an acquisition agreement?",
+    "model_answer": "An earnout is a deferred payment provision in which the buyer agrees to pay additional consideration to the seller in the future contingent on the acquired business meeting specific financial or operational milestones, such as achieving a revenue target or EBITDA level within a set timeframe. Buyers use earnouts to bridge valuation gaps when the buyer and seller disagree on the company's future prospects — the seller gets more if its optimistic projections prove correct, and the buyer pays less if they do not. Earnouts also incentivize the seller's management team to continue performing post-close rather than taking the proceeds and disengaging. They are most common in acquisitions of private companies and startups, and are rarely used when acquiring public companies.",
+    "common_mistakes": ["Saying earnouts are common in large public company acquisitions — they are almost exclusively used for private and small company deals", "Forgetting to mention that earnouts create post-close disputes about whether milestones were met, which is a significant practical risk"]
+  },
+  {
+    "id": "ma_020",
+    "topic": "Mergers_MA",
+    "difficulty": "Fundamental",
+    "concept": "Why a strategic acquirer pays more than a private equity buyer",
+    "question": "Why is a strategic acquirer typically willing to pay a higher price for a company than a private equity firm?",
+    "model_answer": "A strategic acquirer can realize revenue and cost synergies by combining the target with its existing business — eliminating overlapping functions, cross-selling to each other's customers, and leveraging combined purchasing power. These synergies allow the strategic buyer to justify a higher purchase price while still achieving an acceptable return on investment. A private equity firm generally cannot realize these operational synergies unless it owns a complementary portfolio company, so its return depends primarily on financial engineering and standalone operational improvement. This means private equity firms must buy at a lower price to hit their return thresholds, while strategics can absorb a higher price by capturing synergy value.",
+    "common_mistakes": ["Saying PE firms always pay less because they use more leverage — leverage affects returns but is not the primary reason for the valuation difference", "Forgetting that strategic buyers also consider the cost of integration, which partially offsets synergy value"]
+  },
+  {
+    "id": "ma_021",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Basic all-stock accretion/dilution calculation",
+    "question": "Company A has net income of $400, 100 shares outstanding, and a share price of $80. Company B has net income of $200, 50 shares outstanding, and a share price of $30. Company A acquires Company B in an all-stock deal at no premium. Is the deal accretive or dilutive, and by how much?",
+    "model_answer": "Company A's pre-deal EPS is $400 / 100 = $4.00. The total consideration is $30 × 50 = $1,500. New shares issued by Company A are $1,500 / $80 = 18.75 shares. Pro forma shares outstanding are 100 + 18.75 = 118.75. Pro forma net income is $400 + $200 = $600. Pro forma EPS is $600 / 118.75 = $5.05. Accretion is $5.05 / $4.00 − 1 = approximately 26% accretive. This is accretive because Company A's P/E of 20x is higher than Company B's P/E of 15x, so Company A is issuing higher-multiple stock to acquire lower-multiple earnings.",
+    "common_mistakes": ["Failing to calculate new shares issued correctly by dividing total consideration by the acquirer's share price rather than the target's", "Adding both companies' net incomes without accounting for the new share count when calculating pro forma EPS"]
+  },
+  {
+    "id": "ma_022",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "All-stock accretion/dilution with premium",
+    "question": "Company A has net income of $600, 200 shares outstanding, and a share price of $60. Company B has net income of $150, 100 shares outstanding, and a share price of $20. Company A buys Company B in an all-stock deal at a 25% premium. Is this deal accretive or dilutive?",
+    "model_answer": "Company A's pre-deal EPS is $600 / 200 = $3.00. The purchase price per share for Company B is $20 × 1.25 = $25. Total consideration is $25 × 100 = $2,500. New shares issued are $2,500 / $60 = 41.67 shares. Pro forma shares outstanding are 200 + 41.67 = 241.67. Pro forma net income is $600 + $150 = $750. Pro forma EPS is $750 / 241.67 = $3.10. The deal is approximately 3.4% accretive. Company A's P/E of 20x is higher than the effective purchase P/E of $2,500 / $150 = 16.7x, which explains the accretion.",
+    "common_mistakes": ["Using the target's market P/E rather than the effective purchase P/E when applying the rule of thumb", "Forgetting to apply the premium to the target's share price before calculating total consideration"]
+  },
+  {
+    "id": "ma_023",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Accretion/dilution with mixed consideration — cash and stock",
+    "question": "Company A has a P/E of 15x, 100 shares outstanding, and a share price of $45. Company B has net income of $50, 40 shares outstanding, and a share price of $25. Company A acquires Company B at market value using 50% stock and 50% cash. The after-tax foregone interest rate on cash is 3%. Is the deal accretive or dilutive?",
+    "model_answer": "Company A's net income is $45 / 15 × 100 = $300. Pre-deal EPS is $300 / 100 = $3.00. Total consideration is $25 × 40 = $1,000. Cash portion is $500; stock portion is $500. New shares issued are $500 / $45 = 11.11. Pro forma shares are 100 + 11.11 = 111.11. Foregone after-tax interest is $500 × 3% = $15. Pro forma net income is $300 + $50 − $15 = $335. Pro forma EPS is $335 / 111.11 = $3.015. The deal is approximately 0.5% accretive. The cost of cash (3%) and cost of equity (1/15 = 6.7%) are both below the target earnings yield of 1/20 = 5%, driving accretion.",
+    "common_mistakes": ["Forgetting to subtract foregone interest from pro forma net income when cash is used", "Using the pre-tax foregone interest rate rather than the after-tax rate in the income statement adjustment"]
+  },
+  {
+    "id": "ma_024",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Dilutive deal with premium — all stock",
+    "question": "Company A has a market cap of $200, net income of $20, and 20 shares outstanding. Company B has a market cap of $120, net income of $20, and 10 shares outstanding. Company A buys Company B at a 50% premium in an all-stock deal. Is this accretive or dilutive and by how much?",
+    "model_answer": "Company A's pre-deal EPS is $20 / 20 = $1.00. The purchase price for Company B is $120 × 1.5 = $180. Company A's share price is $200 / 20 = $10. New shares issued are $180 / $10 = 18 shares. Pro forma shares are 20 + 18 = 38. Pro forma net income is $20 + $20 = $40. Pro forma EPS is $40 / 38 = $1.053. The deal is approximately 5.3% accretive despite the premium. Company A's P/E is 10x and the purchase P/E is $180 / $20 = 9x — since the acquirer's P/E is still slightly above the purchase P/E, the deal remains modestly accretive.",
+    "common_mistakes": ["Assuming a large premium automatically makes a deal dilutive — what matters is the relationship between the buyer's P/E and the purchase P/E", "Miscalculating the buyer's share price when market cap and shares outstanding are given separately"]
+  },
+  {
+    "id": "ma_025",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Break-even interest rate for a mixed deal",
+    "question": "Company A has net income of $500, 100 shares outstanding, and a share price of $100. Company B has net income of $300, 100 shares outstanding, and a share price of $45. Company A acquires Company B using 50% stock and 50% debt, with a tax rate of 25%. What interest rate on the debt would produce the same EPS as an all-stock acquisition of the same deal?",
+    "model_answer": "In the all-stock deal: new shares issued = $4,500 / $100 = 45. Pro forma EPS = ($500 + $300) / 145 = $5.517. In the 50/50 deal: stock portion = $2,250, new shares = $2,250 / $100 = 22.5. Total shares = 122.5. To achieve the same EPS of $5.517, pro forma net income must be $5.517 × 122.5 = $675.8. Current net income without interest is $800. So after-tax interest must be $800 − $675.8 = $124.2. Pre-tax interest = $124.2 / (1 − 0.25) = $165.6. Interest rate = $165.6 / $2,250 = 7.36%. Any rate below this would make the mixed deal more accretive than the all-stock deal.",
+    "common_mistakes": ["Forgetting to gross up the after-tax interest expense to find the pre-tax rate when deriving the interest rate", "Incorrectly solving for the break-even relative to zero accretion rather than relative to the accretion level in the all-stock scenario"]
+  },
+  {
+    "id": "ma_026",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Accretion/dilution using earnings yield comparison",
+    "question": "Company A has a P/E of 12x. Company B has a P/E of 18x. Company A is considering acquiring Company B using 100% stock. Without doing any full calculation, is this deal accretive or dilutive? Now explain what after-tax interest rate on debt would make a 100% debt alternative break even.",
+    "model_answer": "The deal is dilutive in an all-stock scenario because Company A has a lower P/E (12x) than Company B's purchase P/E (18x), meaning Company A is issuing stock with a high earnings yield (1/12 = 8.3%) to acquire earnings at a lower yield (1/18 = 5.6%). For a 100% debt deal to break even, the after-tax cost of debt must equal the target's earnings yield of 5.6%. Since after-tax cost of debt = interest rate × (1 − tax rate), if the tax rate is 40%, the required pre-tax rate would be 5.6% / (1 − 0.40) = 9.3%. Any debt rate below 9.3% (pre-tax) would make the debt-funded deal accretive. This illustrates why debt-funded acquisitions of high-P/E targets can work even when stock deals would be dilutive.",
+    "common_mistakes": ["Saying the deal is accretive because Company B has a higher P/E — a higher target P/E means a lower earnings yield, which is worse for the buyer", "Forgetting to gross up the break-even after-tax rate to find the required pre-tax interest rate"]
+  },
+  {
+    "id": "ma_027",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Goodwill calculation step by step",
+    "question": "Company A acquires Company B for an equity purchase price of $500. Company B's balance sheet shows total assets of $350, total liabilities of $150, existing goodwill of $30, and an asset write-up of $40 is made at close. The tax rate is 40% and the deal is a stock purchase. Calculate the goodwill created.",
+    "model_answer": "Company B's shareholders' equity (book value) is $350 − $150 = $200. In a stock purchase, the existing goodwill of $30 must be added back because it is reset to zero and flows into new goodwill. The asset write-up of $40 creates a deferred tax liability of $40 × 40% = $16, which appears on the liabilities side and reduces the amount of goodwill needed. Goodwill = equity purchase price − book value of equity + existing goodwill − asset write-ups + newly created DTL. Goodwill = $500 − $200 + $30 − $40 + $16 = $306. This goodwill sits on the combined balance sheet as a long-lived asset subject to annual impairment testing.",
+    "common_mistakes": ["Forgetting to add back existing goodwill — it is reset to zero in purchase accounting and must be added to arrive at the new goodwill figure", "Omitting the deferred tax liability created by the asset write-up, which reduces the amount of goodwill needed"]
+  },
+  {
+    "id": "ma_028",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Combined EV/EBITDA and P/E multiples post-acquisition",
+    "question": "Company A has a market cap of $300, net debt of $100, and EBITDA of $40. Company B has a market cap of $150, no net debt, and EBITDA of $30. Company A acquires Company B using 100% cash. What are the combined EV/EBITDA and P/E multiples immediately after the deal? Assume no synergies and ignore interest effects on P/E.",
+    "model_answer": "Company A's pre-deal EV is $300 + $100 = $400. In a cash acquisition, Company A uses $150 of cash, which reduces cash on the asset side and effectively increases net debt by $150. Combined EV = $300 + $100 + $150 = $550 (the equity value stays $300 since cash fell, and debt-equivalent rises). Combined EBITDA is $40 + $30 = $70. Combined EV/EBITDA = $550 / $70 = 7.9x. Combined market cap stays at $300 in a cash deal (no new shares). Net income must be adjusted for foregone interest, but ignoring that per the question, combined net income is proportionally around $300 / (original P/E) + $150 net income from B — the EV/EBITDA multiple is the cleanest answer here at approximately 7.9x, illustrating that EV/EBITDA is stable regardless of deal structure since EBITDA excludes interest.",
+    "common_mistakes": ["Treating the combined market cap as the sum of both companies' market caps — in a cash deal, the acquirer does not issue stock so its market cap is unchanged in theory", "Forgetting that using cash to acquire a company increases net debt in the EV bridge, raising the combined EV"]
+  },
+  {
+    "id": "ma_029",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Accretion/dilution with synergies and debt",
+    "question": "Company A has 2 million shares outstanding at a price of $40, with $8 million in net income. Company B has 500K shares outstanding at a price of $20 with $2 million net income. Company A acquires Company B using 40% equity and 60% debt at a 6% interest rate. The tax rate is 35%, and $500K of post-tax synergies are realized. How accretive or dilutive is this deal?",
+    "model_answer": "Company A's pre-deal EPS is $8M / 2M = $4.00. Market cap of Company B is $20 × 500K = $10M. Equity portion is $10M × 40% = $4M; new shares issued = $4M / $40 = 100K shares. Debt portion is $10M × 60% = $6M; after-tax interest = $6M × 6% × (1 − 0.35) = $234K. Pro forma net income = $8M + $2M + $500K − $234K = $10.266M. Pro forma shares = 2M + 100K = 2.1M. Pro forma EPS = $10.266M / 2.1M = $4.89. Accretion = $4.89 / $4.00 − 1 = 22.1% accretive. Synergies and the relatively low cost of debt both contribute meaningfully to accretion.",
+    "common_mistakes": ["Using the pre-tax synergy amount instead of the post-tax amount in the net income build", "Calculating interest expense on the full debt balance without applying the tax shield"]
+  },
+  {
+    "id": "ma_030",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "EV impact of different consideration types",
+    "question": "If Company A acquires Company B using 100% stock, what happens to Company A's enterprise value after the deal closes, assuming no synergies?",
+    "model_answer": "When Company A issues stock to acquire Company B, the combined market capitalization increases by the value of the new shares issued — which equals the equity purchase price. Since no cash leaves the company and no new debt is added, the only change to the EV bridge is the increase in equity value. The combined EV equals Company A's original EV plus Company B's EV (since the market cap rises by the purchase price and debt and cash are unchanged on Company A's side). EV/EBITDA is unaffected by whether cash, debt, or stock is used for the acquisition — the combined EV will be the same in all three cases because each form of consideration increases the EV by an equal amount, just through different components of the bridge.",
+    "common_mistakes": ["Saying stock issuance does not affect EV because cash does not leave the company — the market cap rises when new shares are issued, increasing EV", "Thinking that EV/EBITDA changes based on whether cash or stock is used — it is the same regardless of funding method because EBITDA excludes interest and EV adjusts accordingly"]
+  },
+  {
+    "id": "ma_031",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Higher-P/E buyer acquiring lower-P/E target with debt",
+    "question": "Company A has a P/E of 20x and Company B has a P/E of 10x. Company A acquires Company B using 100% debt at a 5% pre-tax interest rate with a 40% tax rate. Is this deal accretive or dilutive, and would using stock instead of debt increase or decrease accretion?",
+    "model_answer": "The cost of debt after tax is 5% × (1 − 0.40) = 3%. Company B's earnings yield is 1/10 = 10%. Since the cost of debt (3%) is well below the target's earnings yield (10%), this deal is accretive. If stock were used instead, the cost of equity would be 1/20 = 5%, which is still below the target's earnings yield of 10%, so the stock deal would also be accretive — but less so than the debt deal. Using debt (3% after-tax cost) achieves far more accretion than using stock (5% cost), so the debt-funded deal is more accretive. Whenever a company can borrow at a rate below the target's earnings yield, debt financing creates more accretion than stock.",
+    "common_mistakes": ["Saying both debt and stock produce equal accretion if both costs are below the earnings yield — the magnitude of accretion differs based on the spread between cost and yield", "Using the pre-tax interest rate of 5% rather than the after-tax rate of 3% in the comparison"]
+  },
+  {
+    "id": "ma_032",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Accretion/dilution when acquirer has lower P/E than target",
+    "question": "Company A has a P/E of 8x and Company B has a P/E of 15x. Company A is acquiring Company B in an all-stock deal. Without calculating specific numbers, explain directionally what happens to EPS and why. At what tax rate would a 100% debt deal at a 10% pre-tax interest rate break even?",
+    "model_answer": "The deal is dilutive in an all-stock scenario because Company A is issuing shares with an earnings yield of 1/8 = 12.5% to acquire earnings yielding only 1/15 = 6.7% — it is paying more in terms of earnings given up per dollar than it is receiving. For the debt deal to break even, the after-tax cost of debt must equal the target's earnings yield of 6.7%. Setting 10% × (1 − t) = 6.7% and solving: 1 − t = 0.67, so t = 33%. The tax rate must be at least 33% for the debt-funded deal to break even. Above that rate, the debt deal would be accretive; below it, the deal remains dilutive even with debt financing.",
+    "common_mistakes": ["Applying the P/E rule incorrectly by saying a higher target P/E means the target is 'better' — a higher target P/E actually means a lower earnings yield and is worse for the buyer", "Setting after-tax cost of debt equal to the buyer's earnings yield rather than the target's earnings yield when solving for break-even"]
+  },
+  {
+    "id": "ma_033",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Fully diluted equity value calculation",
+    "question": "A company has a share price of $60 and 300 shares outstanding. There are 60 options outstanding with a strike price of $30, 40 RSUs, and $9,000 in convertible notes with a $1,000 par value and a conversion price of $50 per share. What is the fully diluted equity value?",
+    "model_answer": "For the options using the treasury stock method: 60 options are exercised at $30, generating $1,800 in proceeds. The company repurchases $1,800 / $60 = 30 shares. Net new shares from options = 60 − 30 = 30. RSUs each convert to one share, adding 40 new shares. For the convertibles: $9,000 / $1,000 = 9 notes. Each note converts at $50, so each creates $1,000 / $50 = 20 shares. Total new shares from convertibles = 9 × 20 = 180. Total shares = 300 + 30 + 40 + 180 = 550 shares. Fully diluted equity value = 550 × $60 = $33,000.",
+    "common_mistakes": ["Forgetting to apply the treasury stock method to options and simply adding all 60 option shares as new shares", "Forgetting that convertibles create shares equal to the par value divided by the conversion price, not simply par value divided by share price"]
+  },
+  {
+    "id": "ma_034",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Synergies required to break even",
+    "question": "Company A has a P/E of 10x and a market cap of $500. Company B has a P/E of 25x and a market cap of $250. Company B acquires Company A at a 40% premium using all stock. How much in net income synergies would be required to make this deal break even on an EPS basis?",
+    "model_answer": "Company A's net income is $500 / 10 = $50. Company B's net income is $250 / 25 = $10. Company B's share price is $250 / (shares); for simplicity use earnings yield. Company B is buying a lower-P/E target, which sounds accretive, but the 40% premium raises the effective purchase P/E to 10 × 1.4 = 14x. Company B's P/E is 25x, so it is paying 14x for earnings at a 25x valuation — the deal is accretive since 14 < 25. But with the 40% premium the new effective purchase price = $500 × 1.4 = $700. For the deal to break even at Company B's original P/E of 25x: $700 / 25 = $28 of net income needed from Company A. Company A currently contributes $50 of net income, so with the premium the deal is already accretive without synergies. If instead the question were whether the purchase P/E being 14x vs. 25x generates accretion: accretion exists but the break-even synergy is $0 here because the P/E condition is already satisfied.",
+    "common_mistakes": ["Forgetting to adjust the target's effective P/E for the premium paid, which determines whether the deal is accretive before synergies", "Calculating break-even synergies by setting pro forma EPS equal to pre-deal EPS of the acquirer and solving algebraically — a valid approach that should be explained step by step"]
+  },
+  {
+    "id": "ma_035",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Accretion/dilution with tax rate differential",
+    "question": "Company A has a tax rate of 35% and acquires Company B, which has a tax rate of 25%. Directionally, what happens to the deal's accretion or dilution profile, and why?",
+    "model_answer": "The deal becomes more dilutive or less accretive compared to a scenario where both companies have the same tax rate. This is because after the acquisition, Company B's earnings will be taxed at Company A's higher tax rate of 35% rather than its standalone rate of 25%. The effectively higher tax rate reduces the post-acquisition net income that Company B contributes to the combined entity relative to its standalone earnings. The incremental tax drag reduces pro forma net income and therefore pro forma EPS. This effect can make a deal that looked neutral or mildly accretive become dilutive once the tax differential is properly accounted for.",
+    "common_mistakes": ["Ignoring the tax rate differential entirely and just adding both companies' net incomes at their respective tax rates", "Saying the combined company uses an average tax rate — it uses the acquirer's rate applied to the combined pre-tax income"]
+  },
+  {
+    "id": "ma_036",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Enterprise value post-acquisition with debt assumption",
+    "question": "Company A has an equity value of $800, net debt of $200. Company B has an EV of $300 and no debt. Company A acquires Company B by raising $300 in new debt. What is the combined enterprise value?",
+    "model_answer": "Company A's pre-deal EV is $800 + $200 = $1,000. Company B's EV is $300. In a debt-funded acquisition, Company A raises $300 in new debt and uses it to pay for Company B. The combined equity value remains $800 (no new shares issued) but debt increases from $200 to $500. Combined EV = $800 + $500 = $1,300. Alternatively: combined EV = Company A's original EV + Company B's EV = $1,000 + $300 = $1,300. Both approaches yield the same result. This illustrates the key principle that regardless of whether the deal is funded with cash, debt, or stock, the combined EV equals the sum of both companies' standalone EVs.",
+    "common_mistakes": ["Thinking that raising debt to fund an acquisition does not change the combined EV — it increases both debt and therefore EV by the same amount", "Adding equity values rather than EVs when one or both companies have debt on their balance sheets"]
+  },
+  {
+    "id": "ma_037",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Why a target's stock doesn't rise to full offer price",
+    "question": "A company's stock is trading at $20. An acquirer announces it will buy the company for $35 per share, but the target's stock only rises to $30. Why doesn't it rise to $35?",
+    "model_answer": "The target's stock reflects the market's probability-weighted estimate of the deal actually closing. Since M&A deals can fail for regulatory, financial, or shareholder approval reasons, the market discounts the offer price by the probability that the deal does not close. If the market assigns a 70% probability that the deal closes, the stock would trade at roughly $20 + 70% × ($35 − $20) = $30.50. Additional factors include the time value of money if the deal takes months to close, uncertainty about whether the final price might be renegotiated, and risk that the acquirer's stock price declines in a stock deal. The gap between the offer price and the current trading price is called the 'merger spread' and is exploited by merger arbitrage strategies.",
+    "common_mistakes": ["Saying the stock rises exactly to the offer price upon announcement — the market always discounts for deal risk", "Forgetting to mention the time value of money — even a certain deal closing in six months is worth slightly less today"]
+  },
+  {
+    "id": "ma_038",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Treatment of target's existing debt in a deal",
+    "question": "In an M&A deal, if the target has $200 of existing debt on its balance sheet, how does this affect the purchase price the acquirer must pay?",
+    "model_answer": "Most debt instruments contain change-of-control provisions that require the debt to be repaid when a new buyer acquires more than 50% of the company. If the debt is refinanced, the acquirer must fund the full debt repayment as part of the transaction, which increases the total funds required above the equity purchase price. In the sources and uses table, repaid debt appears only in the uses column, increasing total funding needed. If the debt is assumed rather than refinanced, it appears in both sources and uses and has no net impact on funds required, but the buyer takes on the liability. The equity purchase price is unaffected by either treatment — it is always calculated as the price paid to equity holders — but the total transaction cost including debt repayment can be significantly higher.",
+    "common_mistakes": ["Confusing equity purchase price with total transaction value — existing debt increases total funds required but not the equity purchase price used in purchase price allocation", "Forgetting that assumed debt appears in both columns of the sources and uses table and nets to zero impact on total funding"]
+  },
+  {
+    "id": "ma_039",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Accretion/dilution with cash, debt, and synergies combined",
+    "question": "Company A has 1 million shares at $50 per share with $5 million net income. Company B has a market cap of $8 million and net income of $800K. Company A acquires Company B using 50% debt and 50% cash. Interest rate is 8%, tax rate is 40%, and $200K of post-tax synergies are realized. Is the deal accretive or dilutive?",
+    "model_answer": "Company A's pre-deal EPS is $5M / 1M = $5.00. Total consideration is $8M. Debt = $4M; cash = $4M. After-tax interest on debt = $4M × 8% × (1 − 0.40) = $192K. After-tax foregone interest on cash (assume 2% foregone rate) = $4M × 2% × (1 − 0.40) = $48K. Pro forma net income = $5M + $800K − $192K − $48K + $200K = $5.76M. Pro forma shares = 1M (no new shares issued). Pro forma EPS = $5.76M / 1M = $5.76. Accretion = $5.76 / $5.00 − 1 = 15.2% accretive. Note: if the foregone interest rate is not given, the question typically states only the debt interest, and foregone cash interest may be assumed negligible or given explicitly.",
+    "common_mistakes": ["Omitting foregone interest on the cash portion — candidates often only subtract the debt interest expense", "Adding post-tax synergies to pre-tax income rather than treating them as a direct addition to net income"]
+  },
+  {
+    "id": "ma_040",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Break-even tax rate for a debt-funded deal",
+    "question": "Company A has a P/E of 10x and Company B has a P/E of 20x. Company A acquires Company B using 50% stock and 50% debt at a 10% interest rate. What tax rate would make this deal exactly break even (neither accretive nor dilutive)?",
+    "model_answer": "For break even, the weighted average cost of consideration must equal the target's earnings yield. Target earnings yield = 1/20 = 5%. Cost of stock = 1/10 = 10%. For the weighted cost to equal 5%: 0.5 × 10% + 0.5 × (1 − t) × 10% = 5%. Solving: 5% + 5% × (1 − t) = 5%. Then 5% × (1 − t) = 0%, which means (1 − t) = 0, so t = 100%. A tax rate of 100% would be required to make this deal break even, which is practically impossible. This illustrates that when the acquirer has a lower P/E than the target and the interest rate equals the cost of equity, no realistic tax rate makes a debt deal work — the fundamental mismatch in earnings yields makes any structure dilutive.",
+    "common_mistakes": ["Setting up the break-even equation using the acquirer's earnings yield instead of the target's earnings yield", "Arithmetic errors when solving for the tax rate — candidates often forget to isolate the debt cost term before solving"]
+  },
+  {
+    "id": "ma_041",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "What happens to EPS if deal consideration is all debt vs. all stock",
+    "question": "Company A has a P/E of 15x and net income of $300. Company B has net income of $60 and a market cap of $600. Company A acquires Company B using 100% debt at a 6% pre-tax rate with a 40% tax rate. Separately, what if it used 100% stock? Which creates more accretion?",
+    "model_answer": "Company A's shares outstanding = $300 × 15 / $300 = 15 units; share price = 15x P/E implies EV math — for simplicity: EPS = $300 / shares; let share price = $300 × 15 = $4,500 market cap → shares = 4,500 / share price. Let's normalize: Company A EPS = let shares = 100, share price = $300 × 15 / 100 = $45. Debt deal: after-tax interest = $600 × 6% × (1 − 0.40) = $21.6. Pro forma NI = $300 + $60 − $21.6 = $338.4. Shares unchanged = 100. Pro forma EPS = $3.384 vs. standalone $3.00. Accretion = 12.8%. Stock deal: new shares = $600 / $45 = 13.33. Pro forma NI = $360. Pro forma shares = 113.33. EPS = $3.176. Accretion = 5.9%. Debt deal is more accretive because the after-tax cost of debt (3.6%) is lower than the cost of equity (1/15 = 6.7%).",
+    "common_mistakes": ["Calculating debt interest without applying the tax shield, overstating the interest expense", "Not comparing which structure is more accretive — candidates often calculate one scenario and stop"]
+  },
+  {
+    "id": "ma_042",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Stock price reaction when deal is announced with stock consideration",
+    "question": "If an acquirer announces a deal using 100% stock and the market immediately decides the combined company is worth 20% less than the announced purchase price, what happens to the seller's shareholders?",
+    "model_answer": "The seller's shareholders, who are receiving the acquirer's stock as consideration, effectively receive shares worth 20% less than the deal terms implied. For example, if the acquirer offered $100 per seller share in stock, and the market reprices the acquirer's shares downward by 20%, the seller's shareholders now hold stock worth approximately $80 per original seller share. This is one of the major risks of stock-based deals — the effective purchase price floats with the acquirer's share price and can erode significantly between announcement and close. To mitigate this, parties sometimes negotiate exchange ratios with collars that guarantee a minimum value floor.",
+    "common_mistakes": ["Saying the acquirer's share count is unchanged — it already issued new shares, so existing shareholders are diluted regardless of post-deal price movement", "Confusing fixed exchange ratio deals with fixed dollar amount deals — in a fixed exchange ratio deal, the seller's dollar value received changes with the acquirer's stock price"]
+  },
+  {
+    "id": "ma_043",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "How to determine if an all-stock deal needs synergies to break even",
+    "question": "Company A has a P/E of 12x and a market cap of $360. Company B has a market cap of $200 and net income of $10. Company A acquires Company B at a 30% premium in an all-stock deal. How much net income in synergies is needed to make this deal break even?",
+    "model_answer": "Company A's net income = $360 / 12 = $30. Company A's EPS: let shares = 30, share price = $360 / 30 = $12. Purchase price = $200 × 1.30 = $260. New shares issued = $260 / $12 = 21.67. Total shares = 30 + 21.67 = 51.67. For break-even EPS = $30 / 30 = $1.00, required pro forma NI = $1.00 × 51.67 = $51.67. Current combined NI = $30 + $10 = $40. Synergies needed = $51.67 − $40 = $11.67 of net income synergies. This means the deal requires synergies greater than the target's entire standalone net income just to break even, illustrating that paying a 30% premium for a low-earnings company at a lower P/E is highly dilutive.",
+    "common_mistakes": ["Solving for pre-tax synergies when net income synergies are what matters for the EPS calculation", "Setting the pro forma net income target equal to the acquirer's standalone net income rather than the amount needed to maintain the same EPS given the new higher share count"]
+  },
+  {
+    "id": "ma_044",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "How acquisition consideration affects the P/E multiple of the combined company",
+    "question": "Company A has a P/E of 20x and $4 net income. Company B has a P/E of 20x, $2 net income, and a market cap of $40. Company A acquires Company B using 100% cash at market value. What is the combined P/E? Now what if the acquisition used 100% debt at 8% pre-tax interest and a 25% tax rate?",
+    "model_answer": "Cash deal: No new shares are issued. Combined market cap remains at Company A's original market cap = $4 × 20 = $80. Combined net income = $4 + $2 = $6. Combined P/E = $80 / $6 = 13.3x. The P/E compresses because we added earnings without adding market cap. Debt deal: Same combined market cap of $80. After-tax interest = $40 × 8% × (1 − 0.25) = $2.40. Combined net income = $4 + $2 − $2.40 = $3.60. Combined P/E = $80 / $3.60 = 22.2x. The P/E expands in the debt deal because interest expense reduces net income, making the same market cap look more expensive per dollar of earnings. This illustrates why EV/EBITDA is a cleaner multiple for comparing deals — it is unaffected by capital structure.",
+    "common_mistakes": ["Thinking the combined P/E stays at 20x simply because both companies have the same P/E — the consideration method changes the combined net income and therefore the P/E", "Forgetting to apply the tax shield when calculating after-tax interest in the debt scenario"]
+  },
+  {
+    "id": "ma_045",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Exchange ratio in an all-stock deal",
+    "question": "Company A's stock trades at $50 and Company B's stock trades at $25. Company A wants to acquire Company B at a 20% premium in an all-stock deal using a fixed exchange ratio. What exchange ratio should be offered?",
+    "model_answer": "The offer price per Company B share is $25 × 1.20 = $30. In a fixed exchange ratio deal, each Company B share is exchanged for a number of Company A shares. The exchange ratio = offer price per B share / Company A share price = $30 / $50 = 0.60. Company B shareholders receive 0.60 shares of Company A for each share of Company B they hold. If Company B has 100 shares outstanding, Company A issues 60 new shares to fund the deal. The risk of a fixed exchange ratio is that if Company A's stock price falls before the deal closes, the effective dollar value received by Company B shareholders decreases proportionally.",
+    "common_mistakes": ["Inverting the ratio by dividing Company A's price by Company B's offer price", "Forgetting to apply the premium before calculating the exchange ratio, using the pre-premium market price instead"]
+  },
+  {
+    "id": "ma_046",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "How to calculate synergies in a model and test feasibility",
+    "question": "Company A has 3,000 SG&A employees and Company B has 800 SG&A employees. After the merger, management estimates that 200 of Company B's SG&A employees will be redundant. Average fully-loaded cost per employee is $120,000 per year. The tax rate is 35%. What is the annual net income benefit from this cost synergy?",
+    "model_answer": "Pre-tax cost synergy = 200 employees × $120,000 = $24 million per year. After-tax benefit = $24M × (1 − 0.35) = $15.6 million incremental net income per year. This would be added to the combined company's net income in the merger model as a cost synergy, increasing pro forma EPS. In a model, these synergies are typically phased in over two to three years — for example, 50% in year one and 100% in year two — to reflect the time required for layoffs, severance payments, and integration activities. One-time severance costs would also be modeled as an upfront charge that partially offsets early synergy benefits.",
+    "common_mistakes": ["Using the pre-tax synergy in the net income build rather than applying the tax rate", "Forgetting that synergies phase in over time and modeling them as fully realized immediately in year one"]
+  },
+  {
+    "id": "ma_047",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Sources and uses table mechanics",
+    "question": "Company A is acquiring Company B for an equity purchase price of $500. Company A will fund the deal with $150 of existing cash, $200 of new debt, and $150 of new equity. Transaction fees are $20 and financing fees are $15. Build the sources and uses table and explain how financing fees are treated differently from transaction fees.",
+    "model_answer": "Uses: equity purchase price $500, transaction fees $20, financing fees $15 — total uses = $535. Sources: cash $150, new debt $200, new equity $185 (adjusted to balance) — total sources must equal $535. Regarding fee treatment: transaction fees (legal, advisory, accounting) are expensed immediately through the income statement and reduce retained earnings on the balance sheet. Financing fees are capitalized as an asset on the balance sheet and amortized over the life of the debt, because they relate to a long-term financing activity. Both fees are paid in cash upfront, but only financing fees remain on the balance sheet. Neither fee type affects the equity purchase price or the goodwill calculation.",
+    "common_mistakes": ["Treating financing fees as an income statement expense immediately — they are capitalized and amortized", "Including fees in the goodwill calculation — fees increase total funds required but do not affect the equity purchase price or goodwill"]
+  },
+  {
+    "id": "ma_048",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "Contribution analysis in a merger of equals",
+    "question": "Company A has revenue of $400, EBITDA of $80, and net income of $20. Company B has revenue of $200, EBITDA of $60, and net income of $15. If the deal is structured so Company A shareholders receive 60% of the combined entity and Company B shareholders receive 40%, is this split fair based on a contribution analysis?",
+    "model_answer": "A contribution analysis looks at what each party contributes to the combined company across key financial metrics. Revenue contribution: Company A = $400 / $600 = 67%, Company B = 33%. EBITDA contribution: Company A = $80 / $140 = 57%, Company B = 43%. Net income contribution: Company A = $20 / $35 = 57%, Company B = 43%. On average, Company A contributes roughly 60% of revenue, 57% of EBITDA, and 57% of net income. The proposed 60/40 split is broadly consistent with Company A's revenue contribution but may slightly undervalue Company B given its higher EBITDA margin and proportional earnings contribution. A complete fairness assessment would also include balance sheet items and cash flows.",
+    "common_mistakes": ["Conducting a contribution analysis using only one metric — a proper analysis uses multiple financial dimensions", "Saying the contribution analysis is definitive — it is one input into fairness, not a standalone conclusion"]
+  },
+  {
+    "id": "ma_049",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "How to model revenue synergies with margin assumptions",
+    "question": "After an acquisition, the combined company expects to generate $30 of incremental annual revenue from cross-selling the target's products to the acquirer's customers. The incremental EBITDA margin on these sales is 40% and the tax rate is 35%. How do you incorporate this revenue synergy into the merger model and what is the net income impact?",
+    "model_answer": "Revenue synergies are modeled by adding the $30 of incremental revenue to the combined company's revenue line. You then apply the 40% incremental margin to calculate EBITDA impact of $12. Below EBITDA, you would apply D&A and other below-the-line items as appropriate; for simplicity, assuming the $12 flows through to pre-tax income, the after-tax net income impact is $12 × (1 − 0.35) = $7.80. This $7.80 incremental net income is added to the combined company's pro forma net income and divided by total shares to calculate pro forma EPS. Revenue synergies must never be modeled as pure EBITDA additions — the cost of generating that incremental revenue must always be reflected.",
+    "common_mistakes": ["Adding the full $30 of revenue directly to net income without applying the margin — failing to reflect the cost embedded in the synergy", "Forgetting to tax the incremental operating income before adding it to pro forma net income"]
+  },
+  {
+    "id": "ma_050",
+    "topic": "Mergers_MA",
+    "difficulty": "Technical",
+    "concept": "NOL usage limitation under Section 382",
+    "question": "Company A acquires Company B at an equity purchase price of $400 million. Company B has $100 million in net operating loss carryforwards. The highest adjusted long-term federal rate over the past three months is 4%. How much of Company B's NOLs can be used each year under Section 382, and over how many years will they be fully consumed?",
+    "model_answer": "Under Section 382, the annual allowable NOL usage is capped at the equity purchase price multiplied by the highest adjusted long-term rate. Annual NOL limit = $400M × 4% = $16 million per year. With $100 million in total NOLs, it will take $100M / $16M = 6.25 years to fully utilize the NOLs, assuming the combined company generates sufficient taxable income each year. If the combined company's annual taxable income is less than $16 million in any year, the unused NOL limit from that year may be carried forward. This limitation prevents buyers from acquiring companies solely to harvest large NOL balances.",
+    "common_mistakes": ["Saying there is no limit on NOL usage in an acquisition — Section 382 imposes an annual cap based on the equity purchase price and long-term rate", "Applying the NOL limit as a total cap rather than an annual cap — the limit is per year, not a total lifetime restriction"]
+  },
+  {
+    "id": "ma_051",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Goodwill formula with DTLs, write-ups, and existing intangibles",
+    "question": "Walk me through the complete goodwill formula in a stock purchase, including every major adjustment item and why each one is included or excluded.",
+    "model_answer": "Goodwill = Equity Purchase Price − Seller's Book Value of Common Equity + Seller's Existing Goodwill − Asset Write-Ups + Newly Created Deferred Tax Liability − Write-Down of Seller's Existing Deferred Tax Asset + Write-Down of Seller's Existing Deferred Tax Liability + Intercompany Accounts Receivable − Intercompany Accounts Payable. Existing goodwill is added back because it is reset to zero in purchase accounting — the entire excess premium is recalculated. Asset write-ups reduce goodwill because they add value to the assets side, requiring less goodwill as a plug. A newly created DTL increases goodwill because it adds a liability without adding a tangible asset, requiring more goodwill on the asset side to balance. Intercompany receivables and payables eliminate because they no longer exist as separate obligations once the entities are combined.",
+    "common_mistakes": ["Forgetting to reset the seller's existing goodwill to zero and add it into the new goodwill calculation", "Confusing the sign of DTL on goodwill — a new DTL is a liability that requires more goodwill (adds to goodwill), not less"]
+  },
+  {
+    "id": "ma_052",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "DTL creation from asset write-ups and impact on combined balance sheet",
+    "question": "In a stock purchase, Company A acquires Company B and writes up PP&E by $100. The tax rate is 40%. Walk through how this write-up affects the combined balance sheet, the income statement over time, and the goodwill calculation.",
+    "model_answer": "At deal close: the PP&E asset increases by $100 on the assets side. A deferred tax liability of $100 × 40% = $40 is created on the liabilities side, representing future tax payments since the write-up depreciation is not tax-deductible. Goodwill decreases by the net write-up of $60 ($100 asset increase less $40 DTL) — assets are up $60 net and goodwill fills the remaining gap. Over time: additional depreciation of $100 divided by the useful life is charged to the income statement each year, reducing pre-tax income and net income. Simultaneously, the DTL decreases each year as the timing difference reverses — the DTL declines by $40 × (1/useful life) per year. The net effect is lower reported earnings due to higher D&A, which is why acquirers often report adjusted EPS excluding amortization of purchase accounting items.",
+    "common_mistakes": ["Saying the write-up increases goodwill — it actually reduces goodwill because it adds to a specific identified asset line", "Forgetting that the DTL reverses over the life of the written-up asset, which must be tracked in forward projections"]
+  },
+  {
+    "id": "ma_053",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "338(h)(10) mechanics and when it cannot be used",
+    "question": "What is a Section 338(h)(10) election, how does it benefit both buyer and seller compared to a plain stock purchase, and when is it legally unavailable?",
+    "model_answer": "A 338(h)(10) election allows a stock purchase to be treated as an asset purchase for tax purposes — the buyer gets a step-up in the tax basis of all acquired assets and can deduct higher depreciation and amortization, reducing future cash taxes. The seller is still subject to double taxation (corporate-level and shareholder-level), but buyers typically agree to pay a higher price to compensate for this, which can partially make sellers whole. Unlike a plain stock purchase where assets are not stepped up for tax, the 338(h)(10) election combines legal simplicity with the tax benefits of an asset deal. It is unavailable when the seller is a C corporation (though there are limited exceptions) and when the buyer is not a C corporation — for example, private equity firms structured as partnerships generally cannot use it. The seller must also have been an S corporation or a subsidiary in a consolidated group.",
+    "common_mistakes": ["Saying 338(h)(10) eliminates double taxation for the seller — it does not, the seller still faces two levels of tax", "Thinking it can always be used as an alternative to an asset purchase — entity type requirements make it unavailable in many common deal structures"]
+  },
+  {
+    "id": "ma_054",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "DTL and DTA treatment in asset purchase vs. stock purchase",
+    "question": "Why do deferred tax liabilities and deferred tax assets arise in a stock purchase but not in an asset purchase? Walk through the mechanics clearly.",
+    "model_answer": "In a stock purchase, the book basis of the target's assets is written up or written down to fair market value for financial reporting purposes, but the tax basis of those assets remains unchanged. This creates a difference between book and tax depreciation: if book D&A is now higher because of a write-up, but tax D&A is still based on original cost, the company pays less tax in the short term — but will pay more later as the timing difference reverses. This creates a deferred tax liability. In an asset purchase, both the book basis and the tax basis of the acquired assets are stepped up simultaneously to fair market value. There is no book-tax difference created, and therefore no DTL or DTA arises from the write-up itself. This is a key reason buyers prefer asset purchases — they get the tax benefit of depreciation on the stepped-up basis without creating offsetting deferred tax liabilities.",
+    "common_mistakes": ["Saying DTLs arise in all acquisitions regardless of structure — they are specific to stock purchases where book and tax bases diverge", "Confusing a DTL from an asset write-up with goodwill — they are distinct balance sheet items with different treatments"]
+  },
+  {
+    "id": "ma_055",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Noncontrolling interest creation when less than 100% is acquired",
+    "question": "Company A acquires 80% of Company B for $160 in cash. Company B has total assets of $300, total liabilities of $180, and shareholders' equity of $120. Walk through the combined balance sheet adjustments including goodwill and noncontrolling interest.",
+    "model_answer": "Since 80% of Company B is acquired, the equity purchase price is $160, implying a 100% valuation of $200. Company B's book equity is $120. Goodwill = $200 − $120 = $80 (using the full fair value method where NCI is measured at fair value). Combined balance sheet: add all of Company B's assets ($300) and liabilities ($180) — 100% consolidation is required even for 80% ownership. Cash decreases by $160. Goodwill of $80 is created. On the liabilities side, liabilities increase by $180, and a noncontrolling interest of $40 is created (20% of $200 fair value). Assets: original + $300 − $160 + $80 = net increase. Liabilities: +$180 + $40 NCI. Both sides balance. The NCI represents the 20% stake in Company B that Company A does not own.",
+    "common_mistakes": ["Consolidating only 80% of Company B's assets and liabilities — GAAP requires 100% consolidation when you own more than 50%", "Calculating NCI based on 20% of book equity ($24) rather than 20% of fair value ($40) when using the full fair value method"]
+  },
+  {
+    "id": "ma_056",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "How calendarization and stub periods work in a merger model",
+    "question": "Company A's fiscal year ends December 31. Company B's fiscal year ends June 30. A deal closes on September 30. How do you calendarize the merger model and handle the stub period?",
+    "model_answer": "The combined company needs to report on Company A's calendar-year basis going forward, so Company B's financials must be restated to match. You take Company B's most recent fiscal year data (July 1 − June 30) and reconstruct it on a December 31 fiscal year basis by combining July–December quarters from two different B fiscal years. For the stub period: from the deal's close on September 30 to December 31 is a three-month stub period. You combine both companies' income statements and balance sheets for only that three-month window as the first combined period. Accretion/dilution analysis is typically not computed for the stub period because it is incomplete — you calculate it for the first full fiscal year post-close. All acquisition effects including interest, foregone interest, and amortization are pro-rated for the stub period.",
+    "common_mistakes": ["Attempting to calculate accretion/dilution for the stub period — stub period EPS is not a meaningful comparable since it only captures part of a year", "Forgetting to restate Company B's financials to match Company A's fiscal year before projecting forward — using Company B's native fiscal year quarters creates a mismatch"]
+  },
+  {
+    "id": "ma_057",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Negative goodwill — when purchase price is below book equity",
+    "question": "Company A acquires Company B for $200 in cash. Company B has assets of $500 and liabilities of $250, giving shareholders' equity of $250. There are no asset write-ups or write-downs. How is this negative goodwill situation handled in the merger model?",
+    "model_answer": "Since the equity purchase price of $200 is below Company B's shareholders' equity of $250, negative goodwill of $50 arises. Under US GAAP, this cannot simply be recorded as negative goodwill on the balance sheet. Instead, the first step is to reassess whether any assets need to be written down to eliminate the negative goodwill. If no write-downs are appropriate, the $50 is recorded as a gain on bargain purchase on the income statement. This gain increases pre-tax income and net income. On the cash flow statement, you subtract this non-cash gain in operating activities while adding the acquisition in investing activities. The combined balance sheet reflects the acquired assets and liabilities at fair value with no goodwill line. These situations arise most commonly in distressed acquisitions.",
+    "common_mistakes": ["Recording negative goodwill as a negative balance sheet line item — GAAP does not allow this; it must flow through the income statement as a gain", "Forgetting to reverse the gain in the operating section of the cash flow statement since it is a non-cash item from the financing side"]
+  },
+  {
+    "id": "ma_058",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Deferred revenue write-down in acquisition accounting",
+    "question": "What is a deferred revenue write-down in an acquisition and why does it make a deal look more dilutive?",
+    "model_answer": "When a company collects cash before delivering goods or services, it records deferred revenue as a liability. In an acquisition, purchase accounting rules require the acquirer to write down the target's deferred revenue balance because the acquirer only recognizes the profit component — it cannot recognize revenue for services already substantially performed or for which the cost has already been incurred. This write-down means the combined company recognizes less revenue post-acquisition than it otherwise would have, reducing EBITDA and net income. This makes the deal appear more dilutive and reduces near-term reported earnings. It is particularly impactful for software companies with large subscription deferred revenue balances, which is why SaaS M&A deals often show GAAP dilution even when the underlying economics are strong.",
+    "common_mistakes": ["Saying deferred revenue write-downs only affect the balance sheet — they directly reduce revenue and net income in the combined income statement post-acquisition", "Thinking only large deferred revenue balances matter — even modest write-downs can shift a deal from accretive to dilutive in the first year"]
+  },
+  {
+    "id": "ma_059",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Equity value vs. enterprise value in PPA and Sources & Uses",
+    "question": "In building a merger model, when do you use equity purchase price versus enterprise value, and why is neither exactly the 'total funds required'?",
+    "model_answer": "The equity purchase price is used exclusively in purchase price allocation to calculate goodwill — it represents the price paid to the target's equity holders, excluding debt. Enterprise value is a useful reference for comparing deal pricing but is not the amount the acquirer must actually fund. The total funds required — sometimes called the 'transaction value' or 'sources' total — is the equity purchase price plus any target debt being repaid, plus transaction fees, plus financing fees. This total exceeds the equity purchase price but is not exactly EV because it includes fees that are not part of the asset value. In the sources and uses table, sources must equal this total funds required figure. The key insight is that EV understates total funding needs (fees excluded) while equity purchase price understates it even more (debt and fees excluded).",
+    "common_mistakes": ["Using enterprise value as the goodwill input — goodwill must be calculated from equity purchase price only", "Treating total sources as identical to EV — this ignores transaction and financing fees that must also be funded"]
+  },
+  {
+    "id": "ma_060",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "How to model NOL carryforwards in forward projections",
+    "question": "After an acquisition subject to Section 382 limits, the combined company has $80 million in usable NOLs at $10 million per year. The statutory tax rate is 35% and combined pre-tax income is $50 million per year. Walk through how you model the NOL utilization and the actual tax expense in years 1 through 3.",
+    "model_answer": "Each year, the company first calculates its book tax expense at 35% of pre-tax income: 35% × $50M = $17.5M. But cash taxes are lower because $10M of NOLs can offset taxable income each year. Cash taxes = 35% × ($50M − $10M) = 35% × $40M = $14M. The difference of $3.5M per year represents a reduction in the deferred tax asset (the NOL balance). Year 1: DTA decreases by $10M × 35% = $3.5M; cash taxes = $14M; book tax expense = $17.5M. Years 2 and 3 are identical. After 8 years, the $80M in NOLs is fully utilized and the company pays the full statutory rate on all taxable income. In the financial model, you track the remaining NOL balance and the corresponding DTA, which declines by $3.5M per year.",
+    "common_mistakes": ["Adding back the full NOL balance to net income as a tax benefit — NOLs reduce cash taxes but not book tax expense, and they deplete over time", "Ignoring the deferred tax asset decline — the DTA representing unused NOLs must decrease each year as NOLs are consumed"]
+  },
+  {
+    "id": "ma_061",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Exchange ratio collars and how they protect buyer and seller",
+    "question": "Explain how a collar works in a stock-for-stock M&A deal and describe a structure where the deal has a 1.2x exchange ratio with a floor if the acquirer's stock falls below $40 and a cap if it rises above $60, starting from a $50 acquirer share price.",
+    "model_answer": "A collar limits the risk of share price volatility in a fixed exchange ratio deal. At a $50 acquirer share price, the seller receives 1.2 shares per seller share, worth 1.2 × $50 = $60 per seller share. If the acquirer's stock falls below $40, the exchange ratio adjusts upward so the seller still receives $60 in value per share — they receive more acquirer shares to compensate. If the acquirer's stock rises above $60, the exchange ratio is capped so the seller receives at most $72 per seller share (1.2 × $60). Between $40 and $60, the normal 1.2x ratio applies and the seller's proceeds float with the acquirer's stock price. The collar protects the seller from downside and the buyer from having to issue excessive shares in a price appreciation scenario. These structures add complexity to the EPS and share count calculations in the merger model.",
+    "common_mistakes": ["Thinking the collar eliminates all price risk — there is still exposure outside the collar range and the exchange ratio adjustment mechanism must be specified carefully", "Confusing the collar floor and cap as applying to the seller's stock price rather than the acquirer's stock price"]
+  },
+  {
+    "id": "ma_062",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "How merger model differs for private seller",
+    "question": "How does building a merger model for a private target differ from building one for a public target?",
+    "model_answer": "For a private target, there is no observable market EPS or P/E multiple, so EPS accretion/dilution analysis is less relevant — the acquirer's own EPS still changes, but comparing to a non-existent seller P/E is meaningless. The transaction is more likely to be structured as an asset purchase or 338(h)(10) election, which changes the balance sheet adjustments. Purchase price determination relies more heavily on DCF, EBITDA multiples, and comparable transaction analysis rather than a premium to market. Contribution analysis and IRR-based return analysis take greater prominence in evaluating deal attractiveness. The model mechanics for combining financials, adjusting for goodwill, and projecting synergies are otherwise similar, but the absence of a traded share price requires more assumption-driven valuation inputs.",
+    "common_mistakes": ["Saying merger models cannot be built for private companies — they can, but EPS accretion/dilution is less meaningful", "Forgetting that private companies almost never have EPS, making the seller's P/E undefined and the standard accretion/dilution shortcut inapplicable"]
+  },
+  {
+    "id": "ma_063",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Reverse merger mechanics and evaluation metrics",
+    "question": "What is a reverse merger and how would you evaluate deal attractiveness if a private company acquires a public company?",
+    "model_answer": "In a reverse merger, a private company acquires a public company, typically as a way for the private company to gain a public listing without going through a traditional IPO. The balance sheet and income statement combination mechanics are similar to any acquisition — you still allocate purchase price, create goodwill, and combine the statements. However, since the acquirer is private and has no EPS, accretion/dilution analysis is meaningless. Instead, you evaluate the deal using a contribution analysis — which party is contributing more financial value and whether the ownership split reflects that — and an IRR analysis that models the return on investment assuming an eventual exit or liquidity event. The public target's market P/E provides a reference for the deal cost but doesn't drive the analysis the same way it would in a strategic public-to-public transaction.",
+    "common_mistakes": ["Trying to calculate EPS accretion/dilution for the private acquirer — it has no EPS", "Saying reverse mergers always result in public status for the private company — the mechanics depend on the deal structure and regulatory treatment"]
+  },
+  {
+    "id": "ma_064",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "How options and convertibles are handled in merger models",
+    "question": "The target company has 50 employee stock options outstanding with a strike price of $10 and 20 convertible bonds with a face value of $1,000 and a conversion price of $25. The buyer is offering $30 per target share. How do you handle these securities in the acquisition?",
+    "model_answer": "For the stock options: the purchase price of $30 exceeds the strike price of $10, so the options are in the money. The buyer typically allows them to be cashed out at the spread — each option holder receives $30 − $10 = $20 per option, totaling $1,000 in cash. Alternatively, the options may be converted into the right to receive acquiring company shares at an adjusted ratio. Either way, the 50 in-the-money options increase the total consideration paid. For the convertible bonds: each converts into $1,000 / $25 = 40 target shares. At $30 per share, each converts into stock worth $1,200. Since the conversion value ($1,200) exceeds the face value ($1,000), holders would convert. The 20 bonds create 800 new target shares. These 800 shares are then purchased at $30, adding $24,000 to the equity purchase price. Both adjustments flow through the diluted share count calculation.",
+    "common_mistakes": ["Ignoring in-the-money options when calculating equity purchase price — they increase total consideration paid", "Forgetting to check whether convertible holders prefer cash repayment or equity conversion — they convert only if the conversion value exceeds the par value"]
+  },
+  {
+    "id": "ma_065",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Pro forma adjustments vs. GAAP reported results",
+    "question": "After an acquisition, why might the acquirer report both GAAP and 'pro forma' or 'adjusted' EPS, and what items are typically excluded from adjusted EPS?",
+    "model_answer": "GAAP EPS post-acquisition includes all acquisition-related charges, many of which are non-cash and considered non-recurring: amortization of newly created intangible assets, depreciation of written-up PP&E, deferred revenue write-downs that reduce near-term reported revenue, and amortization of financing fees. These items reduce GAAP net income and EPS but do not represent ongoing cash costs — the business generates real cash flow even when GAAP earnings look depressed. Companies report adjusted EPS by adding back these items so investors can evaluate the underlying business performance independent of accounting treatment. The most common adjustment is adding back intangible amortization from purchase accounting, which can be substantial in large acquisitions. Critics argue this practice is inconsistent because other non-cash charges like stock compensation are not typically added back.",
+    "common_mistakes": ["Saying adjusted EPS always excludes the same items — companies define their own adjustments, creating inconsistency across firms", "Treating GAAP EPS as meaningless post-acquisition — GAAP metrics still matter for covenants, tax calculations, and some investor analyses"]
+  },
+  {
+    "id": "ma_066",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Sensitivities in a merger model",
+    "question": "What sensitivity analyses are most important in a merger model and how would you structure a two-way sensitivity table?",
+    "model_answer": "The most important sensitivities are purchase price versus cost synergies, purchase price versus revenue synergies, and purchase price versus the percentage of stock versus cash used. These reveal the range of outcomes across realistic scenarios and identify the breakeven points where the deal flips from accretive to dilutive. A typical two-way sensitivity table places purchase price along one axis (for example, ranging from no premium to 40% premium in 10% increments) and synergies along the other (ranging from zero to full management estimate). Each cell shows EPS accretion or dilution at that combination of assumptions. This allows management and boards to see whether the deal 'works' only in optimistic synergy scenarios or is robust across a range of outcomes. Operating sensitivities such as revenue growth and margin assumptions are typically modeled as separate scenario analyses rather than included in the accretion/dilution table.",
+    "common_mistakes": ["Building a single-scenario merger model without sensitivity analysis — deal decisions require understanding the range of outcomes, not just one base case", "Varying purchase price and synergies simultaneously in a single model without distinguishing the marginal impact of each driver"]
+  },
+  {
+    "id": "ma_067",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "How to combine all three financial statements in a merger model",
+    "question": "If you were building a full three-statement merger model rather than a simple accretion/dilution analysis, what is the correct sequence of steps and what are the key complications?",
+    "model_answer": "Start by combining both companies' balance sheets at the transaction close date, wiping out the seller's shareholders' equity, making all purchase price allocation adjustments (goodwill, intangibles, write-ups, DTLs), and adjusting for cash used, debt raised, and shares issued. Then build the combined income statement by adding the two companies' revenues and expenses and layering in all acquisition effects including additional interest expense, foregone interest income, and D&A on written-up assets and new intangibles. The combined cash flow statement is then projected by linking to the income statement and balance sheet as in any three-statement model. Key complications include tracking goodwill impairment testing, amortizing new intangibles and financing fees, reducing the deferred tax liability as book-tax differences reverse, and handling the NCI share of earnings on the income statement if less than 100% was acquired.",
+    "common_mistakes": ["Combining income statements and cash flow statements from before the deal close rather than only combining post-close — pre-close statements are standalone", "Forgetting to reduce the deferred tax liability each period as the timing differences between book and tax D&A reverse"]
+  },
+  {
+    "id": "ma_068",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "CapEx synergies and how they flow through the model",
+    "question": "The combined company expects to reduce annual capital expenditures by $20 million because it no longer needs to build a new manufacturing facility after acquiring the target's existing facility. How do CapEx synergies differ from cost synergies and how do you model them?",
+    "model_answer": "CapEx synergies reduce cash outflows in the investing section of the cash flow statement rather than reducing operating expenses. Unlike cost synergies that immediately reduce EBITDA and net income, CapEx synergies only affect the income statement indirectly — lower CapEx in year one means lower depreciation starting in year two and beyond, since assets must first be not purchased before their depreciation disappears. You model this by reducing the annual CapEx line in the cash flow statement by $20M beginning in the first post-close year, and then reflecting reduced D&A in years two onward based on the assumed asset life. A full PP&E schedule makes this cleaner to track. CapEx synergies also improve free cash flow immediately since cash outflows decline in year one, even before the income statement benefit appears.",
+    "common_mistakes": ["Adding CapEx synergies directly to EBITDA in year one — they appear in CapEx first and only flow to D&A savings starting in year two", "Forgetting that the cash flow statement benefit of reduced CapEx is immediate, even though the income statement depreciation benefit is delayed by one year"]
+  },
+  {
+    "id": "ma_069",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Why EV/EBITDA is purchase method-neutral but P/E is not",
+    "question": "Explain why the combined EV/EBITDA multiple is the same regardless of whether the acquisition is funded with cash, debt, or stock, while the combined P/E multiple changes based on how the deal is funded.",
+    "model_answer": "EV/EBITDA is unaffected by purchase method because EBITDA excludes all interest income and interest expense. Whether you use cash (which increases EV because net debt rises), debt (which also increases EV through higher gross debt), or stock (which increases EV through higher market cap), the combined EV rises by the same amount — the acquisition price — and combined EBITDA simply adds both companies' EBITDA. The combined EV/EBITDA is therefore identical in all three cases. P/E is different because the interest expense from debt reduces net income, and foregone interest from cash reduces net income, while stock issuance increases the share count. Each of these changes the denominator (net income or EPS) of the P/E ratio differently, causing the combined P/E to vary significantly based on funding mix. This is why EBITDA-based multiples are considered more structurally comparable across deals with different financing.",
+    "common_mistakes": ["Saying EV/EBITDA changes if debt is used because interest reduces EBITDA — EBITDA explicitly excludes interest, so it is unaffected by financing choice", "Confusing changes to market cap with changes to enterprise value — market cap only changes in stock deals, while EV changes in all three cases through different components"]
+  },
+  {
+    "id": "ma_070",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Double taxation in an asset purchase",
+    "question": "Why does an asset purchase result in double taxation for the seller and why does the buyer almost always prefer this structure anyway?",
+    "model_answer": "In an asset purchase, the selling corporation first pays corporate income tax on any gain recognized when assets are sold above their tax basis. Then, when the after-tax proceeds are distributed to shareholders as a dividend or liquidating distribution, shareholders pay personal income tax a second time. This two-level tax burden — corporate plus individual — is why sellers prefer stock purchases, where they pay only capital gains tax at the shareholder level. Despite this, buyers strongly prefer asset purchases because they receive a step-up in the tax basis of acquired assets to fair market value, which generates higher depreciation and amortization deductions and lowers future cash taxes substantially. The present value of tax savings from the step-up often more than compensates for the premium buyers agree to pay sellers to accept the double-tax structure.",
+    "common_mistakes": ["Saying only the seller pays double tax — the buyer does not face double taxation, only the seller does", "Forgetting that buyers often agree to pay a higher price in asset purchases to compensate the seller for the additional tax burden — the total economic deal value may be similar"]
+  },
+  {
+    "id": "ma_071",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "No-shop vs. go-shop provisions in M&A agreements",
+    "question": "What is the difference between a no-shop and go-shop provision in an M&A purchase agreement, and when would a target board negotiate for a go-shop?",
+    "model_answer": "A no-shop provision prohibits the target's board from soliciting or entertaining competing bids after signing the definitive agreement. A go-shop provision, by contrast, allows the target to actively market itself to other potential buyers for a specified period (typically 30–60 days) after signing, even though it has already agreed to the first deal. Target boards negotiate for go-shop provisions when there is uncertainty that the signed deal represents the best available price — particularly when a sale process was limited or when the initial deal was negotiated quickly without a full auction. If a superior bid emerges during the go-shop period, the target can terminate the original agreement by paying a reduced break-up fee. The go-shop is a mechanism for the board to satisfy its fiduciary duty to maximize shareholder value while still allowing a deal to proceed.",
+    "common_mistakes": ["Saying no-shop provisions are illegal or never enforceable — they are standard in the majority of public company M&A deals", "Thinking a go-shop guarantees a higher bid will emerge — most go-shops do not produce competing offers, particularly when the original price was fair"]
+  },
+  {
+    "id": "ma_072",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Fairness opinion and its role in M&A",
+    "question": "What is a fairness opinion in an M&A transaction and why does the target board typically obtain one?",
+    "model_answer": "A fairness opinion is a written assessment from an investment bank stating that the financial terms of the proposed transaction are fair, from a financial point of view, to the shareholders of the company receiving it. Target boards obtain fairness opinions to fulfill their fiduciary duty to shareholders and to protect themselves from legal liability — particularly in shareholder litigation claiming the board sold the company too cheaply. The investment bank performing the fairness analysis uses the same valuation tools used in any deal process: DCF analysis, comparable company multiples, precedent transaction multiples, and sometimes LBO analysis. Importantly, the opinion addresses only financial fairness and not strategic merit. It is a point-in-time analysis as of the opinion date and does not guarantee future performance of the combined entity.",
+    "common_mistakes": ["Saying the fairness opinion is required by law — it is not legally required but is standard practice to satisfy fiduciary duty obligations", "Confusing a fairness opinion with a recommendation to shareholders — it addresses only whether the price is financially fair, not whether shareholders should vote yes"]
+  },
+  {
+    "id": "ma_073",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Accretion/dilution in a deal with amortization of intangibles",
+    "question": "Company A's pro forma net income from combining income statements is $500. However, purchase accounting creates $200 of newly identified intangible assets amortized over 10 years. The tax rate is 40%. What is the GAAP pro forma net income and how does amortization of intangibles affect the accretion/dilution calculation?",
+    "model_answer": "Annual amortization of the new intangibles = $200 / 10 = $20 per year. This amortization reduces pre-tax income by $20. After-tax impact = $20 × (1 − 0.40) = $12 reduction in net income per year. GAAP pro forma net income = $500 − $12 = $488. If amortization creates dilution that would not otherwise exist, many acquirers report 'cash EPS' or 'adjusted EPS' that adds back the after-tax amortization to give investors a cleaner view of underlying earnings. The GAAP EPS is the number technically relevant for standard accretion/dilution tests, but analysts frequently compare both. In deals where the target has large intangible asset bases — technology companies, media, consumer brands — intangible amortization can be the difference between GAAP dilution and adjusted accretion.",
+    "common_mistakes": ["Deducting the full pre-tax amortization from net income without applying the tax shield", "Saying amortization of intangibles is optional — GAAP requires amortization of all finite-lived intangibles identified in purchase price allocation"]
+  },
+  {
+    "id": "ma_074",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Divestiture accounting — how a subsidiary sale flows through three statements",
+    "question": "Company A sells a subsidiary for $600 in cash. The subsidiary has $400 of assets on Company A's balance sheet and no liabilities. The tax rate is 35%. Walk through the impact on all three financial statements.",
+    "model_answer": "Income statement: Company A recognizes a gain of $600 − $400 = $200 on the sale. This flows into pre-tax income, generating a tax expense of $200 × 35% = $70. Net income increases by $130. Cash flow statement: Net income is up $130. In operating cash flows, the $200 gain is subtracted (because it is a non-operating item that appears in investing activities). In investing activities, the full $600 cash proceeds are added. Net cash change = −$200 + $600 = +$400 at the bottom. Balance sheet: Cash increases by $400. The $400 of subsidiary assets are removed. The assets side is unchanged in total. Shareholders' equity increases by $130 due to net income. Retained earnings is up $130 and both sides balance.",
+    "common_mistakes": ["Forgetting to reverse the gain in operating cash flows, leaving cash overstated in the operating section", "Adding only the gain ($200) rather than the full proceeds ($600) in the investing section of the cash flow statement"]
+  },
+  {
+    "id": "ma_075",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "How a merger model changes when you acquire a minority vs. majority stake",
+    "question": "Explain how the financial statement consolidation and accretion/dilution analysis changes depending on whether Company A acquires a 25% stake versus a 75% stake in Company B.",
+    "model_answer": "For a 25% stake (between 20% and 50%): Company B is treated as an equity method investment. Company A records the investment as an asset at cost on the balance sheet, and only picks up 25% of Company B's net income in the income statement as 'equity income from affiliates.' No goodwill is formally created through purchase accounting in the traditional sense. The accretion/dilution analysis would reflect only the 25% of net income Company A is entitled to. For a 75% stake (over 50%): Company A must fully consolidate 100% of Company B's assets, liabilities, revenue, and expenses, even though it only owns 75%. A noncontrolling interest is created on the balance sheet and income statement for the 30% not owned. Goodwill is calculated based on the full implied enterprise value. The accretion/dilution analysis uses 100% of Company B's consolidated net income less the NCI deduction.",
+    "common_mistakes": ["Consolidating 25% of Company B's assets in the equity method scenario — only net income is picked up, not balance sheet consolidation", "Consolidating only 75% of Company B's assets in the majority stake scenario — GAAP requires 100% consolidation with an offsetting NCI"]
+  },
+  {
+    "id": "ma_076",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Financing fees versus transaction fees — balance sheet treatment",
+    "question": "Company A pays $15 million in investment banking advisory fees and $8 million in debt financing fees to complete an acquisition. How are each of these treated on the balance sheet and income statement, and why are they treated differently?",
+    "model_answer": "Advisory and transaction fees of $15 million are expensed immediately because they relate to the one-time transaction event and provide no ongoing economic benefit to the company. They reduce pre-tax income in the period of close, flow through retained earnings on the balance sheet, and reduce cash. Financing fees of $8 million are capitalized as a deferred financing cost asset and amortized over the life of the debt instrument, typically on a straight-line basis. This treatment reflects that the fees provide an economic benefit over the entire duration of the borrowing — similar to how CapEx is depreciated rather than expensed immediately. Neither fee affects the equity purchase price or goodwill. Cash decreases by $23 million total at close regardless of accounting treatment, but only $15 million hits the income statement immediately.",
+    "common_mistakes": ["Capitalizing transaction advisory fees alongside financing fees — only financing fees are capitalized", "Including either type of fee in the goodwill calculation — fees increase total funds required but are entirely separate from purchase price allocation"]
+  },
+  {
+    "id": "ma_077",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Break-even synergies calculation with given deal structure",
+    "question": "Company A has 500 shares at $40 per share and $4,000 in net income. Company B has net income of $300 and a market cap of $3,600. Company A acquires Company B using 100% stock at market value. How much net income in synergies is needed to make this deal exactly break even?",
+    "model_answer": "Company A's pre-deal EPS = $4,000 / 500 = $8.00. Company A's share price = $40. New shares issued = $3,600 / $40 = 90. Total shares = 500 + 90 = 590. For break-even EPS of $8.00, required pro forma net income = $8.00 × 590 = $4,720. Combined standalone net income = $4,000 + $300 = $4,300. Required synergies = $4,720 − $4,300 = $420 of net income synergies. This is a high bar — approximately 140% of Company B's own standalone net income — because Company A's P/E of $40 / ($4,000/500) = 5x is lower than the purchase P/E of $3,600 / $300 = 12x. Buying a higher-P/E target in an all-stock deal requires significant synergies to overcome the inherent dilution.",
+    "common_mistakes": ["Solving for the synergy level that makes pro forma net income equal to $4,000 rather than the level that maintains EPS — the denominator (share count) increases and must be accounted for", "Using pre-tax synergies in the net income break-even calculation without applying the tax rate"]
+  },
+  {
+    "id": "ma_078",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Multiple NOL scenarios and limitation tradeoffs",
+    "question": "Company A is considering two acquisition targets: Target X has $50M in NOLs and an equity purchase price of $200M. Target Y has $50M in NOLs and an equity purchase price of $500M. The long-term rate is 4% and the combined company generates $20M in taxable income annually. Compare the NOL utilization timelines and value of the NOL under each scenario.",
+    "model_answer": "Target X: Annual NOL limit = $200M × 4% = $8M per year. With $20M of taxable income, the full $8M can be used each year. It takes $50M / $8M = 6.25 years to utilize. At a 35% tax rate, NPV of tax savings = $8M × 35% × annuity factor for 6.25 years. Target Y: Annual NOL limit = $500M × 4% = $20M per year. Since taxable income is also $20M, the full limit can be used each year, consuming all $50M in 2.5 years. Tax savings timing is faster, generating more NPV. The larger equity purchase price in Target Y creates a higher Section 382 limit, allowing faster NOL utilization — but the acquirer paid more ($500M vs. $200M). A higher purchase price paradoxically accelerates NOL value realization by loosening the annual utilization cap.",
+    "common_mistakes": ["Ignoring the taxable income constraint — the annual NOL limit is a maximum, not a guaranteed deduction if income is insufficient", "Comparing NOL values without discounting — faster utilization has higher NPV than the same total deduction spread over more years"]
+  },
+  {
+    "id": "ma_079",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Interplay of goodwill impairment and overpayment",
+    "question": "Company A acquires Company B for $800, creating $300 of goodwill. Three years later, management determines Company B is worth only $550. Walk through the goodwill impairment charge and its financial statement impacts.",
+    "model_answer": "Goodwill impairment arises when the carrying value of the reporting unit exceeds its fair value. Original goodwill = $300. Fair value of Company B is now $550 versus original acquisition price of $800 — a decline of $250. If the carrying value of goodwill exceeds what would be implied at $550, the impairment charge equals the excess. Assuming all $250 of value decline is attributable to goodwill: impairment charge = $250, reducing goodwill on the balance sheet from $300 to $50. Income statement: the $250 impairment is recorded as an operating charge, reducing pre-tax income and net income by $250 (less tax benefit if any — note that goodwill impairment is often not tax-deductible). Cash flow statement: net income falls by $250 but the non-cash impairment charge is added back in operating cash flows, leaving cash flow unchanged. Balance sheet: goodwill falls by $250 and retained earnings fall by $250 (plus any tax effect).",
+    "common_mistakes": ["Thinking goodwill impairment reduces cash — it is a non-cash charge and does not affect operating cash flow", "Assuming goodwill impairment is always tax-deductible — in most stock purchase structures, goodwill impairment provides no tax benefit"]
+  },
+  {
+    "id": "ma_080",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Acquisition of a company with negative shareholders' equity",
+    "question": "Company A acquires Company B for an equity purchase price of $400. Company B has total assets of $600 and total liabilities of $750, implying negative shareholders' equity of −$150. How does this affect the goodwill calculation?",
+    "model_answer": "Goodwill = Equity Purchase Price − Seller's Book Value of Equity. Since book equity is −$150, the formula becomes $400 − (−$150) = $550 of goodwill created. Negative book equity does not create negative goodwill — it actually increases the goodwill figure because you are paying $400 for an entity with net liabilities, meaning you are paying $550 above the net asset value. In practice, the acquirer is paying for the target's franchise value, brand, customer relationships, or future cash flows that are not captured by a liabilities-heavy balance sheet. The combined balance sheet fully consolidates Company B's $600 in assets and $750 in liabilities, adds $550 of goodwill, reduces cash by $400, and wipes out Company B's negative equity. Both sides of the combined balance sheet balance.",
+    "common_mistakes": ["Treating negative equity as zero in the goodwill formula — you must use the actual negative value, which increases goodwill beyond the simple purchase price", "Thinking negative equity means negative goodwill — negative book equity creates more positive goodwill, not negative goodwill"]
+  },
+  {
+    "id": "ma_081",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Comparing all-cash vs. all-debt vs. all-stock on accretion, balance sheet, and risk",
+    "question": "You are advising a client with a P/E of 14x that wants to acquire a target at a P/E of 10x. The deal size is $300. Compare all-cash (foregone interest 2% after-tax), all-debt (interest rate 7% pre-tax), and all-stock approaches across accretion, leverage impact, and risk. Tax rate is 35%.",
+    "model_answer": "Earnings yield of target = 1/10 = 10%. Cost of cash = 2% (given after-tax). Cost of debt after-tax = 7% × (1 − 0.35) = 4.55%. Cost of stock = 1/14 = 7.14%. All three costs are below the target's earnings yield, so all three approaches are accretive. Accretion ranking: cash (cost 2%) > debt (cost 4.55%) > stock (cost 7.14%). Balance sheet risk: all-debt option adds $300 of debt, increasing leverage ratios significantly and reducing financial flexibility. All-cash depletes the liquidity buffer. All-stock dilutes existing shareholders but does not add balance sheet stress. Risk assessment: debt maximizes accretion but raises default risk and covenant pressure; stock minimizes balance sheet risk but dilutes most; cash is intermediate on both. The optimal mix depends on the client's current leverage, liquidity needs, and cost of debt versus equity.",
+    "common_mistakes": ["Saying stock always creates the most accretion simply because it avoids interest — the cost of equity must be compared to the target yield, not treated as zero", "Evaluating only accretion without considering leverage impact — a deal that is maximally accretive via debt may be unsustainable if the company becomes over-levered"]
+  },
+  {
+    "id": "ma_082",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Full diluted share count with multiple instrument types in a merger context",
+    "question": "A target company has 400 shares outstanding at $25 per share. It also has 80 warrants with a $10 strike price, 50 convertible preferred shares convertible at a ratio of 2:1 into common, and $5,000 in convertible debt with a conversion price of $20 per share. The acquirer is paying $32 per share for all common shares. Calculate the total equity purchase price.",
+    "model_answer": "Start with basic shares: 400. Warrants: strike of $10 < $32 offer price, so they are in-the-money. Using treasury stock method: 80 warrants exercised generate $10 × 80 = $800 in proceeds. At $32 per share, $800 / $32 = 25 shares repurchased. Net new shares from warrants = 80 − 25 = 55. Convertible preferred: 50 preferred shares × 2:1 ratio = 100 new common shares. Convertible debt: $5,000 / $20 conversion price = 250 new common shares. Total diluted shares = 400 + 55 + 100 + 250 = 805 shares. Total equity purchase price = 805 × $32 = $25,760. Note: this assumes all convertible securities are cashed out or converted at the offer price, which the purchase agreement must specify. In-the-money options and warrants are typically settled at the spread rather than converted into new shares, but both approaches yield similar total consideration.",
+    "common_mistakes": ["Forgetting the treasury stock method for warrants and simply adding all 80 new shares", "Calculating convertible debt shares as face value divided by share price ($5,000/$32) rather than face value divided by conversion price ($5,000/$20)"]
+  },
+  {
+    "id": "ma_083",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Why deals sometimes fail regulatory approval and how it's modeled",
+    "question": "What are the main regulatory risks that can prevent an M&A deal from closing, and how does a banker reflect this risk in the deal economics?",
+    "model_answer": "The primary regulatory risk is antitrust review, where competition authorities determine that the combined company would hold an anticompetitive market share — this is most acute when the buyer and seller are direct competitors in a concentrated market. Other regulatory hurdles include national security review (CFIUS in the US), sector-specific approvals (banking, telecommunications, utilities), and in cross-border deals, approval from multiple jurisdictions including the EU. Bankers reflect regulatory risk by including a material adverse change clause in the purchase agreement that allows parties to walk away if certain conditions are not met. In the merger arbitrage and deal probability contexts, the spread between the current trading price and the offer price widens when regulatory risk is high, reflecting a lower market-implied probability of closing. In the deal model itself, scenario analysis may include a 'deal fails' scenario to show downside to the acquirer's stock.",
+    "common_mistakes": ["Ignoring cross-border regulatory complexity — US deals reviewed by DOJ/FTC may also require EU, China, or other approvals independently", "Saying regulatory risk only applies to horizontal mergers — vertical transactions and cross-border deals also face significant regulatory scrutiny"]
+  },
+  {
+    "id": "ma_084",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "LBO as a competing bid — why PE can sometimes outbid strategics",
+    "question": "If strategic acquirers can typically pay more than private equity due to synergies, under what circumstances could a PE firm outbid a strategic acquirer?",
+    "model_answer": "A PE firm can outbid a strategic when the strategic's synergy realization is uncertain or likely to be partially offset by integration costs, making the effective premium comparable. PE firms can also use higher leverage than public strategic acquirers, allowing them to structure a higher total offer price while equity invested is moderate. If the target has strong, stable free cash flows that can service heavy debt loads, an LBO-funded bid may exceed what a conservatively capitalized strategic can offer. Additionally, if multiple PE firms are competing in an auction, competitive dynamics can push PE bids above the rational synergy-adjusted price of a strategic. Some strategics also face board constraints on leveraging their own balance sheet for large acquisitions. In certain take-private scenarios, PE may also benefit from operational improvements that a strategic's management structure cannot efficiently capture.",
+    "common_mistakes": ["Saying PE can never match strategic bids — leverage and competitive auction dynamics can allow PE to win even without synergies", "Ignoring that PE firms have return requirements (typically 20%+ IRR) that limit how high they can rationally bid regardless of leverage"]
+  },
+  {
+    "id": "ma_085",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Impact on EV if acquirer uses cash on hand versus raises new debt",
+    "question": "Company A has $500 in cash and $200 in debt. It acquires Company B for $300 using its existing cash. Later, an identical Company C is acquired for $300 by raising $300 in new debt. In both cases the equity value of Company A is $1,000 before the deal. Compare the resulting enterprise values.",
+    "model_answer": "Before any deal: EV = equity $1,000 + debt $200 − cash $500 = $700. Cash acquisition of Company B: cash falls from $500 to $200. Net debt rises from −$300 (net cash) to $0. EV = $1,000 + $200 − $200 = $1,000. EV rises by $300 (the price paid for Company B, which has its own EV of $300 assuming no premium and same capital structure). Debt acquisition of Company C: debt rises from $200 to $500, cash unchanged at $500. Net debt = $500 − $500 = $0. EV = $1,000 + $500 − $500 = $1,000. The combined EV is identical in both scenarios — the acquisition of a $300 EV company increases total EV by $300 regardless of whether you use cash or debt. This confirms that the combined EV equals the sum of both companies' standalone EVs independent of financing method.",
+    "common_mistakes": ["Saying the cash deal results in a lower EV because cash is 'spent' — cash reduction and debt reduction have symmetrical effects on EV", "Failing to trace through the EV bridge correctly by forgetting that cash is subtracted in the EV calculation"]
+  },
+  {
+    "id": "ma_086",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "How stub period accretion is calculated differently from full year",
+    "question": "A deal closes on October 1 and the acquirer's fiscal year ends December 31. The full-year pro forma accretion is estimated at 8%. How would you calculate stub period EPS, and why is it not compared to standalone EPS for the accretion/dilution test?",
+    "model_answer": "For the October 1 to December 31 stub period, you pro-rate all deal-related items — interest expense, foregone interest, synergies, and amortization — for three months by multiplying annual amounts by 3/12. You then add the target's Q4 revenue and expenses to the acquirer's Q4 standalone results to produce a combined three-month income statement. However, this stub period EPS is not used for the accretion/dilution test because it reflects only a partial year of ownership, making it incomparable to a full-year standalone EPS benchmark. The standard accretion/dilution analysis compares the first full fiscal year post-close — in this case, the January 1 through December 31 of the following year — to the acquirer's standalone full-year EPS. Stub period results are useful for near-term guidance purposes but not as the primary accretion/dilution metric.",
+    "common_mistakes": ["Annualizing stub period EPS and comparing it to standalone EPS — this creates distortions from seasonality and partial-year accounting adjustments", "Applying full-year synergy amounts to the stub period rather than pro-rating them for the number of months the combined company existed"]
+  },
+  {
+    "id": "ma_087",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Interplay between stock price decline and exchange ratio in announced deals",
+    "question": "Company A offers to acquire Company B at a fixed exchange ratio of 0.8 shares of Company A per share of Company B. At announcement, Company A trades at $50 and Company B trades at $36. By the time the deal closes three months later, Company A's stock has fallen to $40. What did Company B shareholders actually receive in value, and what is the implied premium at close?",
+    "model_answer": "At announcement: implied offer price = 0.8 × $50 = $40 per Company B share. Company B's pre-deal price = $36. Implied premium at announcement = ($40 − $36) / $36 = 11.1%. At close: Company A trades at $40, so Company B shareholders receive 0.8 × $40 = $32 per share. Company B's stock had risen from $36 toward $40 after announcement, but if it settled at approximately $40 × 0.8 = $32 at close, shareholders received $32. The implied premium at close versus the original pre-deal price is ($32 − $36) / $36 = −11% — shareholders actually received less than the pre-announcement market price. This is the core risk of fixed exchange ratio deals: the acquirer's stock price decline can eliminate and even reverse the announced premium, leaving the seller worse off than before the deal was announced.",
+    "common_mistakes": ["Saying the seller always gets the 11% premium because it was 'announced' — fixed exchange ratio deals provide no price floor if the acquirer's stock falls", "Forgetting that Company B's stock price itself adjusts post-announcement to reflect the expected deal value, so the comparison must go back to pre-announcement prices"]
+  },
+  {
+    "id": "ma_088",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Acquisition with partial stock and synergies — full numerical walkthrough",
+    "question": "Company A has 3 million shares at $30 per share and net income of $9 million. Company B has net income of $1.5 million and a market cap of $12 million. Company A acquires Company B using 60% stock and 40% debt at a 5% pre-tax interest rate. Tax rate is 30%. Post-tax synergies are $400K. Calculate pro forma EPS and the percentage accretion or dilution.",
+    "model_answer": "Company A pre-deal EPS = $9M / 3M = $3.00. Stock portion = $12M × 60% = $7.2M. New shares issued = $7.2M / $30 = 240,000. Debt portion = $12M × 40% = $4.8M. After-tax interest = $4.8M × 5% × (1 − 0.30) = $168K. Pro forma net income = $9M + $1.5M + $400K − $168K = $10.732M. Pro forma shares = 3M + 240K = 3.24M. Pro forma EPS = $10.732M / 3.24M = $3.313. Accretion = ($3.313 − $3.00) / $3.00 = 10.4% accretive. The combination of synergies, relatively low-cost debt, and a purchase P/E of $12M / $1.5M = 8x (below Company A's P/E of 10x) all contribute to meaningful accretion.",
+    "common_mistakes": ["Using pre-tax synergies in the net income calculation instead of the given post-tax amount", "Incorrectly dividing total consideration by the combined share price rather than only the stock portion by Company A's share price when calculating new shares issued"]
+  },
+  {
+    "id": "ma_089",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Why EPS accretion is an imperfect deal evaluation metric",
+    "question": "A deal is 15% accretive to EPS. A second-year analyst asks whether this proves the deal creates value. How do you respond?",
+    "model_answer": "EPS accretion does not prove value creation. A deal can be accretive while still destroying economic value if the acquirer overpaid — the mere act of paying with low-cost debt or using high-P/E stock can mechanically generate accretion even when the premium paid far exceeds the present value of synergies. EPS also ignores the risk profile of the acquired earnings stream; levering up with cheap debt to buy a cyclical business creates accretion but also amplifies downside risk. Furthermore, accounting adjustments like adding back D&A on acquired intangibles or using non-GAAP metrics can make deals appear accretive in an adjusted sense without reflecting economic reality. A proper value assessment requires an NPV or IRR analysis of synergies relative to the premium paid, comparing the deal to the company's cost of capital. Accretion is a useful communication tool for shareholders, but it is a means, not the end goal.",
+    "common_mistakes": ["Accepting EPS accretion as sufficient justification for a deal — boards and advisors must evaluate whether the premium is justified by fundamentals", "Confusing adjusted/non-GAAP accretion with GAAP accretion — some deals are GAAP dilutive but adjusted accretive, which requires careful explanation to shareholders"]
+  },
+  {
+    "id": "ma_090",
+    "topic": "Mergers_MA",
+    "difficulty": "Advanced",
+    "concept": "Full deal scenario — synergies needed, structure tradeoffs, and final recommendation",
+    "question": "Company A has 200 shares at $25 per share and net income of $1,000. Company B has net income of $200 and a market cap of $4,000. The after-tax cost of debt is 4% and the foregone after-tax interest on cash is 1.5%. If Company A must achieve at least 5% EPS accretion to satisfy its board, what mix of stock and debt (no cash) achieves this target with the least dilution to existing shareholders?",
+    "model_answer": "Company A pre-deal EPS = $1,000 / 200 = $5.00. Target post-deal EPS = $5.00 × 1.05 = $5.25. Let S = stock fraction and (1−S) = debt fraction. New shares from stock = ($4,000 × S) / $25 = 160S. Total shares = 200 + 160S. After-tax interest = $4,000 × (1−S) × 4% = 160(1−S). Pro forma NI = $1,000 + $200 − 160(1−S) = $1,200 − 160 + 160S = $1,040 + 160S. Pro forma EPS = ($1,040 + 160S) / (200 + 160S) = $5.25. Solving: $1,040 + 160S = 5.25 × (200 + 160S) = 1,050 + 840S. Then $1,040 − $1,050 = 840S − 160S → −10 = 680S → S = −10/680 which is negative, implying pure debt achieves >5% accretion. Check: with 100% debt, pro forma NI = $1,040, shares = 200, EPS = $5.20, accretion = 4%. With 100% stock: NI = $1,200, shares = 360, EPS = $3.33 — dilutive. Therefore, the minimum required debt mix to achieve 5% accretion requires iterating — approximately 80–90% debt achieves the target. To minimize shareholder dilution, maximize the debt component while maintaining the 5% accretion floor.",
+    "common_mistakes": ["Not setting up the algebra correctly to solve for the funding mix simultaneously — candidates often test one extreme and stop", "Forgetting that maximizing debt minimizes share dilution but increases financial risk — the answer must acknowledge both the accretion target and the leverage tradeoff"]
+  }
+]

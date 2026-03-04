@@ -1,0 +1,812 @@
+[
+  {
+    "id": "lbo_001",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Basic definition and mechanics of a leveraged buyout",
+    "question": "What is a leveraged buyout, and why does using debt increase returns compared to an all-equity acquisition?",
+    "model_answer": "A leveraged buyout is an acquisition where a private equity firm purchases a company using a mix of debt and equity, operates it for several years, then sells it to realize a return. The debt is serviced by the acquired company's cash flows, not the PE firm directly. Using debt increases returns because it reduces the upfront equity check — the PE firm is earning a return on a smaller capital base while the total asset base remains the same. A $100M gain on a $500M all-equity deal is a 20% return, but the same $100M gain on a $200M equity check is 50%.",
+    "common_mistakes": ["Saying the PE firm itself repays the debt, rather than the portfolio company", "Confusing the return-boosting effect of leverage with simply 'more risk,' without explaining the mechanics of the smaller equity denominator"]
+  },
+  {
+    "id": "lbo_002",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Ideal LBO candidate characteristics",
+    "question": "What makes a company an ideal LBO candidate? Walk through the key characteristics.",
+    "model_answer": "The most critical attribute is stable, predictable free cash flow, because the company must service significant debt obligations. Beyond that, ideal candidates are undervalued relative to peers (lower entry multiple), have limited ongoing CapEx needs so cash flow isn't consumed by reinvestment, have a defensible market position with pricing power, and carry assets that can serve as debt collateral. Strong management is also important, as the PE firm typically installs operational improvements rather than running the business day-to-day. Commodity-exposed or highly cyclical businesses are weak candidates because cash flow volatility makes debt service unreliable.",
+    "common_mistakes": ["Listing 'high growth' as a positive without noting that high-growth companies usually command high entry multiples and require reinvestment, both of which hurt LBO returns", "Omitting the collateral point, which matters because it determines how much debt lenders will extend"]
+  },
+  {
+    "id": "lbo_003",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Sources and Uses of funds",
+    "question": "What is a Sources and Uses table in an LBO model, and what items typically appear in each column?",
+    "model_answer": "The Sources and Uses table shows how a transaction is financed and what that capital is spent on, and the two columns must balance exactly. Sources typically include all debt tranches raised (revolver, term loans, high-yield notes), investor equity from the PE firm, management rollover equity, and any excess cash the target contributes. Uses typically include the equity purchase price paid to selling shareholders, refinanced debt, advisory and legal fees, and capitalized financing fees. The investor equity figure is often the plug — once you know the purchase price and how much debt you can raise, equity fills the gap.",
+    "common_mistakes": ["Putting assumed debt in only the Uses column — if debt is assumed rather than refinanced, it appears in both columns and nets to zero", "Forgetting transaction fees (legal, advisory) and financing fees as separate Uses line items"]
+  },
+  {
+    "id": "lbo_004",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Balance sheet adjustment at LBO close",
+    "question": "How does the balance sheet change when a PE firm closes an LBO transaction?",
+    "model_answer": "On the liabilities and equity side, existing shareholders' equity is wiped out and replaced by the PE firm's equity contribution, and new debt tranches are added. On the assets side, cash is adjusted downward for any cash used in the transaction and for advisory fees, and goodwill and other intangibles are created as a plug to make both sides balance. Any PP&E or intangible assets that are written up in a purchase price allocation create corresponding deferred tax liabilities on the liabilities side. The result is a heavily leveraged balance sheet with significantly more debt relative to equity than the company had pre-transaction.",
+    "common_mistakes": ["Forgetting that goodwill functions as the balancing plug rather than being independently calculated", "Leaving the pre-transaction shareholders' equity on the balance sheet instead of wiping it out and replacing it with investor equity"]
+  },
+  {
+    "id": "lbo_005",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "How goodwill is created in an LBO",
+    "question": "Why is goodwill created in an LBO, and how is the amount determined?",
+    "model_answer": "Goodwill arises because the PE firm pays more for the company than the fair market value of its identifiable net assets. In purchase price accounting, you first write up identifiable assets (PP&E, customer lists, trademarks) to fair value; any remaining excess of the purchase price over the fair value of net assets becomes goodwill. In an LBO, goodwill also functions mechanically as the plug that balances the assets side after the liabilities and equity side has been restructured. For example, if a company's equity was worth $1B but you paid $1.5B, roughly $500M in goodwill and intangibles would be created, though the exact split between goodwill and other intangibles depends on the purchase price allocation.",
+    "common_mistakes": ["Saying goodwill equals purchase price minus book equity — it actually equals purchase price minus the fair value of net identifiable assets, not book value", "Not mentioning that identified intangibles like customer relationships and trademarks are broken out first, and goodwill is only the residual"]
+  },
+  {
+    "id": "lbo_006",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Tax shield from interest expense",
+    "question": "What is the interest tax shield in an LBO, and how significant is it to overall returns?",
+    "model_answer": "The interest tax shield refers to the fact that interest expense is tax-deductible, so a highly levered company pays less in taxes than it would without debt. If a company has $100M in interest expense and a 25% tax rate, it saves $25M in taxes it would have otherwise paid. However, the tax shield is often overstated as a driver of LBO returns — the net cash flow impact is still negative because you're paying $100M in interest to save $25M in taxes. The primary drivers of LBO returns are entry multiple, exit multiple, and leverage itself; the tax shield is a secondary benefit that modestly improves cash flow.",
+    "common_mistakes": ["Claiming the tax shield makes debt 'better' than equity from a cash flow standpoint — debt still costs more than it saves in taxes", "Treating the tax shield as a major return driver on par with multiple expansion or EBITDA growth"]
+  },
+  {
+    "id": "lbo_007",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Difference between bank debt and high-yield debt",
+    "question": "What are the key differences between bank debt and high-yield debt in the context of an LBO?",
+    "model_answer": "Bank debt (revolvers and term loans) typically carries lower, floating interest rates tied to a benchmark like SOFR, is senior secured with first priority on company assets, has maintenance covenants requiring the company to stay within financial ratios, and can be repaid early without penalty. High-yield debt carries higher, fixed interest rates, is generally unsecured or junior secured, has incurrence covenants that restrict specific actions rather than requiring ongoing financial performance, and typically has call protection preventing early repayment for several years. In a leveraged buyout, most deals use both types — bank debt forms the senior layer because it's cheaper, and high-yield notes fill in the capital structure where bank lenders won't go.",
+    "common_mistakes": ["Confusing incurrence covenants with maintenance covenants — incurrence covenants only trigger if you take a specific action, while maintenance covenants must be satisfied continuously", "Saying high-yield is always unsecured — second-lien term loans are technically high-yield-like in pricing but are secured"]
+  },
+  {
+    "id": "lbo_008",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "IRR calculation mechanics",
+    "question": "How do you calculate IRR in an LBO model, and what does the number represent?",
+    "model_answer": "IRR is calculated by treating the initial equity investment as a negative cash flow at time zero, and all cash flows back to the PE firm — dividends during the hold period and net equity proceeds at exit — as positive cash flows. In Excel, you apply the IRR function across these values, entering zero for any year with no cash flow. Technically, IRR is the discount rate that sets the net present value of all cash flows to zero, but practically it represents the annualized compounded return on the equity invested. A 25% IRR means every dollar invested compounds at 25% per year for the duration of the hold.",
+    "common_mistakes": ["Including interest payments and debt principal repayments in the IRR calculation — those are paid by the company from its cash flows, not by the PE firm, so they don't appear in the IRR waterfall", "Forgetting to enter zero for intermediate years with no cash flows, which distorts the Excel IRR calculation"]
+  },
+  {
+    "id": "lbo_009",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "What drives IRR in an LBO",
+    "question": "What are the three primary drivers of IRR in a leveraged buyout, and why do they matter more than other variables?",
+    "model_answer": "The three primary drivers are the entry multiple, the exit multiple, and the amount of leverage used. The entry multiple determines how much equity was put in at the start — a lower purchase price means a smaller equity check relative to the asset base, which mechanically boosts the return percentage. The exit multiple determines how much the company is sold for — even flat EBITDA can produce strong returns if you sell at a higher multiple than you paid. Leverage amplifies returns by reducing the equity denominator. Secondary drivers like EBITDA growth, margin improvement, and debt paydown also matter but have a smaller magnitude of impact relative to these three levers.",
+    "common_mistakes": ["Ranking EBITDA growth as the primary driver — it matters, but multiple expansion and leverage typically have a larger mathematical impact on IRR", "Ignoring the exit multiple and focusing only on EBITDA at exit, forgetting that the multiple applied to that EBITDA is equally important"]
+  },
+  {
+    "id": "lbo_010",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "LBO as a floor valuation",
+    "question": "Why is an LBO model sometimes described as providing a 'floor valuation' for a company?",
+    "model_answer": "An LBO model is used as a floor valuation because PE buyers, who require a minimum IRR threshold (typically 20%+) to justify the deal, will pay less than a strategic acquirer who can realize synergies. A strategic buyer can justify a higher purchase price because they can extract cost or revenue synergies, making the deal accretive at a higher entry multiple. A PE buyer can only earn returns through financial engineering, operational improvement, and a favorable exit — no synergies. So the maximum price a PE firm will pay to hit its return target sets a lower bound on what the company is worth in an M&A context.",
+    "common_mistakes": ["Saying the LBO valuation is a ceiling rather than a floor — it's a floor because strategics almost always pay more", "Confusing the floor valuation concept with saying LBO is the lowest possible value for the company — it's the floor of what a buyer would pay, not the floor of intrinsic value"]
+  },
+  {
+    "id": "lbo_011",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "LBO vs. DCF valuation",
+    "question": "Both a DCF and an LBO model involve a company's cash flows. What is the fundamental difference in how each approach values a company?",
+    "model_answer": "A DCF asks 'what is this company worth today based on the present value of all future cash flows?' and derives an intrinsic value. An LBO model asks 'what price can we pay today and still achieve a target return in a specific holding period?' — the valuation is constrained by the return requirement, not derived from cash flows alone. In a DCF, you discount all future cash flows at WACC to find a value. In an LBO, you work backwards from a targeted IRR (say 20%) and solve for the maximum entry price consistent with that return, given assumptions about exit multiple, debt capacity, and operational performance.",
+    "common_mistakes": ["Saying LBO and DCF are essentially the same because both use cash flows — the direction of the analysis is opposite", "Forgetting that the LBO valuation is sensitive to both equity returns AND the financing structure, while DCF is agnostic to capital structure in its unlevered form"]
+  },
+  {
+    "id": "lbo_012",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Dividend recapitalization definition",
+    "question": "What is a dividend recapitalization, and why would a PE firm pursue one during the holding period?",
+    "model_answer": "A dividend recapitalization is when a PE-owned company takes on new debt specifically to pay a special one-time dividend to the PE firm, returning capital before the company is sold. The PE firm pursues this to recover part of its equity investment early, which boosts IRR because the timing of cash inflows matters — receiving money sooner increases the annualized return rate. It also reduces the PE firm's remaining equity at risk in the company. Dividend recaps have a mixed reputation because the debt benefits the PE firm, not the company itself, which concerns lenders and can leave the company more financially fragile.",
+    "common_mistakes": ["Saying dividend recaps reduce the IRR — they increase it by accelerating cash back to the PE firm", "Confusing a dividend recap with a regular dividend — a recap involves taking on new debt, while a regular dividend is paid from operating cash flow"]
+  },
+  {
+    "id": "lbo_013",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Minimum cash balance assumption",
+    "question": "Why do LBO models include a minimum cash balance assumption, and how does it affect debt repayment?",
+    "model_answer": "A company cannot use every dollar of free cash flow to repay debt because it needs operating liquidity — cash to pay employees, vendors, rent, and unexpected expenses before receivables are collected. The minimum cash balance ensures the model doesn't project the company sweeping all cash to debt service, which would be unrealistic. In practice, only free cash flow above the minimum cash balance threshold is available for optional debt repayment. If the ending cash balance after operations would fall below the minimum, the company draws on its revolver to maintain the floor.",
+    "common_mistakes": ["Forgetting to include the minimum cash balance in the cash flow waterfall, causing the model to over-repay debt", "Setting the minimum cash balance to zero, which is operationally unrealistic for most businesses"]
+  },
+  {
+    "id": "lbo_014",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Mezzanine and PIK debt definition",
+    "question": "What is mezzanine debt, and how does PIK interest work compared to cash interest?",
+    "model_answer": "Mezzanine debt sits below senior and high-yield debt in the capital structure, carries the highest interest rates of any debt tranche, and is often unsecured. Investors include hedge funds and dedicated mezzanine funds rather than traditional banks. PIK, or payment-in-kind, interest does not require cash payments — instead, the unpaid interest accrues to the principal balance, causing the loan to grow over time. This is useful for companies with limited near-term cash flow because it preserves liquidity, but it increases the total debt burden at exit. A PIK toggle allows the borrower to choose each period whether to pay in cash or PIK.",
+    "common_mistakes": ["Saying mezzanine is always subordinated to high-yield — mezzanine is a broad term referring to hybrid debt/equity instruments, and its exact seniority depends on the specific deal", "Forgetting to add back PIK interest on the cash flow statement since it's a non-cash charge that reduces net income but doesn't consume cash"]
+  },
+  {
+    "id": "lbo_015",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Incurrence vs. maintenance covenants",
+    "question": "What is the difference between incurrence covenants and maintenance covenants, and which type typically applies to bank debt versus high-yield debt?",
+    "model_answer": "Maintenance covenants require a company to continuously satisfy financial ratio tests — for example, total debt/EBITDA must stay below 4.0x at all times. If the ratio is breached, the lender has remedies including calling the debt. Incurrence covenants do not require ongoing compliance; they only trigger if the company takes a specific action, such as issuing additional debt, making an acquisition, or selling assets. Bank debt typically carries maintenance covenants because banks want ongoing visibility into borrower health. High-yield bonds typically use incurrence covenants, giving the company more operational flexibility as long as it doesn't take restricted actions.",
+    "common_mistakes": ["Mixing up which type applies to which debt — bank debt has maintenance (ongoing), high-yield has incurrence (action-triggered)", "Saying incurrence covenants are 'weaker' without explaining why — they're simply structured differently and trigger on events rather than continuously"]
+  },
+  {
+    "id": "lbo_016",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Why PE firms exit investments",
+    "question": "What are the three primary exit routes for a PE firm after an LBO, and what are the trade-offs between them?",
+    "model_answer": "The three primary exit routes are a strategic sale, a sponsor-to-sponsor sale, and an IPO. A strategic sale typically achieves the highest valuation because the buyer can pay synergy-driven premiums, and it's the most common exit. A sponsor-to-sponsor sale is faster and avoids public market disclosure requirements, but valuation is often lower because a new PE buyer must also price in their own return requirements. An IPO can achieve the highest valuation in favorable markets because public multiples can exceed private market multiples, but it's slower, more expensive, and the PE firm typically can't exit all its equity at once due to lock-up periods.",
+    "common_mistakes": ["Saying IPOs always yield the highest return — in weak market conditions or for cyclical businesses, a strategic sale often produces better outcomes", "Forgetting the lock-up period constraint on IPOs, which delays full liquidity for the PE firm"]
+  },
+  {
+    "id": "lbo_017",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Revolver mechanics",
+    "question": "What is a revolver in an LBO, how does it differ from a term loan, and when does a company draw on it?",
+    "model_answer": "A revolver is a flexible credit facility that functions like a business credit card — the company can draw and repay funds repeatedly up to a maximum borrowing limit, paying interest only on the outstanding balance and a commitment fee on the undrawn portion. It differs from a term loan, which is drawn in full at closing and repaid on a fixed schedule. In an LBO model, the revolver is undrawn at close and serves as a liquidity buffer: the company draws on it when operating cash flow is insufficient to cover mandatory debt repayments in a given period, and repays it first with any excess cash flow in subsequent periods.",
+    "common_mistakes": ["Treating the revolver as fully drawn at close like a term loan — it starts undrawn and is only tapped when needed", "Forgetting that commitment fees are paid on the undrawn revolver balance, which adds a small but real cost even when no funds are drawn"]
+  },
+  {
+    "id": "lbo_018",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "What IRR target PE firms aim for",
+    "question": "What IRR do private equity firms typically target in an LBO, and why is the threshold higher than for public market investing?",
+    "model_answer": "Most PE firms target a minimum IRR of 20%, with a strong deal typically clearing 25% or higher. The threshold is higher than public equity returns (historically 8–10% annually) because private equity is an illiquid asset class — investors cannot sell their fund stakes on an exchange, so they demand an illiquidity premium. Additionally, PE returns must compensate for significant deal-specific risk, management fees, and carried interest structures that reduce net returns to LPs. The 20%+ hurdle also reflects that PE firms take on concentrated positions in individual companies rather than diversified portfolios.",
+    "common_mistakes": ["Quoting a specific IRR threshold as universal — targets vary by fund strategy, vintage, and market conditions; 20% is a convention, not a hard rule", "Forgetting that the 20% is a gross IRR target; net IRR after management fees and carry is materially lower"]
+  },
+  {
+    "id": "lbo_019",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "Mandatory vs. optional debt repayment",
+    "question": "What is the difference between mandatory and optional debt repayment in an LBO, and what is the typical repayment priority for optional payments?",
+    "model_answer": "Mandatory repayments are contractually required principal payments that must be made regardless of cash flow — for example, the scheduled amortization on a term loan. Optional repayments, also called cash sweeps, are discretionary principal payments the company makes with excess cash flow above its minimum balance. For optional repayments, the typical priority is: repay the revolver first (since it's the most operationally flexible), then any assumed pre-existing debt, then Term Loan A, then Term Loan B. High-yield debt typically cannot be optionally prepaid before its call protection period expires, so it is last in the optional repayment hierarchy.",
+    "common_mistakes": ["Saying the most expensive debt should always be repaid first — in practice, call protection on high-yield debt legally prevents early repayment regardless of economic logic", "Confusing the mandatory repayment schedule (contractually fixed) with optional sweeps (driven by free cash flow availability)"]
+  },
+  {
+    "id": "lbo_020",
+    "topic": "LBO",
+    "difficulty": "Fundamental",
+    "concept": "How to project cash flow available for debt repayment",
+    "question": "In an LBO model, how do you calculate the cash flow available to repay debt principal each year?",
+    "model_answer": "The standard approach is to take cash flow from operations and subtract capital expenditures, which gives you a rough free cash flow figure. Interest expense has already reduced net income and therefore cash flow from operations, so it does not need to be deducted again — this calculation is determining how much principal can be repaid, not total cash obligations. You then subtract any mandatory principal repayments and account for the minimum cash balance requirement; the remainder is available for optional debt repayment. In a simplified paper LBO context, this is often approximated as EBITDA minus interest minus taxes minus CapEx minus changes in working capital.",
+    "common_mistakes": ["Deducting interest expense again after starting from cash flow from operations, double-counting it", "Using EBITDA directly without accounting for taxes, working capital changes, and CapEx, which overstates available cash"]
+  },
+  {
+    "id": "lbo_021",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Paper LBO with EBITDA growth and bullet maturity",
+    "question": "You acquire a company with $80M of LTM EBITDA for 7x EV/EBITDA using 4x leverage. EBITDA grows by $10M per year. You hold for 5 years and sell at 7x EBITDA. The LFCF margin on EBITDA is 25%, and the debt has a bullet maturity. What is the approximate IRR?",
+    "model_answer": "Purchase price is $80M × 7 = $560M. Debt is $80M × 4 = $320M, equity is $240M. At exit, EBITDA is $130M ($80M + 5×$10M), giving an exit EV of $130M × 7 = $910M. Accumulated LFCF over 5 years: Year 1 $22.5M, Year 2 $25M, Year 3 $27.5M, Year 4 $30M, Year 5 $32.5M = $137.5M. Exit equity = $910M − $320M + $137.5M = $727.5M. MOIC = $727.5M / $240M ≈ 3.0x. Using the rule of 114 for a 3x in 5 years: IRR ≈ 114/5 ≈ 23%.",
+    "common_mistakes": ["Forgetting to add accumulated LFCF to exit equity proceeds when the debt has bullet maturity and cash is not swept to principal", "Using EBITDA at acquisition year rather than exit year EBITDA to calculate the exit enterprise value"]
+  },
+  {
+    "id": "lbo_022",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "IRR rules of thumb",
+    "question": "Without using a calculator, estimate the IRR if a PE firm invests $150M in equity and receives $450M back in 5 years with no interim dividends.",
+    "model_answer": "The MOIC is $450M / $150M = 3.0x. To estimate IRR for a 3x return over 5 years, use the rule of 114: IRR ≈ 114 / 5 = 22.8%, approximately 23%. Alternatively, you can check using the rule of thumb that doubling money in 5 years is a 15% IRR and tripling in 5 years is 25%, so a 3x in 5 years should be just under 25%. Both methods converge on approximately 22–23% IRR.",
+    "common_mistakes": ["Using the rule of 72 (which applies to a 2x MOIC) instead of the rule of 114 (which applies to a 3x MOIC)", "Calculating IRR on the total enterprise value rather than the equity invested and equity returned"]
+  },
+  {
+    "id": "lbo_023",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "How leverage affects returns — numerical example",
+    "question": "A PE firm acquires a company for $1B. In Scenario A, it uses $600M of debt and $400M of equity. In Scenario B, it uses $400M of debt and $600M of equity. In both scenarios, the company is sold for $1.2B after 5 years with no debt paydown. Which scenario has a higher IRR, and by approximately how much?",
+    "model_answer": "In Scenario A, equity proceeds at exit are $1.2B − $600M = $600M, giving a MOIC of $600M / $400M = 1.5x. In Scenario B, equity proceeds are $1.2B − $400M = $800M, giving a MOIC of $800M / $600M = 1.33x. Scenario A has a higher MOIC and therefore higher IRR, even though the absolute dollar gain is the same in both ($200M). The difference is that a smaller equity check means the same dollar gain represents a higher percentage return. Over 5 years, 1.5x MOIC corresponds to roughly an 8.5% IRR, while 1.33x corresponds to roughly 6% — so Scenario A is about 2.5 percentage points higher.",
+    "common_mistakes": ["Concluding the IRR is the same in both scenarios because the exit price and debt paydown are identical", "Calculating IRR on total enterprise proceeds rather than on the equity invested and returned"]
+  },
+  {
+    "id": "lbo_024",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Exit multiple selection",
+    "question": "How would you determine the appropriate exit multiple to use in an LBO model, and what are the limitations of simply assuming the entry multiple equals the exit multiple?",
+    "model_answer": "You determine exit multiples by looking at current trading multiples for comparable public companies, precedent transaction multiples for similar M&A deals, and any sector-specific trends in valuation. The exit multiple is typically shown as a sensitivity range rather than a point estimate. Assuming entry equals exit is a conservative and clean assumption for simplicity, but it ignores the reality that multiples fluctuate with market conditions, interest rates, and sector sentiment over a 5-year hold. A company that grows significantly or improves its quality of earnings may command a premium multiple at exit, while a deal done at peak market valuations may see multiple contraction.",
+    "common_mistakes": ["Assuming exit multiples should always be lower than entry multiples as a 'conservative' convention — in bull markets, PE firms have regularly exited at higher multiples than entry", "Using only public trading multiples without considering that M&A transaction multiples typically include a control premium and are more relevant for LBO exits"]
+  },
+  {
+    "id": "lbo_025",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Effect of holding period on IRR",
+    "question": "A PE firm invests $200M and exits for $600M. Compare the IRR if the holding period is 3 years versus 6 years.",
+    "model_answer": "The MOIC is $600M / $200M = 3.0x in both cases. For a 3-year hold, use the rule of 114: IRR ≈ 114/3 ≈ 38%. For a 6-year hold, IRR ≈ 114/6 ≈ 19%. The same absolute dollar return produces dramatically different IRRs depending on time. This illustrates why IRR is a superior metric to MOIC for comparing deals — a 3x MOIC over 3 years reflects outstanding performance, while the same 3x over 6 years is merely adequate. PE firms therefore have a strong incentive to exit investments promptly once returns have been realized.",
+    "common_mistakes": ["Saying MOIC is more important than IRR because it shows absolute return — MOIC ignores time value, making it an incomplete metric for comparing performance across holding periods", "Confusing the rule of 72 (for 2x) with the rule of 114 (for 3x) or 144 (for 4x)"]
+  },
+  {
+    "id": "lbo_026",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Debt paydown impact on returns",
+    "question": "A PE firm acquires a company for $500M using $350M of debt and $150M of equity. After 5 years, the company is sold at the same $500M enterprise value. The company paid down $200M of debt during the hold period. What is the approximate MOIC and IRR?",
+    "model_answer": "At exit, remaining debt is $350M − $200M = $150M. Equity proceeds are $500M − $150M = $350M. MOIC = $350M / $150M ≈ 2.33x. For IRR estimation, 2.33x in 5 years falls between 2x (15% IRR using rule of 72: 72/5 ≈ 14.4%) and 3x (23% IRR using rule of 114). Interpolating, the IRR is approximately 18–19%. This illustrates the mechanism behind LBO returns: even with zero enterprise value creation, debt paydown from company cash flows generates meaningful equity returns.",
+    "common_mistakes": ["Concluding the IRR is 0% because the enterprise value didn't change — the equity value increased substantially due to debt paydown", "Forgetting that the MOIC calculation uses equity invested and equity returned, not total deal value"]
+  },
+  {
+    "id": "lbo_027",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Dividend recap effect on the three financial statements",
+    "question": "A PE-owned company takes on $100M of additional debt to pay a $100M dividend to the PE firm. Walk through the impact on all three financial statements.",
+    "model_answer": "Income statement: no change, because debt proceeds are not income and dividends are paid from equity after taxes, not as an expense. Balance sheet: debt increases by $100M on the liabilities side, and shareholders' equity decreases by $100M on the equity side, leaving total liabilities plus equity unchanged. Cash flow statement: cash flow from operations and investing are unchanged; in the financing section, debt proceeds of +$100M and dividends paid of −$100M net to zero, so the ending cash balance is also unchanged. The only real economic effect is that the company is now more levered and the PE firm has recovered $100M of its equity investment.",
+    "common_mistakes": ["Saying the income statement is impacted because future interest payments increase — this question asks about the day of the transaction, not future periods; future interest is a separate ongoing effect", "Thinking cash increases because debt was raised — the debt proceeds are immediately distributed, leaving cash flat"]
+  },
+  {
+    "id": "lbo_028",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Determining maximum debt capacity",
+    "question": "You're structuring an LBO for a company with $150M of EBITDA. How would you determine how much debt the company can take on, and what metrics would you use?",
+    "model_answer": "You would start by looking at debt comps — the leverage ratios and debt structures used in comparable LBO transactions in the same industry and size range. Key metrics include total debt/EBITDA (leverage ratio) and EBITDA/interest (coverage ratio). For most businesses, leverage rarely exceeds 6–7x EBITDA, and 5–6x is more typical for stable businesses. You'd also calculate the coverage ratio to ensure the company can comfortably pay cash interest — a 2x coverage ratio is dangerously low, while 4–5x suggests there's room for more debt. Finally, you'd stress-test cash flows under a downside scenario to ensure the company can service debt through a recession.",
+    "common_mistakes": ["Using only a leverage multiple without checking the coverage ratio — a highly profitable but low-margin business might support less leverage than the EBITDA multiple suggests", "Applying the same leverage multiple across all industries without adjusting for cyclicality — a stable utility can handle 7x while a cyclical manufacturer might only support 3–4x"]
+  },
+  {
+    "id": "lbo_029",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Why the same purchase and exit multiple doesn't mean zero IRR",
+    "question": "A PE firm buys a company for $800M (8x $100M EBITDA) and sells it 5 years later at the same 8x multiple. During the hold period, EBITDA grew to $140M. The deal was financed with $500M of debt and $300M of equity, and $200M of debt was paid down. What is the approximate MOIC?",
+    "model_answer": "Exit enterprise value is $140M × 8 = $1,120M. Remaining debt is $500M − $200M = $300M. Exit equity proceeds are $1,120M − $300M = $820M. MOIC = $820M / $300M ≈ 2.73x. This demonstrates two sources of return even with no multiple expansion: EBITDA growth increased the enterprise value from $800M to $1,120M (+$320M), and debt paydown reduced the debt burden by $200M, both of which accrued entirely to equity holders.",
+    "common_mistakes": ["Assuming the IRR is roughly 0% because the purchase and exit multiples are identical — the multiple is the same but EBITDA grew, so the exit price is materially higher", "Forgetting to account for debt paydown when calculating equity proceeds at exit"]
+  },
+  {
+    "id": "lbo_030",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Term Loan A vs. Term Loan B differences",
+    "question": "What are the practical differences between a Term Loan A and a Term Loan B in an LBO financing structure?",
+    "model_answer": "Term Loan A is provided by relationship banks, has a shorter maturity (typically 4–6 years), amortizes on a straight-line schedule (often 5–10% of principal per year), and carries a lower interest spread. Term Loan B is typically sold to institutional investors like hedge funds and CLOs, has a longer maturity (6–8 years), has minimal amortization (often 1% per year with a bullet at maturity), and carries a higher interest spread. In an LBO, TLB is far more common because its minimal amortization preserves cash flow for debt service on other tranches and operational needs, and the institutional market is very deep and liquid. TLA is less common post-financial crisis.",
+    "common_mistakes": ["Saying TLB has no amortization — it typically has 1% annual amortization, not zero", "Thinking TLA is always preferable because it's cheaper — the heavier amortization schedule can strain free cash flow, making TLB structurally more useful in high-leverage buyouts"]
+  },
+  {
+    "id": "lbo_031",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Multiple expansion vs. EBITDA growth as return drivers",
+    "question": "A PE firm buys a company for 6x EBITDA and sells for 9x EBITDA five years later, with EBITDA unchanged at $100M. Another PE firm buys the same company at 9x EBITDA, grows EBITDA to $150M over five years, and sells at 9x. Both deals used 4x leverage and no debt was paid down. Which deal produced a higher IRR and MOIC?",
+    "model_answer": "Deal 1: Entry EV $600M, debt $400M, equity $200M. Exit EV $900M, equity $500M. MOIC = 2.5x, IRR ≈ 20%. Deal 2: Entry EV $900M, debt $600M, equity $300M. Exit EV $1,350M, equity $750M. MOIC = 2.5x, IRR ≈ 20%. Interestingly, both deals produce the same MOIC of 2.5x and approximately the same IRR, because the entry/exit multiple gap and equity value creation are proportionally equivalent. This illustrates that what matters for returns is the ratio of entry-to-exit value relative to equity invested, not the absolute level of EBITDA or multiples.",
+    "common_mistakes": ["Assuming Deal 2 must be better because EBITDA grew — the higher entry multiple offset all the EBITDA growth", "Not checking whether the equity multiple is the same across both deals before concluding one is superior"]
+  },
+  {
+    "id": "lbo_032",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "How financing fees are treated in an LBO",
+    "question": "A PE firm pays $10M in financing fees at LBO close. How are these treated on the balance sheet, income statement, and cash flow statement over the holding period?",
+    "model_answer": "At close, $10M of cash leaves the company, and a $10M capitalized financing fee asset is created on the balance sheet (similar to a prepaid expense). Each year, a portion is amortized — if the debt matures in 5 years, $2M per year flows through the income statement as amortization expense, reducing pre-tax income by $2M. On the cash flow statement, the $2M non-cash amortization is added back in cash flow from operations, exactly offsetting its income statement impact. The reason financing fees are capitalized rather than expensed immediately is because they represent a cost that provides a benefit over the life of the loan.",
+    "common_mistakes": ["Treating financing fees identically to advisory fees — advisory fees are expensed immediately and hit retained earnings, while financing fees are capitalized and amortized", "Forgetting to add back the amortization of financing fees on the cash flow statement, which would understate operating cash flow"]
+  },
+  {
+    "id": "lbo_033",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "LBO of a private vs. public company",
+    "question": "How does modeling an LBO of a private company differ from modeling a take-private of a public company?",
+    "model_answer": "The core mechanics are identical — sources and uses, balance sheet adjustment, financial projections, and returns analysis work the same way. The key differences are structural: for a public company, the purchase price is calculated as a premium to the current share price multiplied by shares outstanding, and the company must pay a control premium (typically 20–40% above market price) to convince shareholders to sell. Public companies also have more disclosure requirements making financial analysis easier. Private company LBOs require more judgment on valuation because there's no market price reference, and information is often more limited, making due diligence more challenging.",
+    "common_mistakes": ["Saying the model mechanics are fundamentally different — they're the same; only the entry price derivation and information availability differ", "Forgetting the control premium in a take-private analysis, which is required to motivate shareholders to tender their shares"]
+  },
+  {
+    "id": "lbo_034",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Assumed vs. refinanced debt in Sources and Uses",
+    "question": "A target company has $200M of existing debt. In one scenario, the PE firm assumes this debt; in another, it refinances it. How does each treatment affect the Sources and Uses table and the purchase price paid?",
+    "model_answer": "When debt is assumed, the $200M appears in both the Sources column (as a source of financing since the PE firm doesn't have to fund that portion) and the Uses column (since it remains on the balance sheet post-close). The net effect on the equity check is zero, but total transaction size is larger. When debt is refinanced, the $200M appears only in the Uses column (as a use of proceeds to pay off existing debt), and a corresponding new debt tranche must appear in Sources. Refinancing increases the total capital required and therefore the equity check if new debt terms or capacity differ from the old. The effective purchase price paid to equity holders is the same in both cases, but total transaction value (including debt) differs.",
+    "common_mistakes": ["Saying refinancing increases the purchase price — it increases total sources and uses but the equity consideration to sellers is unchanged", "Putting assumed debt in only the Uses column, which would incorrectly require more equity to be raised"]
+  },
+  {
+    "id": "lbo_035",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Paper LBO with PIK interest",
+    "question": "You buy a company for $300M using $200M of debt and $100M of equity. The debt carries 8% PIK interest and a 5-year bullet maturity. EBITDA is flat at $50M per year. There is no tax, no CapEx, no working capital changes, and no D&A. What is the approximate exit equity value and MOIC if you sell at 6x EBITDA after 5 years?",
+    "model_answer": "Since interest is PIK, no cash leaves the company. The debt principal grows each year: Year 1: $216M, Year 2: $233.3M, Year 3: $251.9M, Year 4: $272.1M, Year 5: $293.9M. At exit, EBITDA is still $50M, so exit EV = $50M × 6 = $300M. Exit equity = $300M − $293.9M ≈ $6.1M. MOIC = $6.1M / $100M ≈ 0.06x — essentially a complete loss of equity. The lesson is that PIK interest causes debt to compound and balloon, which can destroy equity value if the company doesn't grow into a higher exit enterprise value.",
+    "common_mistakes": ["Treating PIK interest as zero cost because no cash leaves — it accrues to principal and dramatically increases the debt load by exit", "Forgetting to compound the PIK interest; calculating $200M × 8% × 5 = $80M in simple interest instead of the compounded $93.9M"]
+  },
+  {
+    "id": "lbo_036",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "How a stub period affects an LBO model",
+    "question": "A PE firm closes an LBO on September 30 of a calendar year. How does this stub period affect the model, and what Excel function should you use when calculating IRR?",
+    "model_answer": "A stub period means the first projection period is only 3 months (October through December) rather than a full year. You typically scale full-year income statement and cash flow projections by 3/12 for the stub period, and you project the balance sheet to the September 30 close date for the opening balance sheet. The IRR calculation must use the XIRR function rather than IRR, because XIRR accepts specific dates for each cash flow rather than assuming uniform annual intervals. If the stub period extends the holding period (e.g., you hold for 5 full years plus the 3-month stub), IRR decreases slightly because the same ultimate return is spread over a longer time.",
+    "common_mistakes": ["Using the regular IRR function in Excel for a deal with a stub period — IRR assumes equal time periods between cash flows, which is incorrect when the first period is a partial year", "Forgetting that a stub period at the beginning of the hold effectively extends the total calendar duration, reducing IRR"]
+  },
+  {
+    "id": "lbo_037",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Revolver drawing formula in a model",
+    "question": "In an LBO model, how do you determine whether the company needs to draw on its revolver in a given year, and what is the formula?",
+    "model_answer": "You compare the cash available for mandatory debt repayments to the total mandatory debt repayment obligations for the year. If obligations exceed available cash, the company must draw on the revolver to make up the shortfall. The formula is: Revolver Draw = MAX(0, Total Mandatory Debt Repayments − Cash Flow Available for Debt Repayment), where cash flow available is beginning cash balance plus free cash flow minus the required minimum cash balance. The MAX(0, ...) ensures the revolver balance never goes negative — if available cash exceeds mandatory payments, the excess is used to repay any outstanding revolver balance rather than drawing more.",
+    "common_mistakes": ["Allowing the revolver to show a negative balance, which would mean the company is lending money to the bank rather than borrowing", "Calculating revolver borrowing need before subtracting the minimum cash balance, which would overstate available cash"]
+  },
+  {
+    "id": "lbo_038",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Asset purchase vs. stock purchase in LBO context",
+    "question": "In an LBO, should the PE firm prefer a stock purchase or an asset purchase from a tax perspective, and why?",
+    "model_answer": "The PE firm generally prefers an asset purchase because it gets a step-up in the tax basis of the acquired assets, allowing it to depreciate and amortize assets at fair value rather than historical cost. This generates higher non-cash charges that reduce taxable income, creating more tax savings over the holding period. An asset purchase is also cleaner from a liability standpoint because contingent liabilities generally don't transfer. However, the seller typically prefers a stock sale because gains are taxed at lower capital gains rates and they avoid ordinary income tax on asset write-ups. In practice, most LBOs are structured as stock purchases because sellers resist asset deals — a Section 338(h)(10) election can achieve asset purchase tax treatment while using stock purchase mechanics, but it requires the buyer to be a C corporation.",
+    "common_mistakes": ["Saying asset purchases are always better without acknowledging that sellers resist them due to higher tax costs, making them difficult to negotiate", "Confusing the buyer's preference (asset purchase for tax step-up) with the seller's preference (stock purchase for capital gains treatment)"]
+  },
+  {
+    "id": "lbo_039",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "MOIC and IRR relationship across holding periods",
+    "question": "A PE firm targets a 20% IRR. What approximate MOIC does it need to achieve this target for a 3-year hold versus a 5-year hold?",
+    "model_answer": "For a 20% IRR, you need to determine how much a dollar compounds at 20% over each holding period. Over 3 years: $1 × (1.20)³ = $1 × 1.728 ≈ 1.73x MOIC. Over 5 years: $1 × (1.20)⁵ = $1 × 2.488 ≈ 2.5x MOIC. This means a deal that holds for only 3 years needs to return less in dollar terms to hit the same 20% IRR. This is why a shorter holding period is generally preferable for PE firms — you can achieve the same IRR with a lower MOIC, and then redeploy capital into a new deal sooner.",
+    "common_mistakes": ["Thinking you need the same MOIC regardless of holding period to achieve a target IRR — MOIC and IRR are inseparable from holding period", "Using simple multiplication (0.20 × 3 = 0.60, so 1.6x) instead of compounding (1.20³ = 1.73x)"]
+  },
+  {
+    "id": "lbo_040",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Roll-up LBO strategy mechanics",
+    "question": "What is a roll-up LBO strategy, and how can it improve returns even if individual acquisition multiples are similar?",
+    "model_answer": "A roll-up strategy involves a PE firm acquiring a platform company and then purchasing multiple smaller add-on companies in the same industry to create a larger, more valuable combined entity. Returns improve through multiple arbitrage: smaller companies typically trade at 4–6x EBITDA while larger, more diversified companies trade at 8–10x. By buying small companies cheaply and consolidating them under a larger platform, the PE firm creates enterprise value simply through the re-rating at exit. Additionally, cost synergies (shared back-office, procurement savings) and revenue synergies (cross-selling, geographic expansion) can materially boost combined EBITDA beyond what the individual businesses would achieve standalone.",
+    "common_mistakes": ["Assuming roll-ups only work through synergies — multiple arbitrage alone can justify the strategy even without meaningful operational improvement", "Overlooking integration risk: add-on acquisitions that fail to integrate properly can destroy rather than create value"]
+  },
+  {
+    "id": "lbo_041",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Calculating equity proceeds at exit with multiple debt tranches",
+    "question": "A PE firm exits an LBO with an enterprise value of $2B. At close, the company had $500M of Term Loan A, $400M of Term Loan B, and $300M of Senior Notes. Over the holding period, TLA was fully paid off, TLB was paid down by $150M, and the Senior Notes had no repayment. What are the equity proceeds?",
+    "model_answer": "Remaining debt at exit: TLA = $0 (fully paid), TLB = $400M − $150M = $250M, Senior Notes = $300M. Total remaining debt = $550M. Equity proceeds = Exit EV − Remaining Debt = $2,000M − $550M = $1,450M. This is then compared to the original equity contribution to compute MOIC. Note that paying down TLA first (the most senior and typically cheapest tranche) may not always be economically optimal, but it follows standard repayment waterfall conventions if TLB or Notes have call protection.",
+    "common_mistakes": ["Forgetting that the Senior Notes were not repaid and therefore still reduce equity proceeds at exit", "Subtracting the original debt principal rather than remaining debt balance when calculating exit equity proceeds"]
+  },
+  {
+    "id": "lbo_042",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "When more leverage reduces IRR",
+    "question": "Under what specific conditions would adding more debt to an LBO actually reduce IRR rather than increase it?",
+    "model_answer": "Adding more debt reduces IRR when the incremental interest and mandatory principal payments exceed the incremental free cash flow the company generates. Concretely, if annual interest on the marginal debt tranche costs $30M but the company only generates $20M in incremental free cash flow, the shortfall must be funded by drawing on the revolver, which compounds the problem. This can also happen if heavy debt service forces the company to cut investment or operations, reducing EBITDA and therefore the exit value. Additionally, a company under severe debt stress may breach maintenance covenants, triggering a restructuring that destroys equity value entirely.",
+    "common_mistakes": ["Saying more leverage always increases returns — this is only true up to the point where the company can service the debt from cash flow", "Not mentioning the operational feedback loop: excess debt service can impair growth investment, which reduces EBITDA and ultimately exit value"]
+  },
+  {
+    "id": "lbo_043",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Impact of EBITDA margin improvement on returns",
+    "question": "A company generates $200M of revenue and $40M of EBITDA (20% margin) at LBO entry. The PE firm improves the EBITDA margin to 25% by exit with no revenue growth. Revenue is still $200M at exit. The company was acquired at 8x EBITDA and exits at 8x. Debt is $200M with no paydown. Original equity was $120M. What is the MOIC from margin improvement alone?",
+    "model_answer": "Entry EBITDA $40M, entry EV $320M, equity $120M (EV $320M − debt $200M). Exit EBITDA = $200M × 25% = $50M. Exit EV = $50M × 8 = $400M. Exit equity = $400M − $200M = $200M. MOIC = $200M / $120M ≈ 1.67x. This shows that a 5-percentage-point margin improvement alone, with no revenue growth and no multiple expansion, generates a meaningful 1.67x return purely through operational improvement — illustrating why operational value creation is a core PE strategy.",
+    "common_mistakes": ["Calculating the exit EBITDA using the original margin rather than the improved margin", "Forgetting to subtract remaining debt when calculating equity proceeds at exit"]
+  },
+  {
+    "id": "lbo_044",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Comparison of equity and debt investor returns",
+    "question": "In an LBO, under what conditions would a debt investor earn a higher return than the equity investor (PE firm)?",
+    "model_answer": "Debt investors earn a guaranteed return equal to their interest rate if the company pays in full. PE investors earn more than this only if the company is sold at a sufficient multiple. If EBITDA multiples contract significantly, the company grows slowly, or the PE firm paid a high entry multiple, the exit equity value may be modest. For example, a high-yield debt investor locking in a 12% coupon effectively guarantees a 12% IRR. If the PE firm paid 11x EBITDA and exits at 9x, its equity IRR could easily be 5–8% — well below the debt investor's return. This scenario is more common when exits occur in depressed market conditions.",
+    "common_mistakes": ["Assuming equity always outperforms debt because equity is 'riskier' — risk and return don't guarantee an ordering in any specific deal", "Forgetting that debt investors have contractual cash flows while equity returns are entirely dependent on the uncertain exit price"]
+  },
+  {
+    "id": "lbo_045",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "PP&E write-up and DTL creation",
+    "question": "In an LBO, a company's PP&E is written up by $80M in purchase price accounting. How does this affect the balance sheet, and what is the resulting DTL if the tax rate is 25%?",
+    "model_answer": "The PP&E write-up of $80M increases PP&E on the assets side of the balance sheet by $80M. However, for tax purposes, the asset basis is not stepped up (in a stock purchase) — so there is a temporary difference between book value ($80M higher) and tax value (unchanged). This creates a deferred tax liability of $80M × 25% = $20M, because the company will pay more in taxes in the future as the written-up asset depreciates for book purposes but generates no incremental tax deduction. On the balance sheet, assets increase by $80M (PP&E) and liabilities increase by $20M (DTL), with the remaining $60M plugged into goodwill to keep the balance sheet balanced.",
+    "common_mistakes": ["Forgetting to create the corresponding DTL — a PP&E write-up without a DTL violates the balance sheet accounting", "Confusing the direction of the DTL — it's a liability because taxes will be higher in the future relative to book income as the written-up asset depreciates"]
+  },
+  {
+    "id": "lbo_046",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Paper LBO with amortizing debt and full cash sweep",
+    "question": "You acquire a company for 8x $60M EBITDA using 5x leverage. The company generates $30M of LFCF per year, which is fully swept to reduce debt. After a 4-year hold, you sell for 8x EBITDA (EBITDA is unchanged). What is the approximate MOIC and IRR?",
+    "model_answer": "Purchase price = $60M × 8 = $480M. Debt = $60M × 5 = $300M. Equity = $180M. Total LFCF swept over 4 years = $30M × 4 = $120M. Remaining debt at exit = $300M − $120M = $180M. Exit EV = $60M × 8 = $480M. Exit equity = $480M − $180M = $300M. MOIC = $300M / $180M ≈ 1.67x. For IRR over 4 years with a 1.67x MOIC, use the rule of 72: 72/4 = 18% for 2x, but 1.67x is less than 2x, so IRR is below 18%. Interpolating, approximately 13–14% IRR.",
+    "common_mistakes": ["Forgetting that LFCF swept to debt reduces the exit debt balance, thereby increasing equity proceeds", "Using the rule of 72 directly for a 1.67x MOIC — the rule of 72 applies to a 2x return; for non-round MOICs you need to interpolate or use CAGR approximation"]
+  },
+  {
+    "id": "lbo_047",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Sensitivity analysis and sensitivity tables in LBO models",
+    "question": "Why are sensitivity tables critical in an LBO model, and what are the most important two-variable combinations to stress-test?",
+    "model_answer": "Sensitivity tables are critical because LBO returns are highly sensitive to key assumptions, and presenting point estimates without ranges creates false precision. The most important two-variable combinations are entry multiple vs. exit multiple (because the gap between these two drives returns more than any other factor), and exit multiple vs. leverage (because more debt magnifies both gains and losses). Additional useful combinations include entry multiple vs. EBITDA growth rate and exit multiple vs. holding period. The tables should show both IRR and MOIC so the reader can assess both the annualized return quality and the absolute return magnitude.",
+    "common_mistakes": ["Running sensitivities only on IRR without including MOIC — a short-hold high-IRR deal with a low MOIC may not actually generate much capital for the fund", "Varying only one variable at a time (one-way sensitivities) when the interplay between two variables is more informative"]
+  },
+  {
+    "id": "lbo_048",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "Management rollover mechanics",
+    "question": "In an LBO where the management team rolls over $30M of equity, how does this affect the Sources and Uses table, and what is the impact on the PE firm's equity contribution?",
+    "model_answer": "Management rollover appears in the Sources column of the Sources and Uses table — it is a source of equity financing because the management team is reinvesting their existing ownership stake rather than cashing out. The PE firm's equity contribution is reduced by the rollover amount, because management is co-investing alongside the PE firm. If total equity required is $200M and management rolls $30M, the PE firm only needs to contribute $170M of cash. At exit, management's rollover is entitled to its proportionate share of exit proceeds, so the PE firm receives a smaller percentage of total equity proceeds — the rollover reduces both equity check and final proceeds proportionately.",
+    "common_mistakes": ["Putting management rollover in the Uses column — rollover is a source of equity capital, not a use of funds", "Forgetting that management rollover reduces the PE firm's exit proceeds, not just its initial check"]
+  },
+  {
+    "id": "lbo_049",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "How add-on acquisitions affect LBO returns",
+    "question": "A PE firm's portfolio company acquires an add-on at 5x EBITDA, and the combined entity is projected to exit at 9x EBITDA. The add-on has $10M of incremental EBITDA. How does this add-on mathematically create value?",
+    "model_answer": "The add-on is purchased for $10M × 5 = $50M. At exit, the $10M of add-on EBITDA is valued at 9x because it is now part of the larger, more diversified platform. The exit value attributable to the add-on EBITDA is $10M × 9 = $90M. The value created is $90M − $50M = $40M, purely from multiple arbitrage. If the add-on was funded with $40M of debt and $10M of equity, that $40M of value creation on a $10M equity check represents a 4x return from this single transaction. This is the mathematical core of roll-up strategy — buying small and selling the combined entity at a larger-company multiple.",
+    "common_mistakes": ["Valuing the add-on at exit at the same 5x acquisition multiple rather than the platform's higher exit multiple", "Ignoring integration risk and cost: transaction fees, integration costs, and potential operational disruption reduce the theoretical value creation"]
+  },
+  {
+    "id": "lbo_050",
+    "topic": "LBO",
+    "difficulty": "Technical",
+    "concept": "LBO with excess cash in sources and uses",
+    "question": "A target company has $80M of cash on its balance sheet but only needs $20M to operate. How is excess cash treated in the Sources and Uses table, and how does it affect the required equity check?",
+    "model_answer": "The excess cash of $60M ($80M − $20M minimum required) appears in the Sources column because it is a source of funding for the transaction — the acquirer effectively 'receives' this cash upon purchase, similar to how enterprise value calculations subtract excess cash. The required equity check decreases by $60M, since this cash partially funds the purchase price. In the balance sheet adjustment, the $80M gross cash balance is reduced to $20M (the minimum operating cash), and the $60M is reflected as having been used in the transaction financing. This is directly analogous to why enterprise value = equity value minus cash: the cash belongs to the buyer at close.",
+    "common_mistakes": ["Putting excess cash in the Uses column rather than Sources — excess cash reduces the funding requirement, so it belongs in Sources", "Using the total cash balance rather than the excess cash above the operating minimum in the Sources column"]
+  },
+  {
+    "id": "lbo_051",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Section 338(h)(10) election availability in PE transactions",
+    "question": "A PE firm wants to structure an LBO as a stock purchase but achieve asset purchase tax treatment. Can it use a Section 338(h)(10) election, and why is this typically unavailable in standard PE buyouts?",
+    "model_answer": "Section 338(h)(10) allows a stock acquisition to be treated as an asset purchase for tax purposes, giving the buyer a stepped-up asset basis. However, it requires the buyer to be a C corporation — most PE firms are structured as LLCs or limited partnerships for tax pass-through purposes. When a PE firm acquires a company, it typically creates an LLC holding company ('Newco') that makes the actual acquisition, and LLCs do not qualify as C corporations for 338(h)(10) purposes. Additionally, 338(h)(10) requires the seller to be a member of a consolidated tax group or to be an S-corp with specific election mechanics. These restrictions make 338(h)(10) unavailable in the vast majority of PE buyouts.",
+    "common_mistakes": ["Saying PE firms routinely use 338(h)(10) without recognizing the C-corporation buyer requirement", "Confusing 338(h)(10) with a 754 election, which is a separate mechanism for basis step-up in partnership contexts"]
+  },
+  {
+    "id": "lbo_052",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Management option pool effect on PE firm returns",
+    "question": "A PE firm acquires a company for $500M using $300M of debt and $200M of equity. It allocates 10% of the equity to a management option pool. The company exits at $800M enterprise value with $200M of remaining debt. How are the exit proceeds allocated, and what is the PE firm's MOIC?",
+    "model_answer": "Exit equity proceeds = $800M − $200M = $600M. The management option pool holds 10% of the equity, so management receives $60M and the PE firm receives $540M. The PE firm's MOIC = $540M / $200M = 2.7x. Without the option pool, the PE firm would have received $600M / $200M = 3.0x. The option pool reduces the PE firm's MOIC by approximately 0.3x, but this is theoretically offset by better management performance that contributed to the $800M exit value. The accurate calculation requires applying the Treasury Stock Method to determine the diluted share count and strike prices if options were in-the-money.",
+    "common_mistakes": ["Forgetting that the option pool reduces the PE firm's share of exit proceeds, not just its share of equity ownership at close", "Applying dilution effects mechanically at 10% without checking whether options are in-the-money based on the per-share exit value versus strike price"]
+  },
+  {
+    "id": "lbo_053",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "LBO of a company with significant NOLs",
+    "question": "You are analyzing an LBO of a company with $200M in net operating loss carryforwards. How do these NOLs affect the deal structure and valuation, and what limitations apply?",
+    "model_answer": "NOLs are valuable in an LBO because the highly leveraged company will generate significant interest expense that can be sheltered by the NOLs, reducing cash taxes and improving free cash flow available for debt service. In valuation, you would model the NOL tax savings as incremental cash flows in your LBO model, increasing the maximum price you're willing to pay. However, Section 382 of the tax code limits the use of NOLs after an ownership change of more than 50% — which is exactly what happens in an LBO. The annual Section 382 limitation equals the equity value of the company at closing multiplied by the long-term tax-exempt rate (a federal rate published monthly). This can severely restrict NOL utilization and must be explicitly modeled.",
+    "common_mistakes": ["Modeling the full NOL value without applying the Section 382 annual limitation, which overstates the tax benefit", "Treating NOLs as a permanent asset without noting they have a 20-year carryforward limit (for NOLs generated before 2018) and that the 80% of taxable income cap applies to NOLs generated after 2017"]
+  },
+  {
+    "id": "lbo_054",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Break-even IRR analysis",
+    "question": "A PE firm is evaluating an LBO at 10x EBITDA. It targets a minimum 20% IRR over a 5-year hold. The company has $100M of EBITDA and the deal uses 5x leverage. What is the minimum exit EV the company needs to achieve (assuming $150M of debt is paid down and no interim dividends)?",
+    "model_answer": "Entry EV = $100M × 10 = $1,000M. Debt = $100M × 5 = $500M. Equity = $500M. For a 20% IRR over 5 years, we need MOIC = (1.20)⁵ ≈ 2.49x. Required exit equity = $500M × 2.49 = $1,245M. Remaining debt = $500M − $150M = $350M. Required exit EV = $1,245M + $350M = $1,595M. This means the company must grow its enterprise value from $1,000M to $1,595M, roughly a 10x exit on $160M EBITDA or some combination of multiple expansion and EBITDA growth. Back-solving for required EBITDA at the same 10x exit: $1,595M / 10 = $159.5M EBITDA required.",
+    "common_mistakes": ["Forgetting to add remaining debt back to exit equity proceeds to get to exit EV", "Using simple rather than compound growth for the required MOIC at a given IRR target"]
+  },
+  {
+    "id": "lbo_055",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "When a PE firm would pay more than a strategic buyer",
+    "question": "Under what specific circumstances could a PE firm outbid a strategic acquirer for a company, despite the strategic buyer's ability to capture synergies?",
+    "model_answer": "There are several scenarios. First, if the PE firm has a proprietary operational playbook with a proven track record in the sector, it may price in value creation the generic market underestimates. Second, if the strategic buyer is constrained — by integration bandwidth, regulatory approval risk, or a stretched balance sheet — it may be unable or unwilling to pay a full synergy-based price. Third, in a competitive auction, PE firms can use more financial creativity (rollover equity, earnouts, deal structuring) to offer a structurally higher price on comparable economics. Fourth, if the strategic has a weak currency (depressed stock price) for a stock deal, an all-cash PE offer may be preferred by sellers.",
+    "common_mistakes": ["Saying a PE firm can never outbid a strategic buyer — this is directionally true on average but wrong in many specific deal situations", "Ignoring the strategic buyer's capital constraints and integration capacity as real limits on their willingness to pay a full synergy value"]
+  },
+  {
+    "id": "lbo_056",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Waterfall return structure with multiple equity classes",
+    "question": "A PE firm invests $200M in equity alongside a management team that invests $20M. The deal has a 1.5x preferred return hurdle for the PE firm (meaning the PE firm receives 1.5x its money before management participates in upside above that). The company exits for $600M equity value. How are proceeds distributed?",
+    "model_answer": "First, calculate the PE firm's preferred return threshold: $200M × 1.5 = $300M. The PE firm receives the first $300M of equity proceeds. Remaining equity = $600M − $300M = $300M. This $300M is split based on ownership: PE firm owns $200M / ($200M + $20M) = 90.9% of equity; management owns 9.1%. PE firm receives $300M × 90.9% = $272.7M from the remaining pool. Management receives $300M × 9.1% = $27.3M. Total PE firm proceeds = $300M + $272.7M = $572.7M. MOIC for PE firm = $572.7M / $200M = 2.86x. Management MOIC = $27.3M / $20M = 1.37x — illustrating how the preferred return waterfall heavily favors PE in moderate return scenarios.",
+    "common_mistakes": ["Splitting all proceeds pro-rata from the start, ignoring the preferred return threshold", "Applying the preferred return to the total exit value rather than only the equity proceeds after debt repayment"]
+  },
+  {
+    "id": "lbo_057",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "PIK toggle debt and its strategic use",
+    "question": "Why would a PE firm prefer PIK toggle debt over straight cash-pay debt in an LBO, and what are the risks of using it?",
+    "model_answer": "A PIK toggle allows the company to elect each payment period whether to pay interest in cash or accrue it to principal, giving optionality if near-term cash flow is uncertain or needs to be preserved for investment. The PE firm might prefer it if the company is in an early growth phase, is executing an acquisition strategy requiring cash, or if the macro environment creates near-term cash flow uncertainty. The risk is that PIK elections cause the principal balance to balloon — if the company toggles to PIK for several years, the debt load at exit could be materially higher than at close, substantially reducing equity value. Lenders charge a higher interest rate for PIK toggle options to compensate for this deferral risk, further compounding the eventual debt burden.",
+    "common_mistakes": ["Treating PIK toggle as unconditionally beneficial — the flexibility comes at a cost through a higher interest rate and the compounding risk of an expanding principal balance", "Forgetting to add back PIK interest as a non-cash item on the cash flow statement in periods when the toggle is elected"]
+  },
+  {
+    "id": "lbo_058",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "LBO model shortcut — skipping the full balance sheet",
+    "question": "An interviewer asks if you need to project a full three-statement balance sheet in an LBO model. What are the minimum components required, and when would you include a full balance sheet?",
+    "model_answer": "You do not strictly need a full balance sheet for a simplified or screening LBO model. The minimum components are an income statement (to project EBITDA, interest, taxes, and net income), a debt schedule (to track mandatory and optional repayments and ending balances each year), and a simplified cash flow statement (to show operating cash flow and free cash flow available for debt service). For the balance sheet, you can approximate changes in working capital as a percentage of revenue rather than projecting each current asset and liability individually. A full three-statement balance sheet is included in a detailed LBO model or bank model when lenders require it for credit analysis or when working capital dynamics are complex and material.",
+    "common_mistakes": ["Saying you always need a full balance sheet in an LBO model — many professional models skip or simplify the balance sheet", "Confusing 'simplified balance sheet' with 'no balance sheet' — you still need to track how debt and equity balances change at minimum"]
+  },
+  {
+    "id": "lbo_059",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Equity vs. enterprise value bridge at LBO close",
+    "question": "At LBO close, walk through how you reconcile from enterprise value paid to the equity contribution required, including all adjustments.",
+    "model_answer": "Starting with enterprise value (purchase price paid), you subtract total debt raised in the transaction (revolver if drawn, term loans, high-yield notes) and add back any cash used from the company's balance sheet as a source — this gives you the equity required from external investors. You then layer in other adjustments: add back transaction fees (advisory and legal), which are uses of cash not reflected in EV; add capitalized financing fees since they are paid in cash at close; subtract excess cash from the target's balance sheet used to fund the deal; and account for management rollover as an equity source that reduces the PE firm's check. The resulting figure is the PE firm's equity contribution, which should match the investor equity line in the Sources column.",
+    "common_mistakes": ["Forgetting to add transaction fees to the equity check — they are a real cash cost at close that the equity must cover", "Netting all debt against EV without separately accounting for the revolver (which is typically undrawn at close and therefore not a source)"]
+  },
+  {
+    "id": "lbo_060",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "How call protection affects the debt repayment schedule",
+    "question": "A company's high-yield notes have 4 years of call protection at a 105 call price in years 1–2 and 102.5 in years 3–4. The company wants to refinance in year 2. What is the economic cost of doing so, and how does this affect the LBO model?",
+    "model_answer": "Call protection means the company must pay a premium above par to redeem the notes early. In year 2, the notes can be called at 105 cents on the dollar — meaning for every $100 of face value, the company pays $105. If there are $400M of notes outstanding, the call cost is $400M × 5% = $20M above par. In the LBO model, this $20M call premium is an additional use of cash in the year of refinancing, reducing free cash flow and potentially drawing on the revolver. The benefit of early refinancing must be weighed against the call cost — if the company can refinance at a materially lower interest rate, the present value of interest savings may exceed the $20M call cost.",
+    "common_mistakes": ["Treating call protection periods as an absolute prohibition on repayment — the company can still redeem the notes, it just pays a premium", "Not modeling the call premium as a cash outflow, understating the cost of the refinancing transaction"]
+  },
+  {
+    "id": "lbo_061",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "LBO return attribution framework",
+    "question": "A PE firm earns a 3.5x MOIC on an LBO. Walk through a framework for attributing this return to its specific drivers.",
+    "model_answer": "Return attribution decomposes MOIC into three components: EBITDA growth, multiple expansion/contraction, and leverage/debt paydown. First, calculate the entry equity value at flat EBITDA and same multiple — this isolates the baseline (1.0x, meaning no return). Second, apply actual exit EBITDA growth at the entry multiple to isolate the EBITDA contribution. Third, apply the actual exit multiple to actual exit EBITDA to capture multiple expansion. Finally, the remaining return is from debt paydown reducing the equity-to-enterprise-value gap. In formula form: MOIC = (Exit EV / Entry EV) × (Entry EV / Entry Equity) × (Exit Equity / Exit EV), where each ratio corresponds to enterprise value creation, initial leverage, and remaining leverage at exit, respectively.",
+    "common_mistakes": ["Attributing multiple expansion to operational improvement — multiple expansion is a market phenomenon driven by investor sentiment, not the PE firm's actions", "Double-counting EBITDA growth and multiple expansion when the exit EV is simply used in total without decomposition"]
+  },
+  {
+    "id": "lbo_062",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Impact of rising interest rates on LBO activity and returns",
+    "question": "How do rising interest rates affect LBO economics, deal volume, and the competitive dynamics between PE buyers and strategic buyers?",
+    "model_answer": "Rising interest rates increase the cost of debt, directly reducing free cash flow (more of EBITDA is consumed by interest payments) and the maximum debt a company can service, which compresses achievable leverage ratios. Lower leverage raises the required equity check, which reduces IRR for any given entry price. This forces PE firms to either lower their bid prices or accept lower returns — both of which reduce deal volume. Simultaneously, higher risk-free rates increase the discount rate in DCF analyses, compressing public market multiples and therefore strategic buyers' reference points for valuation. However, strategic buyers with strong balance sheets and low existing leverage may be less affected than PE firms, improving strategics' competitive position in auctions during rate-hiking cycles.",
+    "common_mistakes": ["Saying rising rates hurt all buyers equally — strategic buyers with cash and low debt are less impacted than leveraged PE buyers", "Ignoring the positive effect on sellers who already own levered PE-backed companies: their interest expense rises too, which can accelerate pressure to exit before debt service consumes more cash flow"]
+  },
+  {
+    "id": "lbo_063",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Preferred stock in LBO capital structure",
+    "question": "Where does preferred stock fit in the LBO capital structure, and when would a PE firm use it instead of or alongside common equity?",
+    "model_answer": "Preferred stock sits between subordinated debt and common equity in the capital structure — it has priority over common equity in dividends and liquidation but is junior to all debt. In LBOs, PE firms sometimes issue preferred stock to co-investors or management as a way to offer downside protection (preferred gets paid first) while allowing upside participation through a conversion feature. Preferred stock can also be used when the PE firm wants a return of capital before profit sharing begins — dividends accumulate (if cumulative preferred) and create a hurdle that must be cleared before common equity participates. Unlike debt, preferred dividends are not tax-deductible, which is a disadvantage compared to high-yield debt that accomplishes a similar economic purpose.",
+    "common_mistakes": ["Saying preferred stock has the same seniority as mezzanine debt — preferred is structurally below all debt and above common equity only", "Forgetting that preferred dividends are not tax-deductible, making preferred stock more expensive on an after-tax basis than debt with similar characteristics"]
+  },
+  {
+    "id": "lbo_064",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "How to model a sponsor-to-sponsor sale",
+    "question": "A PE firm is selling a portfolio company to another PE firm in a secondary buyout. Why do secondary buyouts typically sell at lower multiples than strategic sales, and how would you model this exit in an LBO?",
+    "model_answer": "Secondary buyouts (sponsor-to-sponsor) typically transact at lower multiples than strategic sales because the incoming PE buyer also needs to earn a 20%+ IRR, which constrains how much they can pay. A strategic buyer can pay synergy-driven premiums above standalone value; a PE buyer can only pay what the standalone business can support given their return requirements. In modeling the exit, you would use a lower exit multiple assumption than for a strategic sale and may apply a discount of 0.5–1.5x EBITDA turns relative to strategic comps. The IRR calculation is unchanged — you still use net equity proceeds divided by equity invested, but the lower exit multiple directly reduces the exit equity value and the resulting MOIC.",
+    "common_mistakes": ["Applying the same exit multiple in a secondary buyout analysis as in a strategic sale analysis", "Forgetting that the incoming buyer's return requirements create an implicit ceiling on exit valuation in secondary buyouts"]
+  },
+  {
+    "id": "lbo_065",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "NOL limitations under Section 382",
+    "question": "A company enters an LBO with $150M of NOL carryforwards. The equity value at close is $300M, and the federal long-term tax-exempt rate is 4%. The company's EBITDA is $50M per year and the tax rate is 25%. How much of the NOL can be used per year, and when will the NOLs be fully utilized?",
+    "model_answer": "Under Section 382, the annual NOL utilization limit is calculated as: Equity value at close × Long-term tax-exempt rate = $300M × 4% = $12M per year. With a 25% tax rate, each dollar of NOL utilized saves $0.25 in taxes, so the $12M annual limit saves $12M × 25% = $3M per year in taxes. At $12M utilized per year, the $150M of NOLs would be fully consumed in $150M / $12M ≈ 12.5 years. If the holding period is 5 years, only $60M of NOLs will be utilized during the hold, generating $15M of total tax savings. This should be reflected as a reduced tax expense line in the model during years 1–5.",
+    "common_mistakes": ["Modeling the full $150M of NOLs being used without applying the Section 382 annual cap", "Applying the NOL to EBITDA rather than taxable income — NOLs shelter taxable income, which is EBITDA minus interest minus depreciation, not EBITDA directly"]
+  },
+  {
+    "id": "lbo_066",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Incremental IRR analysis for a dividend recap",
+    "question": "A PE firm invested $200M in equity two years ago in an LBO. The company takes on $80M of additional debt and distributes it as a dividend to the PE firm. The firm expects to sell the company in 3 more years for $450M equity value. How does the dividend recap affect the PE firm's IRR versus without it?",
+    "model_answer": "Without the recap: the PE firm invested $200M and receives $450M in year 5 (3 years from now). MOIC = 2.25x over 5 years. IRR ≈ slightly below 18% (2x in 5 years ≈ 15%, interpolating for 2.25x). With the recap: the PE firm invested $200M, received $80M at year 2, and will receive $450M at year 5 — but the $80M of additional debt reduces final equity proceeds if it's still outstanding at exit. Assuming the debt is still outstanding: exit equity = $450M − $80M = $370M. Net IRR cash flows: −$200M at year 0, +$80M at year 2, +$370M at year 5. The earlier receipt of $80M improves IRR because the time value of money rewards earlier cash inflows.",
+    "common_mistakes": ["Forgetting that the additional debt from the recap still exists at exit (unless paid down), reducing exit equity proceeds by $80M", "Calculating IRR ignoring the interim $80M cash flow at year 2, treating it as if the recap has no effect until exit"]
+  },
+  {
+    "id": "lbo_067",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "LBO valuation as ceiling vs. floor in M&A context",
+    "question": "A banker presents an LBO analysis showing a $2B implied equity value. The company's DCF valuation shows $2.5B–$3.0B. A strategic acquisition analysis shows $3.5B–$4.0B. How should the banker present these three valuations to a client, and what does the hierarchy tell us?",
+    "model_answer": "The banker should present the LBO as the floor valuation — it represents the minimum any sophisticated buyer would pay, since PE firms require a financial return and can walk away if valuation exceeds their model. The DCF represents intrinsic standalone value — what the company is worth based on its own cash flows. The strategic acquisition analysis represents the ceiling — what a motivated strategic buyer might pay after capturing synergies. The spread between LBO floor ($2B) and strategic ceiling ($4B) is the negotiating range. A seller with multiple potential acquirers can argue that strategic buyers should at minimum match the synergy-inclusive value, while a PE buyer who sees the same assets might bid below a strategic but above the LBO floor.",
+    "common_mistakes": ["Presenting the three valuations as equally valid alternatives rather than understanding their logical relationship and what drives each", "Using the LBO value as a ceiling — it's a floor; strategic buyers pay more, not less, than PE firms in most situations"]
+  },
+  {
+    "id": "lbo_068",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Impact of working capital changes on LBO cash flow",
+    "question": "A company being LBO'd has $50M of EBITDA and a working capital cycle that requires $8M of cash annually as the business grows. How does this affect the free cash flow available for debt repayment, and what type of business would have the opposite working capital dynamic?",
+    "model_answer": "Working capital investment is a cash outflow — the company must fund accounts receivable and inventory increases as it grows, which reduces cash available for debt service. FCF available for debt repayment = EBITDA − interest − taxes − CapEx − change in net working capital. If $8M of additional working capital is needed annually, FCF is reduced by $8M per year versus a working-capital-neutral business. A business with the opposite dynamic — negative working capital — collects cash before delivering goods or services (e.g., subscription software, insurance, or retail businesses that receive payment immediately). These businesses are particularly attractive for LBOs because growth generates cash rather than consuming it, increasing both debt capacity and available cash sweep.",
+    "common_mistakes": ["Using EBITDA as a proxy for cash flow without subtracting working capital changes, overstating available cash for debt service", "Treating working capital as always a cash cost — businesses with negative working capital cycles (like software or retail) generate cash as they grow"]
+  },
+  {
+    "id": "lbo_069",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "How PE firms model an IPO exit",
+    "question": "A PE firm is considering an IPO as an exit route for a portfolio company. How is an IPO exit modeled differently from a strategic sale, and what are the return implications of the lock-up period?",
+    "model_answer": "In an IPO exit, the PE firm does not sell all its shares at IPO pricing — it sells a portion (typically 10–30%) in the offering and remains locked up on the rest for 180 days. In the model, you must split the exit into two tranches: shares sold at IPO price and shares sold post-lock-up at an assumed price (typically a discount or premium to IPO price depending on assumptions). The lock-up period effectively extends the holding period for the unsold shares, reducing the IRR on those shares. Additionally, underwriting fees (typically 4–7% of proceeds) reduce net proceeds. Post-lock-up selling also carries market risk — the stock could fall after the IPO, further reducing proceeds on the residual position.",
+    "common_mistakes": ["Modeling an IPO as a clean 100% exit at IPO price, ignoring the lock-up period and unsold stake", "Forgetting underwriting fees, which are a material cost that reduces IPO proceeds versus a private M&A exit"]
+  },
+  {
+    "id": "lbo_070",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Debt investor IRR calculation",
+    "question": "A lender provides $300M of senior secured term loans at a 7% cash interest rate with 10% annual amortization. The loan is held for 5 years, and the company repays the remaining principal at maturity. What is the debt investor's approximate IRR?",
+    "model_answer": "Year 0: −$300M cash out. Years 1–5: Annual cash interest = 7% × $300M = $21M (on original principal for simplicity). Annual amortization = 10% × $300M = $30M per year, so principal repayment occurs each year. By year 5, $150M of principal has been amortized (5 × $30M), and remaining principal of $150M is repaid at maturity. Year 5 cash inflow = $21M interest + $150M principal repayment = $171M. The IRR here is approximately the interest rate of 7%, since the lender is receiving the coupon plus par at maturity — standard bond math shows IRR equals coupon when bonds are issued at par.",
+    "common_mistakes": ["Treating the amortizing payments as reducing the IRR below the stated interest rate — with a par issuance, amortizing debt still yields the stated coupon as its IRR because you're just receiving principal back earlier", "Forgetting to include principal repayments as positive cash flows in the IRR calculation"]
+  },
+  {
+    "id": "lbo_071",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Distinguishing industry risk for LBO suitability",
+    "question": "Why do PE firms rarely use heavy leverage in oil and gas E&P companies, and what types of debt structures do they use instead when they do invest in the sector?",
+    "model_answer": "Oil and gas E&P companies have highly volatile cash flows tied to commodity prices, making it difficult to reliably service fixed debt obligations. Traditional LBO leverage relies on stable, predictable cash flows — E&P cash flows can swing 50%+ year over year based on oil prices, creating severe covenant and default risk. When PE firms do invest in E&P, they typically use reserve-based lending (RBL) facilities, where debt capacity is tied to the present value of proved reserves at current commodity prices, and the borrowing base is redetermined semi-annually. This structure is inherently self-adjusting — as commodity prices fall, the borrowing base shrinks, forcing debt reduction rather than allowing a static debt load to become unsustainable.",
+    "common_mistakes": ["Saying PE firms never invest in oil and gas — energy is one of the largest sectors for PE investment; the key is that structures differ materially from corporate LBOs", "Applying standard EBITDA-based leverage analysis to E&P without recognizing that reserves-based lending is the appropriate framework"]
+  },
+  {
+    "id": "lbo_072",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "How amortization type affects free cash flow modeling",
+    "question": "Two LBO deals are identical in every respect except that Deal A uses a Term Loan A with straight-line amortization of 20% per year, and Deal B uses a Term Loan B with 1% annual amortization and a bullet at maturity. Assuming the same total debt amount and holding period of 5 years, which deal has higher equity IRR and why?",
+    "model_answer": "Deal B (minimal amortization TLB) would generally produce a higher IRR, primarily because fewer mandatory cash outflows occur during the holding period, preserving cash flow flexibility. In Deal A, $20% per year × 5 years = 100% of principal is repaid through mandatory amortization — equity proceeds at exit come only from enterprise value appreciation. In Deal B, nearly all the principal is repaid at maturity in one bullet, so the company retains more cash flow during the hold which can be reinvested, distributed as dividends, or used for value-creating acquisitions. However, Deal A's aggressive amortization does reduce debt faster, which also increases equity value — the question is whether the flexibility value from retaining cash exceeds the debt-reduction benefit.",
+    "common_mistakes": ["Reflexively saying Deal B is always better without acknowledging that Deal A's faster deleveraging also benefits equity if the cash is not redeployed productively", "Ignoring that TLB typically carries a higher interest spread than TLA, partially offsetting the cash flow benefit of lower amortization"]
+  },
+  {
+    "id": "lbo_073",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "LBO in a declining EBITDA scenario",
+    "question": "A PE firm acquires a company for 8x $100M EBITDA with 5x leverage. EBITDA declines by $10M per year. After 4 years, the company is sold at 6x EBITDA (reflecting multiple contraction). No debt was paid down. What is the approximate MOIC?",
+    "model_answer": "Entry EV = $100M × 8 = $800M. Debt = $100M × 5 = $500M. Equity = $300M. Exit EBITDA = $100M − ($10M × 4) = $60M. Exit EV = $60M × 6 = $360M. Exit equity = $360M − $500M = −$140M. Since debt exceeds enterprise value at exit, the equity is completely wiped out — MOIC = 0x. This represents a total loss of equity investment. The scenario illustrates the compounding devastation of declining EBITDA combined with multiple contraction and no debt paydown — all three primary return drivers moved against the investment simultaneously.",
+    "common_mistakes": ["Calculating a negative MOIC — equity cannot have a negative value because equity holders have limited liability and simply lose their entire investment", "Not recognizing that when remaining debt exceeds exit EV, equity is worth zero and the company is effectively insolvent or heading toward restructuring"]
+  },
+  {
+    "id": "lbo_074",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Capitalized financing fees as an asset",
+    "question": "Why are financing fees treated as an asset on the balance sheet rather than immediately expensed, and how does this affect the income statement and cash flow statement over the holding period?",
+    "model_answer": "Financing fees are capitalized as an asset because they represent a cost incurred to obtain long-term financing that provides a future economic benefit — the ability to borrow — over the life of the debt facility. They are conceptually similar to prepaid expenses: cash leaves at close, but the benefit accrues over multiple years. Each year, the capitalized fees are amortized on the income statement as a non-cash expense, reducing pre-tax income by the periodic amortization amount. On the cash flow statement, this amortization is added back (as a non-cash charge) in cash flow from operations, exactly netting to zero cash impact after the initial payment. The only real cash impact was the upfront payment at close, which flowed through cash flow from financing.",
+    "common_mistakes": ["Expensing all financing fees at close through the income statement — this violates GAAP matching principles and would overstate expenses in year one", "Confusing the periodic amortization (a non-cash income statement expense) with the original cash payment (a one-time financing cash outflow at close)"]
+  },
+  {
+    "id": "lbo_075",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Partial stake acquisition vs. full LBO",
+    "question": "A PE firm acquires a 40% stake in a company rather than a majority. Explain why this is not a true LBO and how the return modeling differs.",
+    "model_answer": "A true LBO requires majority control — specifically, the ability to make the acquired company take on debt, implement operational changes, and execute the exit strategy. With only a 40% stake, the PE firm cannot force the company to lever up, replace management, or execute a sale — it is structurally a minority equity investment. The modeling differs significantly: there is no debt loading at acquisition, so there's no leverage benefit. Returns are modeled as a simple equity investment where the PE firm buys 40% of the company at an agreed valuation, the company operates over several years, and then the PE firm sells its 40% stake at an exit multiple (typically at or below the entry multiple to be conservative). Returns are entirely dependent on EBITDA growth and multiple changes, with no financial engineering benefit.",
+    "common_mistakes": ["Assuming any PE investment involves LBO mechanics — minority investments are modeled as straightforward equity investments", "Ignoring the governance limitation: a 40% holder cannot force a sale, which is a critical risk if the majority shareholders want to hold longer or disagree on exit strategy"]
+  },
+  {
+    "id": "lbo_076",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Why a 3-year hold requires a higher exit multiple than a 5-year hold for the same IRR target",
+    "question": "Explain mathematically why achieving a 25% IRR over 3 years requires a higher MOIC — and therefore likely a higher exit multiple — than achieving the same 25% IRR over 5 years, assuming similar debt paydown.",
+    "model_answer": "At 25% IRR over 3 years, required MOIC = (1.25)³ = 1.953x, approximately 2.0x. Over 5 years, required MOIC = (1.25)⁵ = 3.052x, approximately 3.0x. Counterintuitively, a shorter holding period requires a lower MOIC to achieve the same IRR — the confusion arises because MOIC and IRR compound differently over time. A 3-year hold only needs to double money to hit 25% IRR, while a 5-year hold must nearly triple it. This means exit multiple requirements are actually lower for shorter holds if EBITDA hasn't grown much. However, if EBITDA grows substantially over 5 years, the same exit multiple will generate a much higher EV, providing a larger absolute gain to compound the higher MOIC at the same exit multiple.",
+    "common_mistakes": ["Saying a shorter hold requires a lower exit multiple because 'less time means less return needed' — this conflates MOIC with IRR; less MOIC is needed for the same IRR, but the multiple depends on EBITDA growth", "Confusing the direction of the relationship — shorter holds need less total multiple appreciation (lower MOIC) but the same annualized return rate (same IRR)"]
+  },
+  {
+    "id": "lbo_077",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Covenant breach mechanics and consequences",
+    "question": "An LBO'd company's total debt/EBITDA covenant requires the ratio stay below 5.0x. EBITDA was $100M at close with $400M of debt (4.0x). Due to a revenue shortfall, EBITDA falls to $70M. What happens, and what options does the company have?",
+    "model_answer": "At $70M EBITDA and $400M debt, the ratio is $400M / $70M = 5.71x, breaching the 5.0x maintenance covenant. This gives lenders the right to declare the debt in technical default and potentially accelerate repayment. The company's options are: (1) obtain a waiver or amendment from lenders (typically requiring a fee and possibly tighter covenant levels going forward); (2) pay down enough debt to get below the covenant — to reach 5.0x at $70M EBITDA, debt must fall to $350M, requiring a $50M paydown; (3) improve EBITDA through operational actions or EBITDA addbacks to reach covenant compliance. Most companies pursue a combination of an amendment fee and revised covenants while working on operational improvement.",
+    "common_mistakes": ["Treating a covenant breach as automatic bankruptcy — it's a technical default that gives lenders remedies, but most lenders prefer to negotiate rather than accelerate", "Confusing incurrence covenants (only triggered by specific actions) with maintenance covenants (continuously tested) in this scenario — the question describes a maintenance covenant"]
+  },
+  {
+    "id": "lbo_078",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Cash flow model with PIK and amortizing debt simultaneously",
+    "question": "An LBO has two debt tranches: $200M of bank debt at 6% cash interest with 15% annual amortization, and $100M of PIK notes at 10% PIK interest. In year one, walk through the income statement, cash flow statement, and debt balance changes assuming a 30% tax rate and no other items.",
+    "model_answer": "Income statement: Cash interest on bank debt = $200M × 6% = $12M. PIK interest = $100M × 10% = $10M. Total interest expense = $22M. Assuming zero operating income above interest for simplicity and focusing on interest impacts: pre-tax loss = −$22M, tax benefit at 30% = $6.6M, net loss = −$15.4M. Cash flow: Start from net loss −$15.4M, add back PIK interest +$10M (non-cash), subtract mandatory amortization $30M (15% × $200M). Net cash impact from debt service = −$15.4M + $10M − $30M = −$35.4M. Debt balances: Bank debt falls from $200M to $170M (amortization). PIK notes grow from $100M to $110M (+$10M PIK).",
+    "common_mistakes": ["Not adding back PIK interest on the cash flow statement because it was already on the income statement — it reduces net income but is non-cash and must be reversed", "Reducing the PIK note balance rather than increasing it — PIK interest adds to principal, it does not represent a payment"]
+  },
+  {
+    "id": "lbo_079",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Transaction structure choice in LBO (asset vs. stock purchase)",
+    "question": "In structuring an LBO, under what specific circumstances would a PE firm accept a higher purchase price to convince a seller to agree to an asset purchase instead of a stock purchase?",
+    "model_answer": "A PE firm might pay a modest premium for asset purchase treatment when the tax step-up benefit (higher depreciation and amortization on written-up assets reducing future taxes) has a present value that exceeds the purchase price premium. The trade-off is modeled as: PV of incremental tax savings from higher D&A versus the upfront premium cost. For example, if $200M of assets can be stepped up generating $50M of additional D&A over 10 years, at a 25% tax rate, tax savings are $12.5M per year, or approximately $80–100M PV — worth paying a significant premium. Sellers resist because they face higher taxes on asset sale gains, so the PE firm must effectively share the tax benefit by grossing up the purchase price. This negotiation is most common in smaller deals where sellers are individuals rather than large corporates.",
+    "common_mistakes": ["Saying asset purchases are always preferred by PE firms without acknowledging the seller's resistance and the need to share the tax benefit through a higher price", "Forgetting to calculate the net NPV of the trade-off rather than concluding categorically that asset purchase is better or worse"]
+  },
+  {
+    "id": "lbo_080",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Sponsor management fees and their effect on LBO returns",
+    "question": "A PE firm charges its portfolio company an annual management fee of 1% of invested equity ($200M). How does this affect the portfolio company's financial statements and the PE firm's net economics?",
+    "model_answer": "The $2M annual management fee (1% × $200M) is expensed on the portfolio company's income statement as a G&A expense, reducing operating income and therefore EBITDA by $2M. Over a 5-year hold, this reduces total EBITDA by $10M, which at an 8x exit multiple reduces exit enterprise value by $80M and therefore equity proceeds by $80M. However, the PE firm receives $10M in total management fee income, partially offsetting the equity return reduction. The net economic impact is the difference: $80M EV reduction versus $10M fee income. Ironically, the management fee reduces IRR on the equity investment while providing current income to the GP — it benefits the PE firm's management company (which receives the fees) but harms the fund's equity return.",
+    "common_mistakes": ["Treating management fees as a neutral wash — the fee income and equity value impact do not cancel out due to the multiple applied at exit magnifying the EBITDA reduction", "Forgetting that management fees are typically negotiated down or eliminated at exit when the company is sold to eliminate this liability from the P&L"]
+  },
+  {
+    "id": "lbo_081",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "LBO return sensitivity to entry multiple vs. exit multiple",
+    "question": "For a given deal with fixed EBITDA, leverage, and holding period, which has a larger impact on IRR: a 1-turn increase in entry multiple or a 1-turn increase in exit multiple? Demonstrate with a numerical example.",
+    "model_answer": "A 1-turn decrease in entry multiple (lower is better for the buyer) and a 1-turn increase in exit multiple each affect the deal symmetrically in absolute EV terms, but have different IRR impacts because they affect different parts of the equity calculation. Assume $100M EBITDA, 5x leverage, $500M debt, 5-year hold. Base case: 8x entry ($800M EV, $300M equity), 8x exit ($800M EV, $300M equity) = 1.0x MOIC. With 1-turn better entry (7x entry, $700M EV, $200M equity), same 8x exit = $300M exit equity; MOIC = 1.5x. With 1-turn better exit (8x entry, $300M equity), 9x exit ($900M EV, $400M equity); MOIC = 1.33x. The lower entry multiple has a larger MOIC impact because it reduces the equity denominator, which mechanically amplifies the percentage return on a smaller base.",
+    "common_mistakes": ["Saying entry and exit multiples always have equal impact on IRR — the entry multiple affects the denominator (equity check), while the exit multiple affects the numerator; the denominator effect is often larger", "Not holding other variables constant when making the comparison, allowing confounding factors to distort the conclusion"]
+  },
+  {
+    "id": "lbo_082",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Fulcrum security in a distressed LBO",
+    "question": "A PE-owned company has a $600M enterprise value and a capital structure of $500M senior debt and $300M of junior bonds, with $200M of equity. What is the fulcrum security, and what happens to each class in a restructuring?",
+    "model_answer": "The fulcrum security is the debt tranche that straddles the enterprise value — the tranche that is partially 'in the money' in a restructuring. Here, total debt is $500M + $300M = $800M versus a $600M enterprise value. The senior debt ($500M) is fully covered since $600M EV > $500M — senior debt holders recover par. The remaining $100M of enterprise value covers the first $100M of junior bonds, meaning junior bondholders recover 33 cents on the dollar ($100M / $300M). Equity is worthless — there is no value after the $600M EV covers $600M of debt. The junior bonds are the fulcrum security because they receive partial recovery; typically, a restructuring would exchange junior bonds for new equity in the reorganized company.",
+    "common_mistakes": ["Saying the equity holders participate in a restructuring when enterprise value doesn't cover all debt — equity is zero when there's an EV shortfall", "Confusing the fulcrum security with the most junior debt tranche — fulcrum is specifically the tranche where the enterprise value 'fulcrums,' partially covering some tranches and not others"]
+  },
+  {
+    "id": "lbo_083",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "EBITDA adjustments (add-backs) in LBO analysis",
+    "question": "A target company presents $80M of reported EBITDA, but $15M of that includes one-time restructuring charges and $5M reflects above-market management compensation that will be replaced post-close. How should you treat these in your LBO analysis, and what is the risk?",
+    "model_answer": "Both items are commonly treated as EBITDA add-backs — adjusting reported EBITDA upward to reflect normalized, ongoing earnings power. Adjusted EBITDA = $80M + $15M + $5M = $100M, and your LBO would be underwritten on this basis, supporting a higher purchase price and more debt. The restructuring charge add-back is reasonable if truly non-recurring, but the risk is that companies systematically take 'one-time' charges every year — if the $15M repeats in future periods, you've overpaid. The management compensation add-back requires verifying you can actually hire equivalent talent for less. Lenders and PE firms scrutinize add-backs carefully; an aggressive add-back quality of earnings issue is among the most common causes of post-close performance disappointment.",
+    "common_mistakes": ["Accepting all add-backs at face value without verifying non-recurrence — recurring 'one-time' items are one of the most common ways companies inflate EBITDA for sale", "Not factoring in the cost of replacements when stripping out management compensation — if you need to hire comparable people, the savings may be illusory"]
+  },
+  {
+    "id": "lbo_084",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Industry consolidation LBO strategy economics",
+    "question": "A PE firm executes an LBO platform strategy, buying a company for $200M (10x $20M EBITDA) and subsequently acquiring three add-ons at 5x EBITDA each with $8M, $10M, and $12M of EBITDA. All four companies are sold as a combined entity at 10x EBITDA. No debt was paid down. The platform was financed with $120M debt and $80M equity; each add-on was financed entirely with debt. What is the approximate MOIC on the equity?",
+    "model_answer": "Combined EBITDA at exit = $20M + $8M + $10M + $12M = $50M. Exit EV = $50M × 10 = $500M. Total debt: Platform debt $120M + add-on debt ($8M × 5 + $10M × 5 + $12M × 5) = $120M + $40M + $50M + $60M = $270M. Exit equity proceeds = $500M − $270M = $230M. MOIC = $230M / $80M = 2.875x ≈ 3x. The return comes entirely from multiple arbitrage — each add-on was bought at 5x and effectively re-valued at 10x as part of the platform, creating $5 of value for every $5 paid (doubling add-on equity value), all of which accrues to the platform's equity since add-ons were 100% debt-financed.",
+    "common_mistakes": ["Forgetting to include add-on acquisition debt in total exit debt, significantly overstating exit equity proceeds", "Valuing the add-ons at their individual acquisition multiples at exit rather than the platform exit multiple, missing the point of multiple arbitrage"]
+  },
+  {
+    "id": "lbo_085",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "How to value a company using LBO back-solve methodology",
+    "question": "Walk through how you would use an LBO model to derive the maximum price a PE firm could pay for a company if it targets a 20% IRR, given $50M EBITDA, 5x available leverage, a 5-year hold, 25% LFCF margin, and an assumed 7x exit multiple.",
+    "model_answer": "Start by letting x = entry multiple (and therefore entry EV). Debt = $50M × 5 = $250M. Equity = $50M × x − $250M. Over 5 years, LFCF = $50M × 25% = $12.5M per year = $62.5M cumulative. Exit EV = $50M × 7 = $350M. Exit equity = $350M − ($250M − $62.5M) = $350M − $187.5M = $162.5M. For 20% IRR over 5 years, required MOIC = (1.20)⁵ ≈ 2.49x. Required: exit equity / entry equity = 2.49. $162.5M / ($50M × x − $250M) = 2.49. $50M × x − $250M = $65.3M. $50M × x = $315.3M. x = 6.3x. The PE firm can pay approximately 6.3x EBITDA as a maximum entry multiple to achieve a 20% IRR.",
+    "common_mistakes": ["Using the exit equity value directly without subtracting remaining debt, understating the debt balance", "Solving for required exit equity without setting up the MOIC equation, missing the back-solve structure"]
+  },
+  {
+    "id": "lbo_086",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Effect of interest rate hedging on LBO model",
+    "question": "A PE firm's LBO uses $400M of floating-rate bank debt at SOFR + 300 bps. SOFR is currently 4.5%, and the company buys an interest rate cap at 6% SOFR. How does this affect the LBO model and why would the PE firm do it?",
+    "model_answer": "Without the cap, if SOFR rises to 8%, total interest rate would be 11%, creating $44M of annual interest on $400M of debt — a significant cash flow burden. The interest rate cap limits SOFR exposure at 6%, so total rate cannot exceed 9% (6% + 300bps spread), capping interest at $36M. The cap premium is paid upfront and should be included in the Sources and Uses table as a use of cash (similar to a financing fee). In the model, you'd project interest expense at the current rate and model the cap as preventing rates above 6% SOFR. The PE firm buys the cap to reduce downside scenario risk — lenders may also require it as a condition of the loan when floating rate debt is large relative to EBITDA.",
+    "common_mistakes": ["Treating the cap premium as a free hedge — caps cost money (upfront premium) that reduces equity IRR", "Modeling interest expense as fixed when the debt is floating rate, failing to capture rate sensitivity in downside scenarios"]
+  },
+  {
+    "id": "lbo_087",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Portability of debt in LBO transactions",
+    "question": "What is 'portable' debt in an LBO context, and why is it valuable when a PE firm is looking to exit an investment?",
+    "model_answer": "Portable debt refers to financing that can transfer from the current PE owner to a new acquirer in a sale transaction without triggering change-of-control provisions that would require immediate repayment. This is valuable in a PE exit because it reduces financing risk for the next buyer — if debt is portable, a new PE buyer or strategic acquirer doesn't need to arrange full replacement financing at close, which can be difficult in tight credit markets. Portability is particularly useful in secondary buyouts, where the incoming PE firm can rely on existing debt at potentially favorable terms. However, lenders often resist portability because it limits their ability to re-underwrite the credit as the capital structure transitions to a new owner. Portability provisions are more common in Term Loan B markets than in high-yield bonds.",
+    "common_mistakes": ["Confusing portability with debt assumption — portability specifically refers to debt that can carry forward to a new owner, while assumed debt is existing debt that a buyer takes on without change", "Saying portability is always beneficial for the selling PE firm — it can also reduce proceeds if the acquirer pays less because they value the portable financing benefit separately"]
+  },
+  {
+    "id": "lbo_088",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "Comparing LBO and strategic M&A from a target's perspective",
+    "question": "A company is running a sale process and receives a $1.2B bid from a PE firm and a $1.1B bid from a strategic acquirer that will pay entirely in cash. What factors should the seller's board consider beyond price in evaluating these bids?",
+    "model_answer": "Beyond headline price, the board should consider certainty of close — strategic bids may face regulatory scrutiny (antitrust), which introduces delay and close risk, while PE bids typically close faster. Financing risk: the PE firm's bid is contingent on financing markets; if credit conditions tighten, the deal may fail. Employee impact: strategic acquisitions often involve significant post-close layoffs for synergies, which boards consider from an employee welfare and cultural standpoint. Rollover equity: if the PE firm offers rollover to management, management may prefer the PE bid despite the lower financial certainty if they believe in post-close upside. Earnout provisions: strategic bids may include earnouts that complicate headline valuation. The board must weigh the $100M premium against these execution risk and stakeholder considerations.",
+    "common_mistakes": ["Evaluating bids solely on headline price without considering close risk, financing contingencies, and post-close obligations", "Ignoring regulatory risk in strategic transactions — in concentrated industries, antitrust approval is a real gating factor that can delay or kill deals"]
+  },
+  {
+    "id": "lbo_089",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "EBITDA-to-FCF conversion in LBO context",
+    "question": "A company has $80M of EBITDA. Walk through the full reconciliation from EBITDA to levered free cash flow (LFCF) in an LBO context, identifying every deduction and why it matters for debt repayment capacity.",
+    "model_answer": "Starting from EBITDA: subtract D&A to get EBIT (this is a non-cash subtraction only for the next step). Subtract interest expense on all debt tranches (cash interest only; add back PIK if applicable) to get EBT. Multiply by (1 − tax rate) to get net income. Add back D&A (non-cash). Subtract CapEx (required capital investment). Subtract increases in net working capital (cash tied up in the business as it grows). The result is levered free cash flow. In an LBO specifically, LFCF represents what's available to repay debt principal after all cash obligations. A company with $80M EBITDA, $20M D&A, $20M interest, 25% taxes, $15M CapEx, and $5M NWC build would generate: ($80M − $20M − $20M) × 0.75 + $20M − $15M − $5M = $30M × 0.75 + $0M = $22.5M + $0M = $22.5M LFCF.",
+    "common_mistakes": ["Forgetting to subtract NWC changes — businesses that are growing often require significant working capital investment that reduces FCF well below what EBITDA minus CapEx would suggest", "Using EBITDA minus CapEx as a shortcut for LFCF without subtracting interest and taxes, which significantly overstates cash available for debt service"]
+  },
+  {
+    "id": "lbo_090",
+    "topic": "LBO",
+    "difficulty": "Advanced",
+    "concept": "LBO model integrity checks and common errors",
+    "question": "You've built a full LBO model and the balance sheet doesn't balance in year 3 of the projection period. Walk through the most likely sources of error and how you would systematically diagnose the problem.",
+    "model_answer": "A balance sheet imbalance means assets don't equal liabilities plus equity. Start by checking the cash flow statement, which links the income statement to the balance sheet — a common error is failing to flow net income into retained earnings on the balance sheet. Next, verify that every debt repayment on the cash flow statement has a corresponding reduction in the debt balance on the balance sheet. Check that PP&E depreciation flows correctly from the cash flow statement (addback) to the balance sheet (accumulated depreciation offset). Verify that capitalized financing fee amortization is both reducing the asset balance and flowing through net income. Finally, check working capital movements: each balance sheet current asset/liability change should match the adjustment in operating cash flow. The most common single error is net income flowing to retained earnings with the wrong sign or magnitude.",
+    "common_mistakes": ["Checking only the balance sheet rather than tracing discrepancies back to the cash flow statement, which is the typical source of imbalance", "Assuming the error is in year 3 specifically rather than recognizing that balance sheet errors typically originate in year 1 and compound forward through the roll-forward structure"]
+  }
+]

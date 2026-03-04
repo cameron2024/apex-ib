@@ -1,0 +1,1082 @@
+[
+  {
+    "id": "dcf_001",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Core DCF mechanics and purpose",
+    "question": "Walk me through a DCF from start to finish.",
+    "model_answer": "A DCF values a company based on the present value of its future free cash flows plus a terminal value. You start by projecting unlevered free cash flow over a 5-10 year period using assumptions for revenue growth, EBITDA margins, taxes, capex, and changes in working capital. Each year's FCF is discounted back to today using WACC. You then estimate a terminal value — either via an exit multiple applied to Year 5 EBITDA or via the Gordon Growth Model — and discount that back as well. Summing the PV of the FCFs and the PV of the terminal value gives you Enterprise Value; you then bridge to equity value by adding cash and subtracting debt.",
+    "common_mistakes": ["Forgetting to discount the terminal value back to today", "Using net income instead of unlevered free cash flow", "Saying the output is equity value rather than enterprise value"]
+  },
+  {
+    "id": "dcf_002",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Unlevered vs. levered free cash flow",
+    "question": "What is the difference between unlevered free cash flow and levered free cash flow, and which do you use in a standard DCF?",
+    "model_answer": "Unlevered free cash flow (UFCF) excludes the effects of debt — it ignores interest expense and debt repayments, representing cash flow available to all capital providers. Levered free cash flow (LFCF) includes interest expense and mandatory debt repayments, so it represents cash flow available only to equity holders. A standard DCF uses UFCF discounted at WACC to arrive at Enterprise Value, which is then bridged to equity value. A levered DCF uses LFCF discounted at the cost of equity to arrive directly at equity value.",
+    "common_mistakes": ["Saying both methods produce the same equity value in practice", "Confusing which discount rate pairs with which FCF type", "Not recognizing that UFCF produces Enterprise Value, not equity value"]
+  },
+  {
+    "id": "dcf_003",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Revenue to unlevered FCF bridge",
+    "question": "Walk me through how you get from revenue to unlevered free cash flow.",
+    "model_answer": "Start with revenue and subtract COGS and operating expenses to arrive at EBIT. Multiply EBIT by (1 minus the tax rate) to get NOPAT — this gives you after-tax operating income with no impact from financing. Add back D&A and other non-cash charges, subtract the increase in net working capital (or add if NWC decreases), and subtract capital expenditures. The result is unlevered free cash flow, which excludes interest and debt repayments entirely.",
+    "common_mistakes": ["Starting from net income instead of EBIT, which already embeds interest expense", "Forgetting to subtract capex", "Adding back D&A before multiplying by (1 - tax rate), which overstates the tax benefit"]
+  },
+  {
+    "id": "dcf_004",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Why UFCF not net income",
+    "question": "Why do you use unlevered free cash flow in a DCF rather than net income?",
+    "model_answer": "Net income is a poor measure of cash generation for several reasons. First, it includes non-cash charges like D&A that don't represent actual cash outflows. Second, it ignores capex, which is a real cash outflow for reinvestment in the business. Third, net income includes interest expense, which means it already reflects the company's capital structure — using it would make the DCF dependent on how the company is financed, making comparisons across companies difficult. UFCF strips out financing effects and focuses purely on operating cash generation available to all capital providers.",
+    "common_mistakes": ["Saying net income is fine for mature, profitable companies", "Forgetting that net income includes interest, making it a levered metric", "Not mentioning the capex omission as a key flaw"]
+  },
+  {
+    "id": "dcf_005",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "NOPAT and EBIT * (1 - tax rate)",
+    "question": "What is NOPAT and how does it fit into the FCF calculation?",
+    "model_answer": "NOPAT stands for Net Operating Profit After Tax and equals EBIT multiplied by (1 minus the tax rate). It represents the after-tax operating earnings a company generates before the impact of its capital structure — no interest income, no interest expense. In the UFCF build, NOPAT is the starting point: you then add back non-cash charges and adjust for capex and working capital changes. It isolates the value created by the business operations themselves, independent of how the company is financed.",
+    "common_mistakes": ["Confusing NOPAT with net income", "Using EBITDA * (1 - tax rate) instead of EBIT * (1 - tax rate)", "Not recognizing that NOPAT already includes the D&A tax shield"]
+  },
+  {
+    "id": "dcf_006",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Why you add back D&A",
+    "question": "Why do you add back depreciation and amortization when calculating free cash flow?",
+    "model_answer": "D&A is a non-cash expense — it reduces reported earnings but doesn't represent an actual cash outflow in the period. When you start from EBIT and multiply by (1 - tax rate), D&A has already reduced EBIT and therefore reduced your taxes, which is a real benefit. By adding it back, you're correctly capturing the tax benefit without overstating cash outflow. The actual cash outflow for maintaining or growing assets is captured separately through capex.",
+    "common_mistakes": ["Saying you add it back simply because it's non-cash without explaining the tax interaction", "Thinking you should add D&A back before applying the tax rate", "Confusing D&A add-back with the treatment of deferred taxes"]
+  },
+  {
+    "id": "dcf_007",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Changes in working capital",
+    "question": "What does the 'change in working capital' line in the FCF calculation represent, and in which direction does it affect cash flow?",
+    "model_answer": "The change in net working capital reflects the cash tied up in or released from a company's day-to-day operations. Net working capital is typically current operating assets minus current operating liabilities. If NWC increases — for example because accounts receivable or inventory grows faster than accounts payable — the company is using cash, so FCF decreases. If NWC decreases, cash is released and FCF increases. A fast-growing company typically has a negative NWC impact because it needs to fund more receivables and inventory before collecting cash.",
+    "common_mistakes": ["Getting the sign backwards — saying an increase in NWC is a source of cash", "Including cash and short-term debt in the NWC calculation", "Forgetting that NWC changes matter even for profitable companies"]
+  },
+  {
+    "id": "dcf_008",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Why use 5-10 year projection period",
+    "question": "Why do most DCFs use a 5-10 year projection period rather than 3 years or 20 years?",
+    "model_answer": "Five to ten years balances predictability with meaningful near-term cash flow capture. Less than five years is too short — you're pushing too much value into the terminal value, which relies on cruder long-run assumptions. Beyond ten years, projections become increasingly speculative for most companies because competitive dynamics, technology, and macroeconomics change in ways that are nearly impossible to forecast accurately. Cyclical industries like chemicals or semiconductors may justify a longer projection period to capture a full cycle, but for most businesses, five to ten years is the practical limit of defensible forecasting.",
+    "common_mistakes": ["Saying three years is fine for stable businesses", "Not recognizing that a very short period inflates terminal value dependence", "Failing to mention that cyclical industries may require longer periods"]
+  },
+  {
+    "id": "dcf_009",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Enterprise Value to equity value bridge",
+    "question": "Once you have Enterprise Value from a DCF, how do you calculate implied equity value per share?",
+    "model_answer": "Start with Enterprise Value, add cash and cash equivalents, and subtract all debt, preferred stock, noncontrolling interests, and any other debt-like items such as capital leases or unfunded pension obligations. This gives you equity value attributable to common shareholders. Divide by the fully diluted share count — which includes basic shares outstanding plus dilutive securities like in-the-money options and convertible notes — to arrive at implied equity value per share.",
+    "common_mistakes": ["Subtracting cash instead of adding it", "Using basic share count instead of fully diluted share count", "Forgetting to subtract noncontrolling interests and preferred stock"]
+  },
+  {
+    "id": "dcf_010",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "What DCF output means vs. market price",
+    "question": "A DCF produces an implied share price of $45. The stock currently trades at $30. What does this tell you, and how should you interpret it?",
+    "model_answer": "By itself, a single DCF output of $45 versus a market price of $30 suggests the stock may be undervalued — the model implies the market is discounting the company's cash flows at too high a rate or underestimating its future earnings power. However, a single point estimate from a DCF is not very meaningful; you need to look at a range of outputs under different discount rate and growth assumptions. If the stock still looks undervalued across a wide range of scenarios, that's a more compelling signal. DCF is highly sensitive to its inputs, and the analysis is only as good as the assumptions underlying it.",
+    "common_mistakes": ["Treating the single DCF output as definitive", "Not running sensitivity analysis to test robustness", "Ignoring that the market may have information not reflected in the model"]
+  },
+  {
+    "id": "dcf_011",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "WACC formula",
+    "question": "What is the WACC formula and what does each component represent?",
+    "model_answer": "WACC equals the cost of equity multiplied by equity's percentage of total capital, plus the after-tax cost of debt multiplied by debt's percentage of total capital, plus the cost of preferred stock multiplied by preferred's percentage. The weights reflect how much of the company's capital structure each source comprises, measured at market value. The cost of debt is multiplied by (1 minus the tax rate) to reflect the interest tax shield — interest is deductible, so the effective cost to the company is lower. WACC represents the blended required return across all capital providers and is used as the discount rate in an unlevered DCF.",
+    "common_mistakes": ["Using book value weights instead of market value weights", "Forgetting the tax shield on debt", "Using the same cost of debt for all tranches without adjusting for seniority"]
+  },
+  {
+    "id": "dcf_012",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Cost of equity via CAPM",
+    "question": "How do you calculate cost of equity using the Capital Asset Pricing Model?",
+    "model_answer": "Cost of equity equals the risk-free rate plus beta multiplied by the equity risk premium. The risk-free rate is typically the yield on a 10-year or 20-year government bond — US Treasuries in the US. The equity risk premium represents the additional return investors demand for holding equities over risk-free assets, typically pulled from a source like Ibbotson's or Damodaran's data. Beta measures how much the stock moves relative to the market — a beta above 1 means it's more volatile. The result is the minimum return an equity investor expects for taking on the risk of investing in this particular company.",
+    "common_mistakes": ["Using a short-term Treasury rate as the risk-free rate", "Forgetting to use levered beta, not unlevered beta, in the final calculation", "Confusing the equity risk premium with the total market return"]
+  },
+  {
+    "id": "dcf_013",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Risk-free rate selection",
+    "question": "What do you use as the risk-free rate in the CAPM formula, and why?",
+    "model_answer": "The risk-free rate is typically the yield on a 10-year or 20-year US Treasury bond. The logic is that US Treasuries are considered essentially default-free, so they represent the return available with no credit risk. A longer-duration bond — 10 or 20 years — is preferred because a DCF values cash flows over many years, and the duration should match. Using a short-term T-bill rate would mismatch the term structure and understate the baseline rate. Some practitioners also adjust the risk-free rate for the current interest rate environment versus long-run averages.",
+    "common_mistakes": ["Using the 3-month T-bill rate as the risk-free rate", "Not matching the duration of the risk-free rate to the DCF horizon", "Using a corporate bond yield as the risk-free rate"]
+  },
+  {
+    "id": "dcf_014",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Beta definition and interpretation",
+    "question": "What is beta, and what does a beta of 1.5 tell you about a stock?",
+    "model_answer": "Beta measures the sensitivity of a stock's returns to the overall market's returns. A beta of 1.0 means the stock moves in line with the market. A beta of 1.5 means the stock is expected to move 1.5 times as much as the market — if the market rises 10%, the stock is expected to rise 15%, and if the market falls 10%, the stock is expected to fall 15%. A higher beta implies higher systematic risk, which translates directly into a higher required return via CAPM, increasing the cost of equity. Beta captures market-correlated risk but does not capture company-specific, idiosyncratic risk.",
+    "common_mistakes": ["Saying beta of 1.5 means the stock is 50% riskier in absolute terms", "Confusing systematic risk captured by beta with total risk", "Saying beta can never be negative"]
+  },
+  {
+    "id": "dcf_015",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Levered vs. unlevered beta",
+    "question": "What is the difference between levered beta and unlevered beta?",
+    "model_answer": "Levered beta reflects both the business risk of the company and the additional financial risk from its debt — it's what you observe when you look up a company's beta on Bloomberg or a financial data service. Unlevered beta (also called asset beta) strips out the effect of the capital structure and reflects only the underlying business risk, as if the company were all-equity financed. When estimating beta for a DCF, you typically un-lever each comparable company's beta to remove their capital structure effects, take the median, and then re-lever using your target company's capital structure. This produces a more accurate estimate of the company's beta than using its historical levered beta directly.",
+    "common_mistakes": ["Using the raw levered beta from Bloomberg without adjusting for capital structure differences", "Forgetting to re-lever after taking the median unlevered beta", "Thinking unlevered beta equals levered beta for a zero-debt company — it does, but candidates often don't know why"]
+  },
+  {
+    "id": "dcf_016",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Why unlever and re-lever beta",
+    "question": "Why do you have to unlever comparable companies' betas before using them to estimate your target company's cost of equity?",
+    "model_answer": "Each comparable company has a different capital structure, and debt amplifies beta — more leverage means the equity is riskier and the observed beta is higher. If you use the levered betas directly, you're comparing apples to oranges because some comps may have 10% debt and others 60% debt. By unlevering all of them, you isolate the pure business risk that's comparable across the set. You then take the median unlevered beta — reflecting the industry's underlying risk profile — and re-lever it using your target company's own debt-to-equity ratio to get a beta that reflects its specific capital structure.",
+    "common_mistakes": ["Unlevering without re-levering — using the unlevered beta directly in CAPM", "Not adjusting for the tax rate in the un-levering formula", "Using book value debt-to-equity ratios instead of market value ratios"]
+  },
+  {
+    "id": "dcf_017",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Cost of debt",
+    "question": "How do you estimate a company's cost of debt for use in the WACC formula?",
+    "model_answer": "Cost of debt is the yield or interest rate the company pays on its borrowings. You can estimate it by looking at the company's existing debt — the yield to maturity on its traded bonds or the stated interest rate on its bank loans. For companies without traded debt, you look at comparable companies with similar credit profiles and the rates at which they borrow. This pre-tax cost of debt is then multiplied by (1 minus the tax rate) in the WACC formula to reflect that interest expense is tax-deductible, reducing the effective cost to the company.",
+    "common_mistakes": ["Using the coupon rate instead of the yield to maturity on outstanding bonds", "Forgetting to apply the tax shield — using the pre-tax cost of debt directly in WACC", "Using the same rate for all debt regardless of seniority"]
+  },
+  {
+    "id": "dcf_018",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Why debt is cheaper than equity",
+    "question": "Why is debt cheaper than equity as a source of financing?",
+    "model_answer": "Debt is cheaper than equity for three reasons. First, interest on debt is tax-deductible, which reduces the effective after-tax cost — equity dividends and retained earnings do not have this benefit. Second, debt holders are senior to equity holders in the capital structure, meaning they get paid first in bankruptcy or liquidation, so they face less risk and therefore demand a lower return. Third, the required return on debt — the interest rate — is almost always lower than the required return on equity, which typically exceeds 10%, because equity holders bear residual risk with no guaranteed return.",
+    "common_mistakes": ["Only citing the tax deductibility without mentioning seniority and risk", "Saying debt is always cheaper regardless of leverage — at extreme leverage, the cost of debt rises sharply", "Forgetting that cheaper debt increases financial risk for equity holders, raising the cost of equity"]
+  },
+  {
+    "id": "dcf_019",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Terminal value — two methods",
+    "question": "What are the two main methods for calculating terminal value in a DCF, and how does each work?",
+    "model_answer": "The first is the Exit Multiple Method: you apply a valuation multiple — typically EV/EBITDA — to the company's final projected year metric. The multiple is usually based on where comparable public companies currently trade, and you apply it to estimate what a buyer would pay for the business at the end of the projection period. The second is the Gordon Growth Model (perpetuity growth method): Terminal Value equals final year FCF multiplied by (1 plus the long-term growth rate), divided by (WACC minus the growth rate). This treats the company as generating growing cash flows forever. In practice, the Exit Multiple Method is more commonly used in investment banking because it's grounded in observable market data.",
+    "common_mistakes": ["Applying the exit multiple to net income instead of EBITDA or EBIT", "Forgetting to discount the terminal value back to the present", "Using a Gordon Growth rate higher than the economy's long-term GDP growth rate"]
+  },
+  {
+    "id": "dcf_020",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Gordon Growth Model formula",
+    "question": "State the Gordon Growth Model formula for terminal value and explain the intuition behind it.",
+    "model_answer": "Terminal Value equals FCF in the final year multiplied by (1 plus g), divided by (WACC minus g), where g is the perpetuity growth rate. The intuition is that you're valuing an infinite stream of growing cash flows as of the final projection year. If FCF grows at a constant rate g forever, and you require a return of WACC, the present value of that perpetuity equals FCF*(1+g)/(WACC-g). The denominator WACC-g is critical — as g approaches WACC, the terminal value approaches infinity, which is why the growth rate must always be less than the discount rate. A realistic long-run g is typically 1-3%, anchored to GDP growth.",
+    "common_mistakes": ["Using FCF of the final year without multiplying by (1+g)", "Setting g equal to or higher than WACC, producing a nonsensical result", "Using revenue or EBITDA as the starting metric instead of FCF"]
+  },
+  {
+    "id": "dcf_021",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Appropriate terminal growth rate",
+    "question": "What is an appropriate long-term growth rate to use in the Gordon Growth Model, and how do you justify it?",
+    "model_answer": "The long-term growth rate should typically equal the long-run nominal GDP growth rate of the country where the company operates — for developed economies like the US, this is roughly 2-3%. The logic is that no company can grow faster than the overall economy in perpetuity, because it would eventually become larger than the economy itself. You can also use the long-run inflation rate as a floor. For companies in developed markets, any growth rate above 4-5% should be scrutinized carefully. You would cross-check this implied growth rate against the exit multiple method to ensure consistency.",
+    "common_mistakes": ["Using the company's near-term projected growth rate as the perpetuity rate", "Setting g to 0% thinking it's conservative — it may actually understate value for a growing business", "Forgetting that the growth rate must be nominal if WACC is nominal"]
+  },
+  {
+    "id": "dcf_022",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Selecting exit multiples",
+    "question": "How do you select the exit multiple to use in the terminal value calculation?",
+    "model_answer": "You look at the current EV/EBITDA multiples of the comparable public companies used in your comps analysis and take the median or a range centered around the median. The rationale is that the multiple represents what the market currently pays for a dollar of EBITDA in that industry, which should be a reasonable proxy for what a buyer would pay at the end of the projection period. Rather than selecting a single number, you show a range — for example, if comps trade at 8x, you might show 6x to 10x — and present the resulting range of terminal values to capture uncertainty. You should cross-check the implied perpetuity growth rate to ensure the multiples are internally consistent.",
+    "common_mistakes": ["Using transaction multiples instead of trading multiples without acknowledging the difference", "Picking just one multiple instead of showing a range", "Not cross-checking the implied growth rate against the Gordon Growth result"]
+  },
+  {
+    "id": "dcf_023",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Why terminal value dominates DCF value",
+    "question": "Why does terminal value typically represent more than 50% of a company's total DCF value?",
+    "model_answer": "Terminal value represents all cash flows beyond the projection period — effectively the value of the business from Year 5 or Year 10 onward, in perpetuity. Because businesses are going concerns that generate cash flows indefinitely, the far-future period inherently contains more total value than the near-term projection window. Even though those future cash flows are discounted, the sheer scale and duration of them means terminal value dominates. In practice, terminal value often represents 60-80% or more of total DCF value, which is precisely why the assumptions for exit multiples or growth rates are so critical to scrutinize.",
+    "common_mistakes": ["Treating high terminal value dependence as a model error that needs to be fixed", "Not recognizing that this is the norm for most well-run businesses", "Confusing terminal value as a percentage of DCF with the company's 'real' near-term value"]
+  },
+  {
+    "id": "dcf_024",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Discount rate for levered vs. unlevered FCF",
+    "question": "What discount rate do you use with unlevered free cash flow, and what discount rate do you use with levered free cash flow? Why?",
+    "model_answer": "Unlevered FCF is discounted at WACC because UFCF is available to all capital providers — debt, equity, and preferred — and WACC represents the blended required return across all of them. Levered FCF is discounted at the cost of equity because after interest and debt repayments have been made, the remaining cash flow belongs only to equity holders, and the cost of equity is the return those holders require. Mixing these pairings — for example, discounting UFCF at the cost of equity — would produce an incorrect valuation. The unlevered approach produces Enterprise Value; the levered approach produces equity value directly.",
+    "common_mistakes": ["Using WACC to discount levered FCF", "Using cost of equity to discount unlevered FCF", "Not understanding why the pairings can't be interchanged"]
+  },
+  {
+    "id": "dcf_025",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Mid-year convention",
+    "question": "What is the mid-year convention in a DCF, and why does it produce higher valuations than the end-of-year convention?",
+    "model_answer": "The mid-year convention assumes that cash flows are received evenly throughout the year rather than all at the end. Under the standard end-of-year convention, you use discount period factors of 1, 2, 3, 4, 5 for each year. Under the mid-year convention, you use 0.5, 1.5, 2.5, 3.5, 4.5, reflecting that on average you receive cash midway through each year. Since you're dividing by a smaller discount factor — for instance 1/(1+r)^0.5 rather than 1/(1+r)^1 — the present value of each year's cash flow is higher. This more accurately reflects reality, since a company's cash flows arrive continuously, not in a lump sum on December 31.",
+    "common_mistakes": ["Saying the mid-year convention is a more conservative approach", "Using period factors of 1, 2, 3 when the question explicitly involves the mid-year convention", "Forgetting to adjust the terminal value discount period under the mid-year convention"]
+  },
+  {
+    "id": "dcf_026",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Stub period definition",
+    "question": "What is a stub period in a DCF, and when would you use one?",
+    "model_answer": "A stub period is a partial year at the beginning of a DCF that occurs when the valuation date doesn't align with the start of the company's fiscal year. For example, if today is October 1 and the fiscal year ends December 31, there are three months remaining in the current fiscal year that need to be captured before the first full projected year begins. You would calculate FCF for that stub period — representing 0.25 of a year — and apply a discount period of 0.25. Subsequent full years are then discounted at 1.25, 2.25, 3.25, and so on. Without a stub period, you'd be ignoring real cash flows the company will generate in those remaining months.",
+    "common_mistakes": ["Skipping the stub and starting projections from the next full year", "Using 1.0 as the first discount period when there's a stub", "Incorrectly annualizing stub period FCF instead of using the partial year amount"]
+  },
+  {
+    "id": "dcf_027",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "DCF for negative FCF companies",
+    "question": "Can you run a DCF for a company with negative free cash flow in the near term? What happens?",
+    "model_answer": "Yes, you can still run a DCF when near-term FCF is negative — this is common for early-stage, high-growth, or capital-intensive companies. The negative near-term cash flows will reduce the present value of those years, but as long as the company is projected to eventually generate positive FCF, the terminal value can still be substantial and positive. The model remains valid as long as the company turns cash-flow positive at some point. However, if the company never turns cash-flow positive, the DCF will produce a negative Enterprise Value, which is a signal that the model may not be the right valuation framework or that the company is not a going concern.",
+    "common_mistakes": ["Saying the DCF is invalid if FCF is negative in any year", "Not recognizing that terminal value can still dominate even with early negative FCF", "Treating negative interim FCF as a cash inflow due to sign confusion"]
+  },
+  {
+    "id": "dcf_028",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "When not to use a DCF — banks",
+    "question": "Why is a standard DCF not appropriate for valuing a commercial bank?",
+    "model_answer": "Banks use debt — deposits and borrowings — as a raw material to create their products (loans), not as a financing choice separate from operations. This makes it impossible to cleanly separate operating cash flows from financing cash flows, which is the foundation of the UFCF approach. Additionally, interest income and interest expense are core revenue and cost items for banks, not peripheral financing flows you can strip out. CapEx is also minimal and unrelated to reinvestment in the way it is for industrial companies. For these reasons, banks are typically valued using a Dividend Discount Model or a Residual Income Model, which use equity-level metrics like net income and dividends.",
+    "common_mistakes": ["Saying you can use a DCF if you just add back all the interest items", "Not mentioning that debt is an operational input, not just a financing choice", "Confusing insurance companies with commercial banks in this context"]
+  },
+  {
+    "id": "dcf_029",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Dividend Discount Model mechanics",
+    "question": "How does the Dividend Discount Model work, and how is it different from a DCF?",
+    "model_answer": "The DDM values a company by discounting expected future dividends back to the present using the cost of equity. You project net income, apply an assumed dividend payout ratio to determine dividends per share for each year, and then discount those dividends at the cost of equity. The terminal value is typically based on a price-to-earnings or price-to-book multiple. The key differences from a standard DCF are that you use dividends instead of free cash flow, you use the cost of equity instead of WACC as the discount rate, and the output is equity value directly rather than enterprise value. This approach works best for companies that pay regular, predictable dividends — mature utilities, financial institutions, and regulated businesses.",
+    "common_mistakes": ["Using WACC instead of cost of equity to discount dividends", "Confusing the output as Enterprise Value rather than equity value", "Not knowing what to use as terminal value in the DDM"]
+  },
+  {
+    "id": "dcf_030",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Sensitivity analysis variables",
+    "question": "What are the most important variables to sensitize in a DCF, and why?",
+    "model_answer": "The most important sensitivity pairings are: WACC versus exit multiple or terminal growth rate, because both directly and dramatically affect both the FCF discount factors and the terminal value; and revenue growth versus EBITDA margin, because these drive the underlying cash flows. A standard DCF presentation includes at least one sensitivity table showing Enterprise Value or implied share price across a range of WACCs and exit multiples. Terminal value assumptions are particularly important to stress-test because terminal value typically represents the majority of total DCF value. Sensitizing these variables shows the range of outcomes and reveals how much the valuation depends on assumptions the analyst cannot control.",
+    "common_mistakes": ["Sensitizing only one variable at a time rather than doing two-way tables", "Not recognizing that the discount rate and terminal value assumptions have the largest individual impact", "Presenting sensitivity analysis as a sign that the base case is wrong rather than as standard practice"]
+  },
+  {
+    "id": "dcf_031",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Capital structure effect on WACC",
+    "question": "If a company takes on significantly more debt, what happens to its WACC?",
+    "model_answer": "The answer is ambiguous — it depends on how much debt is added and the company's starting capital structure. In theory, adding debt initially lowers WACC because debt is cheaper than equity on an after-tax basis, increasing the weight of the cheaper component. However, as debt increases, both the cost of debt and the cost of equity rise — lenders demand higher yields for the increased credit risk, and equity holders demand higher returns because their residual claim becomes riskier with more leverage. At extreme leverage levels, WACC will start rising. There is a theoretically optimal capital structure that minimizes WACC, but finding it precisely is not practical because these variables interact in a complex, nonlinear way.",
+    "common_mistakes": ["Saying WACC always decreases when you add debt", "Saying WACC always increases when you add debt", "Ignoring the impact of additional debt on the cost of equity"]
+  },
+  {
+    "id": "dcf_032",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "WACC for private companies",
+    "question": "How do you estimate WACC for a private company?",
+    "model_answer": "Estimating WACC for a private company is challenging because there's no observable market value of equity or traded stock price to calculate market-value weights, and no public beta. In practice, you estimate WACC based on the median WACC of comparable public companies, making adjustments for the private company's size and risk profile. For beta, you un-lever the betas of the public comps, take the median, and re-lever using the private company's target capital structure. For the equity premium, some practitioners also add a size premium to the CAPM cost of equity, since small private companies typically require higher returns. The debt component is estimated from credit market data for companies with similar credit characteristics.",
+    "common_mistakes": ["Using the private company's book value debt-to-equity ratio to re-lever beta", "Not adding a size premium when the private company is significantly smaller than its public comps", "Thinking you can't run a DCF for a private company at all"]
+  },
+  {
+    "id": "dcf_033",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Equity risk premium",
+    "question": "What is the equity risk premium and where does it come from?",
+    "model_answer": "The equity risk premium is the additional return that investors expect for holding equities over risk-free assets — it compensates investors for taking on the higher volatility and uncertainty of stock ownership. In CAPM, it's expressed as the expected return of the market minus the risk-free rate. In practice, practitioners typically pull ERP estimates from published sources such as Ibbotson's (now Duff & Phelps) or Damodaran's research, which calculate historical and implied premiums. The ERP typically ranges from 4% to 7% in the US depending on the methodology. It's a market-wide estimate, and company-specific risk is captured through beta.",
+    "common_mistakes": ["Confusing ERP with the total expected market return", "Thinking the ERP is a fixed number rather than an estimate with a range", "Forgetting that beta scales the ERP for each specific stock"]
+  },
+  {
+    "id": "dcf_034",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Cost of equity without CAPM",
+    "question": "How can you estimate cost of equity without using the CAPM formula?",
+    "model_answer": "An alternative to CAPM is the Dividend Growth Model, which sets cost of equity equal to dividends per share divided by share price, plus the expected growth rate of dividends. This is most applicable for companies with stable, predictable dividend payments, such as regulated utilities. Another approach is the Build-Up Method, which starts with the risk-free rate and adds various risk premiums — equity risk premium, size premium, and industry-specific premium — rather than multiplying by beta. These alternatives are used when beta is unreliable (private companies, insufficient trading history) or when the company's dividend policy makes the dividend-based approach more intuitive.",
+    "common_mistakes": ["Applying the Dividend Growth Model to companies that don't pay dividends", "Not knowing that the Build-Up Method exists as an alternative", "Confusing the expected growth rate of dividends with the company's revenue growth rate"]
+  },
+  {
+    "id": "dcf_035",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "What a high TV-to-total-value ratio signals",
+    "question": "A DCF shows that 92% of a company's Enterprise Value comes from the terminal value. What does this tell you?",
+    "model_answer": "While it's normal for terminal value to account for the majority of DCF value, 92% is extremely high and warrants scrutiny. This level of terminal value dependence suggests the near-term projected cash flows are small relative to the company's scale, which often happens with high-growth companies burning cash, companies with heavy near-term capex, or projection periods that are too short. It means the valuation is almost entirely driven by long-run assumptions — the exit multiple or growth rate — which are the hardest inputs to estimate with confidence. You should re-examine whether the projection period is appropriate and whether the terminal year is truly a normalized, steady-state year, and run wide sensitivity scenarios on the terminal value inputs.",
+    "common_mistakes": ["Treating 90%+ terminal value dependence as normal and not flagging it", "Not questioning whether Year 5 or Year 10 represents a normalized cash flow level", "Thinking you should artificially adjust assumptions to reduce TV percentage"]
+  },
+  {
+    "id": "dcf_036",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Money today vs. money tomorrow",
+    "question": "Why is a dollar received today worth more than a dollar received one year from now?",
+    "model_answer": "A dollar today can be invested immediately and earn a return, making it worth more than a dollar received in the future. This is the core principle of time value of money. If the discount rate is 10%, a dollar received one year from now is only worth $0.91 today — you'd only pay $0.91 today to receive a guaranteed $1.00 in one year at a 10% required return. Additionally, future cash flows carry uncertainty — the further out they are, the more they may be eroded by inflation, default risk, or opportunity cost. This is why DCF discounts future cash flows back to their present value.",
+    "common_mistakes": ["Citing only inflation without mentioning opportunity cost or required return", "Not being able to calculate the present value formula: PV = FV / (1 + r)^n", "Confusing nominal and real cash flows in the discount rate discussion"]
+  },
+  {
+    "id": "dcf_037",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Net income vs. FCF for mature companies",
+    "question": "A company has net income of $100M and free cash flow of $40M. Why might there be such a large difference?",
+    "model_answer": "The gap between net income and free cash flow can be explained by several adjustments. First, capex — if the company is spending heavily on property, plant, and equipment to maintain or grow its asset base, this reduces FCF but doesn't flow through the income statement. Second, working capital changes — if receivables or inventory are building up as the business grows, cash is being consumed that doesn't reduce net income. Third, amortization of intangibles or goodwill may inflate net income relative to cash earnings. Conversely, D&A and other non-cash charges in net income are added back in FCF. A $60M gap often signals a capital-intensive business or a company in a growth phase requiring significant working capital investment.",
+    "common_mistakes": ["Assuming high capex is the only explanation", "Forgetting working capital consumption as a major driver of the gap", "Not recognizing that this gap is common and expected for capital-intensive companies"]
+  },
+  {
+    "id": "dcf_038",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "EBIT vs. EBITDA as FCF starting point",
+    "question": "Should you start with EBIT or EBITDA when building free cash flow, and why does it matter?",
+    "model_answer": "The correct starting point for UFCF is EBIT, not EBITDA. When you apply the tax rate to EBIT — computing NOPAT — you are correctly computing taxes on earnings after depreciation and amortization, capturing the tax shield that D&A provides. You then add back D&A as a non-cash charge to get to cash operating earnings. If you started from EBITDA and multiplied by (1 - tax rate), you would overstate taxes because you'd be ignoring the D&A tax deduction. Some practitioners use a shorthand of EBITDA less taxes on EBIT, which arrives at the same result, but using EBIT * (1 - t) is the cleanest approach.",
+    "common_mistakes": ["Using EBITDA * (1 - tax rate) as a shortcut, which double-counts the D&A tax shield", "Not being able to explain why the order of operations matters for taxes", "Thinking EBITDA is acceptable as a starting point for any quick approximation"]
+  },
+  {
+    "id": "dcf_039",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Capex in FCF",
+    "question": "Why do you subtract capital expenditures when calculating unlevered free cash flow?",
+    "model_answer": "Capital expenditures represent real cash outflows for investments in fixed assets — property, plant, and equipment — that are necessary for the business to maintain or grow its operations. Unlike operating expenses, capex is capitalized on the balance sheet and depreciated over time, so it doesn't directly hit the income statement in the year it's spent. If you didn't subtract capex, you'd be overstating the cash available to the business's capital providers, because the company needs to spend that money to keep the assets productive. Capex includes both maintenance capex (required to maintain current capacity) and growth capex (required to expand), and both are legitimate cash uses.",
+    "common_mistakes": ["Confusing capex with D&A — they are related but not the same", "Forgetting capex entirely in a quick FCF calculation", "Not distinguishing between maintenance and growth capex when analyzing a company's reinvestment needs"]
+  },
+  {
+    "id": "dcf_040",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "DCF for cyclical companies",
+    "question": "How should you adjust your DCF approach when valuing a cyclical company?",
+    "model_answer": "For cyclical companies — such as chemicals, mining, or semiconductors — near-term margins and revenues can be at the top or bottom of the cycle, which would make projections misleadingly high or low. The key adjustment is to use normalized, mid-cycle financial metrics as the basis for projections rather than the most recent peak or trough figures. You should consider extending the projection period to 10 years or more to capture a full cycle. For terminal value, the Gordon Growth Model may be more appropriate than an exit multiple if current industry multiples are distorted by cycle positioning. Sensitivity analysis on margin assumptions is particularly important for these companies.",
+    "common_mistakes": ["Using current-peak margins as the starting point without normalizing", "Not adjusting the projection period for the full cycle", "Using exit multiples without checking whether current multiples are at cycle highs or lows"]
+  },
+  {
+    "id": "dcf_041",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Preferred stock in WACC",
+    "question": "How do you incorporate preferred stock into the WACC formula?",
+    "model_answer": "Preferred stock is included as a separate component in WACC, alongside debt and equity. The cost of preferred stock is typically the preferred dividend yield — the annual dividend divided by the preferred stock's market value or liquidation value. Unlike debt, preferred dividends are not tax-deductible, so there is no tax shield adjustment — you use the pre-tax cost directly in the WACC formula. The weight assigned to preferred stock is its market value as a proportion of total capital. Because preferred dividends are not deductible, preferred stock is effectively more expensive than debt on an after-tax basis.",
+    "common_mistakes": ["Applying a tax shield to the cost of preferred stock as if it were debt", "Forgetting to include preferred stock in WACC entirely", "Using book value of preferred stock instead of market or liquidation value"]
+  },
+  {
+    "id": "dcf_042",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Cross-checking TV methods",
+    "question": "How do you cross-check whether your exit multiple and Gordon Growth Model terminal value assumptions are consistent?",
+    "model_answer": "The standard cross-check is to calculate terminal value using one method, then back into the implied assumption for the other method. For example, if you compute terminal value using a Gordon Growth rate of 3%, divide that terminal value by your final year EBITDA to get the implied exit multiple. If that implied multiple is 20x while your public comps trade at 8x, your growth rate assumption is too aggressive. Conversely, if you use an 8x exit multiple, you can back into the implied perpetuity growth rate — if it comes out at 8%, that's well above long-run GDP growth and should be questioned. Both methods should produce plausible implied assumptions for the other.",
+    "common_mistakes": ["Not performing any cross-check between the two methods", "Using the cross-check to precisely match the two methods instead of using it as a sanity check", "Forgetting to discount the terminal value before comparing to total enterprise value"]
+  },
+  {
+    "id": "dcf_043",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Present value of FCFs vs. terminal value",
+    "question": "In a typical DCF, which is larger: the present value of the projection-period free cash flows or the present value of the terminal value?",
+    "model_answer": "In the vast majority of DCFs, the present value of the terminal value is larger — often representing 60-80% of total Enterprise Value. This is because the terminal value captures all cash flows from the end of the projection period into perpetuity, while the near-term cash flows represent only 5-10 years. Even with discounting, the scale and duration of the terminal period overwhelm the finite projection period. The ratio varies by company type: high-growth companies with near-term cash burn will have even higher TV dependence, while mature companies generating substantial near-term cash flows will have a slightly higher share from the projection period.",
+    "common_mistakes": ["Saying the projection-period FCFs are larger for profitable companies", "Not knowing the typical 60-80% range for terminal value contribution", "Thinking equal weighting is the target or norm"]
+  },
+  {
+    "id": "dcf_044",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Noncontrolling interests in DCF",
+    "question": "How do noncontrolling interests affect the Enterprise Value to equity value bridge in a DCF?",
+    "model_answer": "Noncontrolling interests represent the minority ownership stake in a subsidiary that is not owned by the parent company. Because the parent consolidates 100% of the subsidiary's results into its financials but doesn't own 100% of the equity, the minority shareholders have a claim on some of that equity value. In the bridge from Enterprise Value to equity value, you subtract noncontrolling interests — just as you subtract debt — because those minority shareholders have a prior claim on a portion of the consolidated entity's equity value. Failing to subtract NCI would overstate the equity value attributable to the parent's common shareholders.",
+    "common_mistakes": ["Forgetting to subtract NCI in the EV-to-equity bridge", "Adding NCI instead of subtracting it", "Confusing NCI in the bridge with how NCI flows through the income statement and FCF calculation"]
+  },
+  {
+    "id": "dcf_045",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Operating lease adjustments",
+    "question": "How do operating leases factor into a DCF analysis?",
+    "model_answer": "Under ASC 842 and IFRS 16, operating leases are capitalized on the balance sheet as right-of-use assets and lease liabilities. For DCF purposes, if you're including operating lease liabilities in the Enterprise Value bridge — treating them as debt-like — you must also adjust EBITDA and FCF to add back rent expense and replace it with the depreciation of the ROU asset and interest on the lease liability. If you treat operating leases as operating expenses (the older approach), then rent flows through as an operating cost reducing FCF and you don't capitalize the liability. Consistency between the income statement treatment and the balance sheet bridge treatment is critical — you can't double-count the lease cost.",
+    "common_mistakes": ["Not adjusting FCF when capitalizing operating lease liabilities", "Treating all companies the same regardless of whether they adopted ASC 842", "Double-counting rent expense both in FCF and in the debt-like adjustment"]
+  },
+  {
+    "id": "dcf_046",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Size and industry premiums in cost of equity",
+    "question": "What are size and industry premiums in the context of cost of equity, and when do you add them?",
+    "model_answer": "Size and industry premiums are additional return adjustments added to the basic CAPM cost of equity to capture risks not fully reflected in beta. The size premium recognizes that smaller companies — particularly micro-cap and small-cap stocks — historically generate higher returns than large-caps, reflecting their greater illiquidity and business risk. The industry premium captures sector-specific risk that may be systematic but not fully captured by the market beta. These premiums are sourced from databases like Duff & Phelps. You add them when valuing smaller companies, private companies, or companies in industries with known structural risks, and especially when the comps used to estimate beta are much larger than the target.",
+    "common_mistakes": ["Applying size premiums to large-cap companies without justification", "Not knowing where to source size premium data", "Adding industry premiums on top of beta without considering double-counting the industry risk"]
+  },
+  {
+    "id": "dcf_047",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Excess cash adjustment",
+    "question": "How should excess cash on a company's balance sheet be handled in a DCF?",
+    "model_answer": "In a standard DCF, you calculate Enterprise Value and then add all cash to bridge to equity value. However, if a company holds significantly more cash than it needs for operations, that excess cash is not contributing to operating free cash flow — it's earning minimal returns in money market accounts and not being deployed productively. When you bridge from EV to equity value, you simply add total cash, which already captures this. The nuance arises when you're assessing whether management will deploy that cash productively or return it to shareholders. In a financial model, the key is consistency: don't include interest income from excess cash in your UFCF projections, since excess cash is already captured as a balance sheet item in the equity bridge.",
+    "common_mistakes": ["Including interest income from excess cash in UFCF while also adding all cash in the equity bridge, double-counting the benefit", "Not distinguishing between operating cash (needed to run the business) and excess cash", "Forgetting to add back cash when bridging from EV to equity value"]
+  },
+  {
+    "id": "dcf_048",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "DCF sensitivity to discount rate",
+    "question": "Why is the discount rate considered the most sensitive variable in a DCF?",
+    "model_answer": "The discount rate appears in the denominator of every single cash flow's present value calculation, affecting both the projection-period FCFs and the terminal value. Even a small change — for example, moving from 9% to 10% WACC — compresses every year's discounted cash flow and simultaneously reduces the terminal value in two ways: it increases the denominator in the Gordon Growth formula and increases the discount factor applied to the terminal value. Because terminal value often represents 60-80% of total DCF value, the compounding effect of a higher discount rate on terminal value is enormous. A 1% change in WACC can easily shift Enterprise Value by 15-25% or more.",
+    "common_mistakes": ["Thinking revenue growth is more impactful than WACC for a typical company", "Not recognizing that WACC affects the terminal value as well as the projection-period FCFs", "Underestimating the magnitude of the impact — candidates often say it's important but can't quantify it"]
+  },
+  {
+    "id": "dcf_049",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Unlevered FCF to firm formula",
+    "question": "Write out three different formulas for calculating unlevered free cash flow.",
+    "model_answer": "The three common formulations are: (1) EBIT × (1 − tax rate) + D&A + other non-cash charges − change in NWC − capex; (2) EBITDA − taxes on EBIT − change in NWC − capex, which is equivalent because D&A drops out; and (3) Cash Flow from Operations + tax-adjusted net interest expense − capex, which starts from the cash flow statement and adds back the after-tax interest that was deducted in arriving at net income. All three should produce the same UFCF figure if applied consistently. The first formula is most commonly used in DCF models built from scratch; the third is useful when you start from a reported cash flow statement.",
+    "common_mistakes": ["Using net income instead of EBIT as the starting point in formula (1)", "Not tax-adjusting the interest add-back in formula (3)", "Treating all three as fundamentally different rather than algebraically equivalent"]
+  },
+  {
+    "id": "dcf_050",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Levered FCF formula",
+    "question": "How do you calculate levered free cash flow, and what does it represent?",
+    "model_answer": "Levered free cash flow equals net income plus non-cash charges minus changes in net working capital minus capex minus mandatory debt repayments. You can also derive it as UFCF minus after-tax net interest expense minus mandatory debt repayments. It represents the cash flow available to equity holders after all obligations to debt providers have been met — interest payments have reduced net income, and mandatory principal repayments are subtracted at the end. Because LFCF is after debt service, you discount it at the cost of equity to get equity value directly, without going through Enterprise Value first.",
+    "common_mistakes": ["Forgetting to subtract mandatory debt repayments — optional prepayments should not be included", "Using the pre-tax interest expense rather than starting from net income (which already reflects after-tax interest)", "Confusing LFCF output with Enterprise Value rather than equity value"]
+  },
+  {
+    "id": "dcf_051",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Beta un-levering and re-levering math",
+    "question": "Company A has a levered beta of 1.4, a debt-to-equity ratio of 0.6, and a tax rate of 25%. What is its unlevered beta?",
+    "model_answer": "Use the un-levering formula: Unlevered Beta = Levered Beta / (1 + (1 - Tax Rate) × (Debt / Equity)). Plugging in: Unlevered Beta = 1.4 / (1 + (1 - 0.25) × 0.6) = 1.4 / (1 + 0.45) = 1.4 / 1.45 ≈ 0.97. This unlevered beta of 0.97 represents the business risk of the company independent of how it's financed. If you now wanted to re-lever this beta at a different capital structure, you would multiply 0.97 by (1 + (1 - tax rate) × new D/E ratio).",
+    "common_mistakes": ["Using total debt divided by total capital instead of debt divided by equity in the ratio", "Forgetting to apply (1 - tax rate) to the D/E ratio", "Stopping at unlevered beta without being able to explain how to re-lever it"]
+  },
+  {
+    "id": "dcf_052",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Gordon Growth Model calculation",
+    "question": "A company generates $80M of free cash flow in its final projected year. You expect long-term FCF growth of 2.5% annually, and the WACC is 9%. What is the terminal value, and what is its present value if you're discounting back 5 years?",
+    "model_answer": "Terminal Value = FCF × (1 + g) / (WACC - g) = $80M × 1.025 / (0.09 - 0.025) = $82M / 0.065 = approximately $1,261.5M. To find the present value, discount back 5 years at 9%: PV = $1,261.5M / (1.09)^5 = $1,261.5M / 1.5386 ≈ $819.9M. This present value of roughly $820M would be added to the sum of the present values of the 5-year projection period FCFs to arrive at Enterprise Value.",
+    "common_mistakes": ["Forgetting to multiply by (1 + g) in the numerator — using raw $80M instead of $82M", "Not discounting the terminal value back to today", "Using the wrong exponent — discounting back 4 years instead of 5"]
+  },
+  {
+    "id": "dcf_053",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "WACC calculation with numbers",
+    "question": "A company has a capital structure of 60% equity and 40% debt (at market value). The cost of equity is 11%, the pre-tax cost of debt is 6%, and the tax rate is 30%. What is the WACC?",
+    "model_answer": "WACC = (Cost of Equity × % Equity) + (Pre-tax Cost of Debt × (1 - Tax Rate) × % Debt). Plugging in: WACC = (0.11 × 0.60) + (0.06 × 0.70 × 0.40) = 0.066 + 0.0168 = 0.0828, or approximately 8.3%. The debt component benefits from the tax shield — the effective after-tax cost of debt is 4.2% (6% × 0.70), substantially cheaper than the 11% cost of equity. This is why a company with 40% debt has a meaningfully lower WACC than an all-equity company, which would have a WACC of 11%.",
+    "common_mistakes": ["Forgetting to apply (1 - tax rate) to the cost of debt", "Using book value weights instead of the stated market value weights", "Calculating WACC as a simple average of debt and equity costs without applying weights"]
+  },
+  {
+    "id": "dcf_054",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Cost of equity calculation with numbers",
+    "question": "The risk-free rate is 4%, the equity risk premium is 5.5%, and a company's relevered beta is 1.2. What is the cost of equity? What would happen to WACC if the company took on more debt and its relevered beta increased to 1.5?",
+    "model_answer": "Cost of Equity = Risk-Free Rate + Beta × ERP = 4% + 1.2 × 5.5% = 4% + 6.6% = 10.6%. If the company takes on more debt and beta increases to 1.5, the new cost of equity = 4% + 1.5 × 5.5% = 4% + 8.25% = 12.25%. The impact on WACC is twofold and competing: on one hand, more debt lowers WACC because debt is cheaper; on the other hand, the higher cost of equity and potentially higher cost of debt partially offset that. Whether WACC rises or falls depends on the specific capital structure change and the magnitude of each effect. At modest leverage increases, WACC typically falls; at high leverage, it rises.",
+    "common_mistakes": ["Saying WACC unambiguously decreases when debt increases", "Not recognizing that more debt also raises the cost of equity through beta", "Using the equity risk premium as the total cost of equity rather than just the premium over the risk-free rate"]
+  },
+  {
+    "id": "dcf_055",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Implied share price from DCF",
+    "question": "A DCF produces an Enterprise Value of $2,400M. The company has $300M in cash, $600M in debt, and $50M of noncontrolling interests. There are 150M diluted shares outstanding. What is the implied share price?",
+    "model_answer": "Equity Value = Enterprise Value + Cash - Debt - Noncontrolling Interests = $2,400M + $300M - $600M - $50M = $2,050M. Implied Share Price = Equity Value / Diluted Shares = $2,050M / 150M = $13.67 per share. The key steps are to add back cash (a non-operating asset not included in EV) and subtract all claims senior to or alongside common equity, including debt, preferred stock if any, and noncontrolling interests. Using diluted shares ensures all in-the-money options and convertible securities are reflected.",
+    "common_mistakes": ["Subtracting cash instead of adding it", "Forgetting to subtract noncontrolling interests", "Using basic shares outstanding instead of fully diluted shares"]
+  },
+  {
+    "id": "dcf_056",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Effect of revenue growth change on DCF",
+    "question": "A DCF uses 10% annual revenue growth and a 9% WACC. If you reduce revenue growth to 8%, all else equal, what happens to Enterprise Value and in which direction?",
+    "model_answer": "Reducing revenue growth from 10% to 8% will decrease Enterprise Value through two channels. First, lower revenue growth directly reduces EBITDA and therefore UFCF in each projection year, decreasing the PV of the projection-period cash flows. Second, since exit multiple terminal value is applied to final year EBITDA, a lower growth trajectory means a smaller final-year EBITDA base, which mechanically reduces terminal value. The compounding effect means the total EV reduction will be larger than a simple 2% reduction in cash flows might suggest. The magnitude depends on margins, the projection period, and how much of EV comes from terminal value versus near-term FCFs.",
+    "common_mistakes": ["Only identifying the impact on near-term FCFs without mentioning the terminal value impact", "Saying the impact is exactly 2% of EV", "Not recognizing that growth affects EBITDA margins and cash conversion as well as the top line"]
+  },
+  {
+    "id": "dcf_057",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Mid-year convention with stub period math",
+    "question": "You're valuing a company on September 30. Its fiscal year ends December 31. The company generates $20M of FCF in Q4, and $100M in each subsequent full year. Using a WACC of 10% and the mid-year convention, what discount periods would you use?",
+    "model_answer": "The stub period covers Q4 (0.25 years), so the discount period for the stub is 0.25 / 2 = 0.125. For Year 1 (the first full year), the mid-year convention means you're receiving cash at the midpoint of Year 1, but you must also add the 0.25 years of the stub: 0.25 + 0.5 = 0.75. For Year 2: 0.25 + 1.5 = 1.75. For Year 3: 0.25 + 2.5 = 2.75, and so on. The discount factor for the stub is 1/(1.10)^0.125 ≈ 0.988. For Year 1: 1/(1.10)^0.75 ≈ 0.930. This correctly accounts for both the timing of cash receipt within each year and the partial-year delay before the first full projection year begins.",
+    "common_mistakes": ["Simply halving all discount periods without accounting for the stub", "Using 0.25 as the Year 1 mid-year factor instead of 0.75", "Forgetting to add the stub length to all subsequent mid-year periods"]
+  },
+  {
+    "id": "dcf_058",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Discount rate vs. growth rate sensitivity",
+    "question": "A DCF uses a 10% WACC and 3% terminal growth rate. You're deciding between two adjustments: (A) reduce WACC to 9%, or (B) increase terminal growth rate to 4%. Which change has a larger impact on terminal value, and why?",
+    "model_answer": "Both changes affect the Gordon Growth Model denominator: (WACC - g). Original denominator: 10% - 3% = 7%. Change A (9% WACC): denominator = 9% - 3% = 6%, a 14% decrease in the denominator, increasing terminal value by roughly 16.7% (7/6 - 1). Change B (4% growth): denominator = 10% - 4% = 6%, also a 14% decrease in the denominator with a nearly identical impact — but note that Change B also increases the numerator via (1 + g), compounding the effect slightly. In this specific case the impacts are nearly identical in percentage terms on the denominator, but Change B is marginally larger because it also raises the numerator. Generally, WACC changes tend to dominate because WACC also affects the discounting of projection-period FCFs, not just the terminal value.",
+    "common_mistakes": ["Saying WACC always has a larger impact without analyzing the math", "Not recognizing that the denominator (WACC - g) is what matters for terminal value sensitivity", "Ignoring that WACC affects both FCF discounting and terminal value while g only affects terminal value"]
+  },
+  {
+    "id": "dcf_059",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Unlevered vs. levered DCF equity value difference",
+    "question": "You run two DCFs on the same company: one using unlevered FCF discounted at WACC, and one using levered FCF discounted at cost of equity. Will they produce the same equity value?",
+    "model_answer": "In theory, under perfectly matched assumptions, both approaches should yield the same equity value. In practice, they almost never do. The unlevered DCF produces Enterprise Value; you then subtract net debt (and other claims) to get equity value using a fixed, static balance sheet bridge. The levered DCF builds debt repayments and interest expense directly into each year's FCF, so the equity value is affected by the specific repayment schedule and interest rate. As debt is repaid, the capital structure shifts over time, changing the theoretical WACC year by year — but in the levered model, you're using a constant cost of equity as the discount rate. These inconsistencies make it essentially impossible to perfectly reconcile the two methods for the same company.",
+    "common_mistakes": ["Saying the two methods always produce the same result", "Not recognizing that the levered approach embeds debt terms into the cash flows", "Forgetting that the static balance sheet bridge in the unlevered approach doesn't capture debt paydown during the projection period"]
+  },
+  {
+    "id": "dcf_060",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "FCF increase and EV increase",
+    "question": "If a company's Year 3 free cash flow increases by $50M due to a one-time working capital release, by how much will its Enterprise Value change?",
+    "model_answer": "The Enterprise Value increase will be less than $50M because you must discount the $50M back three years to present value. Using a 10% WACC as an example: PV = $50M / (1.10)^3 = $50M / 1.331 ≈ $37.6M. Critically, however, this is a one-time event — the working capital has been released and that cash is gone from future periods. If anything, releasing working capital now may slightly reduce future FCFs if that inventory or receivables base is rebuilt. The terminal value is unaffected because it's based on the normalized FCF in the terminal year, not on a one-time event in Year 3. So the EV increase equals the present value of the $50M, roughly $37-40M depending on the exact discount rate and timing.",
+    "common_mistakes": ["Saying EV increases by exactly $50M without discounting", "Not recognizing that a one-time event doesn't affect terminal value", "Thinking the working capital release permanently boosts FCF for all future years"]
+  },
+  {
+    "id": "dcf_061",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Impact of depreciation on FCF",
+    "question": "A company increases its annual depreciation expense by $20M due to new asset purchases. All else equal, what is the impact on unlevered free cash flow?",
+    "model_answer": "The net impact is a modest increase in UFCF equal to the tax shield on the additional depreciation: $20M × tax rate. At a 25% tax rate, UFCF increases by $5M. Here's why: the $20M higher D&A reduces EBIT by $20M. After multiplying by (1 - 25%), NOPAT decreases by $15M. But you then add back the $20M of D&A as a non-cash charge, resulting in a net positive impact of $5M. The tax shield of $5M is real — it reduces cash taxes paid. If there were no taxes, the D&A add-back would exactly offset the EBIT reduction and UFCF would be unchanged. The capex that caused the new depreciation is already reflected as a separate outflow.",
+    "common_mistakes": ["Saying the $20M increase in D&A has no impact on FCF because it's non-cash", "Saying FCF increases by the full $20M rather than the tax shield amount", "Confusing the timing — the capex outflow already happened; the depreciation is just the amortization of that investment"]
+  },
+  {
+    "id": "dcf_062",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Sensitivity table construction",
+    "question": "You're presenting a DCF to a client and need to build a sensitivity table. What two variables would you choose and why, and what output would the table show?",
+    "model_answer": "The most informative sensitivity table for a standard DCF pairs WACC (rows) against exit multiple or terminal growth rate (columns), with Enterprise Value or implied share price as the output. WACC and the terminal value assumption are the two variables that have the largest combined impact on DCF value and both carry meaningful uncertainty. An alternative is to pair revenue growth rate with EBITDA margin, which shows how operating performance assumptions affect value. The table should show a 3×5 or 5×5 grid centered on the base-case assumptions, with a range wide enough to encompass plausible bull and bear scenarios. The output is typically Enterprise Value in absolute dollars or implied share price.",
+    "common_mistakes": ["Building only a one-way sensitivity rather than a two-way table", "Not centering the table on the base case", "Choosing variables that aren't truly independent — for example, WACC and cost of equity are highly correlated"]
+  },
+  {
+    "id": "dcf_063",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Impact of debt repayment on levered DCF",
+    "question": "A company has $500M in debt at a 6% interest rate and repays $100M of principal each year. Using a levered FCF approach, what happens to the levered FCF and implied equity value over time?",
+    "model_answer": "Each year, as $100M of debt is repaid, levered FCF is reduced by $100M plus the interest saving from having $100M less debt. In Year 1, the mandatory repayment reduces levered FCF by $100M. The interest savings grow over time as the debt balance declines — in Year 2, interest on the remaining $400M is $24M instead of $30M on $500M, saving $6M of after-tax interest. The principal repayments far exceed the interest savings, so LFCF will be lower each year due to the repayments. However, at the end of the projection period, the company has much less debt, making the equity value bridge more favorable. Paradoxically, from a pure present value standpoint, deferring debt repayment maximizes levered FCF and equity value — faster repayment accelerates cash outflows that could have been held or distributed.",
+    "common_mistakes": ["Ignoring that mandatory repayments reduce levered FCF dollar for dollar", "Thinking faster debt repayment increases equity value in a DCF", "Forgetting to adjust interest expense as the debt balance decreases"]
+  },
+  {
+    "id": "dcf_064",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Two-company FCF timing comparison",
+    "question": "Company X generates $200M total FCF over five years but earns 80% in Year 1 and 5% per year in Years 2-5. Company Y generates $200M total FCF evenly at $40M per year. Both have a WACC of 10%. Which has a higher Enterprise Value from operations, and roughly by how much?",
+    "model_answer": "Company X has a higher Enterprise Value because it receives cash earlier, and earlier cash flows have higher present value. Company X's Year 1 FCF is $160M, discounted to $160M/1.10 = $145.5M; the remaining $10M per year over Years 2-5 is discounted at (1.10)^2 through (1.10)^5. Summing: $145.5M + $8.3M + $7.5M + $6.8M + $6.2M = approximately $174.3M. Company Y's PV: $40M discounted at years 1-5 sums to approximately $40M × 3.791 (5-year annuity factor at 10%) = $151.6M. Company X is worth roughly $22-23M more than Company Y from the projection period, despite identical total nominal cash flows.",
+    "common_mistakes": ["Saying both companies have the same value because total FCF is the same", "Not being able to roughly estimate the PV of each pattern", "Forgetting that this only covers the projection period — terminal value would also need to be added"]
+  },
+  {
+    "id": "dcf_065",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Capex increase impact on DCF",
+    "question": "A company is planning to spend an additional $300M on a new factory in Year 3, above and beyond its normal maintenance capex. How would you reflect this in the DCF, and what is the approximate impact on Enterprise Value if WACC is 10%?",
+    "model_answer": "You would add $300M of additional capex in Year 3, which reduces UFCF in Year 3 by $300M. The present value impact equals $300M / (1.10)^3 = $300M / 1.331 ≈ $225.4M reduction in Enterprise Value from the projection period. If the factory generates incremental revenue and EBITDA from Year 4 onward, those benefits would appear in subsequent FCFs and in a higher terminal year EBITDA — potentially more than offsetting the $225M PV cost. If the question asks for the isolated impact of just the capex outflow without the incremental revenue benefit, Enterprise Value decreases by approximately $225M. If the new assets are depreciable, the D&A from Year 4 onward will also create a modest tax shield benefit.",
+    "common_mistakes": ["Saying EV decreases by the full $300M without discounting", "Forgetting that the capex may generate future FCF benefits that increase terminal value", "Including the factory's incremental depreciation in terminal year FCF without also including the revenue it generates"]
+  },
+  {
+    "id": "dcf_066",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "NOL treatment in DCF",
+    "question": "A company has $400M in net operating loss carryforwards. How do you incorporate this into a DCF?",
+    "model_answer": "NOLs create future tax benefits by shielding taxable income in future years. In a DCF, you model this by reducing cash taxes in the years when the NOLs are utilized. If the company becomes profitable, it can apply the NOLs to offset taxable income until they are exhausted, meaning it pays little or no cash taxes in those early profitable years. Practically, you model an effective tax rate of 0% (or close to it) in the years the NOL is being consumed, then transition to the full statutory rate once it's exhausted. The benefit shows up as higher UFCF in the early profitable years. You should also verify any time limits on NOL carryforward under applicable tax rules, and consider whether a Section 382 limitation applies if there's been an ownership change.",
+    "common_mistakes": ["Ignoring NOLs entirely and modeling the full tax rate from Year 1", "Discounting the NOLs as a separate line item rather than embedding them in the FCF tax line", "Not knowing that Section 382 can limit NOL usage after a change of control"]
+  },
+  {
+    "id": "dcf_067",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "WACC components during a financial crisis",
+    "question": "During a financial crisis, what happens to each component of WACC? Does WACC increase or decrease, and why?",
+    "model_answer": "Breaking down each component: the risk-free rate falls as central banks cut interest rates. But the equity risk premium rises sharply as investors demand more compensation for uncertainty. Beta rises due to market volatility and increased covariance between individual stocks and the market. Net result: cost of equity increases substantially because the ERP and beta increases outweigh the risk-free rate decline. The cost of debt rises as credit spreads widen and lenders demand higher rates for perceived default risk. The debt-to-equity ratio increases mechanically as equity values fall while debt balances remain relatively fixed. Since all cost components rise and the weighting shifts toward debt (which is now more expensive), WACC almost certainly increases during a crisis — consistent with the observation that companies became less valuable as the market discounted future cash flows more aggressively.",
+    "common_mistakes": ["Saying WACC decreases because the risk-free rate falls", "Not recognizing that the ERP and beta increases more than offset the rate decrease", "Forgetting that credit spreads widen during crises, raising the cost of debt"]
+  },
+  {
+    "id": "dcf_068",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Convertible debt in DCF equity bridge",
+    "question": "A company has $200M of convertible notes that are in-the-money. How do you handle these in the Enterprise Value to equity value bridge?",
+    "model_answer": "In-the-money convertible notes are treated as equity, not debt, in the bridge. Rather than subtracting $200M as debt, you assume the convertible holders will convert to shares — so you include the diluted shares from conversion in your fully diluted share count (typically using the if-converted method or treasury stock method). The $200M of notes is not subtracted in the bridge because those holders are already captured as equity owners. If convertibles were out-of-the-money, you'd treat them as debt: subtract the face value (or market value) from Enterprise Value just like other debt. Getting this wrong is a common equity value bridge error.",
+    "common_mistakes": ["Subtracting in-the-money convertibles as debt while also including the conversion shares in diluted count, double-counting the dilution", "Not including the conversion shares in diluted share count for in-the-money convertibles", "Treating all convertibles the same regardless of whether they're in- or out-of-the-money"]
+  },
+  {
+    "id": "dcf_069",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "DCF for a company with no comparable comps",
+    "question": "You're running a DCF for a company in a niche industry with no close public comparables. What challenges does this create and how do you address them?",
+    "model_answer": "Without comparable companies, you face three key challenges. First, you can't estimate beta using the standard un-lever/re-lever methodology — instead, you might use a broader industry group, even if imperfect, or use a Build-Up Method for cost of equity with judgment-based premiums. Second, the Exit Multiple Method for terminal value becomes unreliable because there are no meaningful comps multiples — the Gordon Growth Method becomes the preferred approach even though it requires its own assumptions. Third, WACC can't be benchmarked against comparable capital structures. Solutions include using the closest available comps with adjustments, relying more heavily on growth rate assumptions in the Gordon Growth Model, running very wide sensitivity ranges, and cross-checking against whatever transaction multiples might be available even if sparse.",
+    "common_mistakes": ["Saying you simply can't run a DCF without comps", "Not recognizing that the Gordon Growth Method is the fallback when comps don't exist", "Using completely unrelated industry betas without any adjustment or disclosure of the limitation"]
+  },
+  {
+    "id": "dcf_070",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Optimal capital structure",
+    "question": "What is the optimal capital structure, and why can't you determine it precisely with a formula?",
+    "model_answer": "The optimal capital structure is the mix of debt and equity that minimizes WACC, thereby maximizing enterprise value. Since debt is cheaper than equity (lower after-tax cost due to the tax shield and seniority), you might naively conclude 100% debt is optimal — but that ignores the fact that more debt raises both the cost of debt (lenders demand higher rates) and the cost of equity (equity becomes riskier with higher leverage). These two effects create an optimum somewhere in the middle. You can't solve for it precisely because the cost of equity and cost of debt are nonlinear functions of leverage, they interact with each other, and the actual relationships are empirically estimated rather than derived from a clean formula. In practice, companies look at comparable capital structures and run scenario analyses.",
+    "common_mistakes": ["Saying the optimal structure is always the one with the most debt", "Saying you can find the exact optimum using the WACC formula", "Not recognizing that more debt raises the cost of equity through beta"]
+  },
+  {
+    "id": "dcf_071",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Positive beta with counter-cyclical company",
+    "question": "A company describes itself as 'counter-cyclical' because its revenues tend to hold up during recessions. Would you expect its beta to be negative? Why or why not?",
+    "model_answer": "No — counter-cyclical companies still have positive betas in practice, just lower ones. A beta of 0.4 or 0.6 is typical for a defensive company like a consumer staples or utilities firm. True negative beta (where the stock price rises when the market falls, like gold) is extremely rare among operating companies. A defensive company's revenues hold up better than average, but it still declines along with the broad market during severe downturns — it just declines less. Beta measures correlation with market returns, not revenue volatility. Even in recessions, consumer staples companies' stock prices fall; they just fall less. Negative beta would imply the stock increases in value as markets decline, which is almost never true for actual businesses.",
+    "common_mistakes": ["Saying the company should have a negative beta because its revenue is defensive", "Confusing low beta with negative beta", "Not being able to give examples of typical beta ranges for defensive sectors"]
+  },
+  {
+    "id": "dcf_072",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "DCF for an oil and gas E&P company",
+    "question": "Why is a standard DCF generally not the preferred valuation method for an oil and gas exploration and production company?",
+    "model_answer": "E&P companies face several characteristics that make standard DCF impractical. First, their revenues are directly tied to commodity prices, which are notoriously volatile and unpredictable — making 5-10 year revenue projections highly uncertain. Second, capex requirements are enormous and front-loaded, often depressing FCF to near zero or negative for extended periods. Third, reserves — not cash flows — are the fundamental value driver; as the company produces oil, it depletes its asset base. For these reasons, the industry prefers a Net Asset Value (NAV) analysis, which values proved reserves by discounting the future production stream at a standardized rate and netting out development costs. This asset-based approach better captures the value of the reserve portfolio.",
+    "common_mistakes": ["Saying a DCF can work fine for E&P if you just project conservatively", "Not knowing what NAV analysis is or how it differs from a DCF", "Forgetting that reserve depletion means E&P value is fundamentally asset-based, not going-concern cash-flow based"]
+  },
+  {
+    "id": "dcf_073",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Emerging market DCF adjustment",
+    "question": "How does valuing a company in an emerging market differ from a standard DCF, and what adjustments would you make?",
+    "model_answer": "The most significant adjustment is to the discount rate. WACC for an emerging market company must incorporate a country risk premium to reflect political instability, currency risk, weaker rule of law, and potential for capital controls. This premium can be estimated using sovereign credit spreads or equity market volatility relative to developed markets. You might also use a higher equity risk premium and add a company-specific premium if the business operates in a particularly volatile sector. On the cash flow side, you should critically evaluate management projections — companies in emerging markets often have more optimistic growth assumptions than are warranted. Currency denomination matters too: if projections are in local currency, the discount rate should also be in local currency terms (nominal rates reflecting local inflation).",
+    "common_mistakes": ["Using a US-standard WACC without any emerging market adjustment", "Not matching the currency denomination of cash flows and the discount rate", "Ignoring political risk or treating it as unquantifiable and therefore irrelevant"]
+  },
+  {
+    "id": "dcf_074",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Pension liabilities in DCF",
+    "question": "How do unfunded pension liabilities affect a DCF analysis?",
+    "model_answer": "Unfunded pension liabilities represent a real financial obligation to future retirees that hasn't been fully funded. In a DCF, you have two consistent approaches. The first is to treat unfunded pension obligations as debt-like in the equity bridge — subtracting them from Enterprise Value like you would debt — but then you must also add back any pension-related operating expenses (service cost, interest cost) from FCF, since those are akin to interest payments being excluded from UFCF. The second approach is to leave pension expenses in FCF as operating costs and not deduct unfunded obligations in the bridge, treating them as an ordinary operating liability. Either approach is valid as long as you're consistent — you can't subtract the pension liability in the bridge AND include pension expense in FCF, which would double-count the liability.",
+    "common_mistakes": ["Subtracting pension liabilities in the bridge while also keeping pension service cost in FCF", "Forgetting about pension liabilities entirely in the bridge", "Not knowing the difference between the service cost and the interest cost on pension obligations"]
+  },
+  {
+    "id": "dcf_075",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Multi-stage DCF",
+    "question": "When and why would you use a multi-stage DCF, and how does it work mechanically?",
+    "model_answer": "A multi-stage DCF is used when a company's growth profile, margins, or capital structure changes materially over time in a way that a single set of assumptions can't capture. For example, a high-growth technology company might grow revenue at 25% for the first three years, then transition to 15% for years four through seven, then reach maturity at 5% for years eight through ten before terminal value. You model each stage separately with its own growth, margin, and capex assumptions. You still discount all cash flows back using the same WACC (or an adjusted rate if the risk profile truly changes), and you still calculate a terminal value at the end of the final stage. A standard DCF is actually a two-stage model — the projection period and the terminal value — so multi-stage is just an extension of the same logic.",
+    "common_mistakes": ["Thinking multi-stage requires different discount rates for each stage (it doesn't necessarily)", "Not normalizing the terminal year metrics before applying the Gordon Growth or exit multiple", "Using multi-stage when simple one-stage assumptions are adequate, adding unnecessary complexity"]
+  },
+  {
+    "id": "dcf_076",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "APV vs. WACC DCF",
+    "question": "What is an Adjusted Present Value (APV) DCF, and when would you use it instead of the standard WACC approach?",
+    "model_answer": "The APV method values a company by first computing the value as if it were entirely equity-financed — using the unlevered cost of equity as the discount rate — and then separately adding the present value of financing side effects, primarily the interest tax shield. The APV formula is: APV = Base Case (Unlevered) Value + PV(Tax Shield) + PV(Other Financing Effects). APV is superior to WACC when the capital structure changes significantly over the projection period — for example, in an LBO where large amounts of debt are repaid each year. In a WACC DCF, you must keep the capital structure constant or re-estimate WACC each year, which is cumbersome. APV cleanly separates operating value from financing value. It's also used in academic finance and for distressed companies where the tax shield probability is uncertain.",
+    "common_mistakes": ["Not knowing APV exists as an alternative to WACC DCF", "Thinking APV and WACC DCF always produce the same result regardless of capital structure dynamics", "Failing to recognize that APV is particularly useful for LBOs with rapidly changing debt levels"]
+  },
+  {
+    "id": "dcf_077",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Circular reference in WACC and interest expense",
+    "question": "Explain why interest expense in a financial model creates a circular reference, and how is this typically resolved in a DCF?",
+    "model_answer": "Interest expense depends on the debt balance, which depends on the cash generated, which depends on net income, which depends on interest expense — a circularity. In a dynamically modeled financial statement where you pay down debt using excess cash, the interest expense for a given period depends on the ending debt balance, which you can't determine until you know net income, which requires knowing interest expense first. In Excel, this creates a true circular reference. The standard solutions are: (1) enable iterative calculations in Excel so the model solves through multiple iterations until it converges; (2) use beginning-of-period debt to calculate interest expense rather than average or ending balances, breaking the circularity at the cost of some precision; or (3) use a plug for interest expense that gets solved separately. In simplified DCFs, analysts often just fix interest expense to opening debt balances to avoid the issue.",
+    "common_mistakes": ["Not knowing what causes the circularity", "Saying the solution is to simply delete the formula", "Not recognizing that iterative calculation convergence can sometimes produce errors if the model diverges"]
+  },
+  {
+    "id": "dcf_078",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Why two analysts produce very different DCFs",
+    "question": "Two analysts model the same company using a DCF and arrive at Enterprise Values of $1.2 billion and $2.4 billion respectively. What are the most likely reasons for such a large discrepancy?",
+    "model_answer": "The most common sources of large DCF divergence are: (1) different revenue growth assumptions — even a 2-3% difference in annual growth rate compounds significantly over 5-10 years and has an outsized effect on terminal year EBITDA; (2) different EBITDA margin assumptions — a 3-point margin difference on a $1B revenue base changes EBITDA by $30M, which at an 8x exit multiple changes terminal value by $240M alone; (3) different discount rates — a 2% WACC difference can change DCF value by 20-30%; (4) different exit multiples or terminal growth rates — a move from 7x to 9x EBITDA can shift value enormously; (5) one analyst using end-of-year convention and another using mid-year; and (6) different assumptions about the terminal year representing normalized, mid-cycle vs. peak-cycle profitability. A 2x spread in outcomes is not uncommon when both WACC and growth assumptions diverge significantly.",
+    "common_mistakes": ["Blaming it purely on modeling errors rather than assumption differences", "Not recognizing how much terminal value amplifies small assumption differences", "Underestimating how much a 1-2% WACC difference affects a long-duration asset"]
+  },
+  {
+    "id": "dcf_079",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Preferred stock in beta formula",
+    "question": "When un-levering and re-levering beta, how should you treat preferred stock? Should it be grouped with debt or equity in the leverage ratio?",
+    "model_answer": "Preferred stock should be treated as equity — not debt — in the un-levering and re-levering beta formulas. The reason is that preferred dividends are not tax-deductible, unlike interest on debt. The standard un-levering formula uses the debt-to-equity ratio multiplied by (1 - tax rate) to capture the tax shield effect of debt. Since preferred stock has no tax shield, lumping it with debt would incorrectly apply a tax adjustment to a non-deductible payment. By treating preferred as equity, you're appropriately reflecting that preferred is a form of equity financing that increases financial risk without providing any offsetting tax benefit. This contrasts with the WACC formula, where preferred is a separate component — but in beta, it merges with equity.",
+    "common_mistakes": ["Treating preferred as debt in the beta formula and applying (1 - t) to it", "Not knowing that preferred dividends are non-deductible", "Confusing the beta treatment of preferred with its WACC treatment, where it's a separate component"]
+  },
+  {
+    "id": "dcf_080",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Iterative share price calculation",
+    "question": "In a DCF model where stock-based compensation expense depends on the stock price, why does calculating the implied share price require an iterative solution?",
+    "model_answer": "When stock-based compensation (SBC) expense is modeled as a percentage of equity value or share price — rather than a fixed dollar amount — the implied share price from the DCF depends on SBC expense, which itself depends on the share price, creating circularity. The share price affects FCF through the after-tax SBC expense on the income statement; lower FCF leads to lower EV and equity value, which produces a lower share price, which then reduces SBC expense, which increases FCF — and so on. This must be solved iteratively: you assume an initial share price, compute SBC, run the DCF to get implied share price, compare to your assumption, and iterate until they converge. In Excel, this requires circular reference handling. In practice, most models avoid this by treating SBC as a fixed amount in the projection, which breaks the circularity.",
+    "common_mistakes": ["Not recognizing the feedback loop between share price and SBC", "Thinking you can just solve a single equation analytically", "Not being aware that SBC modeled as a fixed dollar amount avoids the issue entirely"]
+  },
+  {
+    "id": "dcf_081",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "APV and interest tax shield PV",
+    "question": "In an APV analysis, you calculate the PV of the interest tax shield separately. What discount rate do you use to discount the tax shield, and why is there debate about the right choice?",
+    "model_answer": "There are two main schools of thought. Modigliani-Miller's original work discounts the tax shield at the cost of debt, reflecting that the tax shield is as certain as the debt payments themselves — if the company can service its debt, it receives the tax shield. Miles-Ezzell and others argue for using the unlevered cost of equity, because the tax shield is only as valuable as the company's ability to generate taxable income, which carries business risk. In practice, for stable companies with relatively constant debt levels, discounting at the cost of debt is common. For companies with rapidly changing capital structures — like LBOs — the debate matters more because the tax shield's certainty diminishes as leverage decreases. Most practitioners use the cost of debt for simplicity.",
+    "common_mistakes": ["Not knowing there's any debate about the appropriate rate", "Discounting the tax shield at WACC, which creates a circularity because WACC already incorporates the tax shield", "Thinking the choice of discount rate for the tax shield is trivial and doesn't affect value"]
+  },
+  {
+    "id": "dcf_082",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Negative beta assets in CAPM",
+    "question": "Can an asset have a negative beta in CAPM, and what would that mean for its required return? Can you give a real-world example?",
+    "model_answer": "Yes, a negative beta is theoretically possible and implies the asset moves in the opposite direction to the market. In CAPM, a negative beta means the required return is less than the risk-free rate — the asset serves as a hedge, providing positive returns when the market falls. This means investors are willing to accept below-risk-free returns in exchange for the insurance value. Gold is the most frequently cited example, though empirically its beta is close to zero, not clearly negative. Certain volatility products like VIX-linked instruments have negative betas. For most corporate stocks, you never see negative betas in practice — even the most defensive companies still have positive betas, because they broadly move with market conditions over time.",
+    "common_mistakes": ["Saying no asset can have a negative beta", "Saying a negative beta means the stock is risk-free", "Confusing low beta with negative beta — a utility might have a beta of 0.3, not -0.3"]
+  },
+  {
+    "id": "dcf_083",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Normalizing terminal year FCF",
+    "question": "Why is it important that the terminal year of your DCF projection represents a 'normalized' level of earnings, and what problems arise if it doesn't?",
+    "model_answer": "The terminal value calculation assumes the company grows from the terminal year level into perpetuity. If Year 5 happens to be a peak margin year, an unusual capex year, or the tail end of an acquisition integration, the terminal value will be artificially high or low — and since terminal value often represents 60-80% of total DCF value, this distortion is magnified enormously. For example, if Year 5 capex is temporarily elevated at $300M versus a normalized $100M, the terminal year FCF is understated by roughly $200M after tax. At an 8% WACC with 3% growth, that understated terminal year costs roughly $200M × 1.03 / 0.05 = $4.1B in terminal value — a massive error. You should always check that the terminal year reflects sustainable margins, capex ratios, working capital levels, and growth rates.",
+    "common_mistakes": ["Using whatever Year 5 metrics the model produces without sanity-checking them", "Not realizing that even small terminal year distortions get amplified by the perpetuity multiplier", "Using a terminal year in the middle of a heavy capex cycle without normalizing"]
+  },
+  {
+    "id": "dcf_084",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Growth exceeding WACC in Gordon Growth",
+    "question": "What happens mathematically and economically if the terminal growth rate in the Gordon Growth Model equals or exceeds WACC?",
+    "model_answer": "Mathematically, when g equals WACC, the denominator (WACC - g) equals zero, producing an infinite terminal value — a nonsensical result. When g exceeds WACC, the denominator becomes negative, producing a negative terminal value, which is also economically incoherent. Economically, a company growing faster than the economy's discount rate in perpetuity would eventually become larger than the entire global economy — impossible. The Gordon Growth Model is only valid when g is strictly less than WACC. In practice, perpetuity growth rates should be anchored to long-run nominal GDP growth (2-3% for developed markets). If your model is producing a growth rate approaching WACC, it signals either that the projection period should be extended or that the terminal year isn't yet normalized.",
+    "common_mistakes": ["Not recognizing why the denominator must be positive", "Setting g equal to the near-term growth rate without considering long-run convergence", "Not being able to explain the economic absurdity of g ≥ WACC intuitively"]
+  },
+  {
+    "id": "dcf_085",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "WACC with changing capital structure",
+    "question": "A company plans to use its projected free cash flows to pay down debt significantly over the next five years. How does this complicate the use of WACC in a DCF?",
+    "model_answer": "Standard WACC assumes a constant capital structure over the entire projection period. If the company actively pays down debt, the D/E ratio changes each year, which means the levered beta changes, the cost of equity changes, and therefore WACC changes. Using a fixed WACC would be an approximation at best and materially wrong at worst — particularly if the company starts highly levered and ends with minimal debt. Rigorous solutions include: (1) using APV, which values the firm as all-equity and separately discounts the declining tax shield year by year; (2) calculating a year-by-year WACC using the projected debt and equity market values at each period, which requires solving iteratively since equity value depends on WACC; or (3) assuming the target long-run capital structure in WACC as a reasonable approximation if the changes aren't too dramatic.",
+    "common_mistakes": ["Applying a static WACC to an LBO-like capital structure without flagging the inconsistency", "Not knowing APV is the cleaner solution for changing capital structures", "Thinking the year-by-year WACC approach can be solved in a simple forward-pass calculation without iteration"]
+  },
+  {
+    "id": "dcf_086",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Residual Income Model",
+    "question": "What is the Residual Income Model and how does it relate to a DCF?",
+    "model_answer": "The Residual Income Model values a company based on its book equity plus the present value of future residual income — also called economic profit or EVA. Residual income equals net income minus a charge for the cost of equity capital applied to beginning book equity: RI = Net Income - (Cost of Equity × Beginning Book Equity). The intuition is that value is created only when returns exceed the cost of equity; if ROE equals the cost of equity, the stock should trade at book value. Mathematically, under clean surplus accounting, the RIM produces the same equity value as a DDM or DCF — they are algebraically equivalent. The RIM is particularly used for financial institutions where FCF-based models are problematic. Its advantage is that it ties valuation directly to accounting book value, making it easier to identify value creation versus book value.",
+    "common_mistakes": ["Not knowing the Residual Income Model exists", "Thinking RIM always produces a different value from a DCF — they're theoretically equivalent", "Not knowing that the model uses cost of equity (not WACC) because it's an equity-level model"]
+  },
+  {
+    "id": "dcf_087",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "DCF for a startup with no near-term FCF",
+    "question": "How would you approach valuing an early-stage startup using a DCF, and what are the key challenges and adjustments?",
+    "model_answer": "DCF is theoretically applicable to startups but practically challenging for several reasons. First, near-term FCF is negative and highly uncertain — small changes in assumptions have enormous impact. Second, the terminal year must be many periods out to reach normalized profitability, increasing the model's sensitivity to long-run assumptions. Third, there's no comparable base to estimate WACC reliably, and the risk profile changes dramatically as the company scales. Practical adjustments include: (1) using a scenario-weighted DCF with probability-weighted outcomes, including a failure scenario; (2) extending the projection period to 10-15 years until the company reaches a mature state; (3) using a very high discount rate (20-30%+) to reflect early-stage risk and illiquidity; (4) using a base case that assumes the company successfully scales, discounted at a rate that incorporates the failure probability. In practice, VCs use alternative approaches like VC method or comparables more commonly.",
+    "common_mistakes": ["Running a 5-year DCF for a startup with negative FCF and a tiny terminal value", "Using a standard 8-10% WACC for a high-risk startup", "Not accounting for the probability that the company fails entirely"]
+  },
+  {
+    "id": "dcf_088",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Mid-year convention terminal value treatment",
+    "question": "Under the mid-year convention, how does the discount period for the terminal value differ depending on whether you use the Exit Multiple Method versus the Gordon Growth Method?",
+    "model_answer": "Under the Exit Multiple Method, you assume the company is sold at the end of the final projection year — this is a year-end event, so you add 0.5 to the final year's mid-year discount period. If the final year is Year 5 with a mid-year discount period of 4.5, you discount the terminal value at period 5.0 (4.5 + 0.5) to reflect that the sale happens at year-end. Under the Gordon Growth Method, you're valuing an ongoing perpetuity of cash flows received throughout the year — you don't add 0.5 because the perpetuity assumption already captures mid-year receipt. You use the same discount period as the final year mid-year factor (4.5 in this case). This distinction is subtle but important for consistency between the two terminal value methods.",
+    "common_mistakes": ["Using the same discount period for both methods under the mid-year convention", "Adding 0.5 to the Gordon Growth terminal value discount period as well as the exit multiple", "Not knowing this distinction exists at all"]
+  },
+  {
+    "id": "dcf_089",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Impact of taxes on debt vs equity cost",
+    "question": "A company has a pre-tax cost of debt of 7% and a cost of equity of 12%. Its tax rate falls from 35% to 20% due to tax reform. What happens to WACC, assuming capital structure stays the same?",
+    "model_answer": "A reduction in the tax rate reduces the after-tax benefit of debt — the interest tax shield becomes smaller. At 35% tax, the after-tax cost of debt is 7% × (1 - 0.35) = 4.55%. At 20% tax, it's 7% × (1 - 0.20) = 5.60%. Since the debt component becomes more expensive while the cost of equity remains unchanged (cost of equity doesn't benefit from a tax shield), WACC increases. The exact increase depends on the proportion of debt in the capital structure. For example, with 40% debt and 60% equity: original WACC = 0.40 × 4.55% + 0.60 × 12% = 1.82% + 7.20% = 9.02%. New WACC = 0.40 × 5.60% + 0.60 × 12% = 2.24% + 7.20% = 9.44%. WACC increases by about 42 basis points, reducing Enterprise Value.",
+    "common_mistakes": ["Saying lower taxes always reduce WACC because companies pay less in taxes overall", "Forgetting that cost of equity is unaffected by the corporate tax rate", "Not being able to quantify the directional change in the after-tax cost of debt"]
+  },
+  {
+    "id": "dcf_090",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Equity risk premium sources and debates",
+    "question": "What are the main approaches to estimating the equity risk premium, and why do they produce different results?",
+    "model_answer": "The two primary approaches are historical and forward-looking. The historical approach — used in Ibbotson's/Duff & Phelps data — calculates the average excess return of equities over T-bills or T-bonds over long historical periods. This assumes past excess returns are a good estimate of future expected returns. The forward-looking (implied) approach — associated with Damodaran — derives the ERP from current equity prices and analyst earnings growth estimates, solving for the discount rate implied by current valuations. Historical estimates tend to be higher (5-7% for the US) because they incorporate realized premiums; implied estimates are often lower (4-5.5%) and adjust for current market conditions. The debate matters because a 1% difference in ERP translates into roughly 1% × beta difference in cost of equity, which compounds into large DCF value differences.",
+    "common_mistakes": ["Citing only one source or approach without acknowledging alternatives", "Thinking the ERP is a fixed number published by a definitive authority", "Not knowing the approximate range of 4-7% for the US ERP"]
+  },
+  {
+    "id": "dcf_091",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Discount rate for different risk profiles within a company",
+    "question": "A conglomerate has three business segments with very different risk profiles: a stable utility, a cyclical manufacturing division, and a high-growth tech startup. Should you use one WACC for the entire company in a DCF?",
+    "model_answer": "Using a single blended WACC for a conglomerate with materially different business segments is theoretically incorrect and practically problematic. Each segment has a different risk profile and therefore deserves a different discount rate. The utility segment should have a low WACC (perhaps 6-7%), the manufacturing segment a medium WACC (9-11%), and the startup a high discount rate (20%+). Using the blended WACC would overvalue the risky segments (discounting too cheaply) and undervalue the stable segments (discounting too aggressively). The correct approach is a Sum-of-the-Parts (SOTP) analysis: value each segment separately using an appropriate segment-level discount rate and segment-appropriate comps, then sum the results. This is one of the key reasons why conglomerates often trade at a 'conglomerate discount' relative to their parts.",
+    "common_mistakes": ["Using a single corporate WACC without acknowledging the segment risk differences", "Not knowing that SOTP is the standard solution for multi-segment companies", "Calculating the blended WACC as a simple average of the three segments' WACCs without weighting by segment value"]
+  },
+  {
+    "id": "dcf_092",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "FCF yield as a DCF sanity check",
+    "question": "How can you use FCF yield as a sanity check on your DCF output, and what would a very low FCF yield on your implied valuation suggest?",
+    "model_answer": "FCF yield equals annual free cash flow divided by enterprise value (or equity FCF divided by market cap for levered). If your DCF implies a very low FCF yield — say, 1-2% — relative to the current interest rate environment or the WACC you used, it suggests the DCF may be pricing in very optimistic growth assumptions that the market hasn't already priced in. You'd expect the FCF yield to be at least in the range of treasury yields or WACC minus expected growth. A very low FCF yield relative to WACC means you're paying a high multiple of current cash flows for future growth — if that growth doesn't materialize, the DCF will be proven wrong. This is a useful check particularly for high-growth companies where terminal value heavily dominates.",
+    "common_mistakes": ["Not knowing what FCF yield is or how to calculate it", "Failing to benchmark the implied FCF yield against the risk-free rate or WACC", "Treating a low FCF yield as automatically fine for high-growth companies without further scrutiny"]
+  },
+  {
+    "id": "dcf_093",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Real vs. nominal DCF",
+    "question": "Should the cash flows and discount rate in a DCF be nominal or real? What happens if you mix them?",
+    "model_answer": "Nominal cash flows should be discounted at a nominal discount rate, and real cash flows at a real discount rate. Both approaches produce the same answer if done correctly, because the Fisher equation links nominal and real rates through inflation: (1 + nominal) = (1 + real) × (1 + inflation). In practice, almost all financial DCF models are built in nominal terms — cash flows are projected with inflation embedded in revenue and cost growth, and WACC is a nominal rate derived from current market data. If you mix them — for example, discounting nominal cash flows (which include inflation) at a real discount rate — you will massively overvalue the company because you're using a denominator that's too small for the inflation-inclusive cash flows. The consistency between the two is critical and often overlooked.",
+    "common_mistakes": ["Discounting nominal cash flows at a real discount rate without recognizing the mismatch", "Thinking real and nominal approaches always produce different values regardless of consistency", "Not knowing the Fisher equation relationship between real and nominal rates"]
+  },
+  {
+    "id": "dcf_094",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Market implied WACC vs. model WACC",
+    "question": "If a company's DCF produces an Enterprise Value of $3 billion but the company trades at $5 billion in the market, what are the possible explanations?",
+    "model_answer": "There are several explanations. First, your model assumptions may be too conservative — you may be underestimating revenue growth, margin improvement, or the appropriate exit multiple. Second, the market may be pricing in strategic value or a control premium (the possibility of an M&A premium) that a standalone DCF doesn't capture. Third, the market may be using a lower discount rate — you can solve for the market-implied WACC by back-solving the DCF to produce $5B, which reveals what rate makes the DCF match the market. Fourth, non-operating assets (real estate, patents, excess cash, equity stakes) may not be fully captured in your FCF projections but are valued by the market. Fifth, the market may simply be overvaluing the stock relative to fundamentals. The right response is to examine each driver rather than assuming either the model or the market is definitively correct.",
+    "common_mistakes": ["Immediately concluding the market is wrong and the DCF is right", "Not thinking to back-solve for the market-implied WACC", "Ignoring non-operating assets as a potential explanation"]
+  },
+  {
+    "id": "dcf_095",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Effective tax rate vs. statutory in DCF",
+    "question": "A company's statutory tax rate is 25% but its effective tax rate has been 18% due to tax incentives. Which rate should you use when projecting FCF, and does it matter whether those incentives are permanent?",
+    "model_answer": "In general, you use the effective tax rate because it reflects what the company actually pays in cash taxes, which is what matters for FCF. However, the sustainability of the effective rate matters enormously. If the lower rate results from temporary incentives, deferred tax liabilities building up, or tax positions that are being audited, using 18% into perpetuity will overstate FCF and terminal value. If the incentives are structural and permanent — for example, tax holidays embedded in long-term government agreements or permanent R&D credits — then 18% is appropriate for the foreseeable projection period. Standard practice is to use the effective rate for the near-term years, potentially normalizing toward the statutory rate in the terminal year unless there's strong evidence the incentives persist. In the terminal value, using the statutory rate is conservative but defensible.",
+    "common_mistakes": ["Always using the statutory rate without considering the actual cash tax burden", "Always using the effective rate without questioning its sustainability", "Not distinguishing between temporary book-tax timing differences and permanent tax incentives"]
+  },
+  {
+    "id": "dcf_096",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Stock-based compensation in FCF",
+    "question": "Should you include stock-based compensation expense as an add-back to free cash flow, like D&A? What are the arguments on each side?",
+    "model_answer": "This is genuinely debated. The argument for adding back SBC (like D&A): SBC is a non-cash charge and doesn't reduce FCF; it's already captured in the diluted share count via dilution, so penalizing FCF and diluting shares simultaneously double-counts the cost. The argument against adding back SBC: unlike D&A, SBC represents real economic value transferred from existing shareholders to employees — it's a real form of compensation that would have to be paid in cash if the company couldn't issue stock. Most rigorous practitioners today treat SBC as a real cash cost and do NOT add it back to FCF — particularly for tech companies where SBC is a major compensation component. The consistency principle matters: if you exclude SBC from FCF, don't also heavily penalize equity value for dilution. If you include SBC in FCF, use basic rather than fully diluted shares. Current CFA and most sell-side practice is to exclude the add-back.",
+    "common_mistakes": ["Automatically adding back SBC exactly like D&A without understanding the distinction", "Not knowing there's a legitimate debate on this topic", "Adding back SBC in FCF AND using fully diluted shares, which double-counts the cost"]
+  },
+  {
+    "id": "dcf_097",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "DCF under different accounting standards",
+    "question": "A US company and a European competitor use IFRS and GAAP respectively. You're building a DCF for each. Are there adjustments you need to make for comparability?",
+    "model_answer": "Yes, several IFRS vs. GAAP differences can affect DCF comparability. The most important for FCF: (1) IFRS allows upward revaluation of PP&E, which inflates depreciation and affects NOPAT relative to GAAP; (2) IFRS 16 and ASC 842 both capitalize operating leases, but the transition treatment differed — you need to ensure both companies reflect leases consistently; (3) R&D expensing — GAAP requires immediate expensing while IFRS allows capitalization of development costs, affecting both EBIT and capex; (4) inventory valuation — GAAP allows LIFO while IFRS doesn't, affecting COGS and margins. When building comparable DCFs, you should normalize each company's financials to a common basis — typically IFRS or adjusted GAAP eliminating LIFO — before projecting FCF, or at minimum understand the magnitude of differences when comparing implied multiples.",
+    "common_mistakes": ["Ignoring GAAP vs. IFRS differences entirely when building cross-border DCFs", "Not knowing that IFRS prohibits LIFO inventory accounting", "Treating all accounting differences as immaterial when they can be substantial for R&D-intensive or capital-heavy companies"]
+  },
+  {
+    "id": "dcf_098",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "DCF and sum-of-the-parts",
+    "question": "When should you use a Sum-of-the-Parts analysis rather than a single consolidated DCF, and how do you implement it?",
+    "model_answer": "SOTP is appropriate when a company has multiple distinct business segments with materially different risk profiles, growth outlooks, or capital intensity — conglomerates, diversified financial companies, or companies with a mix of high-growth and mature divisions. It's also appropriate when a segment has an identifiable market comparable that differs from the consolidated peers. Implementation: separate the company's revenue, EBITDA, and assets by segment; build independent DCFs or apply segment-specific EV/EBITDA multiples for each; sum the segment values; then add unallocated corporate assets (excess cash, equity investments) and subtract corporate overhead and net debt at the consolidated level. SOTP often reveals a discount or premium to the consolidated trading value, highlighting where the market may be mispricing individual segments.",
+    "common_mistakes": ["Not allocating corporate overhead costs to segments, overstating segment values", "Applying the same multiple to all segments without adjusting for segment-specific risk", "Double-counting cash that's already reflected in segment FCF projections"]
+  },
+  {
+    "id": "dcf_099",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "DCF limitations summary",
+    "question": "What are the three most significant limitations of a DCF analysis, and how do practitioners try to mitigate them?",
+    "model_answer": "The three most significant limitations are: (1) Extreme sensitivity to assumptions — small changes in WACC, growth rates, or margins produce large value swings; mitigation is thorough sensitivity analysis and presenting value ranges rather than point estimates. (2) Terminal value dominates — 60-80%+ of value comes from an assumption about what the company is worth in perpetuity, which is inherently speculative; mitigation is cross-checking terminal value assumptions against both methods and against observable comps. (3) Backward-looking inputs for a forward-looking model — beta is estimated from historical data, comps multiples reflect current market sentiment, and growth projections are often anchored in recent performance; mitigation includes scenario analysis, challenging management projections, and triangulating with other valuation methods like comparable companies and precedent transactions. No single DCF output should be presented as a definitive value without acknowledging these limitations.",
+    "common_mistakes": ["Listing only 'it's uncertain' as a limitation without specificity", "Not being able to name concrete mitigation strategies for each limitation", "Ignoring the terminal value concentration risk as a limitation"]
+  },
+  {
+    "id": "dcf_100",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Weighted average vs. marginal cost of capital",
+    "question": "Should you use the marginal cost of capital or the weighted average cost of capital as the discount rate in a DCF? What's the distinction?",
+    "model_answer": "WACC as used in a DCF reflects the marginal cost of capital — the required return on the next dollar of investment — not the historical blended cost of all capital ever raised. In practice, the WACC formula using current market values of debt and equity, current cost of equity via CAPM, and current market-based cost of debt approximates the marginal cost, because it reflects what investors require today to provide capital. Historical book values and historical interest rates would give you a backward-looking average that's irrelevant for new project evaluation. The DCF is asking: given the cash flows this business generates, what is the company worth at today's required returns? That makes today's marginal required return — current WACC — the right discount rate, not a blended historical cost of funds.",
+    "common_mistakes": ["Using the average interest rate on historical book debt rather than the yield on comparable new debt", "Using book equity value in WACC weights rather than market equity value", "Not understanding why historical costs are irrelevant for discounting future cash flows"]
+  },
+  {
+    "id": "dcf_101",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Why WACC uses market value weights",
+    "question": "Why do you use market value weights rather than book value weights when calculating WACC?",
+    "model_answer": "Market value weights reflect the current economic reality of how the company is financed — what it would cost today to replicate the same capital structure by raising funds in the market. Book value weights reflect historical accounting entries that may be decades old and have no bearing on today's required returns. The goal of WACC is to find the required return that investors demand today for providing capital, so you need to weight each component by its current market value. Using book values can dramatically distort WACC, especially for companies with large intangibles, significant accumulated depreciation, or whose equity trades far above or below book value. Most companies' equity market caps are substantially larger than book equity, so book weighting would drastically overweight debt and understate the cost of capital.",
+    "common_mistakes": ["Using book values for the weights while using market-based costs — an inconsistent approach", "Not being able to explain why the weights matter for WACC accuracy", "Saying book and market weights produce similar results for stable companies — they often don't"]
+  },
+  {
+    "id": "dcf_102",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Relationship between DCF and multiples valuation",
+    "question": "How does a DCF relate to a comparable company multiples analysis? Are they truly independent methods?",
+    "model_answer": "DCF and multiples are theoretically related, not truly independent. An exit multiple — say 8x EV/EBITDA — applied to a terminal year EBITDA is implicitly an expression of the market's view of growth and discount rates. You can derive any trading multiple from a DCF by solving for the implied growth rate or discount rate. Conversely, a DCF with a Gordon Growth terminal value implicitly embeds a terminal multiple. In practice, when you use exit multiples based on public comps in your DCF terminal value, you're partly circular — the comps themselves are priced by the market, which is also running an implicit DCF on those companies. The two methods triangulate toward a similar result when used correctly, but they can diverge when market sentiment causes multiples to be elevated or depressed relative to fundamental value.",
+    "common_mistakes": ["Treating DCF and multiples as completely independent checks when they're interrelated", "Not being able to explain how to derive an implicit multiple from a Gordon Growth terminal value", "Saying a DCF is always more accurate than multiples because it's fundamental — both have significant assumptions"]
+  },
+  {
+    "id": "dcf_103",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Maintenance vs. growth capex",
+    "question": "What is the difference between maintenance capex and growth capex, and why does it matter in a DCF?",
+    "model_answer": "Maintenance capex is the spending required to maintain existing productive capacity — replacing worn-out equipment and assets to keep the business running at its current level. Growth capex is incremental spending to expand capacity, enter new markets, or develop new assets that will generate future revenue. In a DCF, both types reduce FCF since both are real cash outflows. However, when building the terminal year, it's important to use a steady-state or normalized capex figure. If you project growth capex as part of a high-growth phase but use the same elevated capex in the terminal year, you'll understate terminal FCF — because a mature company no longer needs aggressive growth capex. Normalizing terminal year capex to a maintenance level (or a rate consistent with the assumed terminal growth) is essential for a realistic terminal value.",
+    "common_mistakes": ["Using peak-growth capex in the terminal year without normalizing", "Not distinguishing between the two types and why the terminal year treatment matters", "Assuming D&A always equals maintenance capex — in asset-heavy industries, they often differ significantly"]
+  },
+  {
+    "id": "dcf_104",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Effect of higher inflation on DCF",
+    "question": "If inflation rises significantly, how would it affect a DCF analysis?",
+    "model_answer": "Higher inflation affects both cash flows and the discount rate. On the cash flow side, nominal revenues and costs both rise with inflation, which may or may not preserve real margins depending on pricing power. If the company can pass through cost increases, real FCF is preserved but nominal FCF increases. On the discount rate side, higher inflation raises the risk-free rate (as Treasury yields rise), which mechanically increases WACC. If cash flows grow with inflation but the discount rate also rises by inflation, the net effect on value depends on whether FCF grows proportionally with WACC. For companies with strong pricing power, the two roughly offset, preserving value. For companies with fixed-price contracts or regulatory price caps, real margins erode and value declines. The Gordon Growth Model captures this: if both g and WACC rise by the same amount, terminal value is unchanged (the spread is constant), but this assumes perfect pass-through.",
+    "common_mistakes": ["Saying higher inflation always reduces DCF value without thinking through the FCF impact", "Not recognizing that inflation affects the risk-free rate and therefore WACC", "Ignoring the difference between companies with and without pricing power"]
+  },
+  {
+    "id": "dcf_105",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Difference between enterprise value and equity value",
+    "question": "What is the conceptual difference between Enterprise Value and Equity Value?",
+    "model_answer": "Enterprise Value represents the total value of a company's core operations, available to all capital providers — debt holders, equity holders, and preferred shareholders. It is capital-structure neutral: two identical operating businesses should have the same EV regardless of how they're financed. Equity Value represents only the residual claim available to common shareholders after all obligations to debt and preferred holders are satisfied. The bridge between them is: Equity Value = Enterprise Value + Cash - Debt - Preferred - Noncontrolling Interests. EV is the relevant output of an unlevered DCF and is used for EV/EBITDA multiples. Equity Value is the relevant measure for P/E ratios, share price calculation, and equity-focused metrics.",
+    "common_mistakes": ["Confusing a higher EV with a more expensive stock — without knowing the capital structure, you can't assess relative value", "Adding debt instead of subtracting it in the bridge", "Thinking EV and equity value are the same for an all-equity company — they are, but only if there's no excess cash"]
+  },
+  {
+    "id": "dcf_106",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Reinvestment rate and growth in FCF",
+    "question": "What is the relationship between a company's reinvestment rate, its return on invested capital, and its FCF growth?",
+    "model_answer": "Growth in FCF is fundamentally driven by how much a company reinvests and what return it earns on that investment: FCF growth ≈ Reinvestment Rate × ROIC. The reinvestment rate is the fraction of NOPAT reinvested back into the business (through capex net of D&A and working capital increases). ROIC measures the return earned on each dollar invested. A company that reinvests 40% of NOPAT and earns a 15% ROIC will grow FCF at roughly 6%. This framework is important in DCF because it links the terminal growth assumption to the implied reinvestment needs — you can't assume 4% perpetual growth without also assuming the company is reinvesting a portion of its FCF to generate that growth. A company growing at 4% with no reinvestment is economically inconsistent.",
+    "common_mistakes": ["Assuming a high terminal growth rate without adjusting terminal year capex and NWC for the reinvestment required", "Not knowing the formula: growth = reinvestment rate × ROIC", "Ignoring ROIC and thinking FCF growth is independent of how efficiently capital is deployed"]
+  },
+  {
+    "id": "dcf_107",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Discount period formula",
+    "question": "What is the formula for the discount factor applied to a cash flow in year n, and how do you apply it?",
+    "model_answer": "The discount factor for a cash flow received in year n is 1 / (1 + r)^n, where r is the discount rate (WACC for UFCF). To find the present value of a cash flow, you multiply the nominal cash flow by this factor: PV = CF_n / (1 + r)^n. For example, if WACC is 10% and Year 3 FCF is $50M, the PV is $50M / (1.10)^3 = $50M / 1.331 = $37.6M. Under the mid-year convention, n takes non-integer values (0.5, 1.5, 2.5) to reflect receipt at mid-year. You calculate a discount factor for each year individually and sum all discounted cash flows including the discounted terminal value to get Enterprise Value.",
+    "common_mistakes": ["Using n = 0 for Year 1 instead of n = 1", "Not being able to apply non-integer exponents for the mid-year convention", "Summing undiscounted FCFs and then applying one discount factor at the end — each year must be discounted separately"]
+  },
+  {
+    "id": "dcf_108",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Effect of lower WACC on DCF value",
+    "question": "A company's WACC decreases from 10% to 8% due to a decline in interest rates. All else equal, what happens to its Enterprise Value from a DCF?",
+    "model_answer": "Enterprise Value will increase substantially for two compounding reasons. First, each year's projected FCF is now discounted at a lower rate, so their present values are higher — for example, Year 5 FCF of $100M at 10% WACC discounts to $62.1M, but at 8% WACC it discounts to $68.1M. Second, and more significantly, the terminal value increases in two ways: the Gordon Growth formula denominator (WACC - g) shrinks (e.g., from 7% to 5% if g is 3%), which increases terminal value by 40% on the pre-discount amount, AND that larger terminal value is discounted at the lower rate. The combined effect of a 2% WACC reduction on a typical DCF often increases Enterprise Value by 25-40% or more, depending on the projection structure.",
+    "common_mistakes": ["Saying value increases but being unable to quantify the rough magnitude", "Only mentioning the FCF discounting impact without the terminal value multiplier effect", "Forgetting that the lower WACC affects both the terminal value calculation and its discounting"]
+  },
+  {
+    "id": "dcf_109",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "Operating vs. non-operating assets in DCF",
+    "question": "What are non-operating assets, and how do they factor into a DCF valuation?",
+    "model_answer": "Non-operating assets are items on the balance sheet that don't generate the core operating cash flows projected in the DCF. Common examples include excess cash above operating needs, equity investments in other companies, real estate held for sale, defined benefit pension assets, and deferred tax assets. The DCF of operating FCF captures the value of the business's core operations and produces Enterprise Value. Non-operating assets are added separately — outside the FCF model — when bridging from EV to equity value or to a total firm value. For example, a 10% equity stake in a publicly traded company would be valued at market and added to the DCF-derived EV. Failing to include non-operating assets understates total company value.",
+    "common_mistakes": ["Including interest income from excess cash in the UFCF model and also adding excess cash in the equity bridge, double-counting", "Forgetting that minority equity stakes need to be added at fair value", "Not knowing how to distinguish operating working capital from excess cash"]
+  },
+  {
+    "id": "dcf_110",
+    "topic": "DCF",
+    "difficulty": "Fundamental",
+    "concept": "What a DCF tells you vs. what it doesn't",
+    "question": "A client asks: 'If I run a DCF and it says the stock is worth $50, should I buy it if it's trading at $40?' What would you say?",
+    "model_answer": "A DCF output of $50 versus a market price of $40 is suggestive but not definitive. The output is only as good as the assumptions driving it — if you've been overly optimistic on revenue growth, margins, or used a below-market discount rate, the $50 may be a mirage. You should first check the model: run sensitivity analysis to see whether the stock looks undervalued across a range of assumptions, or only under the most optimistic scenarios. If the DCF still produces values above $40 across reasonable bear cases and base cases, there's a stronger argument for undervaluation. You should also cross-check against comparable company multiples and precedent transactions. Finally, consider what the market may know that your model doesn't — management execution risk, competitive dynamics, or macro factors. A DCF is one input into an investment decision, not a guarantee.",
+    "common_mistakes": ["Recommending an investment based solely on a single-point DCF output", "Not mentioning the need to sensitivity-test the assumptions", "Ignoring that the market prices in public information and your DCF assumptions may not be superior"]
+  },
+  {
+    "id": "dcf_111",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Reinvestment rate in terminal value",
+    "question": "A company's terminal year NOPAT is $200M and you're assuming a 3% perpetuity growth rate with a ROIC of 12%. What is the terminal year UFCF you should use in the Gordon Growth calculation?",
+    "model_answer": "Using the relationship: FCF = NOPAT × (1 - Reinvestment Rate), where Reinvestment Rate = g / ROIC = 3% / 12% = 25%. Therefore, terminal year UFCF = $200M × (1 - 0.25) = $200M × 0.75 = $150M. This captures the fact that the company must reinvest 25% of its NOPAT to fund the 3% growth. If you used the full $200M NOPAT without the reinvestment deduction, you'd be assuming the company grows at 3% for free with no reinvestment, which violates economic logic. This is a critical and frequently missed refinement in terminal value construction.",
+    "common_mistakes": ["Using the full $200M NOPAT as FCF without deducting reinvestment", "Not knowing the formula: reinvestment rate = g / ROIC", "Applying the reinvestment rate to EBITDA instead of NOPAT"]
+  },
+  {
+    "id": "dcf_112",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Levered FCF pairing with cost of equity",
+    "question": "You build a DCF using levered free cash flow. You estimate a cost of equity of 13% and a WACC of 9%. Your levered FCF in Year 3 is $75M. What is the present value of that cash flow, and what is the output of this analysis?",
+    "model_answer": "Since you're using levered FCF, you discount at the cost of equity — 13% — not WACC. PV = $75M / (1.13)^3 = $75M / 1.4429 ≈ $52.0M. The output of a levered DCF is equity value directly — not Enterprise Value. To get implied share price, you would divide equity value by fully diluted shares outstanding. You would NOT then subtract debt from this equity value, as debt has already been incorporated by using levered FCF (interest expense was deducted in arriving at net income, and mandatory repayments were subtracted). Using WACC here — even though it's also available — would be incorrect and would overstate value by using a discount rate that's too low for an equity-level cash flow.",
+    "common_mistakes": ["Using WACC to discount levered FCF instead of the cost of equity", "Subtracting net debt after arriving at equity value, double-counting the debt deduction", "Treating the output as Enterprise Value and then adding back debt"]
+  },
+  {
+    "id": "dcf_113",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Terminal value as percentage of EV — what's reasonable",
+    "question": "A 5-year DCF for a mature consumer goods company shows the PV of projection-period FCFs equals $800M and the PV of terminal value equals $1,200M. Does this seem reasonable? What would change this ratio?",
+    "model_answer": "Yes, this is entirely reasonable — terminal value at $1,200M out of $2,000M total EV represents 60%, which is in the normal range for a mature, cash-flow-positive business. For a mature consumer goods company with stable mid-single-digit growth and modest capex, having 60% in terminal value makes sense: the near-term FCFs are significant (40%), reflecting the company's maturity, but the perpetuity still dominates. The ratio would be pushed higher (toward 80-90%+) if the company had negative or minimal near-term FCF, or if you extended the projection period shorter than 5 years. It would be lower (toward 40-50%) if you extended the projection to 10+ years and the company had strong early-period cash flow growth. A ratio above 85% for a profitable, mature business would warrant more scrutiny.",
+    "common_mistakes": ["Flagging 60% TV-to-EV as a warning sign when it's entirely normal", "Thinking the ratio should be 50/50 for a well-built model", "Not understanding what would shift the ratio in either direction"]
+  },
+  {
+    "id": "dcf_114",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Backing out implied perpetuity growth rate",
+    "question": "A DCF produces a terminal value of $3,000M using an 8x EV/EBITDA exit multiple on Year 5 EBITDA of $375M. WACC is 10%. What is the implied perpetuity growth rate from this terminal value?",
+    "model_answer": "Using the Gordon Growth formula re-arranged: g = (WACC × TV - FCF_Year6) / (TV + FCF_Year6). More practically, for a quick approximation, solve: TV = FCF × (1+g) / (WACC - g). You need the terminal year FCF. If Year 5 EBITDA is $375M, you'd need additional assumptions (taxes, capex, NWC) to determine FCF. For illustration, assume FCF = $250M (reasonable for this EBITDA level). Then: $3,000M = $250M × (1+g) / (0.10 - g). Solving: $3,000M × (0.10 - g) = $250M × (1+g). $300M - $3,000Mg = $250M + $250Mg. $50M = $3,250Mg. g = $50M / $3,250M ≈ 1.54%. A ~1.5% implied growth rate for a consumer goods company is conservative and plausible — suggesting the exit multiple assumption is reasonable.",
+    "common_mistakes": ["Not being able to rearrange the Gordon Growth formula to solve for g", "Skipping the cross-check entirely when building a DCF", "Using EBITDA as the FCF proxy directly without any tax, capex, or NWC adjustment"]
+  },
+  {
+    "id": "dcf_115",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "DCF for a company being acquired",
+    "question": "You're running a DCF to advise a target company in an M&A transaction. Should you use standalone projections or synergy-adjusted projections? What about the discount rate?",
+    "model_answer": "For advising the target, you generally use standalone projections in the base case — this represents the company's intrinsic value without a buyer and is the floor for negotiation. You can show synergy-adjusted projections in an upside scenario to illustrate what a strategic buyer might be willing to pay. The discount rate for the standalone DCF should be the target's own WACC, reflecting the company's risk as a standalone entity. In a synergy-adjusted DCF, you might use the acquirer's WACC or a blended rate depending on whether the synergies are primarily achieved by the acquirer's operational capabilities. The target's board needs to understand both the standalone value and the potential synergy value to assess whether the offer price appropriately shares synergies between buyer and seller.",
+    "common_mistakes": ["Using the acquirer's lower WACC for the standalone target DCF, overstating the target's intrinsic value", "Including buyer-specific synergies in the standalone DCF", "Not distinguishing between the target's standalone value and what a buyer would rationally pay including synergies"]
+  },
+  {
+    "id": "dcf_116",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "Deferred tax liabilities in DCF",
+    "question": "A company has $150M in deferred tax liabilities on its balance sheet. How should these be treated in a DCF?",
+    "model_answer": "Deferred tax liabilities (DTLs) arise from temporary timing differences between book and tax accounting — the most common is accelerated depreciation for tax purposes, which reduces current cash taxes but creates a liability to pay higher taxes in future years. For most operating companies, DTLs that relate to ongoing PP&E depreciation timing are typically not treated as debt in the equity bridge, because they are perpetually rolling — as new assets are added, the DTL never actually comes due. However, if a DTL is expected to reverse in a specific near-term period (e.g., a one-time timing difference that will unwind), it may be appropriate to treat it as a debt-like obligation in the bridge. The practical treatment: include the DTL as a debt-like item only if it's non-recurring and will reverse; leave it out if it's indefinitely deferred through ongoing operations.",
+    "common_mistakes": ["Automatically subtracting all DTLs as debt in the equity bridge", "Ignoring DTLs entirely without considering whether they'll reverse", "Confusing DTLs (timing differences) with permanent tax differences"]
+  },
+  {
+    "id": "dcf_117",
+    "topic": "DCF",
+    "difficulty": "Technical",
+    "concept": "EBITDA margin vs. revenue growth sensitivity",
+    "question": "A company has $1B in revenue. How does a 1% increase in EBITDA margin compare in impact to a 1% increase in revenue growth rate, for purposes of terminal value?",
+    "model_answer": "A 1% EBITDA margin improvement produces an immediate $10M increase in EBITDA. At an 8x exit multiple in Year 5, this increases terminal value by $80M, then discounted back 5 years at 10% WACC, the PV impact is approximately $50M. A 1% higher revenue growth rate — compounded over 5 years — turns $1B into a higher Year 5 revenue base. At 10% base growth vs. 11% growth over 5 years: ($1B × 1.11^5) - ($1B × 1.10^5) = $1,685M - $1,611M = $74M more revenue. Applying the original EBITDA margin to this revenue difference and then an 8x multiple adds significant terminal value. For most businesses, small changes in revenue growth have a larger compounding impact on terminal value than similar-sized margin improvements, especially over longer periods. But both matter — the combination effect is what drives the most meaningful DCF sensitivity.",
+    "common_mistakes": ["Saying one is always more important without working through the math", "Forgetting to discount the terminal value impact back to present value", "Ignoring that revenue growth also compounds margins if the cost structure has operating leverage"]
+  },
+  {
+    "id": "dcf_118",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Option value in DCF",
+    "question": "A DCF analysis values a pharmaceutical company's pipeline at $500M. The company's lead drug candidate is in Phase II trials with a 50% probability of FDA approval. How should the DCF handle this probability, and what are the limitations?",
+    "model_answer": "The standard approach is to probability-weight the cash flows: project the cash flows assuming FDA approval, multiply each year's FCF by the 50% success probability, and discount the probability-weighted FCF at the appropriate risk-adjusted WACC. Alternatively, you can model two scenarios — approval and rejection — compute DCF value for each, and weight by probability. The limitation is that a standard DCF assumes binary, known probabilities, but option value from the ability to abandon, delay, or scale up the program can't be fully captured in a DCF. Real options analysis (treating the drug development program as a call option) is theoretically more appropriate because the company can make active decisions at each development milestone. In practice, DCF with scenario-weighted cash flows is most commonly used in pharma due to its tractability, but the analyst should note that option value from flexibility is being excluded.",
+    "common_mistakes": ["Discounting unweighted full-approval cash flows and then noting the 50% probability in a footnote without adjusting FCF", "Using the same WACC regardless of approval probability — riskier earlier-stage assets should have higher discount rates", "Not recognizing that real options theory offers a more rigorous framework for this type of problem"]
+  },
+  {
+    "id": "dcf_119",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Working capital intensity and DCF value",
+    "question": "Two identical companies generate $100M EBITDA and $80M NOPAT annually. Company A has growing receivables and inventory requiring $20M of NWC investment per year. Company B collects payment upfront (negative NWC). How do their DCF values differ?",
+    "model_answer": "Company B will have a higher DCF value, even though their NOPAT and EBITDA are identical. Company A's UFCF = $80M NOPAT - $20M NWC investment = $60M annually. Company B's UFCF = $80M NOPAT + NWC inflow from growing deferred revenue. If Company B has a similar-sized business with $20M NWC inflow, its UFCF is $100M annually — nearly 67% higher cash flow on identical accounting earnings. At an 8x EBITDA multiple in terminal value, both look equal. But the Gordon Growth terminal value based on FCF would show Company B at a significant premium. This illustrates why FCF conversion is a critical metric: companies with negative NWC characteristics (like subscription businesses collecting upfront) are genuinely worth more than identical companies with NWC-intensive models, even at equal margins.",
+    "common_mistakes": ["Saying both companies are worth the same because EBITDA is identical", "Not recognizing that NWC drag reduces FCF even for profitable companies", "Confusing the exit multiple terminal value (which misses this) with the Gordon Growth terminal value (which captures it)"]
+  },
+  {
+    "id": "dcf_120",
+    "topic": "DCF",
+    "difficulty": "Advanced",
+    "concept": "Synthesizing DCF across multiple variables",
+    "question": "An analyst builds a DCF for a mid-size technology company. Revenue growth is 15% for Years 1-3, then 8% for Years 4-5. EBITDA margins expand from 20% to 28% over the period. WACC is 11%. Terminal value is based on a 12x EV/EBITDA multiple. The analyst presents a single-point Enterprise Value. What are the three most important critiques you'd make of this analysis?",
+    "model_answer": "The three most important critiques are: (1) Single-point output with no sensitivity analysis — a 12x multiple, 11% WACC, and specific growth/margin assumptions each carry material uncertainty; the analyst must show at minimum a WACC vs. exit multiple sensitivity table to understand the range of defensible outcomes. (2) Verify that Year 5 is truly a normalized terminal year — if margins are still expanding at 28% in Year 5, the company hasn't reached steady state; a terminal year with ongoing rapid margin expansion implies growth capex and reinvestment that may not be fully reflected in the FCF. (3) Cross-check the 12x exit multiple against the implied perpetuity growth rate — back out the implied g using Year 5 FCF and WACC; if 12x implies 6-7% growth in perpetuity for a tech company, it may seem plausible, but test whether it's consistent with the industry's long-run prospects and current comp trading levels. Additionally, the margin expansion assumption (20% to 28%) is aggressive and should be benchmarked against comps.",
+    "common_mistakes": ["Only critiquing the discount rate without addressing terminal year normalization", "Not knowing to cross-check the exit multiple against an implied growth rate", "Accepting the single-point output without requesting sensitivity analysis"]
+  }
+]

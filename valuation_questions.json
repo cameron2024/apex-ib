@@ -1,0 +1,722 @@
+[
+  {
+    "id": "val_001",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Three core valuation methodologies",
+    "question": "What are the three primary valuation methodologies used in investment banking, and how would you categorize them conceptually?",
+    "model_answer": "The three primary methodologies are Public Company Comparables, Precedent Transactions, and Discounted Cash Flow analysis. Public Comps and Precedent Transactions are both forms of relative valuation because they derive value from what the market has actually paid for similar assets. The DCF is intrinsic valuation because it derives value purely from the company's own projected cash flows, independent of what the market is currently paying for comparable businesses.",
+    "common_mistakes": ["Calling all three 'market-based' methods — the DCF is explicitly not market-based", "Forgetting to mention that comps and precedents are relative while DCF is intrinsic", "Listing LBO or liquidation as a primary methodology instead of a supplementary one"]
+  },
+  {
+    "id": "val_002",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "When to use comparable companies analysis",
+    "question": "When is a Public Comparable Companies analysis most useful, and when does it break down?",
+    "model_answer": "Public Comps are most useful when there are several publicly traded companies in the same industry with similar size, growth, and margin profiles, because you can directly observe what the market pays for comparable businesses in real time. It works best in stable, well-covered industries with many participants. It breaks down when the company is in a niche industry with few true peers, when the stock market is highly volatile or sentiment-driven, or when the company being valued is private and lacks the liquidity premium embedded in public trading multiples.",
+    "common_mistakes": ["Saying comps only work for large companies — the methodology applies at any size if peers exist", "Not mentioning the liquidity issue when valuing private companies against public comps", "Claiming comps are always more reliable than a DCF — reliability depends entirely on comparable set quality"]
+  },
+  {
+    "id": "val_003",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Screening criteria for comparable companies",
+    "question": "What criteria do you use to select companies for a Public Comparable Companies analysis, and which criterion is most important?",
+    "model_answer": "The three main screening criteria are industry classification, financial profile (including revenue size, EBITDA margins, and growth rate), and geography. Industry classification is always the most important criterion — you screen by industry first and then layer on financial and geographic filters to refine the set. In practice, you often have to relax financial and geographic screens if your industry peer set is small, but you would almost never include a company from a different industry just to fill out the set.",
+    "common_mistakes": ["Listing geography as the most important factor — industry always comes first", "Forgetting to mention that financial profile includes margins and growth, not just revenue size", "Saying you need all three criteria to be met — in practice you may relax financial/geographic screens"]
+  },
+  {
+    "id": "val_004",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "How to apply comparable company multiples",
+    "question": "Walk me through the mechanics of how you actually use a set of comparable companies to arrive at a valuation range for a target company.",
+    "model_answer": "First, you calculate the relevant valuation multiples — such as EV/EBITDA and EV/Revenue — for each company in the comparable set using their current market prices. Then you calculate summary statistics across the set: minimum, 25th percentile, median, 75th percentile, and maximum for each multiple. Finally, you apply those multiples to the corresponding financial metric of the company you're valuing to get an implied Enterprise Value range. For public companies, you also work backward from Enterprise Value to implied per-share price.",
+    "common_mistakes": ["Using only the median multiple rather than showing a full range", "Applying the multiple to the wrong financial metric — e.g., applying EV/EBITDA to revenue", "Forgetting to convert Enterprise Value to Equity Value and per-share price for public companies"]
+  },
+  {
+    "id": "val_005",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "What is a precedent transactions analysis",
+    "question": "What is a Precedent Transactions analysis, how does it differ from a Public Comps analysis, and what is the key reason precedent transaction multiples are typically higher?",
+    "model_answer": "A Precedent Transactions analysis looks at historical M&A deals involving companies similar to the one you're valuing, and uses the multiples paid in those deals to estimate value. The key difference from Public Comps is that precedent transaction multiples reflect acquisition prices, which include a control premium — the additional amount a buyer must pay above the current market price to convince shareholders to sell. This control premium, typically 20–40% above the unaffected share price, is why precedent transaction multiples are usually higher than comparable company trading multiples.",
+    "common_mistakes": ["Saying the difference is purely about public vs. private — the core distinction is the control premium embedded in deal prices", "Claiming precedent transactions are always higher — there are market conditions where this breaks down", "Confusing the control premium with synergies — they are related but distinct concepts"]
+  },
+  {
+    "id": "val_006",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Screening criteria for precedent transactions",
+    "question": "How do you screen for precedent transactions, and what additional criterion do you apply that you wouldn't use when screening comparable companies?",
+    "model_answer": "You screen precedent transactions on industry, financial size, and geography — the same filters as comparable companies. The additional criterion unique to precedent transactions is date: you typically limit the set to the past one to two years because older deals may reflect very different market conditions, financing environments, and strategic rationales that are no longer relevant. You also sometimes filter by transaction structure — for example, limiting to 100% or majority acquisitions, since partial-stake deals have very different pricing dynamics.",
+    "common_mistakes": ["Forgetting that date is the unique additional screen for precedents", "Including minority stake deals without flagging that they have different valuation dynamics", "Using transactions from more than five years ago without adjusting for market environment changes"]
+  },
+  {
+    "id": "val_007",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "DCF overview",
+    "question": "At a high level, how does a Discounted Cash Flow analysis work, and what are its two main components?",
+    "model_answer": "A DCF values a company by projecting its future free cash flows and discounting them back to the present at the company's weighted average cost of capital. The two main components are the explicit forecast period — typically five to ten years of projected unlevered free cash flows — and the terminal value, which captures all cash flows beyond the forecast horizon and typically represents the majority of total DCF value. The sum of the discounted forecast-period cash flows and the discounted terminal value equals the company's Enterprise Value.",
+    "common_mistakes": ["Saying you discount at the cost of equity — you discount unlevered FCF at WACC, not cost of equity", "Forgetting to mention the terminal value as a separate component", "Claiming the DCF gives you Equity Value directly — it gives Enterprise Value, from which you back out Equity Value"]
+  },
+  {
+    "id": "val_008",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "When DCF is and isn't useful",
+    "question": "For which types of companies is a DCF most reliable, and for which types is it least reliable? Give specific examples.",
+    "model_answer": "A DCF is most reliable for large, mature companies with stable and predictable cash flows — think established industrial manufacturers or consumer staples companies like Procter & Gamble, where you can reasonably project cash flows five to ten years out. It is least reliable for early-stage or high-growth companies like tech startups where cash flows are negative or highly uncertain, and for financial institutions like banks and insurance companies where debt is a raw material rather than simply a financing source and where operating cash flows are difficult to separate from financing flows.",
+    "common_mistakes": ["Saying DCF works well for startups because you can just extend the projection period — the longer you extend, the less reliable the assumptions become", "Forgetting to mention banks as a special case where DCF breaks down structurally", "Claiming DCF is always the most accurate methodology — for companies with volatile cash flows it can be wildly inaccurate"]
+  },
+  {
+    "id": "val_009",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "EV/EBITDA multiple — definition and use",
+    "question": "What does the EV/EBITDA multiple measure, why do you use Enterprise Value rather than Equity Value in the numerator, and in what situations is this multiple most appropriate?",
+    "model_answer": "EV/EBITDA measures how much investors are paying for a company relative to its approximate operating cash generation before the effects of capital structure. Enterprise Value is used in the numerator because EBITDA is a pre-interest metric available to all capital providers — both debt and equity holders — so you pair it with Enterprise Value, which also represents the total claim of all capital providers. EV/EBITDA is most appropriate for capital-light businesses where depreciation and amortization are relatively small, and it is widely used for cross-company comparisons because it neutralizes differences in capital structure and tax rates.",
+    "common_mistakes": ["Using Equity Value in the numerator — this creates a mismatch because EBITDA is pre-interest and available to all investors, not just equity holders", "Saying EBITDA equals free cash flow — it explicitly excludes CapEx and changes in working capital", "Claiming EV/EBITDA is always the best multiple — for capital-intensive businesses EV/EBIT or EV/EBITDA-CapEx may be more meaningful"]
+  },
+  {
+    "id": "val_010",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "P/E multiple — definition and capital structure dependency",
+    "question": "What does the P/E multiple measure, and why is it considered capital-structure dependent while EV/EBITDA is capital-structure neutral?",
+    "model_answer": "The P/E multiple, or Price-to-Earnings, measures how much investors pay per dollar of a company's after-tax net income. It is capital-structure dependent because net income sits below the interest expense line — a company with significant debt will have lower net income due to higher interest charges, making its P/E appear higher than a comparable company that is unlevered, even if their operating performance is identical. EV/EBITDA is capital-structure neutral because EBITDA is calculated before interest expense, so differences in debt levels do not distort the comparison.",
+    "common_mistakes": ["Saying P/E is capital-structure neutral because it uses price per share — the share price already reflects the capital structure", "Forgetting that P/E is also affected by differences in tax rates, which EV/EBITDA is not", "Claiming P/E is never useful — it is the standard multiple for banks and financial institutions where interest income is core to operations"]
+  },
+  {
+    "id": "val_011",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "EBIT vs. EBITDA",
+    "question": "What is the difference between EBIT and EBITDA, and why might an analyst prefer EBIT over EBITDA in certain industries?",
+    "model_answer": "EBIT equals a company's operating income and includes depreciation and amortization as expenses, while EBITDA adds those non-cash charges back to EBIT. An analyst might prefer EBIT in capital-intensive industries like manufacturing or utilities because depreciation is a meaningful proxy for the capital expenditure required to maintain and replace assets — excluding it, as EBITDA does, can overstate the cash-generating ability of businesses that require heavy ongoing reinvestment. EBIT is also preferred when comparing companies that have very different levels of fixed asset intensity.",
+    "common_mistakes": ["Saying EBIT includes CapEx — it does not; CapEx flows through the cash flow statement, not the income statement", "Claiming EBITDA is always a better metric than EBIT — this ignores that EBITDA obscures maintenance CapEx requirements", "Confusing EBIT with operating cash flow — EBIT is still an accrual-based metric"]
+  },
+  {
+    "id": "val_012",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Football field chart",
+    "question": "What is a football field chart in the context of valuation, and why do bankers always show a range of values rather than a single point estimate?",
+    "model_answer": "A football field chart is a horizontal bar chart that displays the valuation range implied by each methodology side by side, typically showing the 25th percentile to 75th percentile as the main bar with min-to-max whiskers. Bankers show a range rather than a point estimate because valuation is inherently uncertain — each methodology involves judgment calls about comparable selection, multiple choice, and financial projections, all of which can reasonably vary. Presenting a range is more intellectually honest and also more useful to clients, who need to understand where the weight of evidence sits and how sensitive the conclusion is to different assumptions.",
+    "common_mistakes": ["Saying bankers show ranges to avoid commitment — the real reason is that a single point would be false precision", "Thinking the median of each methodology is what gets presented — the full interquartile range is shown", "Confusing the football field with a sensitivity table — they are different outputs serving different purposes"]
+  },
+  {
+    "id": "val_013",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "When to use Liquidation Valuation",
+    "question": "What is a Liquidation Valuation, when is it used, and what does it actually calculate?",
+    "model_answer": "A Liquidation Valuation estimates how much equity investors would receive if all of a company's assets were sold off individually and the proceeds were used to pay off liabilities in order of seniority. It is most commonly used in bankruptcy situations to determine whether shareholders will recover anything after creditors are paid, and to advise distressed companies on whether selling assets piecemeal yields more value than selling the whole enterprise. The output is the residual equity value after all liabilities are satisfied — it typically produces the lowest valuation of any methodology unless a company's market price has been severely depressed below its asset value.",
+    "common_mistakes": ["Saying liquidation value is the same as book value — liquidation value uses estimated realizable market prices for assets, which are often below book value", "Claiming liquidation value is relevant for healthy companies — it is primarily a distressed or bankruptcy tool", "Forgetting that assets are sold at a discount to book in most liquidations, especially for intangibles"]
+  },
+  {
+    "id": "val_014",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Sum-of-the-Parts valuation",
+    "question": "What is a Sum-of-the-Parts valuation, and when is it the appropriate methodology to use?",
+    "model_answer": "Sum-of-the-Parts is a valuation methodology where you value each distinct business segment or division separately using its own set of comparable companies and appropriate multiples, then add the individual values together to get total enterprise value. It is appropriate when a company operates in multiple unrelated industries where no single set of comparables would be suitable for the entire business — a conglomerate like General Electric, for example, with divisions spanning industrial manufacturing, financial services, and technology. Using a single blended multiple for a diversified conglomerate would produce a misleading result because the market applies different multiples to different business types.",
+    "common_mistakes": ["Saying sum-of-the-parts is only for large companies — it applies to any multi-segment business with meaningfully different divisions", "Forgetting to subtract corporate overhead or holding company costs when adding the segments together", "Applying the same set of comps to every division instead of using division-specific comparables"]
+  },
+  {
+    "id": "val_015",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "LBO as a valuation floor",
+    "question": "Why is an LBO analysis sometimes used in a valuation context, and what specific role does it play in the valuation framework?",
+    "model_answer": "An LBO analysis is used in valuation to establish a floor — the minimum price a financial sponsor could pay for a company and still achieve its target return, typically 20–25% IRR. If the LBO-implied value is lower than what comparables or precedent transactions suggest, it signals that a strategic buyer would likely outbid any financial sponsor. It is especially useful when a company is being marketed to both strategic acquirers and private equity firms simultaneously, because it helps set expectations about the lower bound of the valuation range that a PE buyer could justify.",
+    "common_mistakes": ["Saying the LBO gives a specific valuation like a DCF does — an LBO back-solves for entry price given a target IRR, it does not independently produce a value", "Claiming the LBO always gives the lowest valuation — in leverage-friendly environments with high exit multiples, LBO values can be competitive with strategic values", "Forgetting that LBO analysis excludes interim cash flows in the value calculation, which is why it tends to produce lower values than DCF"]
+  },
+  {
+    "id": "val_016",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Terminal value — two methods",
+    "question": "What are the two methods for calculating terminal value in a DCF, and how do they conceptually differ?",
+    "model_answer": "The two methods are the Gordon Growth Model and the Exit Multiple Method. The Gordon Growth Model assumes the company grows its free cash flows at a constant perpetuity growth rate forever, and terminal value equals the final year's free cash flow divided by the difference between the discount rate and the perpetuity growth rate. The Exit Multiple Method applies a valuation multiple — typically EV/EBITDA — to the company's projected financial metric in the final year of the forecast, estimating what a hypothetical buyer would pay at that point. The Gordon Growth Model is more theoretically pure while the Exit Multiple Method is more grounded in market comparables.",
+    "common_mistakes": ["Using a perpetuity growth rate that exceeds the long-run GDP growth rate — a company cannot grow faster than the economy in perpetuity", "Applying the wrong year's cash flow in the Gordon Growth Model — it should be the next year's cash flow, not the current year's", "Forgetting that both methods should produce similar results if assumptions are internally consistent — a large divergence signals an error"]
+  },
+  {
+    "id": "val_017",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Unlevered vs. levered free cash flow",
+    "question": "What is the difference between Unlevered Free Cash Flow and Levered Free Cash Flow, and which discount rate do you apply to each?",
+    "model_answer": "Unlevered Free Cash Flow, also called Free Cash Flow to the Firm, represents the cash available to all capital providers before any debt payments, calculated as EBIT times one minus the tax rate, plus non-cash charges, minus changes in working capital, minus CapEx. Levered Free Cash Flow, or Free Cash Flow to Equity, starts from net income and therefore already reflects interest expense and required debt repayments, making it available only to equity holders. You discount Unlevered FCF at WACC because it belongs to all investors, and you discount Levered FCF at the cost of equity because it belongs only to equity holders.",
+    "common_mistakes": ["Discounting unlevered FCF at the cost of equity — this ignores the value of the debt tax shield and produces an incorrect enterprise value", "Saying levered FCF gives enterprise value — it gives equity value directly", "Confusing 'unlevered' with 'no debt' — the company can have debt on its balance sheet; you're just calculating cash flows as if financing decisions didn't exist"]
+  },
+  {
+    "id": "val_018",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "EV/Revenue multiple — when to use",
+    "question": "When would you use EV/Revenue as a valuation multiple instead of EV/EBITDA, and what are its limitations?",
+    "model_answer": "EV/Revenue is used when a company has negative or near-zero EBITDA, making EV/EBITDA meaningless or negative — common for early-stage, high-growth technology or biotech companies. It is also used when comparing companies across geographies or accounting regimes where profitability metrics vary widely due to different cost structures. The main limitation is that revenue multiples ignore profitability entirely — two companies with identical revenue but dramatically different cost structures and cash generation will receive the same implied value, which can be misleading.",
+    "common_mistakes": ["Using EV/Revenue as the primary multiple for a profitable, mature company — EV/EBITDA or EV/EBIT is more appropriate", "Saying EV/Revenue is always conservative — for high-margin businesses a revenue multiple can actually imply a higher value than EBITDA multiples", "Forgetting that EV/Revenue still uses Enterprise Value, not Equity Value, because revenue is a pre-interest metric"]
+  },
+  {
+    "id": "val_019",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Industry-specific multiples — banks",
+    "question": "Why do analysts use Price-to-Book Value and Price-to-Earnings rather than EV/EBITDA when valuing banks and financial institutions?",
+    "model_answer": "Banks are valued using equity-based multiples because their business model makes EV/EBITDA structurally inappropriate. For a bank, debt is a raw material — deposits and borrowings are inputs into the lending business — not simply a financing source, so separating enterprise value from equity value in the usual way does not make sense. Additionally, interest income is the core operating revenue of a bank, so metrics that exclude interest (like EBITDA) strip out the most important driver of value. Price-to-Book is meaningful for banks because their book value closely approximates market value of assets, and P/E captures the after-interest profitability that matters most.",
+    "common_mistakes": ["Trying to apply EV/EBITDA to a bank — EBITDA is not a relevant concept for financial institutions", "Forgetting that ROE is the primary profitability driver for bank valuation, not margins", "Saying P/BV is a key multiple for industrial companies as well — it is primarily used for financials and asset-heavy special cases"]
+  },
+  {
+    "id": "val_020",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Control premium",
+    "question": "What is a control premium in M&A, why does it exist, and how is it reflected in valuation?",
+    "model_answer": "A control premium is the amount above a company's current market price that an acquirer must pay to gain control of the business. It exists because shareholders of the target will not sell their shares unless offered a price that compensates them for giving up their ownership stake and the potential future value they believe the stock holds — typically ranging from 20–40% above the unaffected share price. In valuation, the control premium is why precedent transaction multiples are generally higher than public comparable trading multiples, and it explains why Precedent Transactions typically produce a higher implied value range than Comparable Companies.",
+    "common_mistakes": ["Confusing control premium with synergies — a buyer might also pay for synergies, but those are a separate incremental layer on top of the control premium", "Saying the control premium is always 20–40% — it varies enormously based on competitive dynamics, strategic rationale, and negotiation", "Claiming the control premium only applies to hostile takeovers — it applies to any full acquisition"]
+  },
+  {
+    "id": "val_021",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "EBITDA problems",
+    "question": "What are the main criticisms of EBITDA as a metric, and why is it still so widely used despite those criticisms?",
+    "model_answer": "The main criticisms of EBITDA are that it excludes capital expenditures — which can be enormous for asset-heavy businesses — and that it ignores working capital needs, interest payments, and the real cash costs of running a business. Critics argue that EBITDA can make a highly indebted, capital-intensive company appear far more profitable than it truly is, and that companies game the metric by 'adding back' non-recurring charges. Despite this, EBITDA is widely used because it is easy to calculate, it is capital-structure and tax-rate neutral (making cross-company comparisons cleaner), and it has become the market standard — which means deal multiples are denominated in it regardless of its theoretical flaws.",
+    "common_mistakes": ["Saying EBITDA is a perfect proxy for operating cash flow — it explicitly ignores CapEx and working capital", "Claiming EBITDA is useless — its comparability benefit is real and widely valued in practice", "Forgetting to mention that management teams add back expenses to EBITDA, making reported adjusted EBITDA difficult to compare across companies"]
+  },
+  {
+    "id": "val_022",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Multiples pairing — EV vs. equity value",
+    "question": "How do you determine whether to pair a financial metric with Enterprise Value or Equity Value in a multiple?",
+    "model_answer": "The rule is straightforward: if the financial metric is calculated before interest income and expense — meaning it is available to both debt and equity holders — you pair it with Enterprise Value. If the metric is calculated after interest — meaning it is only available to equity holders — you pair it with Equity Value. For example, EBITDA, EBIT, and revenue all come before interest and therefore pair with Enterprise Value, while net income and earnings per share come after interest and pair with Equity Value or price. Mixing them — such as Equity Value divided by EBITDA — produces a meaningless number that conflates different levels of the capital structure.",
+    "common_mistakes": ["Using Equity Value over EBITDA — this is a classic error that mixes post-interest numerator with pre-interest denominator", "Thinking the pairing rule is just a convention rather than a mathematical necessity", "Forgetting that free cash flow multiples depend on whether the FCF is levered or unlevered — the same pairing logic applies"]
+  },
+  {
+    "id": "val_023",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Limitations of precedent transactions",
+    "question": "What are the main limitations of a Precedent Transactions analysis?",
+    "model_answer": "The most significant limitation is that past deals are rarely perfectly comparable because transaction structure, market timing, strategic rationale, and competitive bidding dynamics all vary dramatically between deals. Data availability is another major issue — for private company acquisitions especially, financial details like EBITDA may not be publicly disclosed, making it difficult to even calculate multiples. Additionally, transactions from periods of very different credit markets, economic cycles, or industry sentiment may embed multiples that are not relevant to today's pricing environment, yet the available dataset may force you to use them.",
+    "common_mistakes": ["Saying the only issue is comparability — data availability is equally important and often more practically constraining", "Forgetting that deal timing relative to the credit cycle dramatically affects multiples", "Not mentioning that transaction structure differences — stock deals vs. cash deals, for example — affect how multiples should be interpreted"]
+  },
+  {
+    "id": "val_024",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "REIT-specific valuation",
+    "question": "How do analysts value Real Estate Investment Trusts (REITs) differently from standard industrial companies, and what is the primary intrinsic valuation methodology?",
+    "model_answer": "REITs are valued using Funds from Operations (FFO) and Adjusted FFO multiples rather than EV/EBITDA, because FFO adds back depreciation — which is a massive non-cash charge in real estate that understates true earnings — and strips out gains or losses on property sales, which are non-recurring. The primary intrinsic valuation methodology is a Net Asset Value model, where you take the projected Net Operating Income from each property and divide by a market-derived capitalization rate to get property value, then add other assets, subtract liabilities, and divide by shares outstanding to get NAV per share. This reflects how REIT investors actually think about value — as a portfolio of individual properties generating recurring cash flows.",
+    "common_mistakes": ["Applying a standard DCF with WACC to a REIT — the NAV model is the industry standard for intrinsic value", "Using EV/EBITDA for REITs without adjusting for the enormous depreciation distortion", "Forgetting that FFO adds back depreciation but does not add back all non-cash charges — maintenance CapEx is still a real cost, captured in AFFO"]
+  },
+  {
+    "id": "val_025",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "LBO analysis mechanics overview",
+    "question": "At a high level, how does an LBO model produce a valuation, and how is this different from how a DCF produces a valuation?",
+    "model_answer": "An LBO model does not produce a standalone valuation the way a DCF does. Instead, you specify a desired return — typically a 20–25% IRR — and back-solve for the maximum entry price a financial sponsor could pay and still hit that return given projected exit multiples and cash flows over the holding period. A DCF, by contrast, projects cash flows and discounts them at WACC to directly produce an Enterprise Value without needing to specify a target return. The LBO is therefore most useful as a floor valuation — it tells you the minimum a PE buyer could justify paying — rather than as an independent estimate of intrinsic value.",
+    "common_mistakes": ["Saying the LBO directly produces a value like a DCF — it back-solves from a return target", "Forgetting that the LBO only captures value at entry and exit, ignoring interim cash flows — this is why it generally produces lower implied values than a DCF", "Claiming LBO models are only relevant in PE contexts — they are used in M&A sell-side processes whenever financial sponsors are potential bidders"]
+  },
+  {
+    "id": "val_026",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Valuation uses in investment banking",
+    "question": "In what three main contexts does an investment banker actually use valuation analysis, and what is the output in each case?",
+    "model_answer": "First, in pitch books and client advisory presentations, bankers use valuation to tell clients what their business is worth or what a target company might cost — the output is a football field chart showing a valuation range. Second, valuation feeds into other financial models: merger models need target company values, LBO models need entry price context, and DCFs are valuation models themselves. Third, in fairness opinions — legal documents delivered just before a deal closes — the financial advisor uses valuation analysis to formally certify that the acquisition price is fair from a financial standpoint to the selling shareholders.",
+    "common_mistakes": ["Saying valuation is only used at deal close — it is used throughout the advisory process from pitching to signing", "Forgetting the fairness opinion context, which has real legal significance", "Not mentioning that valuation is an input into merger models and LBO analyses, not just a standalone deliverable"]
+  },
+  {
+    "id": "val_027",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Why precedents may sometimes be lower than comps",
+    "question": "Under what market conditions might Precedent Transaction multiples actually be lower than Public Comparable Company multiples, contrary to the general rule?",
+    "model_answer": "This can happen when there is a significant mismatch between M&A market activity and public equity market levels. For example, if public equity markets are at elevated valuations due to momentum or speculation while recent M&A deals involved small private company acquisitions at depressed multiples, the comps might trade at higher multiples than what buyers paid in precedent deals. It can also occur when most recent transactions took place during a period of tight credit markets or economic stress, depressing deal multiples even as public markets recovered. In practice it is less common but it serves as a reminder that the rule is a tendency, not a guarantee.",
+    "common_mistakes": ["Treating the rule that precedents are higher as absolute — always acknowledge it can be violated", "Not identifying credit market conditions as a specific driver — tight leverage markets compress LBO-driven deal multiples", "Forgetting that private company deals in the precedent set lack the liquidity premium embedded in public company trading prices"]
+  },
+  {
+    "id": "val_028",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "EV/EBIT vs. EV/EBITDA — which to use",
+    "question": "In which type of industry would you prefer EV/EBIT over EV/EBITDA as your primary valuation multiple, and why?",
+    "model_answer": "You would prefer EV/EBIT in capital-intensive industries where depreciation is large and meaningful as a proxy for ongoing capital expenditure requirements — for example, manufacturing, transportation, or utilities. In these businesses, excluding depreciation from the profitability metric as EBITDA does significantly overstates the true earnings power, because the company must continuously spend on new equipment and infrastructure just to maintain operations. EV/EBIT keeps depreciation in the metric, which implicitly reflects CapEx intensity and gives a more conservative and meaningful measure of earnings.",
+    "common_mistakes": ["Saying EV/EBITDA is better for capital-intensive companies because depreciation is larger there — this is the opposite of the correct logic", "Thinking EV/EBIT includes CapEx directly — it does not, but depreciation is correlated with CapEx so it captures CapEx intensity indirectly", "Not knowing that EV/EBITDA must always be lower than EV/EBIT for the same company because EBITDA is always greater than or equal to EBIT"]
+  },
+  {
+    "id": "val_029",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Valuing a company with no profit",
+    "question": "How would you approach valuing a company that has no EBITDA and no net income, such as an early-stage technology startup?",
+    "model_answer": "For a company with no profitability, you would first consider alternative operating metrics as the basis for comparable multiples — for example, EV per unique monthly active users, EV per subscriber, or EV/Revenue if revenue at least exists. If no meaningful financial metric is available, you could build a long-range DCF that projects the company's financials out to a point where it becomes cash flow positive, then discount those future cash flows back. The DCF approach is more common for biotech companies where you can model probability-weighted drug approval scenarios; the alternative metrics approach is more common for consumer internet businesses where user engagement drives long-term value.",
+    "common_mistakes": ["Saying the company cannot be valued because it has no earnings — bankers always find a way to value a business", "Applying a P/E multiple to a company with negative earnings — this produces a meaningless negative number", "Forgetting to mention that the long-range DCF becomes very sensitive to terminal value assumptions when cash flows are negative in the near term"]
+  },
+  {
+    "id": "val_030",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Oil and gas specific multiples",
+    "question": "What industry-specific metrics and multiples are used to value oil and gas companies, and why are standard multiples like EV/EBITDA insufficient on their own?",
+    "model_answer": "Oil and gas companies are valued using metrics like EV/EBITDAX (adding back exploration expense), EV/Proved Reserves, EV/Daily Production, and through Net Asset Value models that project cash flows from specific reserves until depletion. Standard EV/EBITDA is insufficient because exploration expenses are treated differently across companies — some capitalize them while others expense them immediately — creating incomparable EBITDA figures. Additionally, the value of an oil and gas company is fundamentally tied to the quantity and quality of its reserve base, not just current earnings, so reserve-based metrics capture value that income statement multiples miss entirely.",
+    "common_mistakes": ["Saying EV/EBITDA works fine for oil and gas companies with just a minor adjustment — the accounting differences and reserve-based value make industry-specific metrics necessary", "Forgetting that EBITDAX adds back exploration expense specifically to normalize for different accounting treatment", "Not mentioning the NAV model as the primary intrinsic valuation tool for oil and gas companies"]
+  },
+  {
+    "id": "val_031",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Calendarization — what and why",
+    "question": "What is calendarization in the context of a comparable companies analysis, and why is it necessary?",
+    "model_answer": "Calendarization is the process of adjusting financial data from different companies to cover the same calendar period, enabling apples-to-apples comparisons. It is necessary because companies have different fiscal year-end dates — one company might end its fiscal year on December 31 while another ends on March 31, so their most recently reported annual figures cover different twelve-month windows. Without calendarization, comparing a December 31 fiscal year's LTM financials to a March 31 fiscal year's LTM financials would mix different time periods and introduce a seasonal or cyclical bias that has nothing to do with fundamental differences in the businesses.",
+    "common_mistakes": ["Thinking calendarization is only needed for international companies — it applies to any set of companies with different fiscal year-ends, including US domestic companies", "Confusing calendarization with currency normalization — they are separate adjustments", "Forgetting that calendarization applies to precedent transactions as well when calculating LTM financials as of the deal announcement date"]
+  },
+  {
+    "id": "val_032",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Trailing twelve months (TTM)",
+    "question": "What is the Trailing Twelve Months (TTM) period, how is it calculated, and why is it used in a comparable companies analysis rather than simply using the most recent fiscal year?",
+    "model_answer": "TTM is a rolling twelve-month financial period that ends on the most recent date for which data is available, rather than at the end of the last fiscal year. It is calculated as the most recent fiscal year's financials plus the new partial period's financials minus the same partial period from the prior year. It is used in comps rather than the last fiscal year because fiscal years can end months ago, making them stale — TTM captures the most current operating performance of each company in the set, which is more relevant when comparing current trading multiples to current financial metrics.",
+    "common_mistakes": ["Saying TTM is just the last four quarters reported without explaining the addition/subtraction formula when fiscal year does not align with calendar year", "Confusing LTM (Last Twelve Months, another name for TTM) with the last full fiscal year", "Not recognizing that TTM is especially important when a company has experienced significant growth or decline in recent quarters"]
+  },
+  {
+    "id": "val_033",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "Why DCF is more sensitive than comps",
+    "question": "Why is a DCF analysis generally considered more sensitive to assumptions than a comparable companies analysis?",
+    "model_answer": "A DCF requires you to make explicit, quantified assumptions about revenue growth, margins, capital expenditure, working capital needs, discount rate, and terminal value growth over a five-to-ten-year horizon — each of which compounds on the others and small changes in any one can meaningfully swing the result. The terminal value alone, which is calculated based on a perpetuity assumption, typically represents 60–80% of total DCF value, making the discount rate and growth rate assumptions in that single calculation the dominant driver of the entire output. Comparable companies, by contrast, use actual current market prices and require fewer forward-looking assumptions, making them more anchored to observable data.",
+    "common_mistakes": ["Saying DCF is always more accurate than comps — accuracy depends on the quality of inputs, and a DCF built on unreliable projections can be far less accurate than comps", "Not quantifying that terminal value is typically 60–80% of total value — this specific insight is what makes the sensitivity point concrete", "Forgetting that comps still involve forward estimates for NTM multiples, just fewer of them"]
+  },
+  {
+    "id": "val_034",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "P/BV multiple",
+    "question": "What does the Price-to-Book Value multiple measure, for which sectors is it most meaningful, and why is it relatively unimportant for most industrial companies?",
+    "model_answer": "Price-to-Book Value compares a company's market capitalization to its accounting book value of equity — essentially what the balance sheet says equity is worth. It is most meaningful for banks and financial institutions because their assets are primarily financial instruments carried at or near fair market value, so book value is a reasonable approximation of economic value. For most industrial or consumer companies, book value is not meaningful because assets are carried at historical cost, intangibles and goodwill may dominate, and the connection between accounting book value and true economic value is loose — the market prices these companies based on future earnings power, not balance sheet values.",
+    "common_mistakes": ["Saying P/BV is a useful universal metric — it is really only reliable for financial companies where assets are mark-to-market", "Confusing book value of equity with market value of equity — P/BV is only meaningful when these can diverge in an interpretable way", "Forgetting that P/BV is also used for REITs and asset-heavy businesses where tangible asset values are relevant"]
+  },
+  {
+    "id": "val_035",
+    "topic": "Valuation",
+    "difficulty": "Fundamental",
+    "concept": "M&A premiums analysis overview",
+    "question": "What is an M&A Premiums Analysis, when is it used, and how does it differ from a standard Precedent Transactions analysis?",
+    "model_answer": "An M&A Premiums Analysis looks at historical acquisitions of public companies to calculate what premium the buyer paid over the seller's pre-announcement share price — typically measuring the premium at one day, twenty days, and sixty days before announcement. It is used exclusively when valuing public companies because private companies have no observable market price to calculate a premium from. Unlike a Precedent Transactions analysis, which focuses on transaction multiples relative to financial metrics, the M&A Premiums analysis focuses on the percentage premium over market price — making it useful for advising a board on whether an offer price is within a normal range for comparable transactions.",
+    "common_mistakes": ["Saying M&A premiums analysis can be used for private companies — it cannot, because private companies have no market price", "Confusing premiums analysis with precedent transaction multiples — premiums are percentage over stock price, not EV/EBITDA multiples", "Forgetting that the seller's share price 20 or 60 days before announcement is used because one-day prices may already reflect deal rumors"]
+  },
+  {
+    "id": "val_036",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Applying comparable company multiples with numbers",
+    "question": "You are valuing a company with $200 million in EBITDA. Your set of comparable companies shows the following EV/EBITDA multiples: minimum 5.0x, 25th percentile 6.5x, median 8.0x, 75th percentile 9.5x, maximum 11.0x. The company has $150 million in debt and $50 million in cash, with 20 million shares outstanding. What is the implied share price at the median multiple?",
+    "model_answer": "At the median 8.0x multiple, implied Enterprise Value equals $200 million times 8.0x, or $1.6 billion. To get Equity Value, subtract debt and add cash: $1.6 billion minus $150 million plus $50 million equals $1.5 billion. Dividing by 20 million shares outstanding gives an implied share price of $75.00 per share. You would then repeat this calculation at the 25th and 75th percentile multiples to show the full valuation range.",
+    "common_mistakes": ["Adding debt and subtracting cash when converting from Enterprise Value to Equity Value — it is subtract debt, add cash", "Forgetting to divide Equity Value by shares outstanding to get per-share price", "Using the median without showing the range — an interviewer will ask for the full range, not just one point"]
+  },
+  {
+    "id": "val_037",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Precedent transactions multiples calculation",
+    "question": "In a precedent transaction, the acquirer paid $60 per share for a company with 25 million diluted shares outstanding. The target had $400 million in revenue, $80 million in EBITDA, $100 million in debt, and $20 million in cash at the time of announcement. Calculate the EV/EBITDA and EV/Revenue multiples paid.",
+    "model_answer": "First calculate Equity Value: $60 per share times 25 million shares equals $1.5 billion. Then calculate Enterprise Value: $1.5 billion plus $100 million in debt minus $20 million in cash equals $1.58 billion. EV/EBITDA is $1.58 billion divided by $80 million, or approximately 19.8x. EV/Revenue is $1.58 billion divided by $400 million, or approximately 3.9x. These multiples would then be compared to the broader set of precedent transactions to determine where this deal falls in the distribution.",
+    "common_mistakes": ["Subtracting debt and adding cash instead of adding debt and subtracting cash when going from Equity Value to Enterprise Value", "Using undiluted share count instead of diluted — always use diluted shares for valuation purposes", "Forgetting to use the offer price per share, not the pre-announcement trading price, for precedent transaction multiples"]
+  },
+  {
+    "id": "val_038",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Calendarization mechanics",
+    "question": "A comparable company has a fiscal year ending March 31. Today is July 15 and the company has filed its Q1 results (April 1 – June 30). Its full fiscal year revenue was $800 million and its Q1 revenue this year was $230 million. Last year's Q1 revenue (April 1 – June 30) was $200 million. What is the calendarized TTM revenue for this company?",
+    "model_answer": "The TTM formula is: Most Recent Fiscal Year plus New Partial Period minus Old Partial Period. The most recent fiscal year ended March 31 with $800 million in revenue. The new partial period (Q1 this year, April 1 – June 30) contributed $230 million. The old partial period (Q1 last year, the same window) was $200 million. TTM revenue equals $800 million plus $230 million minus $200 million, or $830 million. This gives a rolling twelve-month figure ending June 30 that is more current than the fiscal year alone.",
+    "common_mistakes": ["Adding both partial periods instead of adding the new and subtracting the old", "Using the full year that ended in March without adjustment, ignoring the more recent quarterly data", "Getting confused about which is the new versus old partial period — the new is current year Q1, the old is prior year Q1"]
+  },
+  {
+    "id": "val_039",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "EV/EBITDA vs. EV/EBIT selection in context",
+    "question": "You are comparing two manufacturers: Company A has $500 million in revenue, $100 million EBITDA, and $60 million in depreciation. Company B has $500 million in revenue, $100 million EBITDA, and $10 million in depreciation. Is EV/EBITDA a fair comparison between these two companies? What multiple would be more appropriate?",
+    "model_answer": "EV/EBITDA is not a fair comparison because Company A has $60 million in depreciation versus only $10 million for Company B, suggesting Company A has a much larger fixed asset base and therefore significantly higher ongoing CapEx requirements to maintain its assets. Their EBITDA figures are identical, but their true economic earnings — and the cash they must reinvest to stay in business — are very different. EV/EBIT would be more appropriate because it keeps depreciation in the profitability metric: Company A's EBIT would be $40 million while Company B's EBIT would be $90 million, much better reflecting their different capital intensities and true earnings power.",
+    "common_mistakes": ["Saying EV/EBITDA is fine because both companies have the same EBITDA — identical EBITDA with different depreciation is precisely when EV/EBITDA misleads", "Not connecting depreciation to CapEx intensity and ongoing reinvestment requirements", "Thinking you should normalize or adjust EBITDA for depreciation instead of simply switching to EV/EBIT"]
+  },
+  {
+    "id": "val_040",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Stock split effect on P/E",
+    "question": "A company has a stock price of $100, earnings per share of $5, and 10 million shares outstanding. It announces a 5-for-1 stock split. What happens to the company's P/E multiple and market capitalization immediately after the split?",
+    "model_answer": "After the 5-for-1 split, the company has 50 million shares outstanding and the share price adjusts to $20 (one-fifth of $100) to keep total market capitalization constant at $1 billion. Earnings per share also adjusts to $1 (one-fifth of $5) because total net income hasn't changed — it is just distributed over five times as many shares. The P/E multiple remains exactly 20x ($20 divided by $1), identical to before the split. A stock split is purely mechanical and does not change the economic value of the business.",
+    "common_mistakes": ["Saying the P/E changes because the stock price drops — both price and EPS fall by the same factor, so the ratio stays constant", "Claiming the market cap changes because there are more shares — total market cap equals price times shares, and since price falls proportionally, cap is unchanged", "Forgetting to adjust EPS when adjusting price — both are affected by the split"]
+  },
+  {
+    "id": "val_041",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Private company valuation adjustment",
+    "question": "You are valuing a private manufacturing company. Your public comparable companies trade at a median EV/EBITDA of 9.0x. The private company has $50 million in EBITDA, $30 million in debt, and $5 million in cash. What adjustments do you make to the public comp multiple before applying it, and what is the resulting implied Equity Value range?",
+    "model_answer": "Because the company is private, you typically apply a liquidity discount of 10–20% to the public comparable multiple to account for the fact that private company shares cannot be sold in the public market. At a 15% discount, the adjusted multiple is 9.0x times 0.85, or approximately 7.65x. Applying that to $50 million in EBITDA gives an implied Enterprise Value of roughly $382.5 million. Subtracting $30 million in debt and adding $5 million in cash yields an implied Equity Value of approximately $357.5 million. You would show a range using both the 10% and 20% discount bounds.",
+    "common_mistakes": ["Applying the public comp multiple without any liquidity discount — private companies trade at a discount to public peers", "Forgetting to convert Enterprise Value to Equity Value by adjusting for debt and cash", "Applying the liquidity discount to the implied value rather than to the multiple itself — the discount belongs on the multiple"]
+  },
+  {
+    "id": "val_042",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "LBO as a floor valuation",
+    "question": "A private equity firm is bidding on a company with $100 million in EBITDA. They use 6x leverage at closing, target a 22% IRR, and expect to exit at 8x EBITDA after 5 years. At what approximate entry EV/EBITDA multiple can they pay to achieve their return, and what does this tell you about the floor valuation?",
+    "model_answer": "At exit, the company is worth 8x EBITDA, so if EBITDA grows modestly, the exit enterprise value is approximately $800 million. With $600 million in initial debt (6x EBITDA), the equity invested is the entry price minus $600 million in debt proceeds. To achieve a 22% IRR over 5 years, the equity needs to roughly 2.7x (1.22 to the fifth power). Working backward from the $800 million exit and assuming modest debt paydown, the PE firm can likely pay roughly 7–8x entry EBITDA, or $700–800 million. This sets a floor: strategic buyers who can realize synergies should be able to justify paying above this level.",
+    "common_mistakes": ["Trying to calculate an exact entry multiple without also accounting for debt paydown during the holding period", "Forgetting that LBO sets a floor relative to what strategic buyers can pay, not a ceiling", "Using 5x IRR multiplier instead of compounding — 1.22^5 is approximately 2.7x, not 5 times 22%"]
+  },
+  {
+    "id": "val_043",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Valuing a partial stake in a transaction",
+    "question": "An acquirer purchased a 60% stake in a target company for $480 million. The target's revenue is $500 million and EBITDA is $120 million. It has $80 million of debt and $20 million of cash. What were the EV/Revenue and EV/EBITDA multiples paid?",
+    "model_answer": "First, the $480 million represents 60% of the equity value, so total Equity Value equals $480 million divided by 60%, or $800 million. Enterprise Value equals $800 million plus $80 million in debt minus $20 million in cash, or $860 million. EV/Revenue equals $860 million divided by $500 million, or 1.72x. EV/EBITDA equals $860 million divided by $120 million, or approximately 7.2x. Note that these multiples should be used with caution in the precedent set because partial-stake acquisitions differ structurally from 100% acquisitions.",
+    "common_mistakes": ["Using $480 million directly as Equity Value instead of grossing it up by the ownership percentage", "Forgetting to gross up the equity investment to 100% before calculating Enterprise Value", "Not flagging that a partial-stake transaction is less comparable than a 100% acquisition when used in a precedent set"]
+  },
+  {
+    "id": "val_044",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "EBIT/EBITDA relationship",
+    "question": "Company X has Revenue of $1 billion, gross margin of 40%, SG&A of $150 million, and D&A of $80 million. Calculate EBIT and EBITDA, and explain whether EV/EBITDA or EV/EBIT will be higher for this company.",
+    "model_answer": "Gross profit is $1 billion times 40%, or $400 million. Subtracting SG&A of $150 million and D&A of $80 million gives EBIT of $170 million. EBITDA is EBIT plus D&A, so $170 million plus $80 million equals $250 million. For any given Enterprise Value, EV/EBIT will always be higher than EV/EBITDA because the same EV is being divided by a smaller number — EBIT of $170 million versus EBITDA of $250 million. EV/EBITDA can never exceed EV/EBIT for the same company at the same point in time.",
+    "common_mistakes": ["Saying EV/EBITDA could be higher than EV/EBIT — mathematically impossible since EBITDA is always greater than or equal to EBIT", "Subtracting D&A from EBIT to get EBITDA — you add D&A back to EBIT", "Including interest expense in the EBIT calculation — EBIT is before interest"]
+  },
+  {
+    "id": "val_045",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Selecting forward vs. trailing multiples",
+    "question": "You are building a comparable companies analysis for a high-growth software company. Should you emphasize trailing (LTM) or forward multiples, and which specific forward period is most commonly used?",
+    "model_answer": "For a high-growth company, forward multiples are more meaningful because LTM metrics reflect historical performance that understates the company's current earnings trajectory — the denominator in LTM multiples is artificially small relative to where the business is actually heading. You would emphasize NTM (Next Twelve Months) or one-year-forward multiples as the primary reference, and may also look at two-year-forward multiples to capture the full growth profile. LTM multiples are still calculated for reference but are less relevant when the business is growing rapidly and historical financials are not representative of current or future performance.",
+    "common_mistakes": ["Using only LTM for a high-growth company — the LTM EBITDA or revenue may be well below current run-rate", "Using 3+ year forward multiples as the primary reference — beyond two years, projection uncertainty makes multiples less reliable", "Forgetting that forward multiples still require equity research consensus estimates, which introduce their own uncertainty"]
+  },
+  {
+    "id": "val_046",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "How competitive bidding affects precedent multiples",
+    "question": "You observe two precedent transactions involving nearly identical companies in the same industry with the same financial profile. Transaction A closed at 10x EBITDA and Transaction B closed at 6x EBITDA. What are the most likely explanations for this discrepancy?",
+    "model_answer": "The most common explanations are differences in competitive bidding dynamics — Transaction A may have had multiple strategic buyers competing aggressively, driving up the price, while Transaction B may have been a bilateral negotiation with a single buyer. Other factors include market timing — if Transaction A occurred during a credit boom and Transaction B during a recession, financing conditions alone could explain a 4-turn difference. Company-specific factors matter too: one target may have had a dominant market position or proprietary technology that justified a premium, or one company may have had adjusted EBITDA that was calculated differently, making the multiples not truly comparable.",
+    "common_mistakes": ["Assuming both transactions used identical EBITDA definitions — adjusted vs. reported EBITDA differences can dramatically change apparent multiples", "Not considering credit market conditions as a systematic driver of deal multiples", "Saying the discrepancy must be an error — large multiple differences between similar companies have legitimate explanations"]
+  },
+  {
+    "id": "val_047",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "DCF terminal value proportion",
+    "question": "An analyst builds a 10-year DCF for a mature consumer goods company. The sum of discounted cash flows from years 1–10 is $400 million. The terminal value using the Gordon Growth Model, discounted back to today, is $1.2 billion. What percentage of total DCF value comes from terminal value, and what does this imply about the sensitivity of the model?",
+    "model_answer": "Total DCF value is $400 million plus $1.2 billion, or $1.6 billion. The terminal value represents $1.2 billion divided by $1.6 billion, or 75% of total value. This means the vast majority of the DCF's output is driven by the terminal value calculation, which in turn is driven by the perpetuity growth rate and the discount rate — two inputs that are assumptions rather than observed facts. A half-point change in either the growth rate or WACC could swing the terminal value by hundreds of millions of dollars, making the entire valuation highly sensitive to assumptions that are difficult to determine precisely.",
+    "common_mistakes": ["Saying 75% terminal value is unusual — for most DCFs, 60–80% of value comes from terminal value; this is normal and expected", "Not connecting the terminal value percentage to model sensitivity — this is the key implication the question is testing", "Thinking you can eliminate terminal value sensitivity by extending the forecast period — you cannot, you just push the problem further out"]
+  },
+  {
+    "id": "val_048",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Valuing a company with negative EBITDA but positive revenue",
+    "question": "You are valuing a SaaS startup with $50 million in annual recurring revenue growing at 80% year-over-year but with negative EBITDA of ($30 million). Your comparable public companies trade at 10x–15x NTM Revenue. Walk through how you would value this company.",
+    "model_answer": "Since EBITDA is negative, EV/EBITDA is not usable here — you apply EV/Revenue multiples instead. Using the 10x–15x NTM Revenue range and projecting next year's revenue at $90 million (current $50 million growing 80%), implied Enterprise Value ranges from $900 million at 10x to $1.35 billion at 15x. Given the company's rapid growth, you might weight toward the higher end of the range or even apply a slight premium if its growth exceeds the comparable set. You would also show a long-range DCF as a cross-check, projecting until the company reaches profitability and discounting back at an appropriate high cost of equity.",
+    "common_mistakes": ["Trying to apply an EV/EBITDA multiple when EBITDA is negative — this produces a negative Enterprise Value, which is nonsensical in this context", "Applying multiples to LTM revenue rather than NTM revenue for a fast-growing company — the current revenue run-rate vastly understates where the business will be in 12 months", "Forgetting that the DCF is a cross-check, not the primary method, for a pre-profitability startup"]
+  },
+  {
+    "id": "val_049",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Impact of non-recurring charges on multiples",
+    "question": "A company reports $200 million in EBITDA for the trailing twelve months. However, the financials include $30 million in one-time restructuring charges and $15 million in a litigation settlement expense. If the company trades at an EV of $1.5 billion, what is the reported EV/EBITDA multiple, and what is the adjusted multiple? Which is more appropriate for valuation?",
+    "model_answer": "Reported EV/EBITDA is $1.5 billion divided by $200 million, or 7.5x. If we add back $30 million in restructuring and $15 million in litigation settlement — assuming both are truly non-recurring — adjusted EBITDA is $245 million, and the adjusted EV/EBITDA is $1.5 billion divided by $245 million, or approximately 6.1x. The adjusted multiple is more appropriate for valuation comparisons because non-recurring items distort normalized earnings power — the comparable companies set should also be adjusted on the same basis to ensure consistency. However, the analyst should scrutinize whether these charges are truly one-time or reflect recurring patterns.",
+    "common_mistakes": ["Adding back all unusual charges without assessing whether they are truly non-recurring — companies with repeated restructuring charges should not receive the same add-back every year", "Forgetting to make the same adjustments to the comparable companies set — consistency across the full set is mandatory", "Not noting that the adjusted multiple produces a lower number — adjusting upward for non-recurring charges makes the company look cheaper, which could mislead if the charges are actually recurring"]
+  },
+  {
+    "id": "val_050",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "IPO valuation mechanics",
+    "question": "A company is preparing to IPO. Its public comparables trade at an average of 12x NTM EBITDA. The company's projected EBITDA for next year is $80 million. It has $200 million in debt, $30 million in cash, and plans to raise $100 million in new equity proceeds from the IPO. It has 40 million existing shares outstanding and will issue 5 million new shares in the offering. What is the implied IPO price per share?",
+    "model_answer": "Implied Enterprise Value is 12x times $80 million, or $960 million. Working back to Equity Value: subtract debt of $200 million, add existing cash of $30 million, and add IPO proceeds of $100 million, giving $890 million. Dividing by total shares outstanding post-IPO of 45 million (40 million existing plus 5 million new) gives an implied IPO price of approximately $19.78 per share. In practice you would show a range around the median multiple rather than using a single point.",
+    "common_mistakes": ["Forgetting to add IPO proceeds when converting Enterprise Value to Equity Value — the company receives cash from the offering", "Using only the 40 million existing shares in the denominator instead of total post-IPO shares of 45 million", "Not adding the IPO cash proceeds to arrive at the correct Equity Value — this is the most common error in IPO valuation mechanics"]
+  },
+  {
+    "id": "val_051",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Comparable companies outlier handling",
+    "question": "In your comparable companies set of 10 companies, one company trades at an EV/EBITDA of 35x — roughly three times the next-highest multiple at 12x. How would you handle this outlier, and when would you keep it versus exclude it?",
+    "model_answer": "You would investigate the reason for the elevated multiple before deciding. If the outlier trades at 35x because it received a takeover bid or has some temporary distortion like very depressed recent EBITDA, you would likely exclude it from the set or at least note the distortion separately. If it reflects a structurally different business — for example, a much faster-growing company or one with a dominant market position — you might keep it but note the difference, and use the interquartile range in your analysis which naturally downweights extreme values. The goal is to ensure the set reflects normalized, comparable economics — not to mechanically include everything just because it is in the same industry.",
+    "common_mistakes": ["Automatically including all companies in the set regardless of outlier distortions", "Automatically excluding outliers without investigating the reason — sometimes extreme multiples reflect legitimate differences", "Relying entirely on the median to handle outliers without disclosing the outlier to the client or in the analysis"]
+  },
+  {
+    "id": "val_052",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Sum-of-the-parts mechanics",
+    "question": "A conglomerate has three divisions: Segment A (Industrial Manufacturing, $200M EBITDA), Segment B (Consumer Brands, $150M EBITDA), and Segment C (Software, $50M EBITDA). Industrial comps trade at 7x EBITDA, Consumer comps at 10x, and Software at 18x. Corporate overhead is $40M per year. The company has $500M in net debt. What is the implied Equity Value?",
+    "model_answer": "Value each segment separately: Segment A is $200M times 7x equals $1.4 billion, Segment B is $150M times 10x equals $1.5 billion, and Segment C is $50M times 18x equals $900 million. Sum of segments equals $3.8 billion. Corporate overhead of $40M is a real ongoing cost — you capitalize it at a reasonable multiple (for example 8x as a blended rate) to subtract approximately $320M, bringing total enterprise value to roughly $3.48 billion. Subtracting $500M in net debt gives an implied Equity Value of approximately $2.98 billion.",
+    "common_mistakes": ["Ignoring corporate overhead — it is a real cost that reduces total enterprise value and must be capitalized", "Applying the same multiple to all three segments — the entire point of sum-of-the-parts is to use different multiples for different business types", "Not knowing how to handle the overhead capitalization and either ignoring it entirely or subtracting the annual amount directly instead of capitalizing it"]
+  },
+  {
+    "id": "val_053",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Margin differences affecting comparability",
+    "question": "Company A has $500M in revenue, a 40% EBITDA margin, and trades at 9x EBITDA. Company B has $500M in revenue, a 10% EBITDA margin, and trades at 15x EBITDA. A junior analyst says Company B is more expensive because it has a higher EBITDA multiple. Is this correct? What would be a better comparison?",
+    "model_answer": "The analyst's conclusion is too simplistic. Company A's EBITDA is $200M, giving an EV of $1.8B. Company B's EBITDA is $50M, giving an EV of $750M — so Company A is actually being valued much higher in absolute terms. The higher multiple for Company B reflects that its EBITDA base is small, which mechanically drives up the multiple even if the absolute valuation is lower. A better comparison would use EV/Revenue, where Company A trades at 3.6x ($1.8B / $500M) and Company B trades at 1.5x ($750M / $500M) — suddenly Company A appears more expensive on a revenue basis. When EBITDA margins differ dramatically, neither multiple alone is fully informative without considering both.",
+    "common_mistakes": ["Concluding that a higher EBITDA multiple definitively means a higher absolute valuation — it depends entirely on the EBITDA base", "Not calculating EV/Revenue as the more consistent cross-margin comparison", "Failing to recognize that companies with very different margin profiles may not be good comparables for each other at all"]
+  },
+  {
+    "id": "val_054",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Unlevered FCF calculation",
+    "question": "A company has EBIT of $100M, a 25% tax rate, D&A of $20M, an increase in net working capital of $10M, and CapEx of $15M. Calculate Unlevered Free Cash Flow.",
+    "model_answer": "Start with EBIT of $100M and apply the tax rate: $100M times (1 minus 25%) equals $75M in after-tax EBIT. Add back D&A of $20M to get $95M. Subtract the increase in working capital of $10M (an increase in working capital is a use of cash) to get $85M. Subtract CapEx of $15M to get Unlevered Free Cash Flow of $70M. This is the cash available to all investors — both debt and equity — before any debt service payments.",
+    "common_mistakes": ["Starting from net income instead of EBIT — unlevered FCF must start from EBIT to exclude the effect of interest", "Adding back CapEx instead of subtracting it — CapEx is a cash outflow", "Adding back an increase in working capital instead of subtracting it — an increase in NWC is a use of cash, not a source"]
+  },
+  {
+    "id": "val_055",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Applying a future share price analysis",
+    "question": "You are running a future share price analysis for a company. Its public comparables have a median trailing P/E of 18x. The company's projected EPS two years from now is $4.00. The company's cost of equity is 12%. What is the implied present value of the future share price?",
+    "model_answer": "Apply the median P/E multiple to the projected EPS to get the implied future share price: 18x times $4.00 equals $72.00 in two years. Discount this back to today using the cost of equity as the discount rate: $72.00 divided by (1.12 squared) equals $72.00 divided by 1.254, or approximately $57.40. This represents the present value of what the stock should be worth in two years based on comparable company multiples, and it is one more data point in the valuation range alongside comps and precedent transactions.",
+    "common_mistakes": ["Using WACC instead of cost of equity to discount the share price — you are discounting an equity cash flow, so cost of equity is appropriate", "Applying a forward P/E multiple to a current EPS rather than the projected EPS in year two", "Forgetting to discount the future value back to present — just using the future share price as if it were today's value"]
+  },
+  {
+    "id": "val_056",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Valuation output — median vs. percentile selection",
+    "question": "A company is the clear market leader in its industry with superior margins and faster growth than its peers. Your comparable companies show a median EV/EBITDA of 8x, a 75th percentile of 10x, and a maximum of 12x. How would you adjust your analysis to reflect the company's competitive position?",
+    "model_answer": "You would not simply use the median as your reference point for this company. Because the company demonstrates superior performance across multiple dimensions — market leadership, better margins, and higher growth — you would emphasize the 75th percentile or above rather than the median. You might also add a specific premium of 1–2 turns to acknowledge attributes not fully captured in the multiples, such as the defensibility of its market position or the brand premium it commands. In practice, you might note that the median reflects the average peer while the upper quartile better reflects the company's positioning, and present the full range while noting the company's relative strengths.",
+    "common_mistakes": ["Always defaulting to the median without considering where the company sits relative to peers", "Adding a premium without being able to articulate why — every premium must be justified by specific qualitative or quantitative differentiators", "Jumping directly to the maximum multiple without considering whether the company is truly best-in-class compared to the comp that trades at the maximum"]
+  },
+  {
+    "id": "val_057",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "EV to equity value bridge",
+    "question": "A DCF analysis produces an Enterprise Value of $2 billion for a target company. The target has $400M in total debt, $150M in cash, $50M in preferred stock, $30M in minority interest on its balance sheet, and 100 million diluted shares outstanding. Calculate the implied equity value per share.",
+    "model_answer": "Starting from Enterprise Value of $2 billion, subtract total debt of $400M, subtract preferred stock of $50M, subtract minority interest of $30M, and add cash of $150M. Equity Value equals $2,000M minus $400M minus $50M minus $30M plus $150M, or $1,670M. Dividing by 100 million diluted shares gives an implied price of $16.70 per share. Preferred stock and minority interest are subtracted because they represent claims senior to common equity that reduce what common shareholders receive.",
+    "common_mistakes": ["Forgetting to subtract preferred stock — it is senior to common equity and reduces the equity value available to common shareholders", "Not subtracting minority interest — it represents the portion of subsidiaries owned by others, not the parent company's shareholders", "Adding debt instead of subtracting it when bridging from Enterprise to Equity Value"]
+  },
+  {
+    "id": "val_058",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Contribution analysis in M&A",
+    "question": "In a stock-for-stock merger, Company A (acquirer) has revenue of $800M, EBITDA of $160M, and a market cap of $2 billion. Company B (target) has revenue of $200M, EBITDA of $60M, and a market cap of $400M. What percentage of the combined entity does each company contribute by revenue, EBITDA, and market cap?",
+    "model_answer": "Combined revenue is $1 billion. Company A contributes 80% and Company B contributes 20%. Combined EBITDA is $220M. Company A contributes 72.7% and Company B contributes 27.3% — note that Company B's EBITDA contribution (27.3%) exceeds its revenue contribution (20%) because Company B has a higher EBITDA margin (30% vs. 20%). Combined market cap is $2.4 billion. Company A contributes 83.3% and Company B contributes 16.7%. This contribution analysis helps inform exchange ratio negotiations — if Company B contributes a higher proportion of earnings than its market cap implies, it argues for a higher price.",
+    "common_mistakes": ["Just calculating revenue contributions without drawing the insight that different contribution percentages across metrics reveal something about relative pricing", "Using enterprise value instead of market cap for the ownership contribution analysis in a stock deal", "Forgetting to note the implication: if EBITDA contribution (27.3%) exceeds market cap contribution (16.7%), Company B's owners may argue for more consideration"]
+  },
+  {
+    "id": "val_059",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Precedent transaction — when no EBITDA is available",
+    "question": "You are building a precedent transactions analysis and you identify a highly relevant deal where the target was a private company. The deal press release reports the purchase price but not the EBITDA. What steps would you take to find or estimate the EBITDA?",
+    "model_answer": "First, search for press releases and financial news articles from around the time of the deal — sometimes the buyer or sell-side advisor discloses financial metrics in public statements or filings. Second, look in equity research reports published by analysts covering the buyer around the announcement date, as they often include analyst estimates of the target's financials. Third, check financial data terminals like Capital IQ or Bloomberg, which sometimes have deal-level financial metrics sourced from regulatory filings or credit agreements. If the target was a subsidiary of a public parent, the parent's SEC filings may contain disaggregated segment financial information that allows you to estimate EBITDA.",
+    "common_mistakes": ["Giving up and excluding the transaction without making a genuine effort to find the data", "Using only one source without triangulating across multiple data points", "Forgetting that credit agreement filings (Form 8-K for public acquirers) often contain trailing financial figures for the target to support lender credit analysis"]
+  },
+  {
+    "id": "val_060",
+    "topic": "Valuation",
+    "difficulty": "Technical",
+    "concept": "Liquidation valuation in context",
+    "question": "A struggling retailer has total assets of $500M on its balance sheet, including $300M in tangible fixed assets and $200M in receivables and inventory. Total liabilities are $450M. In a liquidation scenario, hard assets might sell at 40 cents on the dollar and liquid assets at 85 cents on the dollar. What would equity investors receive, and what does this imply about the liquidation value versus book value?",
+    "model_answer": "Tangible fixed assets realize $300M times 40%, or $120M. Receivables and inventory realize $200M times 85%, or $170M. Total liquidation proceeds are $290M. After paying $450M in liabilities, equity investors would receive nothing — in fact, there is a $160M shortfall, meaning even creditors would not be fully repaid. Book equity value (assets minus liabilities) was $500M minus $450M or $50M, but liquidation value is negative to equity. This illustrates why liquidation value is typically the lowest methodology — book value overstates what hard assets actually fetch in a distressed sale.",
+    "common_mistakes": ["Applying the same haircut to all assets regardless of liquidity — fixed assets and liquid current assets have very different recovery rates", "Confusing book equity value with liquidation equity value — book value is an accounting construct, not a cash recovery number", "Forgetting that liquidation must first repay liabilities in seniority order before equity holders receive anything"]
+  },
+  {
+    "id": "val_061",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Why EV/EBITDA is lower for high-margin companies",
+    "question": "Two companies are in the same industry and have identical revenue of $500M and identical enterprise values of $1B. Company A has a 20% EBITDA margin and Company B has a 50% EBITDA margin. Which has the higher EV/EBITDA multiple, and what does this imply about interpreting multiples across companies with different margin profiles?",
+    "model_answer": "Company A's EBITDA is $100M, so its EV/EBITDA is 10x. Company B's EBITDA is $250M, so its EV/EBITDA is 4x. Company B has the lower EV/EBITDA multiple despite generating far more cash flow — this is purely mechanical, not a sign that Company B is undervalued. It means that when comparing companies with dramatically different margin structures, EV/EBITDA can be actively misleading: a higher multiple does not necessarily mean a company is more expensive in any economically meaningful sense. This is why analysts must always contextualize multiples alongside margins when the comparable set has significant margin dispersion.",
+    "common_mistakes": ["Concluding that the lower EV/EBITDA company is cheaper or more attractively valued — they have identical enterprise values", "Not recognizing that the relationship between margin and EV/EBITDA is mechanical and predictable", "Failing to suggest EV/Revenue as a better cross-margin comparison metric"]
+  },
+  {
+    "id": "val_062",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Stub period adjustments in precedent transactions",
+    "question": "A deal was announced on October 1. The target company's fiscal year ends December 31 and its most recent annual report (fiscal year ending December 31 last year) shows $400M in revenue and $100M in EBITDA. Q3 year-to-date (January through September) results are available showing $320M in revenue and $78M in EBITDA. Q3 of the prior year showed $290M in revenue and $72M in EBITDA. Calculate the LTM revenue and EBITDA at the time of deal announcement.",
+    "model_answer": "The LTM calculation for a deal announced October 1 covers October 1 of the prior year through September 30 of this year. Using the formula: LTM equals Full Fiscal Year plus New Partial Period minus Old Partial Period. Revenue: $400M plus $320M minus $290M equals $430M. EBITDA: $100M plus $78M minus $72M equals $106M. These are the LTM figures you would use when calculating the acquisition multiples for this transaction, because they reflect the company's most current performance as of the deal announcement.",
+    "common_mistakes": ["Using the full prior fiscal year figures without any calendarization — these are nine months stale at the time of announcement", "Adding both partial periods instead of adding the new and subtracting the old", "Using calendar-year figures when the company has a non-December fiscal year — always track the actual fiscal periods carefully"]
+  },
+  {
+    "id": "val_063",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "When DCF produces the highest valuation",
+    "question": "Under what specific conditions would a DCF produce a higher valuation than both comparable companies and precedent transactions, and what does this say about the reliability of the DCF in that scenario?",
+    "model_answer": "A DCF produces the highest valuation when the discount rate is relatively low, the perpetuity growth rate is relatively high, and the company's projected future cash flows are substantially above its current earnings — which often happens when a turnaround story, significant market expansion, or high reinvestment-driven growth is projected. It also happens when comparable companies and precedent transactions are depressed by sector-wide sentiment, poor credit markets, or a small sample of low-quality deals. In these scenarios the DCF's optimism should raise a flag: if market participants consistently transact below the DCF-implied price, the analyst should scrutinize whether the projections are credible or whether the model has a mechanical error in terminal value assumptions.",
+    "common_mistakes": ["Treating a high DCF value as always being more accurate than comps — a DCF that significantly exceeds market evidence is more likely wrong than uniquely insightful", "Not recognizing that a very high perpetuity growth rate or very low WACC are the most common drivers of an inflated DCF", "Forgetting that the DCF must pass a sanity check against what real buyers are actually paying in the market"]
+  },
+  {
+    "id": "val_064",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "EBITDA add-back scrutiny",
+    "question": "A management team presents an 'Adjusted EBITDA' of $120M for their company, adding back $40M in stock-based compensation, $15M in restructuring charges (which have been taken every year for the past four years), and $10M in 'deal-related expenses.' As a banker, how would you approach these add-backs, and what would your own normalized EBITDA figure be?",
+    "model_answer": "Stock-based compensation of $40M should generally be kept as an expense rather than added back — while non-cash, it represents real economic dilution and ongoing compensation cost that replaces cash compensation; most sophisticated buyers capitalize companies on a fully-loaded cost basis. The restructuring charge of $15M has been taken for four consecutive years and is therefore not non-recurring by any reasonable definition — you would keep it as an ongoing cost. Only the $10M in deal-related expenses is a legitimate add-back as a genuine one-time item. Your normalized EBITDA would therefore be $80M: $120M minus $40M stock comp minus $15M restructuring charges, reflecting the true ongoing earnings power of the business.",
+    "common_mistakes": ["Adding back stock-based compensation without noting the economic dilution it represents", "Accepting all four years of restructuring as non-recurring just because management labeled them that way", "Accepting the full management-adjusted EBITDA without independently analyzing each line item"]
+  },
+  {
+    "id": "val_065",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Gordon Growth Model sensitivity",
+    "question": "A company's terminal year Unlevered FCF is $100M, WACC is 10%, and you are considering two perpetuity growth rates: 2% and 3%. Calculate the terminal value under each assumption and explain the implications for valuation sensitivity.",
+    "model_answer": "Terminal value at 2% growth: $100M times (1.02) divided by (0.10 minus 0.02) equals $102M divided by 0.08, or $1.275 billion. Terminal value at 3% growth: $100M times (1.03) divided by (0.10 minus 0.03) equals $103M divided by 0.07, or approximately $1.471 billion. A single percentage point increase in the perpetuity growth rate increases terminal value by about $196M — a 15% swing — and this is before discounting back to present value. When terminal value represents 70% of total DCF value, even small changes in the growth rate assumption translate into enormous swings in the overall valuation, which is why DCF sensitivity tables around growth rate and WACC are essential outputs.",
+    "common_mistakes": ["Forgetting to grow the terminal year FCF by one additional period (multiply by 1+g) in the numerator of the Gordon Growth formula", "Using the current year FCF rather than the next year FCF in the terminal value formula", "Not interpreting the magnitude of the sensitivity in terms of total valuation impact — the calculation alone is insufficient without the implication"]
+  },
+  {
+    "id": "val_066",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Minority discount and control premium interaction",
+    "question": "You are valuing a 25% minority stake in a private company for a client who wants to sell it. The full enterprise value of the company, based on a 100% acquisition, is approximately $1 billion. How would you think about the value of the 25% stake, and what discounts might apply?",
+    "model_answer": "A simple 25% of $1 billion would be $250M, but this overestimates the value of a minority stake. Two discounts apply: a minority discount (also called lack-of-control discount) because the stake cannot direct the company's operations, dividends, or sale — typically 20–40%; and a liquidity discount because private minority stakes have essentially no market, making them very difficult to sell — typically 20–35%. After applying a combined discount of perhaps 30–45%, the 25% stake might realistically be worth $140M–$175M depending on specific facts. The exact discounts depend on the company's industry, financial performance, the shareholder agreement terms, and any drag-along or tag-along rights.",
+    "common_mistakes": ["Valuing a minority stake as a straight percentage of total enterprise value without applying minority and liquidity discounts", "Conflating the minority discount with the liquidity discount — they are separate and often both apply simultaneously to private minority interests", "Forgetting that shareholder agreement terms (drag-along rights, put options, board representation) can meaningfully affect the appropriate discount level"]
+  },
+  {
+    "id": "val_067",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Calendarization across multiple fiscal year-ends",
+    "question": "You are building a comparable companies analysis for a target whose fiscal year ends June 30. Your three comparable companies have fiscal years ending December 31, March 31, and September 30 respectively. Today is November 15 and you have Q1 results for each company that aligns with their most recent quarter. Explain how you would calendarize each company to match the June 30 fiscal year-end.",
+    "model_answer": "The goal is to create a twelve-month period ending June 30 for each company. For the December 31 company, you take the full fiscal year (Jan–Dec), add the January 1–June 30 partial period of the current year, and subtract the same January 1–June 30 partial period from the prior year. For the March 31 company, you take the full fiscal year (Apr–Mar), add the April 1–June 30 quarter of this year, and subtract April 1–June 30 from the prior year — a single quarterly adjustment. For the September 30 company, you take the full fiscal year (Oct–Sep), add the October 1–June 30 period (three quarters), and subtract the same October 1–June 30 period from the prior year. In each case, TTM equals Full Fiscal Year plus New Partial Period minus Old Partial Period.",
+    "common_mistakes": ["Applying the same calendarization adjustment to all companies regardless of their specific fiscal year-end dates", "Adjusting to match the calendar year (December 31) instead of the target company's fiscal year-end (June 30)", "Getting confused about which is the new versus old partial period when fiscal years don't align neatly with calendar quarters"]
+  },
+  {
+    "id": "val_068",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "When to use EV/Revenue vs. EV/EBITDA in a specific scenario",
+    "question": "You are comparing two software companies for an acquisition. Company A has $300M in revenue and a 35% EBITDA margin. Company B has $300M in revenue and a 5% EBITDA margin. Both companies are growing at 30% annually. Which valuation multiple would give you the most meaningful comparison between them, and why?",
+    "model_answer": "EV/Revenue is more meaningful in this comparison because the dramatic margin difference makes EV/EBITDA comparisons mechanically unreliable — Company A's EBITDA is $105M while Company B's is only $15M, so even at the same absolute EV, Company A would show a 7x EV/EBITDA while Company B shows 50x, suggesting an enormous valuation gap that may be illusory. Since both companies have identical revenue and growth rates, EV/Revenue provides a cleaner comparison of how the market values their top-line scale and growth trajectory on a consistent basis. The analyst should also investigate why Company B has a 5% margin despite identical revenue — if it is investing aggressively in growth, a long-range DCF may be a better supplementary tool.",
+    "common_mistakes": ["Defaulting to EV/EBITDA for all software companies without recognizing that extreme margin differences make the multiple incomparable", "Not noting that EV/Revenue ignores profitability entirely and should be supplemented with another analysis", "Failing to ask why the margins differ so dramatically, which is as important as knowing which multiple to use"]
+  },
+  {
+    "id": "val_069",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Net Operating Losses in valuation",
+    "question": "You are acquiring a company that has $300M in Net Operating Loss carryforwards. The company's effective tax rate is 25%. How do you incorporate the NOLs into your valuation, and what is the key limitation?",
+    "model_answer": "To incorporate NOLs, you estimate the present value of the future tax savings they will generate. If the company can use $50M of NOLs per year for six years, the tax savings each year would be $50M times 25%, or $12.5M per year. You then discount that stream of savings at an appropriate rate — often the cost of debt or cost of equity depending on certainty — to get a present value, which you would add to the DCF Enterprise Value as you would add cash, or subtract from Enterprise Value to get Equity Value. The key limitation is Section 382 of the tax code, which in an ownership change scenario limits annual NOL usage to the acquired company's equity value times the long-term tax-exempt rate, potentially making the NOLs far less valuable than a simple calculation suggests.",
+    "common_mistakes": ["Assuming all NOLs can be used freely and immediately after an acquisition — Section 382 limits impose significant constraints on NOL utilization post-ownership change", "Using the wrong discount rate — the certainty of the tax savings matters; if usage is highly uncertain, a higher discount rate is appropriate", "Treating NOLs identically to cash on the balance sheet — their value depends on the ability to generate future taxable income to absorb them"]
+  },
+  {
+    "id": "val_070",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Residual income model for banks",
+    "question": "Why do investment bankers use Dividend Discount Models and Residual Income Models rather than standard DCFs when valuing commercial banks? What makes the standard DCF structurally inappropriate?",
+    "model_answer": "Standard DCFs require separating operating cash flows from financing cash flows, but for a bank this distinction breaks down — deposits and borrowings are the raw materials that banks use to generate revenue, not just financing sources. Calculating unlevered free cash flow for a bank would require removing the impact of debt, but debt is the core input to the business, making the concept economically meaningless. The DDM is appropriate because dividends represent the actual cash returned to equity holders, and banks are required to hold capital ratios which constrain how much cash can be distributed — so dividends are a better proxy for equity value creation than FCF. The Residual Income model captures whether the bank earns returns above its cost of equity, which is the right economic question for a highly leveraged financial institution.",
+    "common_mistakes": ["Saying DCF doesn't work for banks just because the financials are complex — the reason is structural, not complexity", "Forgetting that capital adequacy requirements constrain bank payouts and make dividend-based models more relevant", "Claiming DDM only applies to utility-like businesses — it is the standard intrinsic valuation method for commercial banks globally"]
+  },
+  {
+    "id": "val_071",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Precedent transaction multiples with synergies",
+    "question": "You are using a precedent transaction to inform your valuation, and you learn that the acquirer publicly announced $200M in expected cost synergies after announcing the deal for $3B. The target had $300M in EBITDA. Should you use the $3B price at face value when calculating the EV/EBITDA multiple for your precedent set? Why or why not?",
+    "model_answer": "You should use the $3B price as stated — 10x EBITDA — but you must note the synergy overhang when interpreting it. Acquirers who pay high multiples often do so in part because they expect synergies that make the deal accretive on a pro-forma basis, meaning the multiple overstates the standalone value of the target. If a buyer is paying for $200M in synergies capitalized at, say, 8x, that represents $1.6B of the $3B — implying the standalone EV would be more like $1.4B, or under 5x EBITDA. Whether to adjust for this depends on your purpose: if you're trying to assess what a strategic acquirer would pay your client, keep the synergy-inclusive multiple; if you're assessing standalone value, back out the estimated synergies.",
+    "common_mistakes": ["Always using headline multiples from precedent transactions without investigating whether synergies inflated the price", "Trying to always back out synergies — in many M&A situations, strategic value including synergies is exactly what you want to compare", "Using an annualized NPV of synergies without considering that synergies typically have costs to achieve and are not all realized in year one"]
+  },
+  {
+    "id": "val_072",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Exit multiple vs. Gordon Growth consistency",
+    "question": "A DCF uses an exit EV/EBITDA multiple of 10x in the terminal value. A colleague says the equivalent perpetuity growth rate implied by that multiple is roughly 3%. WACC is 9% and terminal year EBITDA is $200M. Show how you would check whether 10x EBITDA is consistent with a 3% growth assumption, and why this consistency check matters.",
+    "model_answer": "Terminal value using the exit multiple: $200M times 10x equals $2 billion. To back out the implied perpetuity growth rate, assume Terminal Value equals UFCF times (1+g) divided by (WACC minus g), and solve for g. If UFCF is approximately $160M (EBITDA of $200M adjusted for taxes and working capital) and TV is $2 billion: $2B equals $160M times (1+g) divided by (0.09 minus g). Solving approximately: 0.09 minus g equals 0.08, so g is roughly 1%. The implied growth rate may be closer to 1%, not 3%, so 10x is actually inconsistent with a 3% growth assumption in this case. This consistency check matters because using an exit multiple that implies an unrealistic perpetuity growth rate is a common valuation error that can inflate terminal value significantly.",
+    "common_mistakes": ["Accepting the exit multiple without checking what growth rate it implies — this cross-check is a standard quality control step", "Assuming exit multiple and Gordon Growth always agree when using the same underlying assumptions — they only agree when inputs are perfectly consistent", "Not knowing how to back-solve for the implied growth rate from a given terminal value and free cash flow"]
+  },
+  {
+    "id": "val_073",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Valuing a cyclical company",
+    "question": "You are valuing a steel company at the peak of the commodity cycle. Its EBITDA this year is $500M, but a quick analysis of the past decade shows average EBITDA of $200M. How should you approach the valuation, and what specific methodologies or adjustments would you make?",
+    "model_answer": "You should avoid anchoring on peak-cycle EBITDA of $500M for a cyclical company — doing so would dramatically overstate normalized value. Instead, you would calculate midcycle or through-the-cycle EBITDA (roughly $200M based on the decade average) and apply your valuation multiples to that figure. You would also consider normalizing the comparable companies' multiples if they are also at peak-cycle conditions, since their elevated current EBITDA would make their multiples appear artificially low. In a DCF, you would explicitly model a mean-reverting cash flow trajectory rather than extrapolating current margins into perpetuity. Precedent transactions that occurred at cycle peaks should be labeled as such and may warrant a discount when applied to normalized conditions.",
+    "common_mistakes": ["Applying current-cycle multiples to peak-cycle EBITDA — this double-counts cyclical elevation and dramatically overstates value", "Not recognizing that both the numerator (market prices) and denominator (EBITDA) in comps multiples may be cycle-elevated simultaneously", "Assuming midcycle is simply the average — for heavily capital-intensive cyclicals, the investment required through the trough also matters for cash flow normalization"]
+  },
+  {
+    "id": "val_074",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Assigning enterprise vs. equity value multiples to industry metrics",
+    "question": "A telecom analyst uses 'EV per Subscriber' as a valuation metric. A real estate banker uses 'Price per Square Foot' — sometimes as a price-per-share metric and sometimes as an enterprise-level metric. What principle governs whether to use enterprise value or equity value with any given operational metric, and how would you apply it to these two examples?",
+    "model_answer": "The governing principle is whether the operational metric belongs to all capital providers or only to equity holders. If the metric is an asset or revenue-generating unit that benefits all stakeholders — both debt and equity — then Enterprise Value is the appropriate numerator. For telecom subscribers, the subscriber base generates cash flows that service both debt and equity, so EV per Subscriber is appropriate. For real estate, properties generate gross income that must service debt before equity holders receive anything, so EV per Square Foot is the correct enterprise-level metric. Price per Square Foot as an equity-level metric would only make sense if there were no debt at the property level — which rarely applies in real estate investing.",
+    "common_mistakes": ["Defaulting to equity value for any per-unit metric because it sounds like a 'price' — the EV vs. equity distinction depends on capital structure access, not naming convention", "Not recognizing that EV per Subscriber is consistently used in telecom because subscribers generate debt-serviceable cash flows", "Thinking the principle only applies to income statement metrics — it applies to any operational or asset metric used as a valuation denominator"]
+  },
+  {
+    "id": "val_075",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Synergies and accretion/dilution in acquisition context",
+    "question": "In a valuation context, why is it generally inappropriate for a sell-side advisor to include buyer-specific synergies in the standalone valuation of the company being sold, even though strategic buyers will price synergies into their bids?",
+    "model_answer": "A sell-side advisor's job is to establish the standalone value of the business — what it is worth to a financial buyer or in the public market independent of any specific acquirer. Embedding a particular buyer's synergies into the standalone valuation would overstate the company's inherent worth and could mislead shareholders into thinking that value is available regardless of who buys it — when in reality it only exists if that specific buyer completes the deal. Additionally, different buyers will have very different synergy estimates depending on their strategic overlap, so including one buyer's synergies biases the analysis toward that buyer. The appropriate practice is to show standalone valuation separately and then show estimated synergy value as a premium layer in the negotiation context or in a dedicated synergy discussion.",
+    "common_mistakes": ["Embedding buyer synergies into the base valuation presented to a board — this conflates intrinsic standalone value with deal-specific premium", "Saying synergies should never be considered — they are extremely relevant in bid evaluation and fairness opinion contexts, just separated from standalone value", "Forgetting that synergies have costs to achieve (severance, integration costs) and are realized over time, not immediately"]
+  },
+  {
+    "id": "val_076",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Ranking methodologies for a specific situation",
+    "question": "You are advising a mature, profitable public company on a sale process. There are several comparable public companies, five relevant precedent transactions from the past two years, and the company has stable, predictable cash flows. How would you rank the reliability of the three core valuation methodologies in this specific context, and why?",
+    "model_answer": "In this situation, Precedent Transactions would likely be most relevant because they directly reflect acquisition prices — including control premiums — for comparable businesses in current market conditions, and there are five recent and relevant deals which gives you a meaningful dataset. Comparable Companies would be the second most reliable because there are identifiable public peers, though the multiples reflect minority trading values rather than acquisition prices and are subject to market sentiment on any given day. The DCF would be the most internally consistent check and gains credibility precisely because the company has stable, predictable cash flows — but it remains the most assumption-driven methodology and should be presented as a cross-check rather than the primary reference. You would weight all three together in a football field, but the Precedent Transaction range and Public Comps range would anchor the discussion.",
+    "common_mistakes": ["Always ranking DCF as most reliable regardless of context — its reliability depends on cash flow predictability and data quality", "Saying there is no ranking because all three are equally important — in advisory practice, the credibility of each methodology depends on data quality and situational fit", "Ranking Public Comps above Precedent Transactions for a sale situation — for M&A advisory, acquisition multiples are more directly relevant"]
+  },
+  {
+    "id": "val_077",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Internet-specific multiples rationale",
+    "question": "Why are metrics like EV per Unique Monthly Active User or EV per Pageview used to value early-stage internet companies, and what are the key risks of relying on these multiples?",
+    "model_answer": "These metrics are used because early-stage internet companies often have negligible or negative EBITDA, making traditional income-based multiples meaningless, but have large, engaged user bases that represent future monetization potential — the hypothesis being that users today equal revenue and cash flow tomorrow. The multiples are also used because the M&A market for internet companies historically validated these metrics as deal currencies, providing some empirical grounding for the approach. The key risks are that the relationship between user counts and monetization is highly uncertain and varies enormously by business model, that user counts can be inflated by inactive or bot accounts, and that these multiples have no anchor in fundamental cash flow economics — making them susceptible to market sentiment swings that can collapse valuations even for genuinely valuable businesses.",
+    "common_mistakes": ["Treating EV/MAU as a reliable valuation metric without noting its fundamental disconnect from cash flow economics", "Not distinguishing between different types of users — highly engaged daily active users are worth far more than monthly actives that barely open the app", "Forgetting that these multiples require a comparable set of similarly-staged internet companies, which may not always be available"]
+  },
+  {
+    "id": "val_078",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Biotech DCF — probability-weighted scenarios",
+    "question": "You are valuing a clinical-stage biotech company with no revenue and a single drug candidate in Phase 2 trials. The drug has a 30% probability of FDA approval. If approved, you project $500M in peak annual sales and a $300M NPV of cash flows. What valuation methodology would you use, and how would you incorporate the probability of success?",
+    "model_answer": "For a pre-revenue biotech, a probability-weighted DCF (risk-adjusted NPV, or rNPV) is the most appropriate intrinsic methodology. You build a DCF that models the full commercial case — $500M peak sales, projected cash flows discounted to present — arriving at the $300M NPV for the approval scenario. You then multiply by the 30% probability of approval to get a risk-adjusted NPV of $90M. You also add the NPV of the R&D and operating costs the company will incur regardless of approval, which reduces the value, as well as any cash on the balance sheet. For relative valuation, you would look at comparable phase-stage biotech company transaction multiples and trading prices, often expressed as enterprise value per pipeline asset.",
+    "common_mistakes": ["Not probability-weighting the commercial scenario — applying the full $300M NPV without adjustment dramatically overstates expected value", "Forgetting to subtract the ongoing cash burn from R&D and G&A — a biotech's cost structure is a real drag on value even in the approval scenario", "Not knowing that the probability of success should reflect cumulative Phase 2-to-approval rates, not just binary FDA pass/fail"]
+  },
+  {
+    "id": "val_079",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "Fairness opinion context and independence",
+    "question": "What is a Fairness Opinion, who produces it, when is it required, and what are the key limitations that make it controversial despite being a standard feature of public M&A transactions?",
+    "model_answer": "A Fairness Opinion is a formal written statement from a financial advisor, typically an investment bank, delivered to the board of directors of the seller just before a public acquisition closes, certifying that the purchase price is fair from a financial standpoint to the company's shareholders. It is typically required by the board to fulfill their fiduciary duties and is delivered by the sell-side advisor who is also advising on the transaction. The key controversies are: the advisor who produces the opinion is often being paid a success fee that is only earned if the deal closes, creating an obvious incentive to deliver a favorable opinion; the opinion is presented as objective financial analysis but relies on assumptions chosen by the advisor; and the applicable valuation range is often constructed to encompass the deal price rather than being independently derived.",
+    "common_mistakes": ["Saying fairness opinions are purely objective — the fee structure creates inherent conflicts of interest that are widely acknowledged in the legal and financial community", "Thinking fairness opinions are produced by the acquirer — they are almost always produced by the sell-side advisor for the benefit of the selling company's board", "Believing a fairness opinion is a guarantee of full fair value — it is a legal protection for the board, not a market-clearing price determination"]
+  },
+  {
+    "id": "val_080",
+    "topic": "Valuation",
+    "difficulty": "Advanced",
+    "concept": "NAV model for oil and gas",
+    "question": "Explain how a Net Asset Value (NAV) model works for an oil and gas company, how it differs from a standard DCF, and what the key assumptions are that drive the output.",
+    "model_answer": "A NAV model for an oil and gas company values the company's proved reserves by projecting the production profile and commodity prices for each reserve category, subtracting operating costs and taxes, and discounting the resulting cash flows back to the present — typically at a 10% discount rate as industry convention (called PV-10). This is fundamentally similar to a DCF, but it is asset-level rather than company-level: you model each field or well separately, sum the reserve values, then subtract net debt and corporate costs to get equity value per share. The key differences from a standard corporate DCF are that production declines deterministically as reserves deplete (no perpetuity terminal value), commodity prices are the dominant uncertain variable, and reserve categorization (proved vs. probable vs. possible) directly affects which assets are included. The primary value drivers are assumed commodity price deck, production decline rates, and lifting costs.",
+    "common_mistakes": ["Using a Gordon Growth perpetuity in an oil and gas NAV — reserves deplete to zero, so there is no perpetual cash flow and no terminal value based on a growth assumption", "Not risk-adjusting probable and possible reserves — proved reserves are valued at full probability weight while unproved categories should be discounted for uncertainty", "Forgetting that NAV is a before-tax and after-tax exercise where royalties, severance taxes, and corporate taxes all require separate treatment"]
+  }
+]
