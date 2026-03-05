@@ -3,26 +3,66 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { Pool } = require('pg');
 
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'apex-ib-secret-change-in-prod';
-const DB_PATH = process.env.DB_PATH || './db.json';
 
-// ── PURE JS DATABASE (JSON file, no native deps) ──────────────
-function loadDB() {
+// ── POSTGRES ──────────────────────────────────────────────────
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+});
+
+async function initDB() {
+  const client = await pool.connect();
   try {
-    if (fs.existsSync(DB_PATH)) return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-  } catch(e) { console.error('DB load error:', e.message); }
-  return { users: [], question_results: [], sessions: [], activity: [], user_state: [] };
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id BIGINT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        name TEXT,
+        created_at BIGINT
+      );
+      CREATE TABLE IF NOT EXISTS question_results (
+        user_id BIGINT,
+        question_id TEXT,
+        topic TEXT,
+        status TEXT,
+        score INT DEFAULT 0,
+        updated_at BIGINT,
+        PRIMARY KEY (user_id, question_id)
+      );
+      CREATE TABLE IF NOT EXISTS sessions (
+        id SERIAL PRIMARY KEY,
+        user_id BIGINT,
+        question_id TEXT,
+        topic TEXT,
+        score INT DEFAULT 0,
+        status TEXT,
+        created_at BIGINT
+      );
+      CREATE TABLE IF NOT EXISTS activity (
+        user_id BIGINT,
+        date TEXT,
+        questions_answered INT DEFAULT 0,
+        PRIMARY KEY (user_id, date)
+      );
+      CREATE TABLE IF NOT EXISTS user_state (
+        user_id BIGINT PRIMARY KEY,
+        last_topic TEXT DEFAULT 'All',
+        last_question_index INT DEFAULT 0,
+        updated_at BIGINT
+      );
+    `);
+    console.log('✓ DB tables ready');
+  } finally {
+    client.release();
+  }
 }
-function saveDB(db) {
-  try { fs.writeFileSync(DB_PATH, JSON.stringify(db)); }
-  catch(e) { console.error('DB save error:', e.message); }
-}
-let db = loadDB();
-console.log('✓ DB loaded, users:', db.users.length);
 
-// ── JWT (no dependency) ───────────────────────────────────────
+// ── JWT ───────────────────────────────────────────────────────
 function b64url(s) { return Buffer.from(s).toString('base64').replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_'); }
 function signToken(payload) {
   const h = b64url(JSON.stringify({alg:'HS256',typ:'JWT'}));
@@ -45,7 +85,7 @@ function getUser(req) {
   return t ? verifyToken(t) : null;
 }
 
-// ── PASSWORD (SHA256+salt, no dependency) ─────────────────────
+// ── PASSWORD ──────────────────────────────────────────────────
 function hashPwd(pwd) {
   const salt = crypto.randomBytes(16).toString('hex');
   return salt+':'+crypto.createHmac('sha256',salt).update(pwd).digest('hex');
@@ -69,7 +109,7 @@ const today = () => new Date().toISOString().slice(0,10);
 const nowSec = () => Math.floor(Date.now()/1000);
 
 // ── SERVER ────────────────────────────────────────────────────
-http.createServer(async (req, res) => {
+const server = http.createServer(async (req, res) => {
   if (req.method==='OPTIONS') {
     res.writeHead(200,{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*','Access-Control-Allow-Methods':'POST,GET,OPTIONS'});
     res.end(); return;
@@ -78,83 +118,110 @@ http.createServer(async (req, res) => {
 
   // PING
   if (url === '/api/ping') {
-    return json(res, 200, { ok: true, users: db.users.length, ts: Date.now() });
-  }
-
-  // DEBUG — shows raw DB state (remove before production)
-  if (url === '/api/debug') {
-    db = loadDB();
-    return json(res, 200, { users: db.users.map(u => ({id:u.id, email:u.email, name:u.name})), userCount: db.users.length });
+    const r = await pool.query('SELECT COUNT(*) FROM users');
+    return json(res, 200, { ok: true, users: parseInt(r.rows[0].count), ts: Date.now() });
   }
 
   // REGISTER
   if (req.method==='POST' && url==='/api/auth/register') {
-    const {email,password,name} = await readBody(req);
-    if (!email||!password) return json(res,400,{error:'Email and password required'});
-    if (password.length<6) return json(res,400,{error:'Password must be at least 6 characters'});
-    db = loadDB();
-    const emailLower = email.toLowerCase().trim();
-    if (db.users.find(u=>u.email===emailLower)) return json(res,409,{error:'Email already registered'});
-    const id = Date.now();
-    const displayName = name||emailLower.split('@')[0];
-    db.users.push({id, email:emailLower, password_hash:hashPwd(password), name:displayName, created_at:nowSec()});
-    saveDB(db);
-    return json(res,200,{token:signToken({userId:id,email:emailLower}), name:displayName});
+    try {
+      const {email,password,name} = await readBody(req);
+      if (!email||!password) return json(res,400,{error:'Email and password required'});
+      if (password.length<6) return json(res,400,{error:'Password must be at least 6 characters'});
+      const emailLower = email.toLowerCase().trim();
+      const existing = await pool.query('SELECT id FROM users WHERE email=$1', [emailLower]);
+      if (existing.rows.length > 0) return json(res,409,{error:'Email already registered'});
+      const id = Date.now();
+      const displayName = name || emailLower.split('@')[0];
+      await pool.query(
+        'INSERT INTO users (id,email,password_hash,name,created_at) VALUES ($1,$2,$3,$4,$5)',
+        [id, emailLower, hashPwd(password), displayName, nowSec()]
+      );
+      return json(res,200,{token:signToken({userId:id,email:emailLower}), name:displayName});
+    } catch(e) { return json(res,500,{error:e.message}); }
   }
 
   // LOGIN
   if (req.method==='POST' && url==='/api/auth/login') {
-    const {email,password} = await readBody(req);
-    if (!email||!password) return json(res,400,{error:'Email and password required'});
-    db = loadDB();
-    const user = db.users.find(u=>u.email===email.toLowerCase().trim());
-    if (!user||!checkPwd(password,user.password_hash)) return json(res,401,{error:'Invalid email or password'});
-    return json(res,200,{token:signToken({userId:user.id,email:user.email}), name:user.name});
+    try {
+      const {email,password} = await readBody(req);
+      if (!email||!password) return json(res,400,{error:'Email and password required'});
+      const r = await pool.query('SELECT * FROM users WHERE email=$1', [email.toLowerCase().trim()]);
+      const user = r.rows[0];
+      if (!user || !checkPwd(password, user.password_hash)) return json(res,401,{error:'Invalid email or password'});
+      return json(res,200,{token:signToken({userId:user.id,email:user.email}), name:user.name});
+    } catch(e) { return json(res,500,{error:e.message}); }
   }
 
   // SAVE RESULT
   if (req.method==='POST' && url==='/api/progress/save-result') {
     const user = getUser(req); if (!user) return json(res,401,{error:'Unauthorized'});
-    const {questionId,topic,status,score} = await readBody(req);
-    db = loadDB();
-    const ex = db.question_results.find(r=>r.user_id===user.userId&&r.question_id===questionId);
-    if (ex) { ex.status=status; ex.score=score||0; ex.updated_at=nowSec(); }
-    else db.question_results.push({user_id:user.userId,question_id:questionId,topic,status,score:score||0,updated_at:nowSec()});
-    db.sessions.push({user_id:user.userId,question_id:questionId,topic,score:score||0,status,created_at:nowSec()});
-    const t=today(); const act=db.activity.find(a=>a.user_id===user.userId&&a.date===t);
-    if (act) act.questions_answered++; else db.activity.push({user_id:user.userId,date:t,questions_answered:1});
-    saveDB(db);
-    return json(res,200,{ok:true});
+    try {
+      const {questionId,topic,status,score} = await readBody(req);
+      await pool.query(`
+        INSERT INTO question_results (user_id,question_id,topic,status,score,updated_at)
+        VALUES ($1,$2,$3,$4,$5,$6)
+        ON CONFLICT (user_id,question_id) DO UPDATE
+        SET status=$4, score=$5, updated_at=$6, topic=$3
+      `, [user.userId, questionId, topic, status, score||0, nowSec()]);
+      await pool.query(
+        'INSERT INTO sessions (user_id,question_id,topic,score,status,created_at) VALUES ($1,$2,$3,$4,$5,$6)',
+        [user.userId, questionId, topic, score||0, status, nowSec()]
+      );
+      await pool.query(`
+        INSERT INTO activity (user_id,date,questions_answered)
+        VALUES ($1,$2,1)
+        ON CONFLICT (user_id,date) DO UPDATE
+        SET questions_answered = activity.questions_answered + 1
+      `, [user.userId, today()]);
+      return json(res,200,{ok:true});
+    } catch(e) { return json(res,500,{error:e.message}); }
   }
 
   // SAVE STATE
   if (req.method==='POST' && url==='/api/progress/save-state') {
     const user = getUser(req); if (!user) return json(res,401,{error:'Unauthorized'});
-    const {topic,questionIndex} = await readBody(req);
-    db = loadDB();
-    const ex = db.user_state.find(s=>s.user_id===user.userId);
-    if (ex) { ex.last_topic=topic||'All'; ex.last_question_index=questionIndex||0; ex.updated_at=nowSec(); }
-    else db.user_state.push({user_id:user.userId,last_topic:topic||'All',last_question_index:questionIndex||0,updated_at:nowSec()});
-    saveDB(db);
-    return json(res,200,{ok:true});
+    try {
+      const {topic,questionIndex} = await readBody(req);
+      await pool.query(`
+        INSERT INTO user_state (user_id,last_topic,last_question_index,updated_at)
+        VALUES ($1,$2,$3,$4)
+        ON CONFLICT (user_id) DO UPDATE
+        SET last_topic=$2, last_question_index=$3, updated_at=$4
+      `, [user.userId, topic||'All', questionIndex||0, nowSec()]);
+      return json(res,200,{ok:true});
+    } catch(e) { return json(res,500,{error:e.message}); }
   }
 
   // LOAD PROGRESS
   if (req.method==='GET' && url==='/api/progress/load') {
     const user = getUser(req); if (!user) return json(res,401,{error:'Unauthorized'});
-    db = loadDB();
-    const results = db.question_results.filter(r=>r.user_id===user.userId).map(r=>({question_id:r.question_id,topic:r.topic,status:r.status,score:r.score}));
-    const stateRow = db.user_state.find(s=>s.user_id===user.userId);
-    const state = stateRow ? {last_topic:stateRow.last_topic,last_question_index:stateRow.last_question_index} : {last_topic:'All',last_question_index:0};
-    const history = db.sessions.filter(s=>s.user_id===user.userId).sort((a,b)=>b.created_at-a.created_at).slice(0,50);
-    const activity = db.activity.filter(a=>a.user_id===user.userId).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,84);
-    const actDates = new Set(activity.map(a=>a.date));
-    let streak=0;
-    for (let i=0;i<365;i++) { const d=new Date(); d.setDate(d.getDate()-i); const ds=d.toISOString().slice(0,10); if(actDates.has(ds))streak++; else if(i>0)break; }
-    return json(res,200,{results,state,history,activity,streak});
+    try {
+      const [resultsR, stateR, historyR, activityR] = await Promise.all([
+        pool.query('SELECT question_id,topic,status,score FROM question_results WHERE user_id=$1', [user.userId]),
+        pool.query('SELECT last_topic,last_question_index FROM user_state WHERE user_id=$1', [user.userId]),
+        pool.query('SELECT question_id,topic,score,status,created_at FROM sessions WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50', [user.userId]),
+        pool.query('SELECT date,questions_answered FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84', [user.userId])
+      ]);
+      const state = stateR.rows[0] || {last_topic:'All', last_question_index:0};
+      const actDates = new Set(activityR.rows.map(a=>a.date));
+      let streak=0;
+      for (let i=0;i<365;i++) {
+        const d=new Date(); d.setDate(d.getDate()-i);
+        const ds=d.toISOString().slice(0,10);
+        if (actDates.has(ds)) streak++; else if (i>0) break;
+      }
+      return json(res,200,{
+        results: resultsR.rows,
+        state,
+        history: historyR.rows,
+        activity: activityR.rows,
+        streak
+      });
+    } catch(e) { return json(res,500,{error:e.message}); }
   }
 
-  // GRADE (streaming)
+  // GRADE (streaming proxy to Anthropic)
   if (req.method==='POST' && url==='/api/grade') {
     let body=''; req.on('data',c=>body+=c); req.on('end',()=>{
       const parsed=JSON.parse(body); parsed.stream=true;
@@ -167,7 +234,7 @@ http.createServer(async (req, res) => {
     }); return;
   }
 
-  // STATIC
+  // STATIC FILES
   let filePath = '.'+req.url.split('?')[0];
   if (filePath==='./') filePath='./dashboard.html';
   const ext=path.extname(filePath);
@@ -177,8 +244,16 @@ http.createServer(async (req, res) => {
     res.writeHead(200,{'Content-Type':ct,'Access-Control-Allow-Origin':'*'});
     res.end(content);
   });
+});
 
-}).listen(PORT, () => {
-  console.log(`✓ Server on port ${PORT}`);
-  console.log(`✓ API key: ${process.env.ANTHROPIC_API_KEY?'SET':'MISSING'}`);
+// ── BOOT ──────────────────────────────────────────────────────
+initDB().then(() => {
+  server.listen(PORT, () => {
+    console.log(`✓ Server on port ${PORT}`);
+    console.log(`✓ API key: ${process.env.ANTHROPIC_API_KEY ? 'SET' : 'MISSING'}`);
+    console.log(`✓ Database: ${process.env.DATABASE_URL ? 'Postgres connected' : 'NO DATABASE_URL — set this in Railway'}`);
+  });
+}).catch(err => {
+  console.error('✗ DB init failed:', err.message);
+  process.exit(1);
 });
