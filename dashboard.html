@@ -519,9 +519,10 @@
     line-height: 1.45;
     color: var(--text-primary);
     margin-bottom: 3px;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .weak-spot-meta {
@@ -1172,7 +1173,7 @@
       const attemptsLabel = q.attempts === 1 ? '1 attempt' : `${q.attempts} attempts`;
       // Short question text - we only have the ID, link to practice that topic
       const rawText = Q_TEXT[q.id] || null;
-      const qText = rawText ? (rawText.length > 55 ? rawText.slice(0, 55).trimEnd() + '…' : rawText) : (topicLabel + ' question');
+      const qText = rawText || (topicLabel + ' question');
       return `<a class="weak-spot-item" href="practice-screen.html?topic=${q.topic}" style="text-decoration:none;">
         <div class="weak-spot-rank ${rankClasses[i]}">${i+1}</div>
         <div class="weak-spot-body">
