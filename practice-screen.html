@@ -1544,6 +1544,24 @@
 <script>
   let currentMode = 'voice';
 
+
+  // ── Initialize nav badges immediately with 0/total ───────
+  (function initBadges() {
+    const topicTotals = {
+      'All': QUESTION_BANK.length,
+      'Accounting': QUESTION_BANK.filter(q => q.topic === 'Accounting').length,
+      'Enterprise_Value': QUESTION_BANK.filter(q => q.topic === 'Enterprise_Value').length,
+      'Valuation': QUESTION_BANK.filter(q => q.topic === 'Valuation').length,
+      'DCF': QUESTION_BANK.filter(q => q.topic === 'DCF').length,
+      'Mergers_MA': QUESTION_BANK.filter(q => q.topic === 'Mergers_MA').length,
+      'LBO': QUESTION_BANK.filter(q => q.topic === 'LBO').length,
+    };
+    Object.entries(topicTotals).forEach(([topic, total]) => {
+      const el = document.getElementById('badge-' + topic);
+      if (el) el.textContent = '0/' + total;
+    });
+  })();
+
   // ─── AUTH STATE (must be at top — referenced by init) ─────
   let authToken = null;
   let currentUser = null;

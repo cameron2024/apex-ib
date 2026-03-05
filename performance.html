@@ -122,17 +122,37 @@
   .trend-gridline { stroke: var(--border, #E8E5DF); stroke-dasharray: 3 3; }
   .trend-tooltip {
     position: absolute;
-    background: var(--text-primary);
-    color: white;
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 5px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
     pointer-events: none;
-    white-space: nowrap;
     opacity: 0;
     transition: opacity .15s;
     z-index: 10;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    border: 1px solid var(--border);
+    max-width: 220px;
+    white-space: normal;
+    line-height: 1.4;
   }
+  .tip-score { font-size: 18px; font-weight: 700; font-family: 'DM Serif Display', serif; letter-spacing: -.3px; }
+  .tip-topic { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .tip-q { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
+  .tip-date { font-size: 10px; color: var(--text-tertiary); margin-top: 5px; }
+  .trend-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .trend-filter-btn {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border);
+    background: white; color: var(--text-secondary); cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all .15s;
+  }
+  .trend-filter-btn.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+  .trend-avg-line { stroke-dasharray: 4 3; stroke-width: 1.5; opacity: .6; }
+  .trend-improvement { font-size: 12px; font-weight: 600; }
+  .trend-improvement.up { color: var(--accent-green); }
+  .trend-improvement.down { color: var(--accent-red); }
+  .trend-improvement.flat { color: var(--text-tertiary); }
   .trend-empty { padding:32px 0; text-align:center; color:var(--text-tertiary); font-size:13px; }
   .trend-stats { display:flex; gap:20px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
   .trend-stat { flex:1; }
@@ -335,6 +355,15 @@
         <span class="panel-label" id="trendLabel">Last 20 answers</span>
       </div>
       <div class="panel-body">
+        <div class="trend-filters" id="trendFilters">
+          <button class="trend-filter-btn active" data-topic="All" onclick="setTrendFilter('All')">All</button>
+          <button class="trend-filter-btn" data-topic="Accounting" onclick="setTrendFilter('Accounting')">Accounting</button>
+          <button class="trend-filter-btn" data-topic="DCF" onclick="setTrendFilter('DCF')">DCF</button>
+          <button class="trend-filter-btn" data-topic="Valuation" onclick="setTrendFilter('Valuation')">Valuation</button>
+          <button class="trend-filter-btn" data-topic="Mergers_MA" onclick="setTrendFilter('Mergers_MA')">M&A</button>
+          <button class="trend-filter-btn" data-topic="LBO" onclick="setTrendFilter('LBO')">LBO</button>
+          <button class="trend-filter-btn" data-topic="Enterprise_Value" onclick="setTrendFilter('Enterprise_Value')">EV</button>
+        </div>
         <div class="trend-chart-wrap" id="trendWrap">
           <div class="trend-empty" id="trendEmpty">No answers yet</div>
           <div class="trend-tooltip" id="trendTooltip"></div>
@@ -345,8 +374,8 @@
             <div class="trend-stat-label">Avg score</div>
           </div>
           <div class="trend-stat">
-            <div class="trend-stat-val" id="trendBest">—</div>
-            <div class="trend-stat-label">Best session</div>
+            <div class="trend-stat-val" id="trendImprovement">—</div>
+            <div class="trend-stat-label">Trend</div>
           </div>
           <div class="trend-stat">
             <div class="trend-stat-val" id="trendStreak" style="color:var(--accent-amber)">—</div>
@@ -413,12 +442,12 @@
 <script>
   // ── DATA ──────────────────────────────────────────────────
   const TOPICS = [
-    { key:'Accounting',      label:'Accounting',             total:42,  tagClass:'accounting' },
-    { key:'Enterprise_Value',label:'Enterprise Value',       total:12,  tagClass:'ev' },
-    { key:'Valuation',       label:'Valuation',              total:38,  tagClass:'valuation' },
-    { key:'DCF',             label:'Disc. Cash Flow',        total:27,  tagClass:'dcf' },
-    { key:'Mergers_MA',      label:'M&A',                    total:41,  tagClass:'mergers' },
-    { key:'LBO',             label:'Leveraged Buyouts',      total:28,  tagClass:'lbo' },
+    { key:'Accounting',      label:'Accounting',             total:120, tagClass:'accounting' },
+    { key:'Enterprise_Value',label:'Enterprise Value',       total:65,  tagClass:'ev' },
+    { key:'Valuation',       label:'Valuation',              total:80,  tagClass:'valuation' },
+    { key:'DCF',             label:'Disc. Cash Flow',        total:120, tagClass:'dcf' },
+    { key:'Mergers_MA',      label:'M&A',                    total:90,  tagClass:'mergers' },
+    { key:'LBO',             label:'Leveraged Buyouts',      total:90,  tagClass:'lbo' },
   ];
   const TOTAL_QS = TOPICS.reduce((s,t) => s + t.total, 0);
 
@@ -517,72 +546,151 @@
   }
 
   // ── SCORE TREND ───────────────────────────────────────────
+  let _trendHistory = [];
+  let _trendStreak = 0;
+  let _trendFilter = 'All';
+
+  const TOPIC_COLORS = {
+    'Accounting':     '#4338CA',
+    'DCF':            '#0369A1',
+    'Valuation':      '#0F766E',
+    'Mergers_MA':     '#7C3AED',
+    'LBO':            '#BE123C',
+    'Enterprise_Value':'#C2410C',
+  };
+  const TOPIC_LABELS_T = {
+    'Accounting':'Accounting','DCF':'DCF','Valuation':'Valuation',
+    'Mergers_MA':'M&A','LBO':'LBO','Enterprise_Value':'Enterprise Value'
+  };
+
+  function setTrendFilter(topic) {
+    _trendFilter = topic;
+    document.querySelectorAll('.trend-filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.topic === topic);
+    });
+    renderTrend(_trendHistory, _trendStreak);
+  }
+
   function renderTrend(history, streak) {
+    _trendHistory = history || [];
+    _trendStreak = streak || 0;
     const wrap = document.getElementById('trendWrap');
     const empty = document.getElementById('trendEmpty');
 
-    if (!history || history.length === 0) {
+    // Filter by topic if needed
+    let pts = [..._trendHistory];
+    if (_trendFilter !== 'All') pts = pts.filter(p => p.topic === _trendFilter);
+    pts = pts.sort((a,b) => a.created_at - b.created_at).slice(-30);
+
+    if (pts.length === 0) {
       empty.style.display = 'block';
+      empty.textContent = _trendFilter === 'All' ? 'No answers yet' : 'No ' + (TOPIC_LABELS_T[_trendFilter]||_trendFilter) + ' answers yet';
       document.getElementById('trendStats').style.display = 'none';
+      wrap.querySelectorAll('svg').forEach(e => e.remove());
       return;
     }
 
     empty.style.display = 'none';
 
-    // Take last 20, oldest first
-    const pts = [...history].sort((a,b) => a.created_at - b.created_at).slice(-20);
     const scores = pts.map(p => p.score);
-    const W = wrap.offsetWidth || 340;
-    const H = 120;
-    const PAD_L = 28, PAD_R = 8, PAD_T = 8, PAD_B = 20;
+    const W = wrap.offsetWidth || 380;
+    const H = 130;
+    const PAD_L = 28, PAD_R = 12, PAD_T = 10, PAD_B = 20;
     const w = W - PAD_L - PAD_R;
     const h = H - PAD_T - PAD_B;
 
-    const minS = Math.max(0, Math.min(...scores) - 10);
-    const maxS = Math.min(100, Math.max(...scores) + 10);
-    const xOf = (i) => PAD_L + (i / (scores.length - 1 || 1)) * w;
-    const yOf = (s) => PAD_T + h - ((s - minS) / (maxS - minS || 1)) * h;
+    const minS = Math.max(0,  Math.min(...scores) - 8);
+    const maxS = Math.min(100, Math.max(...scores) + 8);
+    const xOf = i => PAD_L + (i / (scores.length - 1 || 1)) * w;
+    const yOf = s => PAD_T + h - ((s - minS) / (maxS - minS || 1)) * h;
 
-    // Build SVG
-    const linePts = scores.map((s,i) => `${xOf(i)},${yOf(s)}`).join(' ');
-    const areaPts = `${xOf(0)},${PAD_T+h} ${scores.map((s,i) => `${xOf(i)},${yOf(s)}`).join(' ')} ${xOf(scores.length-1)},${PAD_T+h}`;
+    // Rolling avg (window 5)
+    const rollingAvg = scores.map((_, i) => {
+      const window = scores.slice(Math.max(0, i-4), i+1);
+      return Math.round(window.reduce((a,b)=>a+b,0) / window.length);
+    });
 
-    // Gridlines at 0,50,100
-    const grids = [0, 50, 100].filter(v => v >= minS && v <= maxS);
-
+    const grids = [0, 25, 50, 75, 90].filter(v => v >= minS && v <= maxS);
     const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
-    const color = avg >= 75 ? '#16A34A' : avg >= 50 ? '#D97706' : '#DC2626';
+    const mainColor = '#1a1a18';
+
+    // Area path
+    const areaPts = `${xOf(0)},${PAD_T+h} ${scores.map((s,i) => `${xOf(i)},${yOf(s)}`).join(' ')} ${xOf(scores.length-1)},${PAD_T+h}`;
+    // Score line
+    const linePts = scores.map((s,i) => `${xOf(i)},${yOf(s)}`).join(' ');
+    // Rolling avg line
+    const avgLinePts = rollingAvg.map((s,i) => `${xOf(i)},${yOf(s)}`).join(' ');
+
+    // Mastery zone band (90+)
+    const masteryY = yOf(90);
 
     const svg = `<svg class="trend-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      <!-- Mastery zone -->
+      <rect x="${PAD_L}" y="${PAD_T}" width="${w}" height="${Math.max(0, masteryY - PAD_T)}" fill="#F0FDF4" opacity=".5"/>
+      <!-- Gridlines -->
       ${grids.map(g => `
         <line class="trend-gridline" x1="${PAD_L}" y1="${yOf(g)}" x2="${PAD_L+w}" y2="${yOf(g)}"/>
         <text class="trend-axis-label" x="${PAD_L-4}" y="${yOf(g)+3}" text-anchor="end">${g}</text>
       `).join('')}
-      <polygon class="trend-area" points="${areaPts}" fill="${color}"/>
-      <polyline class="trend-line" points="${linePts}" stroke="${color}"/>
-      ${scores.map((s,i) => `<circle class="trend-dot" cx="${xOf(i)}" cy="${yOf(s)}" r="3.5" fill="${color}" stroke="white" stroke-width="1.5"
-        onmouseenter="showTip(event,${s},'Q${i+1}')" onmouseleave="hideTip()"/>`).join('')}
+      <!-- Mastery label -->
+      <text class="trend-axis-label" x="${PAD_L+w+3}" y="${yOf(90)+3}" fill="#16A34A" font-size="9">✓</text>
+      <!-- Area fill -->
+      <polygon class="trend-area" points="${areaPts}" fill="${mainColor}"/>
+      <!-- Score line -->
+      <polyline class="trend-line" points="${linePts}" stroke="${mainColor}"/>
+      <!-- Rolling avg line -->
+      ${scores.length >= 3 ? `<polyline class="trend-avg-line" points="${avgLinePts}" stroke="#D97706" fill="none"/>` : ''}
+      <!-- Dots colored by topic -->
+      ${pts.map((p,i) => {
+        const dotColor = _trendFilter === 'All' ? (TOPIC_COLORS[p.topic] || mainColor) : mainColor;
+        const qText = (Q_TEXT[p.question_id] || '').slice(0, 60);
+        const topicLabel = TOPIC_LABELS_T[p.topic] || p.topic;
+        const dateStr = p.created_at ? new Date(p.created_at * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+        const scoreColor = p.score >= 90 ? '#16A34A' : p.score >= 75 ? '#D97706' : '#DC2626';
+        return `<circle class="trend-dot" cx="${xOf(i)}" cy="${yOf(p.score)}" r="4" fill="${dotColor}" stroke="white" stroke-width="1.5"
+          onmouseenter="showTip(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"
+          onmouseleave="hideTip()"/>`;
+      }).join('')}
     </svg>`;
 
-    // Remove old SVG if any
     wrap.querySelectorAll('svg').forEach(e => e.remove());
     wrap.insertAdjacentHTML('afterbegin', svg);
 
     // Stats
+    const first5avg = scores.length >= 5 ? Math.round(scores.slice(0,5).reduce((a,b)=>a+b,0)/5) : null;
+    const last5avg  = scores.length >= 5 ? Math.round(scores.slice(-5).reduce((a,b)=>a+b,0)/5) : null;
+    const improvEl = document.getElementById('trendImprovement');
+    if (first5avg !== null && last5avg !== null) {
+      const diff = last5avg - first5avg;
+      if (diff > 0) { improvEl.textContent = '+' + diff + ' pts'; improvEl.className = 'trend-stat-val trend-improvement up'; }
+      else if (diff < 0) { improvEl.textContent = diff + ' pts'; improvEl.className = 'trend-stat-val trend-improvement down'; }
+      else { improvEl.textContent = 'Steady'; improvEl.className = 'trend-stat-val trend-improvement flat'; }
+    } else {
+      improvEl.textContent = '—'; improvEl.className = 'trend-stat-val';
+    }
+
     document.getElementById('trendStats').style.display = 'flex';
     document.getElementById('trendAvg').textContent = avg;
-    document.getElementById('trendBest').textContent = Math.max(...scores);
-    document.getElementById('trendStreak').textContent = (streak || 0) + ' day' + (streak !== 1 ? 's' : '');
-    document.getElementById('trendLabel').textContent = `Last ${scores.length} answer${scores.length!==1?'s':''}`;
+    document.getElementById('trendStreak').textContent = (_trendStreak || 0) + ' day' + (_trendStreak !== 1 ? 's' : '');
+    document.getElementById('trendLabel').textContent = `Last ${scores.length} answer${scores.length!==1?'s':''}${_trendFilter !== 'All' ? ' · ' + (TOPIC_LABELS_T[_trendFilter]||_trendFilter) : ''}`;
   }
 
-  function showTip(e, score, label) {
+  function showTip(e, score, topicLabel, qText, dateStr, scoreColor) {
     const tip = document.getElementById('trendTooltip');
-    tip.textContent = `${label}: ${score}/100`;
+    tip.innerHTML = `
+      <div class="tip-topic" style="color:${scoreColor}">${topicLabel}</div>
+      <div class="tip-score" style="color:${scoreColor}">${score}<span style="font-size:12px;font-weight:400;color:var(--text-tertiary)">/100</span></div>
+      ${qText ? `<div class="tip-q">${qText}${qText.length >= 60 ? '…' : ''}</div>` : ''}
+      ${dateStr ? `<div class="tip-date">${dateStr}</div>` : ''}
+    `;
     tip.style.opacity = '1';
-    const rect = e.target.closest('.trend-chart-wrap').getBoundingClientRect();
-    tip.style.left = (e.clientX - rect.left + 8) + 'px';
-    tip.style.top = (e.clientY - rect.top - 28) + 'px';
+    const wrap = e.target.closest('.trend-chart-wrap');
+    const wrapRect = wrap.getBoundingClientRect();
+    const tipW = 220;
+    let left = e.clientX - wrapRect.left + 12;
+    if (left + tipW > wrapRect.width) left = e.clientX - wrapRect.left - tipW - 8;
+    tip.style.left = left + 'px';
+    tip.style.top = Math.max(0, e.clientY - wrapRect.top - 20) + 'px';
   }
   function hideTip() { document.getElementById('trendTooltip').style.opacity = '0'; }
 
