@@ -2304,6 +2304,10 @@ Grade strictly and return JSON only.`;
           drillQueue = [];
           inDrillMode = false;
           skipEl.style.display = 'none';
+          // Clear the answer box and reset UI state
+          document.getElementById('answerInput').value = '';
+          document.getElementById('feedbackPanel').style.display = 'none';
+          document.getElementById('submitRow').style.display = 'flex';
           loadNextQuestion();
         };
         // Kick off async generation
@@ -2507,6 +2511,10 @@ Grade strictly and return JSON only.`;
     if (!filteredQuestions.length) return;
     currentIndex = Math.max(0, Math.min(index, filteredQuestions.length - 1));
     const q = filteredQuestions[currentIndex];
+    // Always clear answer box and reset UI on every question load
+    document.getElementById('answerInput').value = '';
+    document.getElementById('feedbackPanel').classList.remove('visible');
+    document.getElementById('submitRow').style.display = 'flex';
     displayQuestion(q, currentIndex);
     saveStateToServer();
   }
@@ -2903,6 +2911,24 @@ Generate 3 drill questions targeting this exact gap.`;
     });
   }
 
+
+  // ── KEYBOARD SHORTCUTS ───────────────────────────────────
+  document.addEventListener('keydown', function(e) {
+    // Cmd+Enter (Mac) or Ctrl+Enter (Windows) — next question
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      const feedbackVisible = document.getElementById('feedbackPanel').classList.contains('visible');
+      const nextBtn = document.getElementById('btnLoadNext');
+      if (feedbackVisible && nextBtn && nextBtn.offsetParent !== null) {
+        // Feedback is showing — trigger next question
+        confirmNextQuestion();
+      } else {
+        // No feedback yet — submit the answer
+        const input = document.getElementById('answerInput').value.trim();
+        if (input.length > 0) submitAnswer();
+      }
+    }
+  });
 </script>
 
 </body>
