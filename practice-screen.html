@@ -596,6 +596,7 @@
   }
 
   .verdict-badge.mastered { color: var(--accent-green); background: #F0FDF4; }
+  .verdict-badge.strong { color: var(--accent-blue); background: #EFF6FF; }
   .verdict-badge.needs-work { color: var(--accent-amber); background: #FFFBEB; }
   .verdict-badge.miss { color: var(--accent-red); background: #FEF2F2; }
 
@@ -1987,30 +1988,59 @@
 
     const question = document.getElementById('questionText').textContent.trim();
 
-    const systemPrompt = `You are a supportive but rigorous investment banking technical interviewer grading a candidate's answer. Your goal is to accurately reflect understanding — rewarding genuine grasp of concepts while clearly identifying meaningful gaps.
+    // Detect question type to calibrate grading weights
+    const isNumerical = /\$[\d,]+|\bwalk me through\b|\bwhat happens to\b|\bassume.*tax rate\b|\bwhat is the impact\b|\bincreases?\s+by\b|\bdecreases?\s+by\b|\bcalculate\b|\bcompute\b/i.test(question);
+    const isConceptual = /\bwhy\b|\bwhat is the difference\b|\bwhen would you\b|\bexplain\b|\bhow does\b|\bdefine\b/i.test(question);
+    const qType = isNumerical ? 'numerical_walkthrough' : isConceptual ? 'conceptual' : 'mixed';
 
-Grade on exactly 3 dimensions (0-100 each):
-1. technical_accuracy — Are the core facts and mechanics correct? Small imprecisions or missing edge cases are Minor issues. Only wrong mechanics, incorrect numbers, or fundamental misunderstandings are Critical.
-2. completeness — Did they cover the key concepts? A solid answer that captures the core idea scores well even if it omits peripheral details. Only deduct significantly for missing a central concept — not for skipping advanced nuance.
-3. structure — Was the answer clear and logical? A well-reasoned answer in plain prose is fine. Only penalize if the answer is genuinely hard to follow.
+    const weightingNote = qType === 'numerical_walkthrough'
+      ? `This is a NUMERICAL WALKTHROUGH question. Weight: technical_accuracy 60%, completeness 25%, structure 15%.
+Key rule: If the candidate gets the direction and magnitude of effects correct, that is a high-scoring answer.
+Do NOT penalize for: omitting minor line items, combining steps, not listing every account affected, rounding differences.
+Only penalize for: wrong direction of effect (e.g. cash goes up when it should go down), wrong tax treatment, or confusing which statement an item hits.`
+      : qType === 'conceptual'
+      ? `This is a CONCEPTUAL question. Weight: technical_accuracy 45%, completeness 40%, structure 15%.
+Key rule: If the candidate demonstrates they understand the core concept and the "why", that is a high-scoring answer.
+Do NOT penalize for: not listing every nuance, using informal language, not covering advanced edge cases.
+Only penalize for: fundamental misunderstanding of the core mechanism or getting the concept backwards.`
+      : `This is a MIXED question. Weight: technical_accuracy 50%, completeness 35%, structure 15%.`;
 
-Overall score = weighted average: technical(50%) + completeness(35%) + structure(15%). Round to nearest whole number.
+    const systemPrompt = `You are an investment banking technical interviewer grading a candidate's answer. Your primary job is to reward genuine understanding, not to find fault.
 
-Scoring guidance — be calibrated, not harsh:
-- 90-100: Excellent. Nailed the core concept with accuracy and clarity. Minor omissions are fine at this level.
-- 75-89: Good. Understands the concept, may have missed one secondary point or had a small imprecision.
-- 60-74: Partial. Got the gist but missed something meaningful, or had a factual error on a secondary point.
-- Below 60: Only if the candidate fundamentally misunderstood the concept or got a core mechanic wrong.
+${weightingNote}
 
-Critical errors (reserved for): wrong direction of an effect (e.g. saying depreciation reduces cash), confusing two distinct concepts (e.g. EV and equity value), missing the single most important mechanic of the question.
-Minor errors: omitting a secondary detail, imprecise wording, missing an edge case, not mentioning a nuance.
+SCORING CALIBRATION — internalize these before grading:
+- 92-100: Candidate clearly understands the concept and got all important parts right. Award this freely when the answer is correct — do not hunt for missing nuances to justify a lower score.
+- 80-91: Solid answer. Got everything important, may have skipped one non-essential detail.
+- 65-79: Understood the concept but missed one meaningful point or had a minor factual imprecision.
+- 50-64: Got the gist but missed something genuinely important, or had a factual error on a secondary point.
+- Below 50: ONLY for answers that fundamentally misunderstood the core concept or got a central mechanic wrong.
 
-Rules:
-- "correct": max 3 items. One short sentence each referencing what they actually said.
-- "missed": max 3 items. One short sentence each. Prefix EVERY item with either "Critical:" or "Minor:" — use Critical sparingly, only for the issues above.
-- "model_answer": 2-3 sentences MAX. The essential answer only.
-- "concept_gap": If score < 75, identify the single most important concept they missed or misunderstood. Be specific — not "depreciation" but "why depreciation is added back on the CFS despite reducing Net Income". If score >= 75, set to null.
-- "harder_followon": If score >= 90, write one harder follow-on question testing a related advanced concept. If score < 90, set to null.
+CRITICAL ERRORS — only these justify a score below 65:
+- Wrong direction of an effect (e.g. saying Net Income goes UP when it should go DOWN)
+- Confusing two fundamentally different concepts (e.g. Enterprise Value vs. Equity Value)
+- Missing the single central mechanic the question is explicitly testing
+- Applying wrong tax treatment when tax rate is given in the question
+
+MINOR ISSUES — these alone should NOT drop score below 75:
+- Not mentioning every affected line item in a walkthrough
+- Imprecise or informal wording when the concept is clearly correct
+- Skipping an edge case not central to the question
+- Not stating something explicitly that was clearly implied
+- Combining multiple steps into one (still correct)
+
+ANTI-PATTERNS — never do these:
+- Do not give a 70 because the answer "could have been more detailed" when the core was correct
+- Do not mark something Critical because the model answer is longer than the candidate's answer
+- Do not penalize for avoiding jargon if the concept was explained correctly in plain language
+- Do not add "missed" items that are advanced nuances not central to the question
+
+JSON rules:
+- "correct": max 3 items. Reference what they actually said.
+- "missed": max 3 items. Prefix with "Critical:" or "Minor:". If the answer was excellent, "missed" can be [].
+- "model_answer": 2-3 sentences MAX. Essential answer only.
+- "concept_gap": ONLY if score < 75 — the single most important concept to drill, stated specifically. Null if score >= 75.
+- "harder_followon": ONLY if score >= 90 — one harder follow-on question. Null if score < 90.
 
 Respond ONLY with valid JSON, no markdown fences:
 {
@@ -2023,23 +2053,23 @@ Respond ONLY with valid JSON, no markdown fences:
   "correct": ["They correctly stated X", "They mentioned Y"],
   "missed": ["Critical: they missed X", "Minor: they didn't mention Y"],
   "model_answer": "2-3 sentence ideal answer.",
-  "concept_gap": "The specific concept they need to drill, or null if score >= 75",
-  "harder_followon": "A harder follow-on question, or null if score < 90"
+  "concept_gap": "Specific concept to drill, or null",
+  "harder_followon": "A harder follow-on question, or null"
 }`;
 
     const userPrompt = `Question: "${question}"
 
 Candidate's answer: "${userAnswer}"
-${peeked ? '\nNote: Candidate peeked at the question after it was hidden — deduct 5 points from overall.' : ''}
+${peeked ? '\nNote: Candidate peeked at the question — deduct 5 points from overall.' : ''}
 
-Grade strictly and return JSON only.`;
+Return JSON only.`;
 
     try {
       const response = await fetch('/api/grade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1200,
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }]
@@ -2137,8 +2167,9 @@ Grade strictly and return JSON only.`;
     const badge = document.getElementById('verdictBadge');
     const icon = document.getElementById('verdictIcon');
     const label = document.getElementById('verdictLabel');
-    if (overall >= 90) { badge.className = 'verdict-badge mastered'; icon.textContent = '★'; label.textContent = 'Mastered'; }
-    else if (overall >= 75) { badge.className = 'verdict-badge needs-work'; icon.textContent = '◎'; label.textContent = 'Needs Work'; }
+    if (overall >= 92) { badge.className = 'verdict-badge mastered'; icon.textContent = '★'; label.textContent = 'Mastered'; }
+    else if (overall >= 80) { badge.className = 'verdict-badge strong'; icon.textContent = '◎'; label.textContent = 'Strong'; }
+    else if (overall >= 65) { badge.className = 'verdict-badge needs-work'; icon.textContent = '△'; label.textContent = 'Needs Work'; }
     else { badge.className = 'verdict-badge miss'; icon.textContent = '✕'; label.textContent = 'Miss'; }
   }
 
@@ -2182,13 +2213,17 @@ Grade strictly and return JSON only.`;
 
     verdictScore.textContent = overall;
 
-    if (overall >= 90) {
+    if (overall >= 92) {
       verdictBadge.className = 'verdict-badge mastered';
       verdictIcon.textContent = '★';
       verdictLabel.textContent = 'Mastered';
-    } else if (overall >= 75) {
-      verdictBadge.className = 'verdict-badge needs-work';
+    } else if (overall >= 80) {
+      verdictBadge.className = 'verdict-badge strong';
       verdictIcon.textContent = '◎';
+      verdictLabel.textContent = 'Strong';
+    } else if (overall >= 65) {
+      verdictBadge.className = 'verdict-badge needs-work';
+      verdictIcon.textContent = '△';
       verdictLabel.textContent = 'Needs Work';
     } else {
       verdictBadge.className = 'verdict-badge miss';
