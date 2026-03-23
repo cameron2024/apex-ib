@@ -238,7 +238,7 @@ const server = http.createServer(async (req, res) => {
   let filePath = '.'+req.url.split('?')[0];
   if (filePath==='./') filePath='./dashboard.html';
   const ext=path.extname(filePath);
-  const ct=ext==='.html'?'text/html':ext==='.js'?'application/javascript':ext==='.css'?'text/css':'text/plain';
+  const ct=ext==='.html'?'text/html':ext==='.js'?'application/javascript':ext==='.css'?'text/css':ext==='.json'?'application/json':'text/plain';
   fs.readFile(filePath,(err,content)=>{
     if (err) { res.writeHead(404); res.end('Not found'); return; }
     res.writeHead(200,{'Content-Type':ct,'Access-Control-Allow-Origin':'*'});
