@@ -752,6 +752,104 @@
     .topics-grid { grid-template-columns: 1fr; }
     .summary-bar { grid-template-columns: repeat(2, 1fr); }
   }
+  /* ── HEATMAP MODAL ─────────────────────── */
+  .heatmap-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,24,20,0.45);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .heatmap-overlay.visible { display: flex; }
+  .heatmap-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    max-width: 540px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .heatmap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .heatmap-header h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    font-weight: 400;
+  }
+  .heatmap-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    padding: 4px;
+  }
+  .heatmap-close:hover { color: var(--text-primary); }
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 3px;
+  }
+  .heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    background: var(--bg);
+    position: relative;
+  }
+  .heatmap-cell.level-1 { background: #d1fae5; }
+  .heatmap-cell.level-2 { background: #6ee7b7; }
+  .heatmap-cell.level-3 { background: #34d399; }
+  .heatmap-cell.level-4 { background: #16a34a; }
+  .heatmap-cell.today { outline: 2px solid var(--text-primary); outline-offset: -1px; }
+  .heatmap-cell[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    color: #fff;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .heatmap-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+  .heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 14px;
+    justify-content: flex-end;
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+  .heatmap-legend .heatmap-cell { width: 12px; height: 12px; }
+  .heatmap-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .heatmap-stat-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 2px; }
+  .heatmap-stat-value { font-size: 18px; font-weight: 600; }
+
 </style>
 </head>
 <body>
@@ -838,7 +936,7 @@
       <p id="greetingSubtext">Loading your progress…</p>
     </div>
     <div class="greeting-meta">
-      <div class="streak-badge">
+      <div class="streak-badge" onclick="openHeatmap()" style="cursor:pointer;" title="View activity">
         <span class="fire">🔥</span>
         <span id="streakText">— day streak</span>
       </div>
@@ -1296,6 +1394,9 @@
           buildRec(data.results || [], data.history || []);
           buildSummary(data.results || [], data.history || [], data.streak || 0);
           buildSessionsList(data.history || []);
+          // Store for heatmap
+          window._activityData = data.activity || [];
+          window._streakCount = data.streak || 0;
         }
       } catch(e) {
         console.log('Progress load error:', e.message);
@@ -1318,7 +1419,81 @@
   }
 
   init();
+  // ── HEATMAP ──────────────────────────────────────────────
+  function openHeatmap() {
+    buildHeatmap(window._activityData || [], window._streakCount || 0);
+    document.getElementById('heatmapOverlay').classList.add('visible');
+  }
+  function closeHeatmap() {
+    document.getElementById('heatmapOverlay').classList.remove('visible');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHeatmap(); });
+  function buildHeatmap(activity, streak) {
+    const grid = document.getElementById('heatmapGrid');
+    grid.innerHTML = '';
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const days = 84; // 12 weeks
+    const actMap = {};
+    activity.forEach(a => { actMap[a.date] = a.questions_answered; });
+
+    let totalQs = 0, activeDays = 0;
+    const cells = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0,10);
+      const count = actMap[key] || 0;
+      if (count > 0) { totalQs += count; activeDays++; }
+      const level = count === 0 ? '' : count <= 2 ? 'level-1' : count <= 5 ? 'level-2' : count <= 10 ? 'level-3' : 'level-4';
+      const isToday = i === 0;
+      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const tip = count > 0 ? `${label}: ${count} question${count!==1?'s':''}` : `${label}: No practice`;
+      const cell = document.createElement('div');
+      cell.className = 'heatmap-cell ' + level + (isToday ? ' today' : '');
+      cell.setAttribute('data-tip', tip);
+      cells.push(cell);
+    }
+    cells.forEach(c => grid.appendChild(c));
+
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - (days - 1));
+    document.getElementById('heatmapStart').textContent = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    document.getElementById('hmStreak').textContent = streak + ' day' + (streak !== 1 ? 's' : '');
+    document.getElementById('hmActiveDays').textContent = activeDays;
+    document.getElementById('hmTotalQs').textContent = totalQs;
+  }
+
 </script>
+
+<!-- HEATMAP MODAL -->
+<div class="heatmap-overlay" id="heatmapOverlay" onclick="if(event.target===this)closeHeatmap()">
+  <div class="heatmap-modal">
+    <div class="heatmap-header">
+      <h3>🔥 Practice Activity</h3>
+      <button class="heatmap-close" onclick="closeHeatmap()">&times;</button>
+    </div>
+    <div class="heatmap-grid" id="heatmapGrid"></div>
+    <div class="heatmap-labels">
+      <span id="heatmapStart">12 weeks ago</span>
+      <span>Today</span>
+    </div>
+    <div class="heatmap-legend">
+      <span>Less</span>
+      <div class="heatmap-cell"></div>
+      <div class="heatmap-cell level-1"></div>
+      <div class="heatmap-cell level-2"></div>
+      <div class="heatmap-cell level-3"></div>
+      <div class="heatmap-cell level-4"></div>
+      <span>More</span>
+    </div>
+    <div class="heatmap-stats">
+      <div><div class="heatmap-stat-label">Current streak</div><div class="heatmap-stat-value" id="hmStreak">0 days</div></div>
+      <div><div class="heatmap-stat-label">Active days</div><div class="heatmap-stat-value" id="hmActiveDays">0</div></div>
+      <div><div class="heatmap-stat-label">Total questions</div><div class="heatmap-stat-value" id="hmTotalQs">0</div></div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
