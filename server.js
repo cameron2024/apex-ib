@@ -234,6 +234,23 @@ const server = http.createServer(async (req, res) => {
     }); return;
   }
 
+  // QUESTIONS JSON — explicit route to avoid static-file resolution issues
+  if (url === '/questions.json') {
+    const qPath = path.join(__dirname, 'questions.json');
+    return fs.readFile(qPath, (err, content) => {
+      if (err) { res.writeHead(404,{'Content-Type':'text/plain'}); res.end('questions.json not found at: '+qPath); return; }
+      res.writeHead(200, {'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'public, max-age=3600'});
+      res.end(content);
+    });
+  }
+
+  // DEBUG — list files (remove after confirming deploy works)
+  if (url === '/api/debug-files') {
+    const dir = __dirname;
+    const files = fs.readdirSync(dir);
+    return json(res, 200, { dir, files });
+  }
+
   // STATIC FILES
   let filePath = path.join(__dirname, req.url.split('?')[0]);
   if (req.url.split('?')[0]==='/') filePath=path.join(__dirname,'dashboard.html');
