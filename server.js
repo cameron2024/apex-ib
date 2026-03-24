@@ -235,12 +235,12 @@ const server = http.createServer(async (req, res) => {
   }
 
   // STATIC FILES
-  let filePath = '.'+req.url.split('?')[0];
-  if (filePath==='./') filePath='./dashboard.html';
+  let filePath = path.join(__dirname, req.url.split('?')[0]);
+  if (req.url.split('?')[0]==='/') filePath=path.join(__dirname,'dashboard.html');
   const ext=path.extname(filePath);
   const ct=ext==='.html'?'text/html':ext==='.js'?'application/javascript':ext==='.css'?'text/css':ext==='.json'?'application/json':'text/plain';
   fs.readFile(filePath,(err,content)=>{
-    if (err) { res.writeHead(404); res.end('Not found'); return; }
+    if (err) { res.writeHead(404,{'Content-Type':'text/plain'}); res.end('Not found: '+req.url); return; }
     res.writeHead(200,{'Content-Type':ct,'Access-Control-Allow-Origin':'*'});
     res.end(content);
   });
