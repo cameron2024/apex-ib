@@ -2359,7 +2359,7 @@ Return JSON only.`;
           inDrillMode = false;
           skipEl.style.display = 'none';
           // Clear the answer box and reset UI state
-          document.getElementById('answerInput').value = '';
+          document.getElementById('answerTextarea').value = '';
           document.getElementById('feedbackPanel').style.display = 'none';
           document.getElementById('submitRow').style.display = 'flex';
           loadNextQuestion();
@@ -2561,7 +2561,7 @@ Return JSON only.`;
     currentIndex = Math.max(0, Math.min(index, filteredQuestions.length - 1));
     const q = filteredQuestions[currentIndex];
     // Always clear answer box and reset UI on every question load
-    document.getElementById('answerInput').value = '';
+    document.getElementById('answerTextarea').value = '';
     document.getElementById('feedbackPanel').classList.remove('visible');
     document.getElementById('submitRow').style.display = 'flex';
     displayQuestion(q, currentIndex);
@@ -2986,7 +2986,7 @@ Generate 3 drill questions targeting this exact gap.`;
         confirmNextQuestion();
       } else {
         // No feedback yet — submit the answer
-        const input = document.getElementById('answerInput').value.trim();
+        const input = document.getElementById('answerTextarea').value.trim();
         if (input.length > 0) submitAnswer();
       }
     }
