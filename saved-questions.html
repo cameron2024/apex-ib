@@ -348,6 +348,19 @@
   }
 
   .btn-go-practice:hover { opacity: 0.85; }
+
+  .upgrade-btn {
+    display: flex; align-items: center; gap: 7px;
+    width: 100%; padding: 8px 10px; margin-bottom: 6px;
+    background: var(--accent-blue); color: white;
+    border-radius: var(--radius-sm, 6px);
+    font-size: 12px; font-weight: 600; letter-spacing: .01em;
+    text-decoration: none; cursor: pointer;
+    transition: background .15s, transform .1s;
+    box-sizing: border-box;
+  }
+  .upgrade-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+  .upgrade-btn svg { flex-shrink: 0; }
 </style>
 </head>
 
@@ -387,10 +400,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
       Saved Questions
     </a>
-    <a class="nav-item" href="pricing.html" style="color:var(--accent-blue);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Upgrade to Pro
-    </a>
 
     <div class="nav-section-label" style="margin-top:10px;">Topics</div>
     <a class="nav-item" href="practice-screen.html?topic=Accounting">
@@ -420,11 +429,15 @@
   </nav>
 
   <div class="sidebar-bottom">
+    <a href="pricing.html" class="upgrade-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Upgrade to Pro
+    </a>
     <div class="user-card">
       <div class="user-avatar" id="sidebarAvatar">?</div>
       <div>
         <div class="user-name" id="sidebarUserName">—</div>
-        <div class="user-plan">Free plan · <a href="pricing.html" style="color:var(--accent-blue);text-decoration:none;font-size:11px;">Upgrade</a></div>
+        <div class="user-plan">Free plan</div>
       </div>
     </div>
     <button id="signOutBtn" onclick="doLogout()" style="display:none;margin-top:8px;width:100%;background:none;border:1px solid var(--border);color:var(--text-tertiary);border-radius:6px;padding:6px;cursor:pointer;font-size:12px;">Sign out</button>
