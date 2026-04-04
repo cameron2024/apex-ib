@@ -51,7 +51,7 @@
     flex-shrink: 0;
   }
   .logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; letter-spacing: -.3px; color: var(--text-primary); }
-  .nav-links { display: flex; gap: 24px; margin-left: auto; }
+  .nav-links { display: flex; gap: 24px; margin-left: auto; align-items: center; }
   .nav-link { font-size: 13.5px; color: var(--text-secondary); text-decoration: none; transition: color .15s; }
   .nav-link:hover { color: var(--text-primary); }
   .nav-cta {
@@ -204,13 +204,11 @@
     margin-bottom: 16px; min-height: 18px;
   }
   .card-pro .price-annual-note { color: var(--pro-text-secondary); }
-  .price-annual-note .save-pill {
-    display: inline-block;
-    background: #D1FAE5; color: #065F46;
-    font-size: 11px; font-weight: 700;
-    padding: 1px 7px; border-radius: 20px;
-    margin-left: 4px;
+  .price-note {
+    font-size: 12px; color: var(--text-tertiary);
+    margin-bottom: 16px; min-height: 18px;
   }
+  .card-pro .price-note { color: var(--pro-text-secondary); }
 
   .card-description {
     font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;
@@ -415,9 +413,7 @@
   .btn-cta-ghost:hover { background: rgba(255,255,255,.13); }
 
   /* Price switching */
-  .price-monthly, .price-annual { transition: opacity .2s; }
-  body.annual .price-monthly { display: none; }
-  body:not(.annual) .price-annual { display: none; }
+  /* end pricing styles */
 </style>
 </head>
 <body>
@@ -445,19 +441,10 @@
 <div class="hero">
   <div class="hero-eyebrow">
     <span class="hero-eyebrow-dot"></span>
-    Simple pricing
+    Your superday starts now.
   </div>
   <h1 class="hero-headline">Master every question.<br><em>Not just memorize it.</em></h1>
-  <p class="hero-sub">One plan for serious candidates. Everything you need to walk into your superday and not flinch.</p>
-
-  <!-- Billing toggle -->
-  <div class="billing-toggle">
-    <button class="billing-btn active" id="btnMonthly" onclick="setBilling('monthly')">Monthly</button>
-    <button class="billing-btn" id="btnAnnual" onclick="setBilling('annual')">
-      Annual
-      <span class="billing-badge">2 months free</span>
-    </button>
-  </div>
+  <p class="hero-sub">One tool. One recruiting cycle. No guessing when interviews start.</p>
 </div>
 
 <!-- PRICING CARDS -->
@@ -473,7 +460,7 @@
         <span class="price-amount">$0</span>
         <span class="price-period">/ forever</span>
       </div>
-      <div class="price-annual-note">&nbsp;</div>
+      <div class="price-note">&nbsp;</div>
       <p class="card-description">Start practicing immediately. No card required. See what Apex feels like before you commit.</p>
     </div>
 
@@ -492,15 +479,15 @@
           <div class="feature-icon fi-check">✓</div>
           <div class="feature-text">
             <strong>Full question bank access</strong>
-            <span class="feature-sub">All 188 technical questions across 6 topics</span>
+            <span class="feature-sub">All 565 technical questions across 6 topics</span>
           </div>
         </div>
 
         <div class="feature-item">
           <div class="feature-icon fi-check">✓</div>
           <div class="feature-text">
-            <strong>5 AI-graded answers per day</strong>
-            <span class="feature-sub">Scored 0–100 with detailed feedback</span>
+            <strong>5 banker-graded answers per day</strong>
+            <span class="feature-sub">Scored 0–100 against what IB interviewers actually want to hear</span>
           </div>
         </div>
 
@@ -516,7 +503,7 @@
           <div class="feature-icon fi-dash">—</div>
           <div class="feature-text" style="color:var(--text-tertiary)">
             AI drill questions
-            <span class="feature-sub">Requires Pro</span>
+            <span class="feature-sub">Paid plans only</span>
           </div>
         </div>
 
@@ -524,7 +511,7 @@
           <div class="feature-icon fi-dash">—</div>
           <div class="feature-text" style="color:var(--text-tertiary)">
             Performance analytics
-            <span class="feature-sub">Requires Pro</span>
+            <span class="feature-sub">Paid plans only</span>
           </div>
         </div>
 
@@ -532,15 +519,7 @@
           <div class="feature-icon fi-dash">—</div>
           <div class="feature-text" style="color:var(--text-tertiary)">
             Saved questions & weak spot tracking
-            <span class="feature-sub">Requires Pro</span>
-          </div>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon fi-dash">—</div>
-          <div class="feature-text" style="color:var(--text-tertiary)">
-            Interview mode
-            <span class="feature-sub">Requires Pro</span>
+            <span class="feature-sub">Paid plans only</span>
           </div>
         </div>
 
@@ -548,28 +527,23 @@
     </div>
   </div>
 
-  <!-- PRO -->
-  <div class="card card-pro">
+  <!-- MONTHLY -->
+  <div class="card card-free">
     <div class="card-header">
       <div class="card-tier-row">
-        <span class="card-tier-name">Pro</span>
-        <span class="card-popular-badge">Most popular</span>
+        <span class="card-tier-name">Monthly</span>
       </div>
       <div class="card-price">
-        <span class="price-amount price-monthly">$19</span>
-        <span class="price-amount price-annual">$16</span>
+        <span class="price-amount">$14.99</span>
         <span class="price-period">/ month</span>
       </div>
-      <div class="price-annual-note price-monthly">&nbsp;</div>
-      <div class="price-annual-note price-annual">
-        Billed $192/yr &nbsp;<span class="save-pill">Save $36</span>
-      </div>
-      <p class="card-description">Unlimited AI grading. Adaptive drilling. The full mastery system — everything you need to stop guessing and start knowing.</p>
+      <div class="price-note">Cancel anytime</div>
+      <p class="card-description">Full access while you're actively prepping. Good for early-stage candidates building their foundation over time.</p>
     </div>
 
     <div class="card-cta-row">
-      <button class="btn-cta btn-pro" onclick="window.location.href='auth.html?mode=register&plan=pro'">
-        Start 7-day free trial
+      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register&plan=monthly'">
+        Get started
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
@@ -579,31 +553,31 @@
       <div class="feature-list">
 
         <div class="feature-item">
-          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-icon fi-check">✓</div>
           <div class="feature-text">
-            <strong>Unlimited AI-graded answers</strong>
-            <span class="feature-sub">No daily cap — grade every answer, every session</span>
+            <strong>Unlimited graded answers</strong>
+            <span class="feature-sub">No daily cap — every answer scored against the banker standard</span>
           </div>
         </div>
 
         <div class="feature-item">
-          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-icon fi-check">✓</div>
           <div class="feature-text">
             <strong>AI drill question generation</strong>
-            <span class="feature-sub">Score below 75? Claude generates 3 targeted questions drilling the exact concept you missed</span>
+            <span class="feature-sub">Score below 75? Get 3 targeted questions drilling the exact concept you missed</span>
           </div>
         </div>
 
         <div class="feature-item">
-          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-icon fi-check">✓</div>
           <div class="feature-text">
             <strong>Full performance analytics</strong>
-            <span class="feature-sub">Topic breakdowns, score trends, mastery tracking, weak spot detection</span>
+            <span class="feature-sub">Topic breakdowns, score trends, weak spot detection</span>
           </div>
         </div>
 
         <div class="feature-item">
-          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-icon fi-check">✓</div>
           <div class="feature-text">
             <strong>Saved questions</strong>
             <span class="feature-sub">Bookmark anything for focused review sessions</span>
@@ -611,10 +585,48 @@
         </div>
 
         <div class="feature-item">
-          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-icon fi-check">✓</div>
           <div class="feature-text">
             <strong>Interview mode</strong>
             <span class="feature-sub">Timed questions, hidden text, pressure simulation</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RECRUITING PASS -->
+  <div class="card card-pro">
+    <div class="card-header">
+      <div class="card-tier-row">
+        <span class="card-tier-name">Recruiting Pass</span>
+        <span class="card-popular-badge">Best value</span>
+      </div>
+      <div class="card-price">
+        <span class="price-amount">$49.99</span>
+        <span class="price-period">one-time</span>
+      </div>
+      <div class="price-note">Full cycle access · No renewals</div>
+      <p class="card-description">Pay once. Prep from summer through superday. Everything unlocked for your entire recruiting cycle — no monthly decisions, no canceling.</p>
+    </div>
+
+    <div class="card-cta-row">
+      <button class="btn-cta btn-pro" onclick="window.location.href='auth.html?mode=register&plan=pass'">
+        Get the Recruiting Pass
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div class="card-features">
+      <div class="features-label">Everything in Monthly, plus</div>
+      <div class="feature-list">
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>Full recruiting cycle access</strong>
+            <span class="feature-sub">Active from purchase through your interview season — no expiry</span>
           </div>
         </div>
 
@@ -622,7 +634,7 @@
           <div class="feature-icon fi-check-pro">✓</div>
           <div class="feature-text">
             <strong>Voice answer mode</strong>
-            <span class="feature-sub">Practice speaking your answers out loud, graded just the same</span>
+            <span class="feature-sub">Practice speaking your answers out loud, graded against the same banker standard</span>
           </div>
         </div>
 
@@ -631,6 +643,22 @@
           <div class="feature-text">
             <strong>Spaced repetition ordering</strong>
             <span class="feature-sub">Missed questions surface first. Mastered ones wait. Smart by default.</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>Priority question bank updates</strong>
+            <span class="feature-sub">New questions added each recruiting season, yours automatically</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon fi-check-pro">✓</div>
+          <div class="feature-text">
+            <strong>No monthly decisions</strong>
+            <span class="feature-sub">Lock in and focus on prep — not on whether to renew</span>
           </div>
         </div>
 
@@ -683,10 +711,18 @@
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">What happens after the 7-day trial?</span>
+        <span class="faq-q-text">What's the difference between Monthly and the Recruiting Pass?</span>
         <span class="faq-toggle">+</span>
       </div>
-      <div class="faq-answer">After 7 days your Pro trial ends and you're moved to the Free tier automatically — no charge. If you want to keep unlimited grading and AI drills, you can upgrade at any point. No surprise charges.</div>
+      <div class="faq-answer">Monthly is $14.99/month and you can cancel anytime — good if you're in early-stage prep and want flexibility. The Recruiting Pass is $49.99 one-time and gives you full access through your entire recruiting cycle with no renewals. If you're going to use Apex for more than 3 months, the pass is the better deal.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">How long does the Recruiting Pass last?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">The Recruiting Pass is active from the date of purchase through your full recruiting cycle — typically from summer prep through winter superdays. There's no hard expiry date. You pay once and focus on prep, not on managing a subscription.</div>
     </div>
 
     <div class="faq-item">
@@ -699,10 +735,10 @@
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">How does the AI grading actually work?</span>
+        <span class="faq-q-text">How does the grading actually work?</span>
         <span class="faq-toggle">+</span>
       </div>
-      <div class="faq-answer">Every answer is graded by Claude against a model answer written by IB professionals. You get a score from 0–100 across three dimensions — technical accuracy, completeness, and structure — plus specific feedback on what you got right and what you missed.</div>
+      <div class="faq-answer">Every answer is evaluated by a model built around what investment bankers actually look for in interviews — not generic correctness, but the specific framing, mechanics, and completeness they expect. You get a score from 0–100 across three dimensions — technical accuracy, completeness, and structure — plus specific feedback on what you got right and what you missed.</div>
     </div>
 
     <div class="faq-item">
@@ -710,15 +746,7 @@
         <span class="faq-q-text">What makes the AI drill questions different from the regular bank?</span>
         <span class="faq-toggle">+</span>
       </div>
-      <div class="faq-answer">The regular question bank is a fixed set of 188 vetted technical questions. When you score below 75, Claude generates 3 completely new questions targeting the specific concept you missed — not a topic, but the exact mechanic (e.g. "how D&A flows through to free cash flow specifically"). These are written fresh for your gap, not pulled from any list.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">Can I cancel anytime?</span>
-        <span class="faq-toggle">+</span>
-      </div>
-      <div class="faq-answer">Yes. Cancel from your account settings at any point. You keep Pro access until the end of your billing period, then roll to Free with no further charges.</div>
+      <div class="faq-answer">The regular question bank is a fixed set of 565 vetted technical questions. When you score below 75, the model generates 3 completely new questions targeting the specific concept you missed — not a topic, but the exact mechanic (e.g. "how D&A flows through to free cash flow specifically"). These are written fresh for your gap, not pulled from any list.</div>
     </div>
 
     <div class="faq-item">
@@ -749,18 +777,6 @@
 </div>
 
 <script>
-  function setBilling(type) {
-    if (type === 'annual') {
-      document.body.classList.add('annual');
-      document.getElementById('btnAnnual').classList.add('active');
-      document.getElementById('btnMonthly').classList.remove('active');
-    } else {
-      document.body.classList.remove('annual');
-      document.getElementById('btnMonthly').classList.add('active');
-      document.getElementById('btnAnnual').classList.remove('active');
-    }
-  }
-
   function toggleFaq(el) {
     const item = el.closest('.faq-item');
     const isOpen = item.classList.contains('open');
