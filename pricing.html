@@ -127,23 +127,29 @@
 
   /* ── CARDS ── */
   .cards-wrapper {
-    max-width: 900px; margin: 0 auto;
+    max-width: 1080px; margin: 0 auto;
     padding: 0 24px 96px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
-    align-items: start;
+    align-items: stretch;
   }
 
   /* FREE CARD */
   .card {
     border-radius: 16px; overflow: hidden;
     animation: fadeUp .5s ease both;
+    display: flex; flex-direction: column;
   }
   .card-free {
     background: white;
     border: 1px solid var(--border);
     animation-delay: .1s;
+  }
+  .card-monthly {
+    background: white;
+    border: 1px solid var(--border);
+    animation-delay: .14s;
   }
   .card-pro {
     background: var(--pro-bg);
@@ -152,18 +158,89 @@
     position: relative;
   }
 
-  /* Pro glow */
-  .card-pro::before {
+  /* Per-tier banner */
+  .card-banner {
+    width: 100%; height: 120px;
+    position: relative; overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Free banner — soft warm static grain */
+  .card-free .card-banner {
+    background: #EDEAE4;
+  }
+  .card-free .card-banner::after {
     content: '';
     position: absolute; inset: 0;
-    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(37,99,235,.18) 0%, transparent 70%);
-    pointer-events: none; border-radius: 16px;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(180,170,155,.4) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(200,195,185,.3) 0%, transparent 40%);
+  }
+
+  /* Monthly banner — slow blue/indigo drift */
+  @keyframes monthlyShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .card-monthly .card-banner {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6, #6366f1, #1e40af, #1e3a8a);
+    background-size: 300% 300%;
+    animation: monthlyShift 6s ease infinite;
+  }
+  .card-monthly .card-banner::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 120%, rgba(255,255,255,.12) 0%, transparent 60%);
+  }
+
+  /* Recruiting Pass banner — amber/gold shimmer */
+  @keyframes passShimmer {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes passGlow {
+    0%, 100% { opacity: .6; }
+    50%       { opacity: 1; }
+  }
+  .card-pro .card-banner {
+    background: linear-gradient(135deg, #78350f, #d97706, #fbbf24, #b45309, #92400e, #d97706);
+    background-size: 400% 400%;
+    animation: passShimmer 5s ease infinite;
+  }
+  .card-pro .card-banner::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.22) 0%, transparent 60%);
+    animation: passGlow 3s ease-in-out infinite;
+  }
+
+  /* Banner badge (Best value, etc) */
+  .banner-badge {
+    position: absolute; top: 12px; right: 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; padding: 4px 9px;
+    border-radius: 5px;
+  }
+  .card-monthly .banner-badge {
+    background: rgba(255,255,255,.2); color: white;
+    backdrop-filter: blur(4px);
+  }
+  .card-pro .banner-badge {
+    background: rgba(0,0,0,.3); color: #fde68a;
+    backdrop-filter: blur(4px);
   }
 
   .card-header {
     padding: 32px 32px 24px;
     border-bottom: 1px solid var(--border);
   }
+  .card-monthly .card-header { border-bottom-color: var(--border); }
+  .card-monthly .card-tier-name { color: var(--text-tertiary); }
+  .card-monthly .feature-item { border-top-color: var(--border); }
+
+  /* card-pro header border */
   .card-pro .card-header {
     border-bottom-color: var(--pro-border);
   }
@@ -238,7 +315,7 @@
   .btn-pro:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(37,99,235,.4); transform: translateY(-1px); }
 
   /* FEATURES */
-  .card-features { padding: 0 32px 32px; }
+  .card-features { padding: 0 32px 32px; flex: 1; }
 
   .features-label {
     font-size: 10.5px; font-weight: 700; letter-spacing: .09em;
@@ -452,6 +529,7 @@
 
   <!-- FREE -->
   <div class="card card-free">
+    <div class="card-banner"></div>
     <div class="card-header">
       <div class="card-tier-row">
         <span class="card-tier-name">Free</span>
@@ -528,7 +606,10 @@
   </div>
 
   <!-- MONTHLY -->
-  <div class="card card-free">
+  <div class="card card-monthly">
+    <div class="card-banner">
+      <span class="banner-badge">Most popular</span>
+    </div>
     <div class="card-header">
       <div class="card-tier-row">
         <span class="card-tier-name">Monthly</span>
@@ -598,10 +679,12 @@
 
   <!-- RECRUITING PASS -->
   <div class="card card-pro">
+    <div class="card-banner">
+      <span class="banner-badge">Best value</span>
+    </div>
     <div class="card-header">
       <div class="card-tier-row">
         <span class="card-tier-name">Recruiting Pass</span>
-        <span class="card-popular-badge">Best value</span>
       </div>
       <div class="card-price">
         <span class="price-amount">$49.99</span>
