@@ -688,11 +688,22 @@
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // Redirect if not logged in
+  // Show sign-in wall for guests
   if (!localStorage.getItem('apex_token')) {
-    window.location.href = 'auth.html?next=' + encodeURIComponent(window.location.pathname);
-  }
-
+    document.querySelector('.main').innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:16px;">
+        <div style="font-size:40px;">🔖</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:-.3px;color:var(--text-primary);">Saved questions need an account</h2>
+        <p style="font-size:14px;color:var(--text-secondary);max-width:360px;line-height:1.65;">
+          Bookmark questions for focused review and revisit them anytime. Create a free account to start saving.
+        </p>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <a href="auth.html?mode=register" style="padding:10px 20px;background:var(--text-primary);color:white;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Create free account</a>
+          <a href="auth.html" style="padding:10px 20px;background:white;color:var(--text-primary);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Sign in</a>
+        </div>
+        <a href="practice-screen.html" style="font-size:13px;color:var(--text-tertiary);text-decoration:none;margin-top:4px;">← Back to practice</a>
+      </div>`;
+  } else {
   // Init
   render();
 
@@ -757,6 +768,8 @@
       });
     }, 0);
   }
+
+  } // end else (logged in)
 
 </script>
 

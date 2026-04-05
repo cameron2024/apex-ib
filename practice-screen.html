@@ -1284,7 +1284,7 @@
 <!-- MAIN -->
 <main class="main">
   <div id="guestBanner" class="guest-banner" style="display:none;">
-    <span>⚠️ <strong>You're practicing as a guest.</strong> Your progress won't be saved if you close or reload this tab.</span>
+    <span>⚠️ <strong>Practicing as a guest.</strong> Progress won't be saved if you close this tab — and without an account, Apex can't track your weak spots or target what to drill next.</span>
     <div class="guest-banner-actions">
       <button class="guest-banner-btn guest-banner-signin" onclick="window.location.href='auth.html?next=practice-screen.html'">Sign in to save</button>
       <button class="guest-banner-btn guest-banner-dismiss" onclick="document.getElementById('guestBanner').style.display='none'">Dismiss</button>
@@ -3177,6 +3177,48 @@ Generate 3 drill questions targeting this exact gap.`;
     const plan = window._userPlan || 'free';
     const gt = window._gradedToday || 0;
     const name = localStorage.getItem('apex_user') || '';
+
+    // Guest menu
+    if (plan === 'guest') {
+      const menu = document.createElement('div');
+      menu.id = 'userMenu';
+      menu.className = 'user-menu';
+      menu.innerHTML = `
+        <div class="menu-header">
+          <div class="menu-user-name">Guest</div>
+          <span class="menu-plan-badge badge-free">Not signed in</span>
+        </div>
+        <div class="menu-item" style="cursor:default;color:#9E9890;font-size:12px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ${Math.max(0, 5 - gt)} of 5 free grades left today
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item" style="font-size:12px;color:#6B6560;cursor:default;line-height:1.5;padding:10px 14px;">
+          Sign in to save progress and let Apex target your weak spots.
+        </div>
+        <div class="menu-divider"></div>
+        <a class="menu-item" href="auth.html?mode=register&next=practice-screen.html" style="font-weight:600;color:var(--text-primary);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Create free account
+        </a>
+        <a class="menu-item" href="auth.html?next=practice-screen.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Sign in
+        </a>`;
+      const card = document.querySelector('.user-card');
+      card.parentNode.style.position = 'relative';
+      card.parentNode.appendChild(menu);
+      setTimeout(() => {
+        document.addEventListener('click', function closeMenu(e) {
+          if (!menu.contains(e.target) && !card.contains(e.target)) {
+            menu.remove(); _menuOpen = false;
+            document.removeEventListener('click', closeMenu);
+          }
+        });
+      }, 0);
+      return;
+    }
+
     let bc = 'badge-free', bt = 'Free plan';
     if (plan === 'monthly') { bc = 'badge-monthly'; bt = 'Monthly'; }
     if (plan === 'pass') { bc = 'badge-pass'; bt = 'Recruiting Pass ◆'; }

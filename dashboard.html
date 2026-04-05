@@ -1432,9 +1432,9 @@
     const token = localStorage.getItem('apex_token');
     const name  = localStorage.getItem('apex_user');
 
-    // Redirect to auth page if not logged in
+    // Guests go straight to practice — no account needed to start
     if (!token) {
-      window.location.href = 'auth.html?next=dashboard.html';
+      window.location.href = 'practice-screen.html';
       return;
     }
 
