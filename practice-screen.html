@@ -1129,6 +1129,24 @@
   .upgrade-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
   .upgrade-btn svg { flex-shrink: 0; }
 
+  /* ── GUEST BANNER ── */
+  .guest-banner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 10px 16px;
+    background: #FEF9C3; border: 1px solid #FDE047;
+    border-radius: 9px; margin-bottom: 20px;
+    font-size: 13px; color: #854D0E; line-height: 1.45;
+    animation: fadeUp .3s ease both;
+  }
+  .guest-banner strong { font-weight: 600; }
+  .guest-banner-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+  .guest-banner-btn {
+    font-size: 12px; font-weight: 600; padding: 5px 12px;
+    border-radius: 6px; cursor: pointer; border: none; white-space: nowrap;
+  }
+  .guest-banner-signin { background: #1A1814; color: white; }
+  .guest-banner-dismiss { background: none; color: #854D0E; border: 1px solid #D4A017 !important; }
+
   /* ── USER CARD MENU ── */
   .user-card {
     display: flex; align-items: center; gap: 9px;
@@ -1265,6 +1283,14 @@
 
 <!-- MAIN -->
 <main class="main">
+  <div id="guestBanner" class="guest-banner" style="display:none;">
+    <span>⚠️ <strong>You're practicing as a guest.</strong> Your progress won't be saved if you close or reload this tab.</span>
+    <div class="guest-banner-actions">
+      <button class="guest-banner-btn guest-banner-signin" onclick="window.location.href='auth.html?next=practice-screen.html'">Sign in to save</button>
+      <button class="guest-banner-btn guest-banner-dismiss" onclick="document.getElementById('guestBanner').style.display='none'">Dismiss</button>
+    </div>
+  </div>
+
   <div class="topbar">
     <div class="breadcrumb">
       Practice <span class="breadcrumb-sep">›</span> <span id="breadcrumbTopic">All Topics</span>
@@ -2114,7 +2140,7 @@ Return JSON only.`;
 
     try {
       // Front-end cap check before hitting server
-      if (userPlan === 'free' && gradedToday >= 5) {
+      if ((userPlan === 'free' || userPlan === 'guest') && gradedToday >= 5) {
         overlay.classList.remove('visible');
         showUpgradeModal('grade_limit');
         return;
@@ -2849,8 +2875,15 @@ Generate 3 drill questions targeting this exact gap.`;
     updateProgressUI();
     // Persist to server
     saveResultToServer(q.id, q.topic, status, score);
-    // Live-update grade counter for free users
+    // Live-update grade counter for free/guest users
     if (userPlan === 'free') { gradedToday++; window._gradedToday = gradedToday; updatePlanUI(); }
+    if (userPlan === 'guest') {
+      gradedToday++;
+      window._gradedToday = gradedToday;
+      const guestKey = 'apex_guest_grades_' + new Date().toISOString().slice(0,10);
+      localStorage.setItem(guestKey, String(gradedToday));
+      updatePlanUI();
+    }
   }
 
   // ─── INIT ─────────────────────────────────────────────────
@@ -3037,9 +3070,25 @@ Generate 3 drill questions targeting this exact gap.`;
     icon.setAttribute('fill', saved ? 'currentColor' : 'none');
   }
 
-  // Redirect to auth page if not logged in
+  // Guest mode — allow practice without login, track grades in localStorage
   if (!localStorage.getItem('apex_token')) {
-    window.location.href = 'auth.html?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+    userPlan = 'guest';
+    window._userPlan = 'guest';
+    const guestKey = 'apex_guest_grades_' + new Date().toISOString().slice(0,10);
+    gradedToday = parseInt(localStorage.getItem(guestKey) || '0');
+    window._gradedToday = gradedToday;
+    const nameEl = document.getElementById('sidebarUserName');
+    const planEl = document.getElementById('sidebarPlan');
+    const avatarEl = document.getElementById('sidebarAvatar');
+    if (nameEl) nameEl.textContent = 'Guest';
+    if (avatarEl) avatarEl.textContent = '?';
+    if (planEl) {
+      const remaining = Math.max(0, 5 - gradedToday);
+      planEl.textContent = 'Free · ' + remaining + ' grade' + (remaining !== 1 ? 's' : '') + ' left today';
+    }
+    // Show guest banner
+    const banner = document.getElementById('guestBanner');
+    if (banner) banner.style.display = 'flex';
   }
 
   // (legacy ping block removed)
@@ -3075,6 +3124,14 @@ Generate 3 drill questions targeting this exact gap.`;
   function updatePlanUI() {
     window._userPlan = userPlan;
     window._gradedToday = gradedToday;
+    if (userPlan === 'guest') {
+      const planEl = document.getElementById('sidebarPlan');
+      if (planEl) {
+        const r = Math.max(0, 5 - gradedToday);
+        planEl.textContent = 'Free · ' + r + ' grade' + (r !== 1 ? 's' : '') + ' left today';
+      }
+      return;
+    }
     updateSidebarPlanText(userPlan, gradedToday);
     const upgradeBtn = document.querySelector('.upgrade-btn');
     if (upgradeBtn && userPlan !== 'free') upgradeBtn.style.display = 'none';
@@ -3156,10 +3213,13 @@ Generate 3 drill questions targeting this exact gap.`;
         </h2>
         <p style="font-size:14px;color:#6B6560;line-height:1.6;margin-bottom:28px;">
           ${reason === 'grade_limit'
-            ? "Free accounts get 5 graded answers per day. Upgrade to grade every answer, every session — no cap."
+            ? (userPlan === 'guest'
+                ? "You've used all 5 free grades for this session. Sign in to keep your progress, or upgrade for unlimited grading."
+                : "Free accounts get 5 graded answers per day. Upgrade to grade every answer, every session — no cap.")
             : "Targeted drill questions are available on paid plans. Upgrade to drill your exact weak spots."}
         </p>
         <div style="display:flex;flex-direction:column;gap:10px;">
+          ${userPlan === 'guest' ? `<button onclick="window.location.href='auth.html?next=practice-screen.html'" style="padding:12px;background:#1A1814;color:white;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;">Sign in / Create account</button>` : ''}
           <button onclick="startCheckout('monthly')" style="padding:12px;background:#2563EB;color:white;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;">
             Monthly — $14.99/mo
           </button>

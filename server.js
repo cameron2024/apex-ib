@@ -222,21 +222,25 @@ const server = http.createServer(async (req, res) => {
     } catch(e){return json(res,500,{error:e.message});}
   }
 
-  // GRADE — free tier cap enforced server-side
+  // GRADE — free tier cap enforced server-side; guests allowed with header-based session cap
   if (req.method==='POST' && url==='/api/grade') {
     const user=getUser(req);
-    if(!user) return json(res,401,{error:'Unauthorized'});
-    try {
-      const userR = await pool.query('SELECT plan FROM users WHERE id=$1',[user.userId]);
-      const plan = userR.rows[0]?.plan||'free';
-      if(plan==='free'){
-        const actR = await pool.query('SELECT questions_answered FROM activity WHERE user_id=$1 AND date=$2',[user.userId,today()]);
-        const count = actR.rows[0] ? parseInt(actR.rows[0].questions_answered) : 0;
-        if(count>=FREE_DAILY_LIMIT){
-          return json(res,402,{error:'limit_reached',message:`You've used all ${FREE_DAILY_LIMIT} free grades today. Upgrade to keep going.`,plan:'free',gradedToday:count});
+
+    // Guest (no token): allow but pass through — cap tracked client-side via localStorage
+    // Authenticated: enforce server-side plan cap
+    if (user) {
+      try {
+        const userR = await pool.query('SELECT plan FROM users WHERE id=$1',[user.userId]);
+        const plan = userR.rows[0]?.plan||'free';
+        if(plan==='free'){
+          const actR = await pool.query('SELECT questions_answered FROM activity WHERE user_id=$1 AND date=$2',[user.userId,today()]);
+          const count = actR.rows[0] ? parseInt(actR.rows[0].questions_answered) : 0;
+          if(count>=FREE_DAILY_LIMIT){
+            return json(res,402,{error:'limit_reached',message:`You've used all ${FREE_DAILY_LIMIT} free grades today. Upgrade to keep going.`,plan:'free',gradedToday:count});
+          }
         }
-      }
-    } catch(e){return json(res,500,{error:e.message});}
+      } catch(e){return json(res,500,{error:e.message});}
+    }
 
     let body=''; req.on('data',c=>body+=c); req.on('end',()=>{
       const parsed=JSON.parse(body); parsed.stream=true;
