@@ -355,37 +355,101 @@
   }
   .card-pro .feature-sub { color: var(--pro-text-secondary); }
 
-  /* DIVIDER SECTION */
-  .divider-section {
-    max-width: 900px; margin: 0 auto;
-    padding: 0 24px 80px;
+  /* ── PHILOSOPHY SECTION ── */
+  .philosophy-section {
+    max-width: 1080px; margin: 0 auto;
+    padding: 0 24px 96px;
   }
-  .divider-inner {
+  .philosophy-header {
+    text-align: center;
+    max-width: 680px; margin: 0 auto 64px;
+  }
+  .philosophy-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-tertiary);
+    margin-bottom: 16px;
+  }
+  .philosophy-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px; letter-spacing: -.5px; line-height: 1.18;
+    color: var(--text-primary); margin-bottom: 20px;
+  }
+  .philosophy-headline em { font-style: italic; color: var(--accent-blue); }
+  .philosophy-sub {
+    font-size: 15px; color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .loop-wrapper {
+    background: var(--text-primary);
+    border-radius: 20px;
+    padding: 48px 40px 52px;
+    margin-bottom: 20px;
+  }
+  .loop-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: rgba(247,246,243,.4);
+    margin-bottom: 36px; text-align: center;
+  }
+  .loop-steps {
+    display: flex; align-items: flex-start; gap: 0;
+  }
+  .loop-step { flex: 1; padding: 0 20px; }
+  .loop-step-highlight {
+    background: rgba(255,255,255,.06);
+    border-radius: 12px; padding: 16px 20px;
+    margin-top: -16px; border: 1px solid rgba(255,255,255,.1);
+  }
+  .loop-arrow {
+    color: rgba(247,246,243,.25); font-size: 20px;
+    padding-top: 36px; flex-shrink: 0; align-self: flex-start;
+  }
+  .loop-step-num {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em;
+    color: rgba(247,246,243,.3); margin-bottom: 12px;
+  }
+  .loop-step-icon {
+    width: 36px; height: 36px; background: rgba(255,255,255,.08);
+    border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .loop-step-highlight .loop-step-icon { background: rgba(37,99,235,.3); }
+  .loop-step-icon svg { width: 17px; height: 17px; color: rgba(247,246,243,.7); }
+  .loop-step-highlight .loop-step-icon svg { color: #93C5FD; }
+  .loop-step-title {
+    font-size: 13px; font-weight: 600; color: #F7F6F3;
+    line-height: 1.35; margin-bottom: 8px;
+  }
+  .loop-step-desc { font-size: 12px; color: rgba(247,246,243,.5); line-height: 1.65; }
+  .contrast-wrapper {
+    display: grid; grid-template-columns: 1fr auto 1fr;
     background: white; border: 1px solid var(--border);
-    border-radius: 16px; padding: 48px;
-    display: grid; grid-template-columns: 1fr 1fr 1fr;
-    gap: 48px;
+    border-radius: 20px; overflow: hidden;
   }
-  .diff-item { text-align: center; }
-  .diff-icon {
-    width: 44px; height: 44px;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 14px;
+  .contrast-col { padding: 40px 40px 44px; }
+  .contrast-apex { background: #F0F7FF; }
+  .contrast-divider-v { width: 1px; background: var(--border); margin: 24px 0; }
+  .contrast-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; margin-bottom: 24px;
   }
-  .diff-icon svg { width: 18px; height: 18px; color: var(--text-primary); }
-  .diff-title {
-    font-size: 14px; font-weight: 600; color: var(--text-primary);
-    margin-bottom: 7px; letter-spacing: -.15px;
+  .contrast-old .contrast-label { color: var(--text-tertiary); }
+  .contrast-apex .contrast-label { color: var(--accent-blue); }
+  .contrast-list { display: flex; flex-direction: column; gap: 14px; }
+  .contrast-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13.5px; line-height: 1.5;
   }
-  .diff-desc {
-    font-size: 12.5px; color: var(--text-secondary); line-height: 1.65;
+  .contrast-item-bad { color: var(--text-secondary); }
+  .contrast-item-good { color: var(--text-primary); font-weight: 500; }
+  .contrast-icon-bad {
+    font-size: 11px; color: #EF4444; background: #FEF2F2; border-radius: 50%;
+    width: 18px; height: 18px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
   }
-  .diff-divider {
-    width: 1px; background: var(--border);
-    align-self: stretch;
-    justify-self: center;
+  .contrast-icon-good {
+    font-size: 10px; color: #16A34A; background: #DCFCE7; border-radius: 50%;
+    width: 18px; height: 18px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
   }
 
   /* FAQ */
@@ -751,39 +815,133 @@
 
 </div>
 
-<!-- HOW IT DIFFERS -->
-<div class="divider-section">
-  <div class="divider-inner">
-    <div class="diff-item">
-      <div class="diff-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-        </svg>
+<!-- PHILOSOPHY SECTION -->
+<div class="philosophy-section">
+
+  <div class="philosophy-header">
+    <div class="philosophy-eyebrow">Why Apex is different</div>
+    <h2 class="philosophy-headline">Other tools teach you the answer.<br><em>Apex finds out why you got it wrong.</em></h2>
+    <p class="philosophy-sub">Most IB prep is passive — read a guide, flip a flashcard, repeat. That's how you recognize answers in a vacuum. It's not how you perform under a banker who's probing for your gaps. Apex is built around a different loop entirely.</p>
+  </div>
+
+  <!-- THE LOOP -->
+  <div class="loop-wrapper">
+    <div class="loop-label">The Apex Loop</div>
+    <div class="loop-steps">
+
+      <div class="loop-step">
+        <div class="loop-step-num">01</div>
+        <div class="loop-step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <div class="loop-step-title">You answer cold</div>
+        <div class="loop-step-desc">No hints. No multiple choice. You type or speak your answer from scratch — just like in the actual room.</div>
       </div>
-      <div class="diff-title">Active recall, not passive reading</div>
-      <div class="diff-desc">You answer from scratch every time. No multiple choice. No reading first. The only way to actually retain it.</div>
-    </div>
-    <div class="diff-divider"></div>
-    <div class="diff-item">
-      <div class="diff-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
+
+      <div class="loop-arrow">→</div>
+
+      <div class="loop-step">
+        <div class="loop-step-num">02</div>
+        <div class="loop-step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="loop-step-title">Scored against the banker standard</div>
+        <div class="loop-step-desc">A model trained on what IB interviewers want scores your answer across accuracy, completeness, and structure — 0 to 100.</div>
       </div>
-      <div class="diff-title">Drills the gap, not the topic</div>
-      <div class="diff-desc">When you miss a question, Apex generates 3 new ones targeting the exact concept you got wrong — not just more questions on the same topic.</div>
-    </div>
-    <div class="diff-divider"></div>
-    <div class="diff-item">
-      <div class="diff-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-        </svg>
+
+      <div class="loop-arrow">→</div>
+
+      <div class="loop-step loop-step-highlight">
+        <div class="loop-step-num">03</div>
+        <div class="loop-step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="loop-step-title">The exact gap is identified</div>
+        <div class="loop-step-desc">Not "you need to study DCF." The specific mechanic you got wrong — e.g. how terminal value flows into equity value.</div>
       </div>
-      <div class="diff-title">Mastery-gated, not time-gated</div>
-      <div class="diff-desc">You don't finish a topic by spending two hours on it. You finish when you can answer every question cold, consistently.</div>
+
+      <div class="loop-arrow">→</div>
+
+      <div class="loop-step loop-step-highlight">
+        <div class="loop-step-num">04</div>
+        <div class="loop-step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="loop-step-title">3 drills hit that exact weakness</div>
+        <div class="loop-step-desc">Three new questions generated for that specific concept — not the topic, not a guess. The precise gap, attacked directly.</div>
+      </div>
+
+      <div class="loop-arrow">→</div>
+
+      <div class="loop-step">
+        <div class="loop-step-num">05</div>
+        <div class="loop-step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <div class="loop-step-title">You earn mastery</div>
+        <div class="loop-step-desc">You don't finish by spending time on a topic. You finish when you can answer every question cold, every time.</div>
+      </div>
+
     </div>
   </div>
+
+  <!-- CONTRAST -->
+  <div class="contrast-wrapper">
+    <div class="contrast-col contrast-old">
+      <div class="contrast-label">Every other prep tool</div>
+      <div class="contrast-list">
+        <div class="contrast-item contrast-item-bad">
+          <span class="contrast-icon-bad">✗</span>
+          Read a guide, try to absorb it
+        </div>
+        <div class="contrast-item contrast-item-bad">
+          <span class="contrast-icon-bad">✗</span>
+          Flip flashcards, self-grade in your head
+        </div>
+        <div class="contrast-item contrast-item-bad">
+          <span class="contrast-icon-bad">✗</span>
+          Finish a "topic" by spending time on it
+        </div>
+        <div class="contrast-item contrast-item-bad">
+          <span class="contrast-icon-bad">✗</span>
+          No feedback on what you actually missed
+        </div>
+        <div class="contrast-item contrast-item-bad">
+          <span class="contrast-icon-bad">✗</span>
+          Walk into interviews hoping you covered it
+        </div>
+      </div>
+    </div>
+
+    <div class="contrast-divider-v"></div>
+
+    <div class="contrast-col contrast-apex">
+      <div class="contrast-label">Apex</div>
+      <div class="contrast-list">
+        <div class="contrast-item contrast-item-good">
+          <span class="contrast-icon-good">✓</span>
+          Answer from scratch every time — active recall only
+        </div>
+        <div class="contrast-item contrast-item-good">
+          <span class="contrast-icon-good">✓</span>
+          Scored by a model that knows what bankers look for
+        </div>
+        <div class="contrast-item contrast-item-good">
+          <span class="contrast-icon-good">✓</span>
+          Finish a topic when you can answer cold, consistently
+        </div>
+        <div class="contrast-item contrast-item-good">
+          <span class="contrast-icon-good">✓</span>
+          Exact gap identified, 3 targeted drills generated instantly
+        </div>
+        <div class="contrast-item contrast-item-good">
+          <span class="contrast-icon-good">✓</span>
+          Walk in knowing you've been tested on every gap
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- FAQ -->
