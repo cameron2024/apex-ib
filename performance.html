@@ -816,28 +816,28 @@
         <a href="practice-screen.html" style="font-size:13px;color:var(--text-tertiary);text-decoration:none;margin-top:4px;">← Back to practice</a>
       </div>`;
   } else {
-    // Render empty states first
+    // Render empty states immediately so page isn't blank
     renderReadiness(null, 0);
     renderBalance([]);
     renderNextSession([], []);
     renderWeakTable([], []);
 
     const firstName = userName ? userName.split(' ')[0] : 'there';
-    document.getElementById('pageSubtitle').textContent = `Your interview prep analytics, ${firstName}`;
+    document.getElementById('pageSubtitle').textContent = 'Your interview prep analytics, ' + firstName;
 
-    if (!token) return;
-
-    async function init() {
+    // Async IIFE — the only safe way to use await in a classic script tag
+    (async function () {
+      if (!token) return;
       try {
         const res = await fetch('/api/progress/load', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
-        if (!res.ok) throw new Error('Response ' + res.status);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
 
-        const results = data.results || [];
-        const history = data.history || [];
-        const streak = data.streak || 0;
+        const results  = data.results  || [];
+        const history  = data.history  || [];
+        const streak   = data.streak   || 0;
 
         const readiness = computeReadiness(results, history);
         renderReadiness(readiness, streak);
@@ -846,31 +846,29 @@
         renderNextSession(results, history);
         renderWeakTable(results, history);
 
-        window._userPlan = data.plan || 'free';
+        window._userPlan    = data.plan        || 'free';
         window._gradedToday = data.gradedToday || 0;
         window._memberSince = data.memberSince || null;
         initSidebarMenu(window._userPlan, window._gradedToday);
 
         document.getElementById('pageSubtitle').textContent =
           history.length > 0
-            ? `${history.length} answer${history.length!==1?'s':''} recorded · ${readiness?.score ?? '\u2014'}% readiness`
-            : `No answers yet — start practicing to see your analytics`;
+            ? history.length + ' answer' + (history.length !== 1 ? 's' : '') + ' recorded · ' + (readiness ? readiness.score : '—') + '% readiness'
+            : 'No answers yet — start practicing to see your analytics';
 
-        setTimeout(() => {
-          document.querySelectorAll('.rbar-fill, .balance-fill').forEach(el => {
-            const w = el.style.width;
+        setTimeout(function () {
+          document.querySelectorAll('.rbar-fill, .balance-fill').forEach(function (el) {
+            var w = el.style.width;
             el.style.width = '0%';
-            setTimeout(() => { el.style.width = w; }, 60);
+            setTimeout(function () { el.style.width = w; }, 60);
           });
         }, 200);
 
-      } catch(e) {
-        console.log('Performance load error:', e);
+      } catch (e) {
+        console.error('Performance load error:', e);
         document.getElementById('pageSubtitle').textContent = 'Could not load data — check your connection and refresh.';
       }
-    }
-
-    init();
+    })();
   } // end else (logged in)
   // ── SIDEBAR MENU ──────────────────────────────────────────
 
