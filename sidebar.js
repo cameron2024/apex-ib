@@ -97,7 +97,77 @@
       const active = document.querySelector(`.nav-item[data-page="${page}"]`);
       if (active) active.classList.add('active');
     }
+
+    // Apply saved avatar immediately
+    applyAvatarToSidebar();
   }
+
+  // ── AVATAR HELPERS ────────────────────────────────────────
+  function applyAvatarToSidebar() {
+    const url = localStorage.getItem('apex_avatar');
+    const el = document.getElementById('sidebarAvatar');
+    if (!el) return;
+    if (url) {
+      el.style.backgroundImage = 'url(' + url + ')';
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+      el.textContent = '';
+    } else {
+      el.style.backgroundImage = '';
+    }
+  }
+
+  function applyAvatarToMenu() {
+    const url = localStorage.getItem('apex_avatar');
+    const menuAv = document.getElementById('menuHeaderAvatar');
+    if (!menuAv) return;
+    const existing = menuAv.querySelector('img.av-photo');
+    if (url && !existing) {
+      const img = document.createElement('img');
+      img.className = 'av-photo';
+      img.src = url;
+      menuAv.insertBefore(img, menuAv.firstChild);
+      menuAv.querySelector('.av-initials') && (menuAv.querySelector('.av-initials').style.display = 'none');
+    } else if (url && existing) {
+      existing.src = url;
+      menuAv.querySelector('.av-initials') && (menuAv.querySelector('.av-initials').style.display = 'none');
+    } else if (!url && existing) {
+      existing.remove();
+      menuAv.querySelector('.av-initials') && (menuAv.querySelector('.av-initials').style.display = '');
+    }
+  }
+
+  window._triggerAvatarUpload = function () {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const raw = new Image();
+        raw.onload = function () {
+          const canvas = document.createElement('canvas');
+          const SIZE = 220;
+          canvas.width = SIZE; canvas.height = SIZE;
+          const ctx = canvas.getContext('2d');
+          // Centre-crop to square
+          const min = Math.min(raw.width, raw.height);
+          const sx = (raw.width  - min) / 2;
+          const sy = (raw.height - min) / 2;
+          ctx.drawImage(raw, sx, sy, min, min, 0, 0, SIZE, SIZE);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          localStorage.setItem('apex_avatar', dataUrl);
+          applyAvatarToSidebar();
+          applyAvatarToMenu();
+        };
+        raw.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
 
   // ── PLAN UI ───────────────────────────────────────────────
   function updateSidebarPlanText(plan, gradedToday) {
@@ -196,7 +266,12 @@
     menu.className = 'user-menu';
     menu.innerHTML = `
       <div class="menu-header">
-        <div class="menu-header-avatar">${initials}</div>
+        <div class="menu-header-avatar" id="menuHeaderAvatar" onclick="window._triggerAvatarUpload()" title="Change profile photo">
+          <span class="av-initials">${initials}</span>
+          <div class="menu-avatar-edit-overlay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="15" height="15"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+        </div>
         <div class="menu-header-text">
           <div class="menu-user-name">${name}</div>
           ${email ? `<div class="menu-user-email">${email}</div>` : ''}
@@ -214,6 +289,9 @@
 
     const bottom = document.querySelector('.sidebar-bottom');
     if (bottom) { bottom.style.position = 'relative'; bottom.appendChild(menu); }
+
+    // Apply saved photo to the freshly-rendered menu avatar
+    applyAvatarToMenu();
 
     setTimeout(() => {
       document.addEventListener('click', function close(e) {
