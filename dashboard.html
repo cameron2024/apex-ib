@@ -1199,10 +1199,9 @@
     if (name) {
       setGreeting(name);
       const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-      document.getElementById('userAvatar').textContent = initials;
+      const avatarEl = document.getElementById('sidebarAvatar');
+      if (avatarEl) avatarEl.textContent = initials;
       document.getElementById('sidebarUserName').textContent = name;
-      const signOutBtn = document.getElementById('signOutBtn');
-      if (signOutBtn) signOutBtn.style.display = 'block';
     } else {
       setGreeting('');
     }
