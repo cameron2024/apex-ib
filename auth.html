@@ -215,11 +215,11 @@
     <span class="logo-name">Apex</span>
   </div>
   <div class="left-headline">Crack your IB<br>interview.</div>
-  <div class="left-sub">Graded by a model trained on what investment bankers actually want to hear — across accounting, valuation, DCF, M&A, and LBO.</div>
+  <div class="left-sub">AI-graded practice on every technical question you'll face — accounting, valuation, DCF, M&A, and LBO.</div>
   <div class="left-stats">
-    <div><div class="stat-val">565</div><div class="stat-label">Questions</div></div>
+    <div><div class="stat-val">188</div><div class="stat-label">Questions</div></div>
     <div><div class="stat-val">6</div><div class="stat-label">Topics</div></div>
-    <div><div class="stat-val">IB</div><div class="stat-label">Graded</div></div>
+    <div><div class="stat-val">AI</div><div class="stat-label">Graded</div></div>
   </div>
 </div>
 
@@ -262,6 +262,11 @@
       <input type="password" id="registerPassword" placeholder="Min 6 characters" autocomplete="new-password"
              onkeydown="if(event.key==='Enter')doRegister()">
     </div>
+    <div class="field">
+      <label>Confirm Password</label>
+      <input type="password" id="registerConfirm" placeholder="Re-enter your password" autocomplete="new-password"
+             onkeydown="if(event.key==='Enter')doRegister()">
+    </div>
     <button class="submit-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
   </div>
 
@@ -270,6 +275,9 @@
   <div class="switch-row">
     <span id="switchLabel">Don't have an account?</span>&nbsp;
     <button id="switchBtn" onclick="showTab('register')">Sign up free →</button>
+  </div>
+  <div style="text-align:center;margin-top:14px;">
+    <button onclick="goGuest()" style="background:none;border:none;font-size:12.5px;color:var(--text-tertiary);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">Continue as guest →</button>
   </div>
 </div>
 
@@ -320,13 +328,15 @@
   }
 
   async function doRegister() {
-    const name  = document.getElementById('registerName').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const pass  = document.getElementById('registerPassword').value;
-    const btn   = document.getElementById('registerBtn');
-    if (!name)           return showError('Please enter your name');
-    if (!email)          return showError('Please enter your email');
-    if (pass.length < 6) return showError('Password must be at least 6 characters');
+    const name    = document.getElementById('registerName').value.trim();
+    const email   = document.getElementById('registerEmail').value.trim();
+    const pass    = document.getElementById('registerPassword').value;
+    const confirm = document.getElementById('registerConfirm').value;
+    const btn     = document.getElementById('registerBtn');
+    if (!name)              return showError('Please enter your name');
+    if (!email)             return showError('Please enter your email');
+    if (pass.length < 6)    return showError('Password must be at least 6 characters');
+    if (pass !== confirm)   return showError('Passwords don\'t match');
     btn.disabled = true; btn.textContent = 'Creating account…'; showError('');
     try {
       const res  = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pass, name}) });
@@ -336,6 +346,12 @@
       onSuccess(d.token, d.name);
     } catch(e) { showError(e.message); }
     finally { btn.disabled = false; btn.textContent = 'Create Account'; }
+  }
+
+  function goGuest() {
+    const dest = new URLSearchParams(window.location.search).get('next') || 'practice-screen.html';
+    // Always send guests to practice — that's the only guest-friendly page
+    window.location.href = dest.includes('practice') ? dest : 'practice-screen.html';
   }
 
   function onSuccess(token, name) {
