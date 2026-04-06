@@ -6,6 +6,15 @@ const crypto = require('crypto');
 const { Pool } = require('pg');
 
 const PORT = process.env.PORT || 3000;
+
+// Load questions.json into memory at startup
+let QUESTIONS_DATA = null;
+try {
+  QUESTIONS_DATA = fs.readFileSync(path.join(__dirname, 'questions.json'), 'utf8');
+  console.log('questions.json loaded: ' + JSON.parse(QUESTIONS_DATA).length + ' questions');
+} catch(e) {
+  console.error('WARNING: questions.json not found or invalid:', e.message);
+}
 const JWT_SECRET = process.env.JWT_SECRET || 'apex-ib-secret-change-in-prod';
 const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
@@ -327,13 +336,11 @@ const server = http.createServer(async (req, res) => {
     } catch(e){return json(res,500,{error:e.message});}
   }
 
-  if (url==='/questions.json') {
-    const qPath=path.join(__dirname,'questions.json');
-    return fs.readFile(qPath,(err,content)=>{
-      if(err){res.writeHead(404,{'Content-Type':'text/plain'});res.end('Not found');return;}
-      res.writeHead(200,{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'public, max-age=3600'});
-      res.end(content);
-    });
+  if (url==='/api/questions') {
+    if (!QUESTIONS_DATA) return json(res, 503, { error: 'questions.json not loaded — ensure the file is committed to your repository' });
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=3600' });
+    res.end(QUESTIONS_DATA);
+    return;
   }
 
   if (url==='/api/debug-files') {
