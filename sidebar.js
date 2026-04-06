@@ -171,7 +171,7 @@
     if (plan === 'pass')    { bc = 'badge-pass';    bt = 'Recruiting Pass ◆'; }
 
     const memberLine = memberSince
-      ? `<div style="font-size:11px;color:var(--text-tertiary);margin-top:3px;">Member since ${new Date(memberSince * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>`
+      ? `<div style="font-family:'DM Serif Display',serif;font-style:italic;font-size:11.5px;color:var(--text-tertiary);margin-top:5px;letter-spacing:.01em;">Member since ${new Date(memberSince * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>`
       : '';
 
     const gradeRow = plan === 'free'
