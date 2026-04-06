@@ -827,65 +827,50 @@
 
     if (!token) return;
 
-    try {
-      const res = await fetch('/api/progress/load', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      if (!res.ok) return;
-      const data = await res.json();
+    async function init() {
+      try {
+        const res = await fetch('/api/progress/load', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('Response ' + res.status);
+        const data = await res.json();
 
-      const results = data.results || [];
-      const history = data.history || [];
-      const streak = data.streak || 0;
+        const results = data.results || [];
+        const history = data.history || [];
+        const streak = data.streak || 0;
 
-      const readiness = computeReadiness(results, history);
-      renderReadiness(readiness, streak);
-      renderTrend(history, streak);
-      renderBalance(results);
-      renderNextSession(results, history);
-      renderWeakTable(results, history);
+        const readiness = computeReadiness(results, history);
+        renderReadiness(readiness, streak);
+        renderTrend(history, streak);
+        renderBalance(results);
+        renderNextSession(results, history);
+        renderWeakTable(results, history);
 
+        window._userPlan = data.plan || 'free';
+        window._gradedToday = data.gradedToday || 0;
+        window._memberSince = data.memberSince || null;
+        initSidebarMenu(window._userPlan, window._gradedToday);
 
-      // Update plan display
-      // Init sidebar menu
-      window._userPlan = data.plan || 'free';
-      window._gradedToday = data.gradedToday || 0;
-      window._memberSince = data.memberSince || null;
-      initSidebarMenu(window._userPlan, window._gradedToday);
-      if (data.plan) {
-        const planEl = document.getElementById('sidebarPlan');
-        if (planEl) {
-          if (data.plan === 'pass') { planEl.textContent = 'Recruiting Pass'; planEl.style.color = '#D97706'; }
-          else if (data.plan === 'monthly') { planEl.textContent = 'Monthly plan'; planEl.style.color = '#2563EB'; }
-          else {
-            const remaining = Math.max(0, 5 - (data.gradedToday || 0));
-            planEl.textContent = `Free plan · ${remaining} grade${remaining !== 1 ? 's' : ''} left today`;
-          }
-          const upgradeBtn = document.querySelector('.upgrade-btn');
-          if (upgradeBtn && data.plan !== 'free') upgradeBtn.style.display = 'none';
-        }
+        document.getElementById('pageSubtitle').textContent =
+          history.length > 0
+            ? `${history.length} answer${history.length!==1?'s':''} recorded · ${readiness?.score ?? '\u2014'}% readiness`
+            : `No answers yet — start practicing to see your analytics`;
+
+        setTimeout(() => {
+          document.querySelectorAll('.rbar-fill, .balance-fill').forEach(el => {
+            const w = el.style.width;
+            el.style.width = '0%';
+            setTimeout(() => { el.style.width = w; }, 60);
+          });
+        }, 200);
+
+      } catch(e) {
+        console.log('Performance load error:', e);
+        document.getElementById('pageSubtitle').textContent = 'Could not load data — check your connection and refresh.';
       }
-      document.getElementById('pageSubtitle').textContent =
-        history.length > 0
-          ? `${history.length} answer${history.length!==1?'s':''} recorded · ${readiness?.score ?? '—'}% readiness`
-          : `No answers yet — start practicing to see your analytics`;
-
-    } catch(e) {
-      console.log('Performance load error:', e);
-      document.getElementById('pageSubtitle').textContent = 'Could not load data — check your connection and refresh.';
     }
 
-    // Animate bars
-    setTimeout(() => {
-      document.querySelectorAll('.rbar-fill, .balance-fill').forEach(el => {
-        const w = el.style.width;
-        el.style.width = '0%';
-        setTimeout(() => { el.style.width = w; }, 60);
-      });
-    }, 200);
-  }
-
-  init();
+    init();
   } // end else (logged in)
   // ── SIDEBAR MENU ──────────────────────────────────────────
 

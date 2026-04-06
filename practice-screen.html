@@ -2155,8 +2155,22 @@ Return JSON only.`;
     const btnLabel    = document.getElementById('btnLoadNextLabel');
     const labelText   = document.getElementById('nextLabelText');
 
-    if (overall >= 90 && result.harder_followon) {
-      // Mastered — queue a single harder follow-on as a real AI question
+    const currentQ = filteredQuestions[currentIndex];
+    const isAlreadyDrilling = currentQ && currentQ.ai_generated && currentQ.ai_type === 'drill';
+
+    // ── If mid-drill and questions remain, always continue the existing drill ──
+    if (isAlreadyDrilling && drillQueue.length > 0) {
+      nextBadge.textContent = 'Continue drill';
+      nextBadge.className = 'next-label-badge';
+      labelText.textContent = 'Keep drilling';
+      nextQText.textContent = drillQueue[0].question;
+      nextQReason.textContent = '🎯 ' + drillQueue.length + ' drill question' + (drillQueue.length > 1 ? 's' : '') + ' remaining';
+      btnLabel.textContent = 'Next drill question';
+      document.getElementById('drillQueuePreview').style.display = 'none';
+      const skipElC = document.getElementById('drillSkipLink');
+      if (skipElC) skipElC.style.display = 'none';
+    } else if (overall >= 90 && result.harder_followon && !isAlreadyDrilling) {
+      // Mastered on a bank question — queue a single harder follow-on
       const hardQ = {
         id: 'ai_followon_' + Date.now(),
         question: result.harder_followon,
@@ -2180,8 +2194,6 @@ Return JSON only.`;
       const skipElM = document.getElementById('drillSkipLink');
       if (skipElM) skipElM.style.display = 'none';
     } else if (overall < 75 && result.concept_gap) {
-      const currentQ = filteredQuestions[currentIndex];
-      const isAlreadyDrilling = currentQ.ai_generated && currentQ.ai_type === 'drill';
 
       if (isAlreadyDrilling && drillQueue.length > 0) {
         // Mid-drill failure — don't spawn new drills, just continue the existing set
@@ -2193,12 +2205,12 @@ Return JSON only.`;
         btnLabel.textContent = 'Next drill question';
         document.getElementById('drillQueuePreview').style.display = 'none';
       } else if (isAlreadyDrilling) {
-        // Last drill question failed — just move on, don't infinite loop
-        nextBadge.textContent = 'Next question';
+        // Last drill question done — drill complete, move on
+        nextBadge.textContent = 'Drill complete';
         nextBadge.className = 'next-label-badge';
-        labelText.textContent = 'Move on';
+        labelText.textContent = 'Up next';
         nextQText.textContent = 'Continue to next question in the bank';
-        nextQReason.textContent = '📌 Review the model answer above before moving on';
+        nextQReason.textContent = overall >= 75 ? '✓ Drill done — good work' : '📌 Review the model answer above before moving on';
         btnLabel.textContent = 'Next question';
         drillQueue = [];
         inDrillMode = false;
