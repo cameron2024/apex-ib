@@ -244,12 +244,8 @@
   };
 
   // ── BOOT ──────────────────────────────────────────────────
-  // Run after DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectSidebar);
-  } else {
-    injectSidebar();
-  }
+  // Inject sidebar immediately (script is loaded at bottom of body)
+  injectSidebar();
 
   // Expose helpers globally for pages to call
   window.initSidebarMenu      = initSidebarMenu;
