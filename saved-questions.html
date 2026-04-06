@@ -533,6 +533,7 @@
       .then(r => r.json()).then(data => {
         window._userPlan = data.plan || 'free';
         window._gradedToday = data.gradedToday || 0;
+        window._memberSince = data.memberSince || null;
         initSidebarMenu(window._userPlan, window._gradedToday);
       }).catch(() => {});
   }
@@ -755,7 +756,7 @@
     const menu = document.createElement('div');
     menu.id = 'userMenu';
     menu.className = 'user-menu';
-    menu.innerHTML = '<div class="menu-header"><div class="menu-user-name">' + name + '</div><span class="menu-plan-badge ' + badgeClass + '">' + badgeText + '</span></div>' + gradeRow + upgradeRow + '<div class="menu-divider"></div><div class="menu-item menu-item-danger" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</div>';
+    menu.innerHTML = '<div class="menu-header"><div class="menu-user-name">' + name + '</div><span class="menu-plan-badge ' + badgeClass + '">' + badgeText + '</span>' + (window._memberSince ? '<div style="font-size:11px;color:#9E9890;margin-top:3px;">Member since ' + new Date(window._memberSince * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'}) + '</div>' : '') + '</div>' + gradeRow + upgradeRow + '<div class="menu-divider"></div><div class="menu-item menu-item-danger" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</div>';
     const card = document.querySelector('.user-card');
     card.parentNode.style.position = 'relative';
     card.parentNode.appendChild(menu);

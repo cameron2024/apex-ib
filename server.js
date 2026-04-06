@@ -205,7 +205,7 @@ const server = http.createServer(async (req, res) => {
         pool.query('SELECT last_topic,last_question_index FROM user_state WHERE user_id=$1',[user.userId]),
         pool.query('SELECT question_id,topic,score,status,created_at FROM sessions WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50',[user.userId]),
         pool.query('SELECT date,questions_answered FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84',[user.userId]),
-        pool.query('SELECT plan FROM users WHERE id=$1',[user.userId])
+        pool.query('SELECT plan, created_at FROM users WHERE id=$1',[user.userId])
       ]);
       const state = stateR.rows[0]||{last_topic:'All',last_question_index:0};
       const actDates = new Set(activityR.rows.map(a=>a.date));
@@ -218,7 +218,8 @@ const server = http.createServer(async (req, res) => {
       const todayAct = activityR.rows.find(a=>a.date===today());
       const gradedToday = todayAct ? parseInt(todayAct.questions_answered) : 0;
       const plan = userR.rows[0]?.plan||'free';
-      return json(res,200,{results:resultsR.rows,state,history:historyR.rows,activity:activityR.rows,streak,plan,gradedToday});
+      const memberSince = userR.rows[0]?.created_at || null;
+      return json(res,200,{results:resultsR.rows,state,history:historyR.rows,activity:activityR.rows,streak,plan,gradedToday,memberSince});
     } catch(e){return json(res,500,{error:e.message});}
   }
 

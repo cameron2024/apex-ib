@@ -977,6 +977,7 @@
       // Init sidebar menu
       window._userPlan = data.plan || 'free';
       window._gradedToday = data.gradedToday || 0;
+      window._memberSince = data.memberSince || null;
       initSidebarMenu(window._userPlan, window._gradedToday);
       if (data.plan) {
         const planEl = document.getElementById('sidebarPlan');
@@ -1097,6 +1098,7 @@
       <div class="menu-header">
         <div class="menu-user-name">${name}</div>
         <span class="menu-plan-badge ${badgeClass}">${badgeText}</span>
+        ${window._memberSince ? `<div style="font-size:11px;color:#9E9890;margin-top:3px;">Member since ${new Date(window._memberSince * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>` : ''}
       </div>
       ${gradeRow}
       ${upgradeRow}

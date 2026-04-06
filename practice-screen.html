@@ -2978,6 +2978,7 @@ Generate 3 drill questions targeting this exact gap.`;
         gradedToday = data.gradedToday || 0;
         window._userPlan = userPlan;
         window._gradedToday = gradedToday;
+        window._memberSince = data.memberSince || null;
         initSidebarMenu(userPlan, gradedToday);
         updatePlanUI();
       }
@@ -3141,7 +3142,12 @@ Generate 3 drill questions targeting this exact gap.`;
   function initSidebarMenu(plan, gradedToday) {
     const card = document.querySelector('.user-card');
     if (!card) return;
-    card.setAttribute('onclick', 'toggleUserMenu()');
+    if (plan === 'guest') {
+      card.setAttribute('onclick', "window.location.href='auth.html?next=practice-screen.html'");
+      card.title = 'Sign in or create an account';
+    } else {
+      card.setAttribute('onclick', 'toggleUserMenu()');
+    }
     const avatar = card.querySelector('.user-avatar');
     if (avatar && plan !== 'free') {
       const wrap = document.createElement('div');
@@ -3222,12 +3228,16 @@ Generate 3 drill questions targeting this exact gap.`;
     let bc = 'badge-free', bt = 'Free plan';
     if (plan === 'monthly') { bc = 'badge-monthly'; bt = 'Monthly'; }
     if (plan === 'pass') { bc = 'badge-pass'; bt = 'Recruiting Pass ◆'; }
+    const ms = window._memberSince;
+    const memberLine = ms
+      ? `<div style="font-size:11px;color:#9E9890;margin-top:3px;">Member since ${new Date(ms * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>`
+      : '';
     const upgradeRow = plan === 'free' ? '<div class="menu-divider"></div><a class="menu-item" href="pricing.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Upgrade to Pro</a>' : '';
     const gradeRow = plan === 'free' ? '<div class="menu-divider"></div><div class="menu-item" style="cursor:default;color:#9E9890;font-size:12px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' + Math.max(0, 5 - gt) + ' of 5 free grades left today</div>' : '';
     const menu = document.createElement('div');
     menu.id = 'userMenu';
     menu.className = 'user-menu';
-    menu.innerHTML = '<div class="menu-header"><div class="menu-user-name">' + name + '</div><span class="menu-plan-badge ' + bc + '">' + bt + '</span></div>' + gradeRow + upgradeRow + '<div class="menu-divider"></div><div class="menu-item menu-item-danger" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</div>';
+    menu.innerHTML = '<div class="menu-header"><div class="menu-user-name">' + name + '</div><span class="menu-plan-badge ' + bc + '">' + bt + '</span>' + memberLine + '</div>' + gradeRow + upgradeRow + '<div class="menu-divider"></div><div class="menu-item menu-item-danger" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</div>';
     const card = document.querySelector('.user-card');
     card.parentNode.style.position = 'relative';
     card.parentNode.appendChild(menu);
