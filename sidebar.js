@@ -161,22 +161,25 @@
     if (existing) { existing.remove(); _menuOpen = false; return; }
     _menuOpen = true;
 
-    const plan       = window._userPlan || 'free';
-    const gt         = window._gradedToday || 0;
-    const name       = localStorage.getItem('apex_user') || '—';
+    const plan        = window._userPlan || 'free';
+    const gt          = window._gradedToday || 0;
+    const name        = localStorage.getItem('apex_user') || '—';
+    const email       = localStorage.getItem('apex_email') || '';
     const memberSince = window._memberSince;
 
-    let bc = 'badge-free', bt = 'Free plan';
-    if (plan === 'monthly') { bc = 'badge-monthly'; bt = 'Monthly'; }
-    if (plan === 'pass')    { bc = 'badge-pass';    bt = 'Recruiting Pass ◆'; }
+    const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+    let bc = 'badge-free', bt = '✦ Free plan';
+    if (plan === 'monthly') { bc = 'badge-monthly'; bt = '★ Monthly'; }
+    if (plan === 'pass')    { bc = 'badge-pass';    bt = '◆ Recruiting Pass'; }
 
     const memberLine = memberSince
-      ? `<div style="font-family:'DM Serif Display',serif;font-style:italic;font-size:11.5px;color:var(--text-tertiary);margin-top:5px;letter-spacing:.01em;">Member since ${new Date(memberSince * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>`
+      ? `<div class="menu-member-since">Member since ${new Date(memberSince * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>`
       : '';
 
     const gradeRow = plan === 'free'
       ? `<div class="menu-divider"></div>
-         <div class="menu-item" style="cursor:default;color:var(--text-tertiary);font-size:12px;">
+         <div class="menu-item menu-item-info">
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
            ${Math.max(0, 5 - gt)} of 5 free grades left today
          </div>` : '';
@@ -193,9 +196,13 @@
     menu.className = 'user-menu';
     menu.innerHTML = `
       <div class="menu-header">
-        <div class="menu-user-name">${name}</div>
-        <span class="menu-plan-badge ${bc}">${bt}</span>
-        ${memberLine}
+        <div class="menu-header-avatar">${initials}</div>
+        <div class="menu-header-text">
+          <div class="menu-user-name">${name}</div>
+          ${email ? `<div class="menu-user-email">${email}</div>` : ''}
+          <span class="menu-plan-badge ${bc}">${bt}</span>
+          ${memberLine}
+        </div>
       </div>
       ${gradeRow}
       ${upgradeRow}

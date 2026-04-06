@@ -176,43 +176,80 @@ body {
 
 /* ── USER MENU POPUP ─────────────────────────────────────── */
 .user-menu {
-  position: absolute; bottom: calc(100% + 8px); left: 0; right: 0;
+  position: absolute; bottom: calc(100% + 10px); left: 0; right: 0;
   background: white; border: 1px solid var(--border);
-  border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,.13), 0 2px 8px rgba(0,0,0,.06);
   overflow: hidden; z-index: 200;
-  animation: menuPop .15s ease both;
+  min-width: 220px;
+  animation: menuPop .18s cubic-bezier(0.16,1,0.3,1) both;
 }
 @keyframes menuPop {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* Header: avatar + name + email */
 .menu-header {
-  padding: 12px 14px 10px;
+  padding: 18px 18px 14px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 13px;
 }
+.menu-header-avatar {
+  width: 40px; height: 40px; flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 600; color: white;
+}
+.menu-header-text { flex: 1; min-width: 0; }
 .menu-user-name {
-  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  font-size: 13.5px; font-weight: 600; color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.menu-user-email {
+  font-size: 11.5px; color: var(--text-tertiary);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .menu-plan-badge {
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 600; margin-top: 4px;
-  padding: 2px 7px; border-radius: 20px;
+  font-size: 10.5px; font-weight: 600; margin-top: 5px;
+  padding: 2px 8px; border-radius: 20px; letter-spacing: .01em;
 }
-.badge-free    { background: var(--bg);  color: var(--text-tertiary); }
+.badge-free    { background: var(--bg);  color: var(--text-tertiary); border: 1px solid var(--border); }
 .badge-monthly { background: #EFF6FF;    color: #2563EB; }
 .badge-pass    { background: #FEF3C7;    color: #D97706; }
+
+/* Member since line */
+.menu-member-since {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 3px;
+  letter-spacing: .01em;
+}
+
+/* Items */
 .menu-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 10px 14px; font-size: 13px; color: var(--text-primary);
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 18px; font-size: 13px; color: var(--text-primary);
   cursor: pointer; text-decoration: none;
   transition: background .1s;
+  font-family: 'DM Sans', sans-serif;
 }
 .menu-item:hover { background: var(--bg); }
-.menu-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: .6; }
+.menu-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .55; }
+.menu-item-info {
+  cursor: default; color: var(--text-secondary); font-size: 12.5px;
+}
+.menu-item-info:hover { background: transparent; }
+.menu-item-info svg { opacity: .4; }
 .menu-item-danger { color: #DC2626; }
-.menu-item-danger svg { opacity: .7; }
-.menu-divider { height: 1px; background: var(--border); }
+.menu-item-danger svg { opacity: .65; }
+.menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
 
 /* ── MAIN CONTENT AREA ───────────────────────────────────── */
 .main {
