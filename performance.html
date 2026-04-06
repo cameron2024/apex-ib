@@ -4,45 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Performance — Apex</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="sidebar.js"></script>
 <style>
-  :root {
-    --bg: #F7F6F3; --surface: #FFFFFF;
-    --border: #E8E5DF; --border-strong: #D4CFC6;
-    --text-primary: #1A1814; --text-secondary: #6B6560; --text-tertiary: #9E9890;
-    --accent-green: #16A34A; --accent-amber: #D97706; --accent-red: #DC2626; --accent-blue: #2563EB;
-    --sidebar-width: 240px; --radius: 10px; --radius-sm: 6px;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text-primary); min-height:100vh; display:flex; }
 
   /* SIDEBAR */
-  .sidebar { width:var(--sidebar-width); background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; height:100vh; z-index:10; overflow-y:auto; }
-  .sidebar-logo { padding:20px 20px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-shrink:0; }
-  .logo-mark { width:32px; height:32px; background:var(--text-primary); border-radius:8px; display:flex; align-items:center; justify-content:center; }
-  .logo-name { font-family:'DM Serif Display',serif; font-size:17px; letter-spacing:-0.3px; }
-  .sidebar-nav { padding:12px 10px; flex:1; }
-  .nav-section-label { font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-tertiary); padding:8px 10px 6px; }
-  .nav-item { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:var(--radius-sm); cursor:pointer; font-size:13.5px; color:var(--text-secondary); transition:all .15s; text-decoration:none; margin-bottom:1px; }
-  .nav-item:hover { background:var(--bg); color:var(--text-primary); }
-  .nav-item.active { background:var(--bg); color:var(--text-primary); font-weight:500; }
-  .nav-item svg { width:15px; height:15px; flex-shrink:0; opacity:.7; }
-  .nav-item.active svg { opacity:1; }
-  .sidebar-bottom { padding:12px 10px; border-top:1px solid var(--border); flex-shrink:0; }
-  .user-card { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:var(--radius-sm); }
-  .user-avatar { width:28px; height:28px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:white; flex-shrink:0; }
-  .user-name { font-size:13px; font-weight:500; }
-  .user-plan { font-size:11px; color:var(--text-tertiary); }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   /* MAIN */
-  .main { margin-left:var(--sidebar-width); flex:1; min-height:100vh; padding:40px 44px; max-width:calc(100vw - var(--sidebar-width)); }
+  
 
-  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  .fade-1 { animation: fadeUp .35s ease both; }
-  .fade-2 { animation: fadeUp .35s ease .07s both; }
-  .fade-3 { animation: fadeUp .35s ease .14s both; }
+  
+  
+  
+  
   .fade-4 { animation: fadeUp .35s ease .21s both; }
   .fade-5 { animation: fadeUp .35s ease .28s both; }
 
@@ -88,7 +78,7 @@
   }
   .dial-score { font-family:'DM Serif Display',serif; font-size: 28px; letter-spacing: -1px; line-height: 1; }
   .dial-label { font-size: 9px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-tertiary); margin-top: 2px; }
-  .readiness-body { flex: 1; }
+  .readiness-
   .readiness-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; letter-spacing: -.2px; }
   .readiness-desc { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; max-width: 440px; }
   .readiness-bars { display: flex; flex-direction: column; gap: 8px; max-width: 380px; }
@@ -110,7 +100,7 @@
   .panel-header { padding:16px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
   .panel-title { font-size:14px; font-weight:600; letter-spacing:-.15px; }
   .panel-label { font-size:12px; color:var(--text-tertiary); }
-  .panel-body { padding:20px; }
+  .panel-
 
   /* SCORE TREND */
   .trend-chart-wrap { position: relative; height: 120px; }
@@ -248,163 +238,44 @@
   /* FULL-WIDTH SECTION */
   .full-section { margin-bottom:24px; }
 
-  .upgrade-btn {
-    display: flex; align-items: center; gap: 7px;
-    width: 100%; padding: 8px 10px; margin-bottom: 6px;
-    background: var(--accent-blue); color: white;
-    border-radius: var(--radius-sm, 6px);
-    font-size: 12px; font-weight: 600; letter-spacing: .01em;
-    text-decoration: none; cursor: pointer;
-    transition: background .15s, transform .1s;
-    box-sizing: border-box;
-  }
-  .upgrade-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
-  .upgrade-btn svg { flex-shrink: 0; }
+  
+  
+  
 
-  /* ── USER CARD MENU ── */
-  .user-card {
-    display: flex; align-items: center; gap: 9px;
-    padding: 8px 10px; border-radius: var(--radius-sm, 6px);
-    cursor: pointer; position: relative;
-    transition: background .15s;
-  }
-  .user-card:hover { background: var(--bg, #F7F6F3); }
+  
+  
+  
 
-  .user-avatar-wrap { position: relative; flex-shrink: 0; }
-  .plan-ring {
-    position: absolute; inset: -2px;
-    border-radius: 50%; pointer-events: none;
-  }
-  .plan-ring-monthly { border: 2px solid #2563EB; }
-  .plan-ring-pass {
-    border: 2px solid transparent;
-    background: linear-gradient(#fff,#fff) padding-box,
-                linear-gradient(135deg,#D97706,#FCD34D,#D97706) border-box;
-  }
+  
+  
+  
+  
 
-  .plan-icon {
-    position: absolute; bottom: -3px; right: -3px;
-    width: 14px; height: 14px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 8px; border: 1.5px solid white;
-  }
-  .plan-icon-monthly { background: #2563EB; color: white; }
-  .plan-icon-pass { background: #D97706; color: white; }
+  
+  
+  
 
   /* POPUP MENU */
-  .user-menu {
-    position: absolute; bottom: calc(100% + 8px); left: 0; right: 0;
-    background: white; border: 1px solid var(--border, #E8E5DF);
-    border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
-    overflow: hidden; z-index: 200;
-    animation: menuPop .15s ease both;
-  }
-  @keyframes menuPop {
-    from { opacity:0; transform: translateY(6px); }
-    to   { opacity:1; transform: translateY(0); }
-  }
-  .menu-header {
-    padding: 12px 14px 10px;
-    border-bottom: 1px solid var(--border, #E8E5DF);
-  }
-  .menu-user-name {
-    font-size: 13px; font-weight: 600; color: var(--text-primary, #1A1814);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .menu-plan-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; font-weight: 600; margin-top: 4px;
-    padding: 2px 7px; border-radius: 20px;
-  }
-  .badge-free { background: var(--bg, #F7F6F3); color: var(--text-tertiary, #9E9890); }
-  .badge-monthly { background: #EFF6FF; color: #2563EB; }
-  .badge-pass { background: #FEF3C7; color: #D97706; }
-  .menu-item {
-    display: flex; align-items: center; gap: 9px;
-    padding: 10px 14px; font-size: 13px; color: var(--text-primary, #1A1814);
-    cursor: pointer; text-decoration: none;
-    transition: background .1s;
-  }
-  .menu-item:hover { background: var(--bg, #F7F6F3); }
-  .menu-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: .6; }
-  .menu-item-danger { color: #DC2626; }
-  .menu-item-danger svg { opacity: .7; }
-  .menu-divider { height: 1px; background: var(--border, #E8E5DF); }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   </style>
 </head>
-<body>
+<body data-page="performance">
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-        <circle cx="8" cy="8" r="2" fill="white"/><circle cx="16" cy="8" r="2" fill="white"/>
-        <circle cx="8" cy="16" r="2" fill="white"/><circle cx="16" cy="16" r="2" fill="white"/>
-      </svg>
-    </div>
-    <span class="logo-name">Apex</span>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section-label">Overview</div>
-    <a class="nav-item" href="dashboard.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Dashboard
-    </a>
-    <a class="nav-item active" href="performance.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Performance
-    </a>
-    <div class="nav-section-label" style="margin-top:10px;">Practice</div>
-    <a class="nav-item" href="practice-screen.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      Practice All
-    </a>
-    <a class="nav-item" href="saved-questions.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-      Saved Questions
-    </a>
-    <div class="nav-section-label" style="margin-top:10px;">Topics</div>
-    <a class="nav-item" href="practice-screen.html?topic=Accounting">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-      Accounting
-    </a>
-    <a class="nav-item" href="practice-screen.html?topic=Enterprise_Value">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
-      Enterprise Value
-    </a>
-    <a class="nav-item" href="practice-screen.html?topic=Valuation">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-      Valuation
-    </a>
-    <a class="nav-item" href="practice-screen.html?topic=DCF">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Discounted Cash Flow
-    </a>
-    <a class="nav-item" href="practice-screen.html?topic=Mergers_MA">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-      Mergers &amp; Acquisitions
-    </a>
-    <a class="nav-item" href="practice-screen.html?topic=LBO">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      Leveraged Buyouts
-    </a>
-  </nav>
-  <div class="sidebar-bottom">
-    <a href="pricing.html" class="upgrade-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Upgrade to Pro
-    </a>
-    <div class="user-card">
-      <div class="user-avatar" id="sidebarAvatar">?</div>
-      <div>
-        <div class="user-name" id="sidebarUserName">—</div>
-        <div class="user-plan" id="sidebarPlan">Free plan</div>
-      </div>
-    </div>
-  </div>
-</aside>
+<div id="sidebar-mount"></div>
 
 <!-- MAIN -->
 <main class="main">
@@ -548,10 +419,6 @@
     document.getElementById('sidebarAvatar').textContent = initials;
     document.getElementById('sidebarUserName').textContent = userName;
     document.getElementById('signOutBtn').style.display = 'block';
-  }
-  function doLogout() {
-    localStorage.removeItem('apex_token'); localStorage.removeItem('apex_user');
-    window.location.href = 'dashboard.html';
   }
 
   // ── READINESS SCORE ───────────────────────────────────────
@@ -1014,115 +881,7 @@
   init();
   } // end else (logged in)
   // ── SIDEBAR MENU ──────────────────────────────────────────
-  let _menuOpen = false;
 
-  function initSidebarMenu(plan, gradedToday) {
-    const card = document.querySelector('.user-card');
-    if (!card) return;
-    card.setAttribute('onclick', 'toggleUserMenu()');
-
-    // Apply avatar ring for paid users
-    const avatar = card.querySelector('.user-avatar');
-    if (avatar) {
-      const wrap = document.createElement('div');
-      wrap.className = 'user-avatar-wrap';
-      avatar.parentNode.insertBefore(wrap, avatar);
-      wrap.appendChild(avatar);
-      if (plan === 'monthly') {
-        const ring = document.createElement('div');
-        ring.className = 'plan-ring plan-ring-monthly';
-        wrap.appendChild(ring);
-        const icon = document.createElement('div');
-        icon.className = 'plan-icon plan-icon-monthly';
-        icon.textContent = '★';
-        wrap.appendChild(icon);
-      } else if (plan === 'pass') {
-        const ring = document.createElement('div');
-        ring.className = 'plan-ring plan-ring-pass';
-        wrap.appendChild(ring);
-        const icon = document.createElement('div');
-        icon.className = 'plan-icon plan-icon-pass';
-        icon.textContent = '◆';
-        wrap.appendChild(icon);
-      }
-    }
-
-    // Update plan text
-    const planEl = document.getElementById('sidebarPlan');
-    if (planEl) {
-      if (plan === 'pass') {
-        planEl.textContent = 'Recruiting Pass'; planEl.style.color = '#D97706';
-      } else if (plan === 'monthly') {
-        planEl.textContent = 'Monthly plan'; planEl.style.color = '#2563EB';
-      } else {
-        const remaining = Math.max(0, 5 - (gradedToday || 0));
-        planEl.textContent = `Free · ${remaining} grade${remaining !== 1 ? 's' : ''} left today`;
-      }
-    }
-
-    // Hide upgrade button for paid users
-    const upgradeBtn = document.querySelector('.upgrade-btn');
-    if (upgradeBtn && plan !== 'free') upgradeBtn.style.display = 'none';
-  }
-
-  function toggleUserMenu() {
-    const existing = document.getElementById('userMenu');
-    if (existing) { existing.remove(); _menuOpen = false; return; }
-    _menuOpen = true;
-    const plan = window._userPlan || 'free';
-    const gradedToday = window._gradedToday || 0;
-    const name = localStorage.getItem('apex_user') || '';
-
-    let badgeClass = 'badge-free', badgeText = 'Free plan';
-    if (plan === 'monthly') { badgeClass = 'badge-monthly'; badgeText = 'Monthly'; }
-    if (plan === 'pass') { badgeClass = 'badge-pass'; badgeText = 'Recruiting Pass ◆'; }
-
-    const upgradeRow = plan === 'free' ? `
-      <div class="menu-divider"></div>
-      <a class="menu-item" href="pricing.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        Upgrade to Pro
-      </a>` : '';
-
-    const gradeRow = plan === 'free' ? `
-      <div class="menu-divider"></div>
-      <div class="menu-item" style="cursor:default;color:var(--text-tertiary);font-size:12px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        ${Math.max(0, 5 - gradedToday)} of 5 free grades left today
-      </div>` : '';
-
-    const menu = document.createElement('div');
-    menu.id = 'userMenu';
-    menu.className = 'user-menu';
-    menu.innerHTML = `
-      <div class="menu-header">
-        <div class="menu-user-name">${name}</div>
-        <span class="menu-plan-badge ${badgeClass}">${badgeText}</span>
-        ${window._memberSince ? `<div style="font-size:11px;color:#9E9890;margin-top:3px;">Member since ${new Date(window._memberSince * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>` : ''}
-      </div>
-      ${gradeRow}
-      ${upgradeRow}
-      <div class="menu-divider"></div>
-      <div class="menu-item menu-item-danger" onclick="doLogout()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sign out
-      </div>
-    `;
-
-    const card = document.querySelector('.user-card');
-    card.parentNode.style.position = 'relative';
-    card.parentNode.appendChild(menu);
-
-    // Close on outside click
-    setTimeout(() => {
-      document.addEventListener('click', function closeMenu(e) {
-        if (!menu.contains(e.target) && !card.contains(e.target)) {
-          menu.remove(); _menuOpen = false;
-          document.removeEventListener('click', closeMenu);
-        }
-      });
-    }, 0);
-  }
 
 </script>
 
