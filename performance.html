@@ -114,20 +114,30 @@
   .trend-gridline { stroke: var(--border, #E8E5DF); stroke-dasharray: 3 3; }
   .trend-tooltip {
     position: absolute;
-    background: white;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: var(--text-primary);
     font-size: 12px;
-    padding: 10px 12px;
-    border-radius: 8px;
+    padding: 12px 14px;
+    border-radius: 12px;
     pointer-events: none;
     opacity: 0;
-    transition: opacity .15s;
+    transform: translateY(4px) scale(0.97);
+    transition: opacity .18s ease, transform .18s ease;
     z-index: 10;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    border: 1px solid var(--border);
-    max-width: 220px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid rgba(232,229,223,0.7);
+    max-width: 230px;
     white-space: normal;
     line-height: 1.4;
+  }
+  .trend-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  .trend-dot-active {
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.25));
   }
   .tip-score { font-size: 18px; font-weight: 700; font-family: 'DM Serif Display', serif; letter-spacing: -.3px; }
   .tip-topic { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
@@ -608,8 +618,7 @@
         const dateStr = p.created_at ? new Date(p.created_at * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
         const scoreColor = p.score >= 90 ? '#16A34A' : p.score >= 75 ? '#D97706' : '#DC2626';
         return `<circle class="trend-dot" cx="${xOf(i)}" cy="${yOf(p.score)}" r="4" fill="${dotColor}" stroke="white" stroke-width="1.5"
-          onmouseenter="showTip(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"
-          onmouseleave="hideTip()"/>`;
+          onclick="toggleTip(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"/>`;
       }).join('')}
     </svg>`;
 
@@ -635,24 +644,68 @@
     document.getElementById('trendLabel').textContent = `Last ${scores.length} answer${scores.length!==1?'s':''}${_trendFilter !== 'All' ? ' · ' + (TOPIC_LABELS_T[_trendFilter]||_trendFilter) : ''}`;
   }
 
-  function showTip(e, score, topicLabel, qText, dateStr, scoreColor) {
+  var _activeDot = null;
+
+  function toggleTip(e, score, topicLabel, qText, dateStr, scoreColor) {
     const tip = document.getElementById('trendTooltip');
-    tip.innerHTML = `
-      <div class="tip-topic" style="color:${scoreColor}">${topicLabel}</div>
-      <div class="tip-score" style="color:${scoreColor}">${score}<span style="font-size:12px;font-weight:400;color:var(--text-tertiary)">/100</span></div>
-      ${qText ? `<div class="tip-q">${qText}${qText.length >= 60 ? '…' : ''}</div>` : ''}
-      ${dateStr ? `<div class="tip-date">${dateStr}</div>` : ''}
-    `;
-    tip.style.opacity = '1';
-    const wrap = e.target.closest('.trend-chart-wrap');
+    const dot = e.target;
+
+    // Clicking the same dot again — dismiss
+    if (_activeDot === dot) {
+      hideTip();
+      return;
+    }
+
+    // Deactivate previous dot
+    if (_activeDot) {
+      _activeDot.setAttribute('r', '4');
+      _activeDot.classList.remove('trend-dot-active');
+    }
+    _activeDot = dot;
+    dot.setAttribute('r', '6');
+    dot.classList.add('trend-dot-active');
+
+    tip.innerHTML =
+      '<div class="tip-topic" style="color:' + scoreColor + '">' + topicLabel + '</div>' +
+      '<div class="tip-score" style="color:' + scoreColor + '">' + score + '<span style="font-size:12px;font-weight:400;color:var(--text-tertiary)">/100</span></div>' +
+      (qText ? '<div class="tip-q">' + qText + (qText.length >= 60 ? '…' : '') + '</div>' : '') +
+      (dateStr ? '<div class="tip-date">' + dateStr + '</div>' : '');
+
+    const wrap = dot.closest('.trend-chart-wrap');
     const wrapRect = wrap.getBoundingClientRect();
-    const tipW = 220;
-    let left = e.clientX - wrapRect.left + 12;
-    if (left + tipW > wrapRect.width) left = e.clientX - wrapRect.left - tipW - 8;
+    const dotRect = dot.getBoundingClientRect();
+    const tipW = 230;
+    // Position above the dot
+    const dotCX = dotRect.left + dotRect.width / 2 - wrapRect.left;
+    let left = dotCX - tipW / 2;
+    if (left < 4) left = 4;
+    if (left + tipW > wrapRect.width - 4) left = wrapRect.width - tipW - 4;
+    const dotCY = dotRect.top + dotRect.height / 2 - wrapRect.top;
     tip.style.left = left + 'px';
-    tip.style.top = Math.max(0, e.clientY - wrapRect.top - 20) + 'px';
+    tip.style.top = Math.max(4, dotCY - 90) + 'px';
+
+    tip.classList.add('visible');
+
+    // Dismiss on outside click
+    setTimeout(function () {
+      document.addEventListener('click', function outsideClick(ev) {
+        if (!tip.contains(ev.target) && ev.target !== dot) {
+          hideTip();
+          document.removeEventListener('click', outsideClick);
+        }
+      });
+    }, 0);
   }
-  function hideTip() { document.getElementById('trendTooltip').style.opacity = '0'; }
+
+  function hideTip() {
+    const tip = document.getElementById('trendTooltip');
+    tip.classList.remove('visible');
+    if (_activeDot) {
+      _activeDot.setAttribute('r', '4');
+      _activeDot.classList.remove('trend-dot-active');
+      _activeDot = null;
+    }
+  }
 
   // ── TOPIC BALANCE ─────────────────────────────────────────
   function renderBalance(results) {
