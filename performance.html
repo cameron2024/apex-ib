@@ -208,20 +208,20 @@
     font-size: 13px;
     line-height: 1.45;
     color: var(--text-primary);
-    max-height: 2.9em;
+    white-space: nowrap;
     overflow: hidden;
     position: relative;
   }
   .next-q-text::after {
     content: '';
     position: absolute;
-    bottom: 0; right: 0; left: 0;
-    height: 1.4em;
-    background: linear-gradient(to bottom, transparent, white);
+    top: 0; right: 0; bottom: 0;
+    width: 60px;
+    background: linear-gradient(to right, transparent, var(--surface));
     pointer-events: none;
   }
   .next-q-item:hover .next-q-text::after {
-    background: linear-gradient(to bottom, transparent, var(--bg));
+    background: linear-gradient(to right, transparent, var(--bg));
   }
   .next-q-tag {
     font-size:10.5px; font-weight:500;
@@ -260,21 +260,21 @@
     position: relative;
   }
   .weak-full-table td.q-cell .q-text-inner {
-    max-height: 2.9em;
     overflow: hidden;
     position: relative;
     line-height: 1.45;
+    white-space: nowrap;
   }
   .weak-full-table td.q-cell .q-text-inner::after {
     content: '';
     position: absolute;
-    bottom: 0; right: 0; left: 0;
-    height: 1.4em;
-    background: linear-gradient(to bottom, transparent, white);
+    top: 0; right: 0; bottom: 0;
+    width: 60px;
+    background: linear-gradient(to right, transparent, white);
     pointer-events: none;
   }
   .weak-full-table tr:hover td.q-cell .q-text-inner::after {
-    background: linear-gradient(to bottom, transparent, var(--bg));
+    background: linear-gradient(to right, transparent, var(--bg));
   }
   .weak-full-table tr:last-child td { border-bottom:none; }
   .weak-full-table tr:hover td { background:var(--bg); }

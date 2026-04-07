@@ -419,20 +419,20 @@
     color: var(--text-primary);
     margin-bottom: 5px;
     text-decoration: none;
-    max-height: 3em;
+    white-space: nowrap;
     overflow: hidden;
     position: relative;
   }
   .weak-spot-q::after {
     content: '';
     position: absolute;
-    bottom: 0; right: 0; left: 0;
-    height: 1.4em;
-    background: linear-gradient(to bottom, transparent, white);
+    top: 0; right: 0; bottom: 0;
+    width: 60px;
+    background: linear-gradient(to right, transparent, white);
     pointer-events: none;
   }
   .weak-spot-item:hover .weak-spot-q::after {
-    background: linear-gradient(to bottom, transparent, var(--bg));
+    background: linear-gradient(to right, transparent, var(--bg));
   }
 
   .weak-spot-meta {
@@ -532,20 +532,20 @@
     line-height: 1.5;
     margin-bottom: 4px;
     color: var(--text-primary);
-    max-height: 3em;
+    white-space: nowrap;
     overflow: hidden;
     position: relative;
   }
   .rec-q::after {
     content: '';
     position: absolute;
-    bottom: 0; right: 0; left: 0;
-    height: 1.4em;
-    background: linear-gradient(to bottom, transparent, white);
+    top: 0; right: 0; bottom: 0;
+    width: 60px;
+    background: linear-gradient(to right, transparent, white);
     pointer-events: none;
   }
   .rec-item:hover .rec-q::after {
-    background: linear-gradient(to bottom, transparent, var(--bg));
+    background: linear-gradient(to right, transparent, var(--bg));
   }
 
   .rec-meta {
