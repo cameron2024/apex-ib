@@ -1377,39 +1377,6 @@
     document.getElementById('wordCount').textContent = `${words} word${words !== 1 ? 's' : ''}`;
   }
 
-  // ─── INTERVIEW MODE ───────────────────────────────────────s`;
-      // Reset any hidden state first
-        // Start countdown
-      startCountdown();
-    } else {
-      icon.textContent = '🎯';
-      sub.textContent = 'Question stays visible while you answer';
-            }
-  }
-);
-    document.getElementById('interviewModeSub').textContent = `Question will disappear after ${secs}s`;
- }
-
-
-      if (countdownValue <= 0) {
-        clearInterval(countdownInterval);
-        hideQuestion();
-      }
-    }, 1000);
-  }
-
-    document.getElementById('countdownWrap').classList.remove('visible');
-    document.querySelector('.countdown-number-center').classList.remove('urgent');
-    document.getElementById('countdownRingFill').classList.remove('urgent');
-  }
-
-
-      qText.style.animation = '';
-      qHint.style.animation = '';
-    }, 5000);
-  }
-
-
   // ─── SUBMIT ───────────────────────────────────────────────
   // ─── SUBMIT ───────────────────────────────────────────────
   async function submitAnswer() {
