@@ -210,18 +210,8 @@
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
-    position: relative;
-  }
-  .next-q-text::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 60px;
-    background: linear-gradient(to right, transparent, var(--surface));
-    pointer-events: none;
-  }
-  .next-q-item:hover .next-q-text::after {
-    background: linear-gradient(to right, transparent, var(--bg));
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 56px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 56px), transparent 100%);
   }
   .next-q-tag {
     font-size:10.5px; font-weight:500;
@@ -261,20 +251,10 @@
   }
   .weak-full-table td.q-cell .q-text-inner {
     overflow: hidden;
-    position: relative;
     line-height: 1.45;
     white-space: nowrap;
-  }
-  .weak-full-table td.q-cell .q-text-inner::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 60px;
-    background: linear-gradient(to right, transparent, white);
-    pointer-events: none;
-  }
-  .weak-full-table tr:hover td.q-cell .q-text-inner::after {
-    background: linear-gradient(to right, transparent, var(--bg));
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 56px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 56px), transparent 100%);
   }
   .weak-full-table tr:last-child td { border-bottom:none; }
   .weak-full-table tr:hover td { background:var(--bg); }

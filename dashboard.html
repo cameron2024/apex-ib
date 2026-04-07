@@ -421,18 +421,8 @@
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
-    position: relative;
-  }
-  .weak-spot-q::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 60px;
-    background: linear-gradient(to right, transparent, white);
-    pointer-events: none;
-  }
-  .weak-spot-item:hover .weak-spot-q::after {
-    background: linear-gradient(to right, transparent, var(--bg));
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 56px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 56px), transparent 100%);
   }
 
   .weak-spot-meta {
@@ -534,18 +524,8 @@
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
-    position: relative;
-  }
-  .rec-q::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 60px;
-    background: linear-gradient(to right, transparent, white);
-    pointer-events: none;
-  }
-  .rec-item:hover .rec-q::after {
-    background: linear-gradient(to right, transparent, var(--bg));
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 56px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 56px), transparent 100%);
   }
 
   .rec-meta {
