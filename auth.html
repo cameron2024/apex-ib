@@ -349,9 +349,8 @@
   }
 
   function goGuest() {
-    const dest = new URLSearchParams(window.location.search).get('next') || 'practice-screen.html';
-    // Always send guests to practice — that's the only guest-friendly page
-    window.location.href = dest.includes('practice') ? dest : 'practice-screen.html';
+    const dest = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
+    window.location.href = dest;
   }
 
   function onSuccess(token, name) {
