@@ -118,8 +118,8 @@
   /* CONTENT */
   .content {
     flex: 1;
-    padding: 32px 40px;
-    max-width: 860px;
+    padding: 40px 52px;
+    max-width: 920px;
     width: 100%;
     margin: 0 auto;
     animation: fadeIn 0.3s ease;
@@ -197,21 +197,31 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   .q-tag {
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    padding: 3px 9px;
+    padding: 4px 11px;
     border-radius: 20px;
   }
 
-  .q-tag.accounting { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
-  .q-tag.difficulty { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
-  .q-tag.followup { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+  /* Topic tags — each with its own color identity */
+  .q-tag.accounting      { background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; }
+  .q-tag.enterprise      { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
+  .q-tag.valuation       { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+  .q-tag.dcf             { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+  .q-tag.mergers         { background: #FDF4FF; color: #7E22CE; border: 1px solid #E9D5FF; }
+  .q-tag.lbo             { background: #FFF1F2; color: #BE123C; border: 1px solid #FECDD3; }
+  /* Difficulty tag — subtle neutral */
+  .q-tag.difficulty      { background: #F8F7F4; color: var(--text-secondary); border: 1px solid var(--border); }
+  /* AI / follow-up tags */
+  .q-tag.followup        { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+  .q-tag.ai-drill        { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
+  .q-tag.ai-followon     { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
 
   .q-number {
     font-size: 12px;
@@ -2161,17 +2171,30 @@ Generate 3 drill questions targeting this exact gap.`;
   function displayQuestion(q, index) {
     document.getElementById('questionText').textContent = q.question;
 
-    // Update meta tags
+    // Update meta tags — apply per-topic color class
     const topicLabel = TOPIC_LABELS[q.topic] || q.topic;
-    document.getElementById('qTagTopic').textContent = topicLabel;
+    const topicClassMap = {
+      'Accounting':      'accounting',
+      'Enterprise_Value':'enterprise',
+      'Valuation':       'valuation',
+      'DCF':             'dcf',
+      'Mergers_MA':      'mergers',
+      'LBO':             'lbo',
+    };
+    const topicTag = document.getElementById('qTagTopic');
+    topicTag.textContent = topicLabel;
+    topicTag.className = 'q-tag ' + (topicClassMap[q.topic] || 'accounting');
+    const diffTag = document.getElementById('qTagDifficulty');
     if (q.ai_generated) {
-      document.getElementById('qTagDifficulty').textContent = q.ai_type === 'followon' ? 'AI Follow-on' : 'AI Drill';
-      document.getElementById('qTagDifficulty').style.background = q.ai_type === 'followon' ? '#F0FDF4' : '#FEF2F2';
-      document.getElementById('qTagDifficulty').style.color = q.ai_type === 'followon' ? '#15803D' : '#B91C1C';
+      diffTag.textContent = q.ai_type === 'followon' ? 'Follow-on' : 'AI Drill';
+      diffTag.className = 'q-tag ' + (q.ai_type === 'followon' ? 'ai-followon' : 'ai-drill');
+      diffTag.style.background = '';
+      diffTag.style.color = '';
     } else {
-      document.getElementById('qTagDifficulty').textContent = q.difficulty_label || (q.difficulty === 'hard' ? 'Advanced' : q.difficulty === 'intermediate' ? 'Technical' : 'Fundamental');
-      document.getElementById('qTagDifficulty').style.background = '';
-      document.getElementById('qTagDifficulty').style.color = '';
+      diffTag.textContent = q.difficulty_label || (q.difficulty === 'hard' ? 'Advanced' : q.difficulty === 'intermediate' ? 'Technical' : 'Fundamental');
+      diffTag.className = 'q-tag difficulty';
+      diffTag.style.background = '';
+      diffTag.style.color = '';
     }
     document.getElementById('qNumber').textContent = q.ai_generated
       ? (q.ai_type === 'followon' ? '⬆ Follow-on' : '🎯 Drill ' + (drillQueue.length > 0 ? drillQueue.length + ' left' : ''))
