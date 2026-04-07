@@ -418,11 +418,21 @@
     line-height: 1.5;
     color: var(--text-primary);
     margin-bottom: 5px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
     text-decoration: none;
+    max-height: 3em;
+    overflow: hidden;
+    position: relative;
+  }
+  .weak-spot-q::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0; left: 0;
+    height: 1.4em;
+    background: linear-gradient(to bottom, transparent, white);
+    pointer-events: none;
+  }
+  .weak-spot-item:hover .weak-spot-q::after {
+    background: linear-gradient(to bottom, transparent, var(--bg));
   }
 
   .weak-spot-meta {
@@ -522,6 +532,20 @@
     line-height: 1.5;
     margin-bottom: 4px;
     color: var(--text-primary);
+    max-height: 3em;
+    overflow: hidden;
+    position: relative;
+  }
+  .rec-q::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0; left: 0;
+    height: 1.4em;
+    background: linear-gradient(to bottom, transparent, white);
+    pointer-events: none;
+  }
+  .rec-item:hover .rec-q::after {
+    background: linear-gradient(to bottom, transparent, var(--bg));
   }
 
   .rec-meta {

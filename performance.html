@@ -203,7 +203,26 @@
   .next-q-pri.urgent { background:var(--accent-red); }
   .next-q-pri.review { background:var(--accent-amber); }
   .next-q-pri.new    { background:var(--accent-blue); }
-  .next-q-text { flex:1; font-size:13px; line-height:1.45; color:var(--text-primary); }
+  .next-q-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-primary);
+    max-height: 2.9em;
+    overflow: hidden;
+    position: relative;
+  }
+  .next-q-text::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0; left: 0;
+    height: 1.4em;
+    background: linear-gradient(to bottom, transparent, white);
+    pointer-events: none;
+  }
+  .next-q-item:hover .next-q-text::after {
+    background: linear-gradient(to bottom, transparent, var(--bg));
+  }
   .next-q-tag {
     font-size:10.5px; font-weight:500;
     padding:2px 7px; border-radius:4px;
@@ -235,7 +254,28 @@
   /* WEAK SPOTS (full table) */
   .weak-full-table { width:100%; border-collapse:collapse; }
   .weak-full-table th { font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-tertiary); padding:10px 20px; text-align:left; border-bottom:1px solid var(--border); background:var(--bg); }
-  .weak-full-table td { font-size:13px; padding:12px 20px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  .weak-full-table td { font-size:13px; padding:12px 20px; border-bottom:1px solid var(--border); vertical-align:middle; font-family:'DM Sans',sans-serif; }
+  .weak-full-table td.q-cell {
+    max-width: 340px;
+    position: relative;
+  }
+  .weak-full-table td.q-cell .q-text-inner {
+    max-height: 2.9em;
+    overflow: hidden;
+    position: relative;
+    line-height: 1.45;
+  }
+  .weak-full-table td.q-cell .q-text-inner::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0; left: 0;
+    height: 1.4em;
+    background: linear-gradient(to bottom, transparent, white);
+    pointer-events: none;
+  }
+  .weak-full-table tr:hover td.q-cell .q-text-inner::after {
+    background: linear-gradient(to bottom, transparent, var(--bg));
+  }
   .weak-full-table tr:last-child td { border-bottom:none; }
   .weak-full-table tr:hover td { background:var(--bg); }
   .score-chip { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11.5px; font-weight:600; }
@@ -841,7 +881,7 @@
     tbody.innerHTML = rows.map(q => {
       const text = Q_TEXT[q.id] || (q.topic + ' question');
       return `<tr>
-        <td style="max-width:340px;">${escHtml(text)}</td>
+        <td class="q-cell"><div class="q-text-inner">${escHtml(text)}</div></td>
         <td style="color:var(--text-secondary)">${topicLabel(q.topic)}</td>
         <td><span class="score-chip ${chipClass(q.latestScore)}">${q.latestScore}/100</span></td>
         <td style="color:var(--text-tertiary)">${q.attempts}</td>
