@@ -856,17 +856,46 @@
   // Show sign-in wall for guests — this page requires an account
   if (!localStorage.getItem('apex_token')) {
     document.querySelector('.main').innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:16px;">
-        <div style="font-size:40px;">📊</div>
-        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:-.3px;color:var(--text-primary);">Your performance lives here</h2>
-        <p style="font-size:14px;color:var(--text-secondary);max-width:360px;line-height:1.65;">
-          Topic breakdowns, score trends, and weak spot tracking are saved to your account. Create a free account to start tracking your progress.
-        </p>
-        <div style="display:flex;gap:10px;margin-top:8px;">
-          <a href="auth.html?mode=register" style="padding:10px 20px;background:var(--text-primary);color:white;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Create free account</a>
-          <a href="auth.html" style="padding:10px 20px;background:white;color:var(--text-primary);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Sign in</a>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:72vh;text-align:center;padding:60px 24px;">
+
+        <!-- Wordmark-style icon — three rising bars in brand colors -->
+        <div style="display:flex;align-items:flex-end;gap:5px;margin-bottom:36px;opacity:0.18;">
+          <div style="width:10px;height:28px;background:var(--text-primary);border-radius:3px 3px 2px 2px;"></div>
+          <div style="width:10px;height:42px;background:var(--text-primary);border-radius:3px 3px 2px 2px;"></div>
+          <div style="width:10px;height:58px;background:var(--text-primary);border-radius:3px 3px 2px 2px;"></div>
         </div>
-        <a href="practice-screen.html" style="font-size:13px;color:var(--text-tertiary);text-decoration:none;margin-top:4px;">← Back to practice</a>
+
+        <div style="font-family:'DM Serif Display',serif;font-size:30px;letter-spacing:-.5px;color:var(--text-primary);line-height:1.2;margin-bottom:14px;">
+          Your performance analytics<br><em style="font-style:italic;color:var(--text-secondary);">await you here</em>
+        </div>
+
+        <p style="font-size:14px;color:var(--text-secondary);max-width:380px;line-height:1.7;margin-bottom:32px;">
+          Score trends, topic balance, weak spot tracking, and a personalised next-session plan — all built from your practice history.
+        </p>
+
+        <!-- Feature list -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:36px;text-align:left;max-width:300px;width:100%;">
+          ${[
+            ['Score trend across every answer','polyline points="2 10 7 4 12 8 17 2 22 6"'],
+            ['Topic-by-topic mastery breakdown','rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"'],
+            ['Personalised next-session plan','path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"'],
+            ['All weak spots ranked by score','polyline points="22 12 18 12 15 21 9 3 6 12 2 12"'],
+          ].map(([label, path]) =>
+            '<div style="display:flex;align-items:center;gap:10px;">' +
+              '<div style="flex-shrink:0;width:28px;height:28px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" width="13" height="13"><' + path + '/></svg>' +
+              '</div>' +
+              '<span style="font-size:13px;color:var(--text-secondary);">' + label + '</span>' +
+            '</div>'
+          ).join('')}
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <a href="auth.html?mode=register" style="padding:11px 22px;background:var(--text-primary);color:white;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:.01em;">Create free account</a>
+          <a href="auth.html" style="padding:11px 22px;background:var(--surface);color:var(--text-primary);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Sign in</a>
+        </div>
+
+        <a href="practice-screen.html" style="font-size:12.5px;color:var(--text-tertiary);text-decoration:none;margin-top:20px;">← Back to practice</a>
       </div>`;
   } else {
     // Render empty states immediately so page isn't blank
