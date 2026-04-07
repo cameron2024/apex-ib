@@ -87,16 +87,16 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px 4px 6px;
-    background: #EFF6FF;
-    border: 1px solid #BFDBFE;
+    padding: 4px 12px 4px 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 20px;
     font-size: 12px;
     font-weight: 500;
-    color: var(--accent-blue);
+    color: var(--text-secondary);
   }
 
-  .topic-dot { width: 8px; height: 8px; background: var(--accent-blue); border-radius: 50%; }
+  .topic-dot { width: 7px; height: 7px; background: var(--text-primary); border-radius: 50%; opacity: 0.5; }
 
   .btn-ghost {
     background: none;
@@ -118,8 +118,8 @@
   /* CONTENT */
   .content {
     flex: 1;
-    padding: 28px;
-    max-width: 960px;
+    padding: 32px 40px;
+    max-width: 860px;
     width: 100%;
     margin: 0 auto;
     animation: fadeIn 0.3s ease;
@@ -144,7 +144,7 @@
 
   .progress-track {
     flex: 1;
-    height: 4px;
+    height: 3px;
     background: var(--border);
     border-radius: 2px;
     overflow: hidden;
@@ -186,10 +186,11 @@
   .question-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px 32px;
-    margin-bottom: 16px;
+    border-radius: 14px;
+    padding: 32px 36px;
+    margin-bottom: 20px;
     position: relative;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   }
 
   .question-meta {
@@ -200,17 +201,17 @@
   }
 
   .q-tag {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
   }
 
-  .q-tag.accounting { background: #EFF6FF; color: #2563EB; }
-  .q-tag.difficulty { background: #FEF3C7; color: #B45309; }
-  .q-tag.followup { background: #FEF2F2; color: #B91C1C; }
+  .q-tag.accounting { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+  .q-tag.difficulty { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+  .q-tag.followup { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
 
   .q-number {
     font-size: 12px;
@@ -220,22 +221,24 @@
 
   .question-text {
     font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    line-height: 1.45;
+    font-size: 23px;
+    line-height: 1.5;
     color: var(--text-primary);
-    letter-spacing: -0.3px;
+    letter-spacing: -0.4px;
   }
 
   .question-hint {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border);
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: 8px;
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 9px;
     font-size: 12.5px;
     color: var(--text-tertiary);
     font-style: italic;
+    line-height: 1.6;
   }
 
   .hint-icon { font-size: 14px; flex-shrink: 0; }
@@ -730,234 +733,6 @@
   .mastery-celebration-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: #15803D; margin-bottom: 4px; }
   .mastery-celebration-sub { font-size: 13px; color: #16A34A; }
 
-  /* INTERVIEW MODE TOGGLE */
-  .interview-mode-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 11px 16px;
-    margin-bottom: 14px;
-    transition: border-color 0.3s, background 0.3s;
-  }
-
-  .interview-mode-bar.interview-active {
-    border-color: #1A1814;
-    background: #FAFAF8;
-  }
-
-  .interview-mode-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .interview-mode-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: all 0.3s;
-  }
-
-  .interview-active .interview-mode-icon {
-    background: var(--text-primary);
-    border-color: var(--text-primary);
-  }
-
-  .interview-mode-text { display: flex; flex-direction: column; gap: 1px; }
-  .interview-mode-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-  .interview-mode-sub { font-size: 11.5px; color: var(--text-tertiary); }
-
-  .interview-mode-right { display: flex; align-items: center; gap: 12px; }
-
-  /* DURATION PICKER */
-  .duration-picker {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    opacity: 0.35;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-
-  .duration-picker.enabled { opacity: 1; pointer-events: all; }
-  .duration-label { font-size: 12px; color: var(--text-secondary); }
-
-  .duration-options {
-    display: flex;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .dur-btn {
-    padding: 4px 10px;
-    font-size: 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: var(--text-tertiary);
-    transition: all 0.15s;
-  }
-
-  .dur-btn:not(:last-child) { border-right: 1px solid var(--border); }
-  .dur-btn.active { background: var(--text-primary); color: white; }
-
-  /* TOGGLE SWITCH */
-  .toggle-switch {
-    width: 38px;
-    height: 22px;
-    background: var(--border-strong);
-    border-radius: 11px;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.25s;
-    flex-shrink: 0;
-    border: none;
-    outline: none;
-  }
-
-  .toggle-switch.on { background: var(--text-primary); }
-
-  .toggle-knob {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 16px;
-    height: 16px;
-    background: white;
-    border-radius: 50%;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
-
-  .toggle-switch.on .toggle-knob { transform: translateX(16px); }
-
-  /* QUESTION CARD COUNTDOWN STATE */
-  .question-card { transition: all 0.4s ease; }
-
-  .question-card.fading {
-    animation: none;
-  }
-
-  .countdown-ring-wrap {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-
-  .countdown-ring-wrap.visible { display: flex; }
-
-  .countdown-ring {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-  }
-
-  .countdown-ring svg { transform: rotate(-90deg); }
-  .countdown-ring-track { fill: none; stroke: var(--border); stroke-width: 3; }
-  .countdown-ring-fill {
-    fill: none;
-    stroke: var(--text-primary);
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-dasharray: 88;
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear, stroke 0.3s;
-  }
-
-  .countdown-ring-fill.urgent { stroke: var(--accent-red); }
-
-  .countdown-number-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-primary);
-    transition: color 0.3s;
-  }
-
-  .countdown-number-center.urgent { color: var(--accent-red); }
-
-  .countdown-text { font-size: 12.5px; color: var(--text-secondary); }
-  .countdown-text strong { color: var(--text-primary); }
-
-  /* QUESTION CARD WHEN HIDDEN IN INTERVIEW MODE */
-  .question-card.interview-hidden {
-    background: #F0EFE9;
-    border-color: var(--border);
-    cursor: default;
-  }
-
-  .question-card.interview-hidden .question-text,
-  .question-card.interview-hidden .question-hint {
-    display: none;
-  }
-
-  .question-card.interview-hidden .question-meta { margin-bottom: 0; }
-
-  .hidden-question-msg {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 0 4px;
-    font-size: 13.5px;
-    color: var(--text-tertiary);
-  }
-
-  .hidden-question-msg.visible { display: flex; }
-
-  .peek-btn {
-    background: none;
-    border: 1px solid var(--border-strong);
-    padding: 4px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text-secondary);
-    cursor: pointer;
-    margin-left: auto;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-
-  .peek-btn:hover { border-color: var(--text-primary); color: var(--text-primary); }
-
-  /* DISSOLVE ANIMATION */
-  @keyframes dissolve-out {
-    0% { opacity: 1; filter: blur(0px); }
-    70% { opacity: 0.4; filter: blur(1px); }
-    100% { opacity: 0; filter: blur(3px); pointer-events: none; }
-  }
-
-  @keyframes dissolve-in {
-    0% { opacity: 0; filter: blur(3px); }
-    100% { opacity: 1; filter: blur(0px); }
-  }
-
-  .question-text.dissolving {
-    animation: dissolve-out 0.8s ease forwards;
-  }
-
-  .question-hint.dissolving {
-    animation: dissolve-out 0.6s ease 0.1s forwards;
-  }
-
   /* LOADING STATE */
   .analyzing-overlay {
     display: none;
@@ -1101,45 +876,9 @@
       </div>
     </div>
 
-    <!-- INTERVIEW MODE TOGGLE BAR -->
-    <div class="interview-mode-bar" id="interviewModeBar">
-      <div class="interview-mode-left">
-        <div class="interview-mode-icon" id="interviewModeIcon">🎯</div>
-        <div class="interview-mode-text">
-          <div class="interview-mode-title">Interview Mode</div>
-          <div class="interview-mode-sub" id="interviewModeSub">Question stays visible while you answer</div>
-        </div>
-      </div>
-      <div class="interview-mode-right">
-        <div class="duration-picker" id="durationPicker">
-          <span class="duration-label">Hide after</span>
-          <div class="duration-options">
-            <button class="dur-btn" onclick="setDuration(5)">5s</button>
-            <button class="dur-btn active" onclick="setDuration(10)">10s</button>
-            <button class="dur-btn" onclick="setDuration(15)">15s</button>
-            <button class="dur-btn" onclick="setDuration(30)">30s</button>
-          </div>
-        </div>
-        <button class="toggle-switch" id="interviewToggle" onclick="toggleInterviewMode()" aria-label="Toggle interview mode">
-          <div class="toggle-knob"></div>
-        </button>
-      </div>
-    </div>
 
-    <!-- QUESTION CARD -->
+    <!-- QUESTION CARD    <!-- QUESTION CARD -->
     <div class="question-card" id="questionCard">
-      <!-- COUNTDOWN ROW (visible only in interview mode) -->
-      <div class="countdown-ring-wrap" id="countdownWrap">
-        <div class="countdown-ring">
-          <svg width="36" height="36" viewBox="0 0 36 36">
-            <circle class="countdown-ring-track" cx="18" cy="18" r="14"/>
-            <circle class="countdown-ring-fill" id="countdownRingFill" cx="18" cy="18" r="14"/>
-          </svg>
-          <div class="countdown-number-center" id="countdownNumber">10</div>
-        </div>
-        <span class="countdown-text" id="countdownText">Question disappearing in <strong id="countdownStrong">10</strong>s — read carefully</span>
-      </div>
-
       <div class="question-meta">
         <span class="q-tag accounting" id="qTagTopic">Accounting</span>
         <span class="q-tag difficulty" id="qTagDifficulty">Fundamental</span>
@@ -1153,16 +892,10 @@
         Loading question…
       </div>
       <div class="question-hint" id="questionHint">
-        <span class="hint-icon">💡</span>
+        <span class="hint-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
         You struggled with the cash flow statement impact last time. Pay special attention to how depreciation flows through each statement.
       </div>
 
-      <!-- SHOWN WHEN QUESTION IS HIDDEN -->
-      <div class="hidden-question-msg" id="hiddenMsg">
-        <span>🙈</span>
-        <span>Question hidden — answer from memory</span>
-        <button class="peek-btn" onclick="peekQuestion()">Peek (-5pts)</button>
-      </div>
     </div>
 
     <!-- INPUT MODE TOGGLE -->
@@ -1429,13 +1162,6 @@
   let recordingTimer = null;
   let feedbackStyle = 'coach';
 
-  // Interview mode state
-  let interviewModeOn = false;
-  let countdownDuration = 10;
-  let countdownValue = 10;
-  let countdownInterval = null;
-  let questionHidden = false;
-  let peeked = false;
 
   // ─── MODE SWITCH ──────────────────────────────────────────
   function switchMode(mode) {
@@ -1654,84 +1380,19 @@
     document.getElementById('wordCount').textContent = `${words} word${words !== 1 ? 's' : ''}`;
   }
 
-  // ─── INTERVIEW MODE ───────────────────────────────────────
-  function toggleInterviewMode() {
-    interviewModeOn = !interviewModeOn;
-
-    const toggle = document.getElementById('interviewToggle');
-    const bar = document.getElementById('interviewModeBar');
-    const icon = document.getElementById('interviewModeIcon');
-    const sub = document.getElementById('interviewModeSub');
-    const picker = document.getElementById('durationPicker');
-
-    toggle.classList.toggle('on', interviewModeOn);
-    bar.classList.toggle('interview-active', interviewModeOn);
-    picker.classList.toggle('enabled', interviewModeOn);
-
-    if (interviewModeOn) {
-      icon.textContent = '⏱️';
-      sub.textContent = `Question will disappear after ${countdownDuration}s`;
+  // ─── INTERVIEW MODE ───────────────────────────────────────s`;
       // Reset any hidden state first
-      resetQuestionVisibility();
-      // Start countdown
+        // Start countdown
       startCountdown();
     } else {
       icon.textContent = '🎯';
       sub.textContent = 'Question stays visible while you answer';
-      clearCountdown();
-      resetQuestionVisibility();
-    }
+            }
   }
-
-  function setDuration(secs) {
-    countdownDuration = secs;
-    document.querySelectorAll('.dur-btn').forEach(b => {
-      b.classList.toggle('active', b.textContent === secs + 's');
-    });
+);
     document.getElementById('interviewModeSub').textContent = `Question will disappear after ${secs}s`;
-    // If already running, restart
-    if (interviewModeOn && !questionHidden) {
-      clearCountdown();
-      startCountdown();
-    }
-  }
+ }
 
-  function startCountdown() {
-    questionHidden = false;
-    peeked = false;
-    countdownValue = countdownDuration;
-
-    const wrap = document.getElementById('countdownWrap');
-    const numEl = document.getElementById('countdownNumber');
-    const strongEl = document.getElementById('countdownStrong');
-    const fillEl = document.getElementById('countdownRingFill');
-    const numCenter = document.querySelector('.countdown-number-center');
-    const textEl = document.getElementById('countdownText');
-
-    wrap.classList.add('visible');
-    numEl.textContent = countdownValue;
-    numEl.classList.remove('urgent');
-    strongEl.textContent = countdownValue;
-    fillEl.classList.remove('urgent');
-
-    // Ring circumference = 2π×14 ≈ 88
-    const circumference = 88;
-    fillEl.style.strokeDashoffset = 0;
-
-    countdownInterval = setInterval(() => {
-      countdownValue--;
-      numEl.textContent = countdownValue;
-      strongEl.textContent = countdownValue;
-
-      // Update ring
-      const progress = countdownValue / countdownDuration;
-      fillEl.style.strokeDashoffset = circumference * (1 - progress);
-
-      // Urgent state at 3s
-      if (countdownValue <= 3) {
-        fillEl.classList.add('urgent');
-        numCenter.classList.add('urgent');
-      }
 
       if (countdownValue <= 0) {
         clearInterval(countdownInterval);
@@ -1740,93 +1401,21 @@
     }, 1000);
   }
 
-  function clearCountdown() {
-    if (countdownInterval) {
-      clearInterval(countdownInterval);
-      countdownInterval = null;
-    }
     document.getElementById('countdownWrap').classList.remove('visible');
     document.querySelector('.countdown-number-center').classList.remove('urgent');
     document.getElementById('countdownRingFill').classList.remove('urgent');
   }
 
-  function hideQuestion() {
-    questionHidden = true;
-    clearCountdown();
 
-    const qText = document.getElementById('questionText');
-    const qHint = document.getElementById('questionHint');
-    const hiddenMsg = document.getElementById('hiddenMsg');
-    const card = document.getElementById('questionCard');
-
-    // Animate out
-    qText.classList.add('dissolving');
-    qHint.classList.add('dissolving');
-
-    setTimeout(() => {
-      qText.style.display = 'none';
-      qHint.style.display = 'none';
-      qText.classList.remove('dissolving');
-      qHint.classList.remove('dissolving');
-      hiddenMsg.classList.add('visible');
-      card.classList.add('interview-hidden');
-    }, 850);
-
-    // Update bar
-    document.getElementById('interviewModeSub').textContent = 'Question hidden — answering from memory';
-  }
-
-  function peekQuestion() {
-    peeked = true;
-    const qText = document.getElementById('questionText');
-    const qHint = document.getElementById('questionHint');
-    const hiddenMsg = document.getElementById('hiddenMsg');
-    const card = document.getElementById('questionCard');
-
-    qText.style.display = '';
-    qHint.style.display = '';
-    qText.style.animation = 'dissolve-in 0.4s ease forwards';
-    qHint.style.animation = 'dissolve-in 0.4s ease 0.1s forwards';
-    hiddenMsg.classList.remove('visible');
-    card.classList.remove('interview-hidden');
-
-    document.getElementById('interviewModeSub').textContent = '👀 Peeked — -5pts will be deducted from score';
-
-    // Re-hide after 5s
-    setTimeout(() => {
-      if (interviewModeOn) {
-        qText.style.display = 'none';
-        qHint.style.display = 'none';
-        hiddenMsg.classList.add('visible');
-        card.classList.add('interview-hidden');
-        document.getElementById('interviewModeSub').textContent = 'Question hidden — answering from memory';
-      }
       qText.style.animation = '';
       qHint.style.animation = '';
     }, 5000);
   }
 
-  function resetQuestionVisibility() {
-    const qText = document.getElementById('questionText');
-    const qHint = document.getElementById('questionHint');
-    const hiddenMsg = document.getElementById('hiddenMsg');
-    const card = document.getElementById('questionCard');
-
-    qText.style.display = '';
-    qHint.style.display = '';
-    qText.style.animation = '';
-    qHint.style.animation = '';
-    qText.classList.remove('dissolving');
-    qHint.classList.remove('dissolving');
-    hiddenMsg.classList.remove('visible');
-    card.classList.remove('interview-hidden');
-    questionHidden = false;
-  }
 
   // ─── SUBMIT ───────────────────────────────────────────────
   // ─── SUBMIT ───────────────────────────────────────────────
   async function submitAnswer() {
-    clearCountdown();
 
     const overlay = document.getElementById('analyzingOverlay');
 
@@ -1918,7 +1507,6 @@ Respond ONLY with valid JSON, no markdown fences:
     const userPrompt = `Question: "${question}"
 
 Candidate's answer: "${userAnswer}"
-${peeked ? '\nNote: Candidate peeked at the question — deduct 5 points from overall.' : ''}
 
 Return JSON only.`;
 
@@ -2338,18 +1926,13 @@ Return JSON only.`;
   }
 
   function skipQuestion() {
-    clearCountdown();
     resetForNextQuestion();
     loadNextQuestion();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function resetForNextQuestion() {
-    clearCountdown();
-    resetQuestionVisibility();
-    peeked = false;
 
-    if (interviewModeOn) setTimeout(() => startCountdown(), 300);
 
     document.getElementById('feedbackPanel').classList.remove('visible');
     const cel = document.getElementById('masteryCelebration');
@@ -2578,7 +2161,7 @@ Generate 3 drill questions targeting this exact gap.`;
       const nextDrill = drillQueue.shift();
       // Inject at front of filteredQuestions after currentIndex
       filteredQuestions.splice(currentIndex + 1, 0, nextDrill);
-      inDrillMode = drillQueue.length > 0; // still in drill mode if more remain
+      inDrillMode = drillQueue.length > 0;
       loadQuestionAt(currentIndex + 1);
       return;
     }

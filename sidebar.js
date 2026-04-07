@@ -192,9 +192,15 @@
 
     // Guests → redirect to auth on click
     if (plan === 'guest') {
-      card.setAttribute('onclick', "window.location.href='auth.html?next=practice-screen.html'");
+      card.setAttribute('onclick', "window.location.href='auth.html'");
       card.title = 'Sign in or create an account';
       updateSidebarPlanText('guest', gradedToday);
+      // Swap upgrade button to "Create account" CTA
+      const upgradeBtn = document.getElementById('upgradeBtn');
+      if (upgradeBtn) {
+        upgradeBtn.href = 'auth.html?mode=register';
+        upgradeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Create free account';
+      }
       return;
     }
 
