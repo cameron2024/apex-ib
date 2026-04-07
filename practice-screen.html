@@ -891,10 +891,7 @@
       <div class="question-text" id="questionText">
         Loading question…
       </div>
-      <div class="question-hint" id="questionHint">
-        <span class="hint-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
-        You struggled with the cash flow statement impact last time. Pay special attention to how depreciation flows through each statement.
-      </div>
+      <div class="question-hint" id="questionHint" style="display:none;"></div>
 
     </div>
 
@@ -2037,6 +2034,11 @@ Return JSON only.`;
     document.getElementById('answerTextarea').value = '';
     document.getElementById('feedbackPanel').classList.remove('visible');
     document.getElementById('submitRow').style.display = 'flex';
+    // Ensure question text is always visible (guard against any prior hidden state)
+    const qText = document.getElementById('questionText');
+    const qHint = document.getElementById('questionHint');
+    if (qText) { qText.style.display = ''; qText.style.opacity = ''; qText.style.filter = ''; }
+    if (qHint) qHint.style.display = '';
     displayQuestion(q, currentIndex);
     saveStateToServer();
   }
@@ -2209,7 +2211,14 @@ Generate 3 drill questions targeting this exact gap.`;
       : 'Q' + (index + 1) + ' of ' + filteredQuestions.length;
     // Show gap hint if this is an AI drill question, otherwise clear it
     const hint = document.getElementById('questionHint');
-    if (hint) hint.textContent = q.ai_hint ? '💡 Focus: ' + q.ai_hint : '';
+    if (hint) {
+      if (q.ai_hint) {
+        hint.style.display = '';
+        hint.innerHTML = '<span class="hint-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>' + q.ai_hint;
+      } else {
+        hint.style.display = 'none';
+      }
+    }
 
     // Update save button state for this question
     updateSaveButtonState(q.id);
