@@ -421,10 +421,8 @@
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
-    -webkit-mask: linear-gradient(to right, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%) no-repeat;
-    mask: linear-gradient(to right, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%) no-repeat;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
+    white-space: nowrap;
+    overflow: visible;
   }
 
   .weak-spot-meta {
@@ -526,10 +524,8 @@
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
-    -webkit-mask: linear-gradient(to right, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%) no-repeat;
-    mask: linear-gradient(to right, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%) no-repeat;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
+    white-space: nowrap;
+    overflow: visible;
   }
 
   .rec-meta {
@@ -1074,7 +1070,7 @@
       return `<a class="rec-item" href="practice-screen.html?topic=${p.topic}" style="text-decoration:none;color:inherit;">
         <div class="rec-priority ${p.pri}"></div>
         <div class="rec-content">
-          <div class="rec-q">${text}</div>
+          <div class="rec-q"><div style="position:relative;overflow:hidden;white-space:nowrap;">${text}<div style="position:absolute;top:0;right:0;bottom:0;width:64px;background:linear-gradient(to right,rgba(255,255,255,0),#ffffff);pointer-events:none;"></div></div></div>
           <div class="rec-meta">
             <span class="rec-tag ${cls}">${tag}</span>
             <span class="rec-reason">${p.reason}</span>
@@ -1149,7 +1145,7 @@
       return `<a class="weak-spot-item" href="practice-screen.html?topic=${q.topic}" style="text-decoration:none;">
         <div class="weak-spot-rank ${rankClasses[i]}">${i+1}</div>
         <div class="weak-spot-body">
-          <div class="weak-spot-q">${qText}</div>
+          <div class="weak-spot-q"><div style="position:relative;overflow:hidden;white-space:nowrap;">${qText}<div style="position:absolute;top:0;right:0;bottom:0;width:64px;background:linear-gradient(to right,rgba(255,255,255,0),#ffffff);pointer-events:none;"></div></div></div>
           <div class="weak-spot-meta">
             <span class="weak-spot-score ${scoreClass}">${scoreLabel}</span>
             <span class="weak-spot-label">${attemptsLabel}</span>

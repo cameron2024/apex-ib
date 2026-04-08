@@ -210,10 +210,8 @@
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
-    -webkit-mask: linear-gradient(to right, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%) no-repeat;
-    mask: linear-gradient(to right, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%) no-repeat;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
+    white-space: nowrap;
+    overflow: visible;
   }
   .next-q-tag {
     font-size:10.5px; font-weight:500;
@@ -255,10 +253,8 @@
     overflow: hidden;
     line-height: 1.45;
     white-space: nowrap;
-    -webkit-mask: linear-gradient(to right, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%) no-repeat;
-    mask: linear-gradient(to right, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%) no-repeat;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
+    white-space: nowrap;
+    overflow: visible;
   }
   .weak-full-table tr:last-child td { border-bottom:none; }
   .weak-full-table tr:hover td { background:var(--bg); }
@@ -816,7 +812,7 @@
     list.innerHTML = plan.map(q => `
       <a class="next-q-item" href="practice-screen.html?topic=${q.topic}">
         <div class="next-q-pri ${q.priority}"></div>
-        <div class="next-q-text">${escHtml(q.text)}</div>
+        <div class="next-q-text"><div style="position:relative;overflow:hidden;white-space:nowrap;">${{escHtml(q.text)}}<div style="position:absolute;top:0;right:0;bottom:0;width:64px;background:linear-gradient(to right,rgba(255,255,255,0),#ffffff);pointer-events:none;"></div></div></div>
         <span class="next-q-tag ${topicTagClass(q.topic)}">${topicLabel(q.topic)}</span>
         <span class="next-q-reason">${q.reason}</span>
       </a>`).join('');
@@ -865,7 +861,7 @@
     tbody.innerHTML = rows.map(q => {
       const text = Q_TEXT[q.id] || (q.topic + ' question');
       return `<tr>
-        <td class="q-cell"><div class="q-text-inner">${escHtml(text)}</div></td>
+        <td class="q-cell"><div class="q-text-inner"><div style="position:relative;overflow:hidden;white-space:nowrap;">${{escHtml(text)}}<div style="position:absolute;top:0;right:0;bottom:0;width:64px;background:linear-gradient(to right,rgba(255,255,255,0),#ffffff);pointer-events:none;"></div></div></div></td>
         <td style="color:var(--text-secondary)">${topicLabel(q.topic)}</td>
         <td><span class="score-chip ${chipClass(q.latestScore)}">${q.latestScore}/100</span></td>
         <td style="color:var(--text-tertiary)">${q.attempts}</td>
