@@ -147,10 +147,13 @@
     animation-delay: .1s;
   }
   .card-monthly {
-    background: white;
-    border: 1px solid var(--border);
+    background: #F0F6FF;
+    border: 1px solid #BFDBFE;
     animation-delay: .14s;
   }
+  .card-monthly .card-header { border-bottom-color: #BFDBFE; }
+  .card-monthly .feature-item { border-top-color: #DBEAFE; }
+  .card-monthly .card-features { background: #F0F6FF; }
   .card-pro {
     background: var(--pro-bg);
     border: 1px solid var(--pro-border);
@@ -187,13 +190,6 @@
     background: linear-gradient(135deg, #1e3a8a, #3b82f6, #6366f1, #1e40af, #1e3a8a);
     background-size: 300% 300%;
     animation: monthlyShift 6s ease infinite;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .card-monthly .card-banner::before {
-    content: '★';
-    font-size: 36px;
-    color: rgba(255,255,255,0.22);
-    z-index: 1;
   }
   .card-monthly .card-banner::after {
     content: '';
@@ -223,6 +219,22 @@
     animation: passGlow 3s ease-in-out infinite;
   }
 
+  /* Gold ore vein overlay on card body */
+  .card-pro::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(112deg, transparent 15%, rgba(217,119,6,.07) 22%, transparent 30%),
+      linear-gradient(68deg,  transparent 25%, rgba(251,191,36,.05) 34%, rgba(217,119,6,.09) 38%, transparent 46%),
+      linear-gradient(135deg, transparent 40%, rgba(245,158,11,.06) 48%, transparent 56%),
+      linear-gradient(88deg,  transparent 55%, rgba(253,224,71,.04) 62%, rgba(217,119,6,.08) 67%, transparent 75%),
+      linear-gradient(155deg, transparent 60%, rgba(251,191,36,.05) 70%, transparent 80%);
+  }
+  .card-pro > * { position: relative; z-index: 1; }
+
   /* Banner badge (Best value, etc) */
   .banner-badge {
     position: absolute; top: 12px; right: 12px;
@@ -243,9 +255,7 @@
     padding: 32px 32px 24px;
     border-bottom: 1px solid var(--border);
   }
-  .card-monthly .card-header { border-bottom-color: var(--border); }
-  .card-monthly .card-tier-name { color: var(--text-tertiary); }
-  .card-monthly .feature-item { border-top-color: var(--border); }
+  .card-monthly .card-tier-name { color: #1D4ED8; }
 
   /* card-pro header border */
   .card-pro .card-header {
@@ -690,7 +700,7 @@
     </div>
     <div class="card-header">
       <div class="card-tier-row">
-        <span class="card-tier-name">★ Pro</span>
+        <span class="card-tier-name">Pro</span>
         <span class="card-popular-badge">Monthly</span>
       </div>
       <div class="card-price">
