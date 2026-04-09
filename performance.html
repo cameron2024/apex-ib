@@ -814,7 +814,7 @@
     list.innerHTML = plan.map(q => `
       <a class="next-q-item" href="practice-screen.html?topic=${q.topic}">
         <div class="next-q-pri ${q.priority}"></div>
-        <div class="next-q-text">${escHtml(q.text)}</div>
+        <div class="next-q-text">${escHtml(trunc(q.text))}</div>
         <span class="next-q-tag ${topicTagClass(q.topic)}">${topicLabel(q.topic)}</span>
         <span class="next-q-reason">${q.reason}</span>
       </a>`).join('');
@@ -863,7 +863,7 @@
     tbody.innerHTML = rows.map(q => {
       const text = Q_TEXT[q.id] || (q.topic + ' question');
       return `<tr>
-        <td class="q-cell"><div class="q-text-inner">${escHtml(text)}</div></td>
+        <td class="q-cell"><div class="q-text-inner">${escHtml(trunc(text))}</div></td>
         <td style="color:var(--text-secondary)">${topicLabel(q.topic)}</td>
         <td><span class="score-chip ${chipClass(q.latestScore)}">${q.latestScore}/100</span></td>
         <td style="color:var(--text-tertiary)">${q.attempts}</td>
@@ -871,6 +871,8 @@
       </tr>`;
     }).join('');
   }
+
+function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '…' : (s || ''); }
 
   function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
