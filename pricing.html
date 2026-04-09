@@ -147,13 +147,10 @@
     animation-delay: .1s;
   }
   .card-monthly {
-    background: #F0F6FF;
-    border: 1px solid #BFDBFE;
+    background: white;
+    border: 1px solid var(--border);
     animation-delay: .14s;
   }
-  .card-monthly .card-header { border-bottom-color: #BFDBFE; }
-  .card-monthly .feature-item { border-top-color: #DBEAFE; }
-  .card-monthly .card-features { background: #F0F6FF; }
   .card-pro {
     background: var(--pro-bg);
     border: 1px solid var(--pro-border);
@@ -180,7 +177,7 @@
       radial-gradient(circle at 80% 20%, rgba(200,195,185,.3) 0%, transparent 40%);
   }
 
-  /* Pro (Monthly) banner — vivid blue drift with star mark */
+  /* Monthly banner — slow blue/indigo drift */
   @keyframes monthlyShift {
     0%   { background-position: 0% 50%; }
     50%  { background-position: 100% 50%; }
@@ -219,22 +216,6 @@
     animation: passGlow 3s ease-in-out infinite;
   }
 
-  /* Gold ore vein overlay on card body */
-  .card-pro::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background-image:
-      linear-gradient(112deg, transparent 15%, rgba(217,119,6,.07) 22%, transparent 30%),
-      linear-gradient(68deg,  transparent 25%, rgba(251,191,36,.05) 34%, rgba(217,119,6,.09) 38%, transparent 46%),
-      linear-gradient(135deg, transparent 40%, rgba(245,158,11,.06) 48%, transparent 56%),
-      linear-gradient(88deg,  transparent 55%, rgba(253,224,71,.04) 62%, rgba(217,119,6,.08) 67%, transparent 75%),
-      linear-gradient(155deg, transparent 60%, rgba(251,191,36,.05) 70%, transparent 80%);
-  }
-  .card-pro > * { position: relative; z-index: 1; }
-
   /* Banner badge (Best value, etc) */
   .banner-badge {
     position: absolute; top: 12px; right: 12px;
@@ -255,7 +236,9 @@
     padding: 32px 32px 24px;
     border-bottom: 1px solid var(--border);
   }
-  .card-monthly .card-tier-name { color: #1D4ED8; }
+  .card-monthly .card-header { border-bottom-color: var(--border); }
+  .card-monthly .card-tier-name { color: var(--text-tertiary); }
+  .card-monthly .feature-item { border-top-color: var(--border); }
 
   /* card-pro header border */
   .card-pro .card-header {
@@ -310,7 +293,7 @@
   .card-pro .card-description { color: var(--pro-text-secondary); }
 
   /* CTA */
-  .card-cta-row { padding: 24px 32px; margin-top: auto; }
+  .card-cta-row { padding: 24px 32px; }
 
   .btn-cta {
     width: 100%; padding: 13px;
@@ -325,19 +308,11 @@
   }
   .btn-free:hover { border-color: var(--border-strong); background: white; }
 
-  .btn-monthly {
+  .btn-pro {
     background: var(--accent-blue); color: white;
     box-shadow: 0 4px 16px rgba(37,99,235,.3);
   }
-  .btn-monthly:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(37,99,235,.4); transform: translateY(-1px); }
-
-  .btn-pro {
-    background: linear-gradient(135deg, #b45309, #d97706, #f59e0b);
-    color: white;
-    box-shadow: 0 4px 16px rgba(217,119,6,.4);
-    border: 1px solid rgba(251,191,36,.3);
-  }
-  .btn-pro:hover { background: linear-gradient(135deg, #92400e, #b45309, #d97706); box-shadow: 0 6px 20px rgba(217,119,6,.5); transform: translateY(-1px); }
+  .btn-pro:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(37,99,235,.4); transform: translateY(-1px); }
 
   /* FEATURES */
   .card-features { padding: 0 32px 32px; flex: 1; }
@@ -631,6 +606,13 @@
       <p class="card-description">Start practicing immediately. No card required. See what Apex feels like before you commit.</p>
     </div>
 
+    <div class="card-cta-row">
+      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register'">
+        Start for free
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
     <div class="card-features">
       <div class="features-label">What's included</div>
       <div class="feature-list">
@@ -685,12 +667,6 @@
 
       </div>
     </div>
-    <div class="card-cta-row">
-      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register'">
-        Start for free
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>
   </div>
 
   <!-- MONTHLY -->
@@ -700,8 +676,7 @@
     </div>
     <div class="card-header">
       <div class="card-tier-row">
-        <span class="card-tier-name">Pro</span>
-        <span class="card-popular-badge">Monthly</span>
+        <span class="card-tier-name">Monthly</span>
       </div>
       <div class="card-price">
         <span class="price-amount">$14.99</span>
@@ -709,6 +684,13 @@
       </div>
       <div class="price-note">Cancel anytime</div>
       <p class="card-description">Full access while you're actively prepping. Good for early-stage candidates building their foundation over time.</p>
+    </div>
+
+    <div class="card-cta-row">
+      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register&plan=monthly'">
+        Get started
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
 
     <div class="card-features">
@@ -757,12 +739,6 @@
 
       </div>
     </div>
-    <div class="card-cta-row">
-      <button class="btn-cta btn-monthly" onclick="startCheckout('monthly')">
-        Get Pro
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>
   </div>
 
   <!-- RECRUITING PASS -->
@@ -782,8 +758,15 @@
       <p class="card-description">Pay once. Prep from summer through superday. Everything unlocked for your entire recruiting cycle — no monthly decisions, no canceling.</p>
     </div>
 
+    <div class="card-cta-row">
+      <button class="btn-cta btn-pro" onclick="window.location.href='auth.html?mode=register&plan=pass'">
+        Get the Recruiting Pass
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
     <div class="card-features">
-      <div class="features-label">Everything in Pro, plus</div>
+      <div class="features-label">Everything in Monthly, plus</div>
       <div class="feature-list">
 
         <div class="feature-item">
@@ -827,12 +810,6 @@
         </div>
 
       </div>
-    </div>
-    <div class="card-cta-row">
-      <button class="btn-cta btn-pro" onclick="startCheckout('pass')">
-        Get the Recruiting Pass
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
     </div>
   </div>
 
@@ -1041,21 +1018,6 @@
 </div>
 
 <script>
-  async function startCheckout(plan) {
-    const token = localStorage.getItem('apex_token');
-    if (!token) { window.location.href = 'auth.html?mode=register&plan=' + plan; return; }
-    try {
-      const r = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ plan })
-      });
-      const data = await r.json();
-      if (data.url) window.location.href = data.url;
-      else window.location.href = 'auth.html?mode=register&plan=' + plan;
-    } catch(e) { window.location.href = 'auth.html?mode=register&plan=' + plan; }
-  }
-
   function toggleFaq(el) {
     const item = el.closest('.faq-item');
     const isOpen = item.classList.contains('open');
