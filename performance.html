@@ -210,8 +210,9 @@
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
-    white-space: nowrap;
-    overflow: visible;
+white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .next-q-tag {
     font-size:10.5px; font-weight:500;
@@ -253,8 +254,9 @@
     overflow: hidden;
     line-height: 1.45;
     white-space: nowrap;
-    white-space: nowrap;
-    overflow: visible;
+white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .weak-full-table tr:last-child td { border-bottom:none; }
   .weak-full-table tr:hover td { background:var(--bg); }
@@ -812,7 +814,7 @@
     list.innerHTML = plan.map(q => `
       <a class="next-q-item" href="practice-screen.html?topic=${q.topic}">
         <div class="next-q-pri ${q.priority}"></div>
-        <div class="next-q-text"><div style="position:relative;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(to right,black 70%,transparent 100%);mask-image:linear-gradient(to right,black 70%,transparent 100%);">${escHtml(q.text)}</div></div>
+        <div class="next-q-text">${escHtml(q.text)}</div>
         <span class="next-q-tag ${topicTagClass(q.topic)}">${topicLabel(q.topic)}</span>
         <span class="next-q-reason">${q.reason}</span>
       </a>`).join('');
@@ -861,7 +863,7 @@
     tbody.innerHTML = rows.map(q => {
       const text = Q_TEXT[q.id] || (q.topic + ' question');
       return `<tr>
-        <td class="q-cell"><div class="q-text-inner"><div style="position:relative;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(to right,black 70%,transparent 100%);mask-image:linear-gradient(to right,black 70%,transparent 100%);">${escHtml(text)}</div></div></td>
+        <td class="q-cell"><div class="q-text-inner">${escHtml(text)}</div></td>
         <td style="color:var(--text-secondary)">${topicLabel(q.topic)}</td>
         <td><span class="score-chip ${chipClass(q.latestScore)}">${q.latestScore}/100</span></td>
         <td style="color:var(--text-tertiary)">${q.attempts}</td>
