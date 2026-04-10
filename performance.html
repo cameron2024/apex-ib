@@ -139,6 +139,17 @@
   .trend-dot-active {
     filter: drop-shadow(0 0 4px rgba(0,0,0,0.25));
   }
+  .tip-practice-link {
+    display: block; margin-top: 8px; font-size: 12px;
+    color: var(--text-primary); line-height: 1.5;
+    text-decoration: none; border-top: 1px solid var(--border);
+    padding-top: 8px; cursor: pointer;
+  }
+  .tip-practice-link:hover { color: var(--accent-blue); }
+  .tip-practice-cta {
+    display: block; margin-top: 4px; font-size: 11px;
+    font-weight: 600; color: var(--accent-blue);
+  }
   .tip-score { font-size: 18px; font-weight: 700; font-family: 'DM Serif Display', serif; letter-spacing: -.3px; }
   .tip-topic { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
   .tip-q { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
@@ -730,7 +741,7 @@
       (dateStr ? '<div style="font-size:10px;color:var(--text-tertiary);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase;">' + dateStr + '</div>' : '') +
       '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:' + scoreColor + ';margin-bottom:3px;">' + topicLabel + '</div>' +
       '<div class="tip-score" style="color:' + scoreColor + ';">' + score + '<span style="font-size:12px;font-weight:400;color:var(--text-tertiary);">/100</span></div>' +
-      (qText ? '<a href="' + practiceUrl + '" style="display:block;margin-top:8px;font-size:12px;color:var(--text-primary);line-height:1.5;text-decoration:none;border-top:1px solid var(--border);padding-top:8px;cursor:pointer;" onmouseenter="this.style.color='var(--accent-blue)'" onmouseleave="this.style.color='var(--text-primary)'">' + qText + '<span style="display:block;margin-top:4px;font-size:11px;font-weight:600;color:var(--accent-blue);">Practice this question →</span></a>' : '');
+      (qText ? '<a href="' + practiceUrl + '" class="tip-practice-link">' + qText + '<span class="tip-practice-cta">Practice this question →</span></a>' : '');
 
     // Use mouse position directly — always reliable
     const wrap = tip.parentElement;
