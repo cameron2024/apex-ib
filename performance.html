@@ -639,7 +639,9 @@
         const topicLabel = TOPIC_LABELS_T[p.topic] || p.topic;
         const dateStr = p.created_at ? new Date(p.created_at * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
         const scoreColor = p.score >= 90 ? '#16A34A' : p.score >= 75 ? '#D97706' : '#DC2626';
-        return `<circle class="trend-dot" cx="${xOf(i)}" cy="${yOf(p.score)}" r="4" fill="${dotColor}" stroke="white" stroke-width="1.5"
+        const cx = xOf(i), cy = yOf(p.score);
+        return `<circle class="trend-dot" cx="${cx}" cy="${cy}" r="4" fill="${dotColor}" stroke="white" stroke-width="1.5"
+          data-cx="${cx}" data-cy="${cy}"
           onclick="toggleTip(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"
           onmouseenter="showTipHover(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"
           onmouseleave="hideHover()"/>`;
@@ -692,22 +694,30 @@
     dot.classList.add('trend-dot-active');
 
     tip.innerHTML =
-      '<div class="tip-date" style="margin-bottom:4px;">' + (dateStr || '') + '</div>' +
-      '<div class="tip-topic" style="color:' + scoreColor + '">' + topicLabel + '</div>' +
+      (dateStr ? '<div class="tip-date" style="font-size:10px;color:var(--text-tertiary);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;">' + dateStr + '</div>' : '') +
+      '<div class="tip-topic" style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:' + scoreColor + ';margin-bottom:4px;">' + topicLabel + '</div>' +
       '<div class="tip-score" style="color:' + scoreColor + '">' + score + '<span style="font-size:12px;font-weight:400;color:var(--text-tertiary)">/100</span></div>' +
-      (qText ? '<div class="tip-q">' + qText + '</div>' : '');
+      (qText ? '<div class="tip-q" style="margin-top:6px;font-size:12px;color:var(--text-secondary);line-height:1.5;">' + qText + '</div>' : '');
 
+    // Use SVG data-cx/cy for reliable positioning (getBoundingClientRect unreliable on SVG elements)
     const wrap = dot.closest('.trend-chart-wrap');
+    const svg = dot.closest('svg');
+    const svgRect = svg ? svg.getBoundingClientRect() : wrap.getBoundingClientRect();
     const wrapRect = wrap.getBoundingClientRect();
-    const dotRect = dot.getBoundingClientRect();
+    const dotCX = parseFloat(dot.getAttribute('data-cx') || dot.getAttribute('cx') || 0);
+    const dotCY = parseFloat(dot.getAttribute('data-cy') || dot.getAttribute('cy') || 0);
+    // Scale from SVG viewBox coords to rendered pixel coords
+    const scaleX = svgRect.width / (parseFloat(svg ? svg.getAttribute('viewBox').split(' ')[2] : svgRect.width) || svgRect.width);
+    const scaleY = svgRect.height / (parseFloat(svg ? svg.getAttribute('viewBox').split(' ')[3] : svgRect.height) || svgRect.height);
+    const pxX = (svgRect.left - wrapRect.left) + dotCX * scaleX;
+    const pxY = (svgRect.top - wrapRect.top) + dotCY * scaleY;
+
     const tipW = 240;
-    const dotCX = dotRect.left + dotRect.width / 2 - wrapRect.left;
-    let left = dotCX - tipW / 2;
+    let left = pxX - tipW / 2;
     if (left < 4) left = 4;
     if (left + tipW > wrapRect.width - 4) left = wrapRect.width - tipW - 4;
-    const dotCY = dotRect.top + dotRect.height / 2 - wrapRect.top;
     tip.style.left = left + 'px';
-    tip.style.top = Math.max(4, dotCY - 100) + 'px';
+    tip.style.top = Math.max(4, pxY - 110) + 'px';
     tip.classList.add('visible');
   }
 
