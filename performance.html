@@ -121,7 +121,7 @@
     font-size: 12px;
     padding: 12px 14px;
     border-radius: 12px;
-    pointer-events: none;
+    pointer-events: auto;
     opacity: 0;
     transform: translateY(4px) scale(0.97);
     transition: opacity .18s ease, transform .18s ease;
@@ -639,12 +639,11 @@
         const topicLabel = TOPIC_LABELS_T[p.topic] || p.topic;
         const dateStr = p.created_at ? new Date(p.created_at * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
         const scoreColor = p.score >= 90 ? '#16A34A' : p.score >= 75 ? '#D97706' : '#DC2626';
-        // Encode data into data-attributes — avoids double-quote collision inside HTML attributes
         const safeQ = encodeURIComponent(qText);
         const safeTopic = encodeURIComponent(topicLabel);
         const safeDate = encodeURIComponent(dateStr);
         return `<circle class="trend-dot" cx="${xOf(i)}" cy="${yOf(p.score)}" r="4" fill="${dotColor}" stroke="white" stroke-width="1.5"
-          data-score="${p.score}" data-topic="${safeTopic}" data-q="${safeQ}" data-date="${safeDate}" data-color="${scoreColor}"
+          data-score="${p.score}" data-topic="${safeTopic}" data-topickey="${p.topic}" data-qid="${p.question_id || ''}" data-q="${safeQ}" data-date="${safeDate}" data-color="${scoreColor}"
           onclick="dotClick(event,this)"
           onmouseenter="dotHover(event,this)"
           onmouseleave="hideHover()"/>`;
@@ -680,6 +679,8 @@
     return {
       score:      el.getAttribute('data-score'),
       topicLabel: decodeURIComponent(el.getAttribute('data-topic') || ''),
+      topicKey:   el.getAttribute('data-topickey') || '',
+      qid:        el.getAttribute('data-qid') || '',
       qText:      decodeURIComponent(el.getAttribute('data-q') || ''),
       dateStr:    decodeURIComponent(el.getAttribute('data-date') || ''),
       scoreColor: el.getAttribute('data-color') || '#1A1814'
@@ -724,11 +725,12 @@
     dot.setAttribute('r', '6');
     dot.classList.add('trend-dot-active');
 
+    const practiceUrl = 'practice-screen.html?topic=' + (dot.getAttribute('data-topickey') || 'All') + (dot.getAttribute('data-qid') ? '&focus=' + dot.getAttribute('data-qid') : '');
     tip.innerHTML =
       (dateStr ? '<div style="font-size:10px;color:var(--text-tertiary);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase;">' + dateStr + '</div>' : '') +
       '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:' + scoreColor + ';margin-bottom:3px;">' + topicLabel + '</div>' +
       '<div class="tip-score" style="color:' + scoreColor + ';">' + score + '<span style="font-size:12px;font-weight:400;color:var(--text-tertiary);">/100</span></div>' +
-      (qText ? '<div style="margin-top:6px;font-size:12px;color:var(--text-secondary);line-height:1.5;">' + qText + '</div>' : '');
+      (qText ? '<a href="' + practiceUrl + '" style="display:block;margin-top:8px;font-size:12px;color:var(--text-primary);line-height:1.5;text-decoration:none;border-top:1px solid var(--border);padding-top:8px;cursor:pointer;" onmouseenter="this.style.color='var(--accent-blue)'" onmouseleave="this.style.color='var(--text-primary)'">' + qText + '<span style="display:block;margin-top:4px;font-size:11px;font-weight:600;color:var(--accent-blue);">Practice this question →</span></a>' : '');
 
     // Use mouse position directly — always reliable
     const wrap = tip.parentElement;
