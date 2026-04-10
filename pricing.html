@@ -314,6 +314,33 @@
   }
   .btn-pro:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(37,99,235,.4); transform: translateY(-1px); }
 
+  /* Pro (monthly) — amber/gold, matches Recruiting Pass banner */
+  .btn-pro-monthly {
+    background: linear-gradient(135deg, #b45309, #d97706, #f59e0b);
+    color: white;
+    box-shadow: 0 4px 16px rgba(217,119,6,.35);
+    border: 1px solid rgba(251,191,36,.25);
+  }
+  .btn-pro-monthly:hover {
+    background: linear-gradient(135deg, #92400e, #b45309, #d97706);
+    box-shadow: 0 6px 20px rgba(217,119,6,.5);
+    transform: translateY(-1px);
+  }
+
+  /* Recruiting Pass — slate/steel with gold undertone */
+  .btn-pass {
+    background: linear-gradient(135deg, #4a5568, #5a6577, #64748b);
+    color: #fde68a;
+    box-shadow: 0 4px 16px rgba(100,116,139,.3);
+    border: 1px solid rgba(253,230,138,.15);
+    letter-spacing: .01em;
+  }
+  .btn-pass:hover {
+    background: linear-gradient(135deg, #374151, #4a5568, #556070);
+    box-shadow: 0 6px 20px rgba(100,116,139,.4);
+    transform: translateY(-1px);
+  }
+
   /* FEATURES */
   .card-features { padding: 20px 32px 32px; flex: 1; }
 
@@ -676,7 +703,11 @@
     </div>
     <div class="card-header">
       <div class="card-tier-row">
-        <span class="card-tier-name">Monthly</span>
+        <span class="card-tier-name">Pro</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:4px;">
+        <span style="text-decoration:line-through;color:var(--text-tertiary);">$20</span>
+        <span style="color:#16A34A;font-weight:600;margin-left:5px;">25% off</span>
       </div>
       <div class="card-price">
         <span class="price-amount">$14.99</span>
@@ -687,7 +718,7 @@
     </div>
 
     <div class="card-cta-row">
-      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register&plan=monthly'">
+      <button class="btn-cta btn-pro-monthly" onclick="window.location.href='auth.html?mode=register&plan=monthly'">
         Get started
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -759,7 +790,7 @@
     </div>
 
     <div class="card-cta-row">
-      <button class="btn-cta btn-pro" onclick="window.location.href='auth.html?mode=register&plan=pass'">
+      <button class="btn-cta btn-pass" onclick="window.location.href='auth.html?mode=register&plan=pass'">
         Get the Recruiting Pass
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
