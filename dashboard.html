@@ -1273,11 +1273,12 @@
     if (!token) {
       setGreeting('');
       document.getElementById('sidebarUserName').textContent = 'Guest';
-      const planEl = document.getElementById('sidebarPlan');
-      if (planEl) planEl.textContent = 'Free · 5 grades today';
       window._userPlan = 'guest';
-      window._gradedToday = 0;
-      initSidebarMenu('guest', 0);
+      const _gd = new Date();
+      const _guestKey = 'apex_guest_grades_' + _gd.getFullYear() + '-' + String(_gd.getMonth()+1).padStart(2,'0') + '-' + String(_gd.getDate()).padStart(2,'0');
+      const _guestGraded = parseInt(localStorage.getItem(_guestKey) || '0');
+      window._gradedToday = _guestGraded;
+      initSidebarMenu('guest', _guestGraded);
       buildTopicCards({}, {});
       buildWeakSpots([], []);
       buildRec([], []);
