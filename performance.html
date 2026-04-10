@@ -639,9 +639,14 @@
         const topicLabel = TOPIC_LABELS_T[p.topic] || p.topic;
         const dateStr = p.created_at ? new Date(p.created_at * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
         const scoreColor = p.score >= 90 ? '#16A34A' : p.score >= 75 ? '#D97706' : '#DC2626';
+        // Encode data into data-attributes — avoids double-quote collision inside HTML attributes
+        const safeQ = encodeURIComponent(qText);
+        const safeTopic = encodeURIComponent(topicLabel);
+        const safeDate = encodeURIComponent(dateStr);
         return `<circle class="trend-dot" cx="${xOf(i)}" cy="${yOf(p.score)}" r="4" fill="${dotColor}" stroke="white" stroke-width="1.5"
-          onclick="toggleTip(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"
-          onmouseenter="showTipHover(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"
+          data-score="${p.score}" data-topic="${safeTopic}" data-q="${safeQ}" data-date="${safeDate}" data-color="${scoreColor}"
+          onclick="dotClick(event,this)"
+          onmouseenter="dotHover(event,this)"
           onmouseleave="hideHover()"/>`;
       }).join('')}
     </svg>`;
@@ -669,11 +674,39 @@
   }
 
   var _activeDot = null;
-  var _hoverLocked = false; // true when click has locked a dot open
+  var _hoverLocked = false;
 
-  function showTipHover(e, score, topicLabel, qText, dateStr, scoreColor) {
+  function _readDot(el) {
+    return {
+      score:      el.getAttribute('data-score'),
+      topicLabel: decodeURIComponent(el.getAttribute('data-topic') || ''),
+      qText:      decodeURIComponent(el.getAttribute('data-q') || ''),
+      dateStr:    decodeURIComponent(el.getAttribute('data-date') || ''),
+      scoreColor: el.getAttribute('data-color') || '#1A1814'
+    };
+  }
+
+  function dotHover(e, el) {
     if (_hoverLocked) return;
-    _renderTip(e, e.target, score, topicLabel, qText, dateStr, scoreColor);
+    var d = _readDot(el);
+    _renderTip(e, el, d.score, d.topicLabel, d.qText, d.dateStr, d.scoreColor);
+  }
+
+  function dotClick(e, el) {
+    if (_activeDot === el && _hoverLocked) {
+      _hoverLocked = false; hideTip(); return;
+    }
+    _hoverLocked = true;
+    var d = _readDot(el);
+    _renderTip(e, el, d.score, d.topicLabel, d.qText, d.dateStr, d.scoreColor);
+    setTimeout(function () {
+      document.addEventListener('click', function outsideClick(ev) {
+        if (ev.target !== el) {
+          _hoverLocked = false; hideTip();
+          document.removeEventListener('click', outsideClick);
+        }
+      });
+    }, 0);
   }
 
   function hideHover() {
@@ -711,28 +744,7 @@
     tip.classList.add('visible');
   }
 
-  function toggleTip(e, score, topicLabel, qText, dateStr, scoreColor) {
-    const dot = e.target;
-    if (_activeDot === dot && _hoverLocked) {
-      // Clicking active locked dot — unlock and dismiss
-      _hoverLocked = false;
-      hideTip();
-      return;
-    }
-    _hoverLocked = true;
-    _renderTip(e, dot, score, topicLabel, qText, dateStr, scoreColor);
 
-    // Dismiss on outside click
-    setTimeout(function () {
-      document.addEventListener('click', function outsideClick(ev) {
-        if (ev.target !== dot) {
-          _hoverLocked = false;
-          hideTip();
-          document.removeEventListener('click', outsideClick);
-        }
-      });
-    }, 0);
-  }
 
   function hideTip() {
     const tip = document.getElementById('trendTooltip');
