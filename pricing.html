@@ -293,7 +293,7 @@
   .card-pro .card-description { color: var(--pro-text-secondary); }
 
   /* CTA */
-  .card-cta-row { padding: 24px 32px; }
+  .card-cta-row { padding: 24px 32px; margin-top: auto; }
 
   .btn-cta {
     width: 100%; padding: 13px;
@@ -314,30 +314,28 @@
   }
   .btn-pro:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(37,99,235,.4); transform: translateY(-1px); }
 
-  /* Pro (monthly) — amber/gold, matches Recruiting Pass banner */
+  /* Pro (monthly) — blue with glow */
   .btn-pro-monthly {
+    background: #2563EB;
+    color: white;
+    box-shadow: 0 4px 16px rgba(37,99,235,.35);
+  }
+  .btn-pro-monthly:hover {
+    background: #1d4ed8;
+    box-shadow: 0 6px 20px rgba(37,99,235,.5);
+    transform: translateY(-1px);
+  }
+
+  /* Recruiting Pass — amber/gold gradient with warm glow */
+  .btn-pass {
     background: linear-gradient(135deg, #b45309, #d97706, #f59e0b);
     color: white;
     box-shadow: 0 4px 16px rgba(217,119,6,.35);
     border: 1px solid rgba(251,191,36,.25);
   }
-  .btn-pro-monthly:hover {
+  .btn-pass:hover {
     background: linear-gradient(135deg, #92400e, #b45309, #d97706);
     box-shadow: 0 6px 20px rgba(217,119,6,.5);
-    transform: translateY(-1px);
-  }
-
-  /* Recruiting Pass — slate/steel with gold undertone */
-  .btn-pass {
-    background: linear-gradient(135deg, #4a5568, #5a6577, #64748b);
-    color: #fde68a;
-    box-shadow: 0 4px 16px rgba(100,116,139,.3);
-    border: 1px solid rgba(253,230,138,.15);
-    letter-spacing: .01em;
-  }
-  .btn-pass:hover {
-    background: linear-gradient(135deg, #374151, #4a5568, #556070);
-    box-shadow: 0 6px 20px rgba(100,116,139,.4);
     transform: translateY(-1px);
   }
 
@@ -633,13 +631,6 @@
       <p class="card-description">Start practicing immediately. No card required. See what Apex feels like before you commit.</p>
     </div>
 
-    <div class="card-cta-row">
-      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register'">
-        Start for free
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>
-
     <div class="card-features">
       <div class="features-label">What's included</div>
       <div class="feature-list">
@@ -694,6 +685,12 @@
 
       </div>
     </div>
+    <div class="card-cta-row">
+      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register'">
+        Start for free
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
   </div>
 
   <!-- MONTHLY -->
@@ -715,13 +712,6 @@
       </div>
       <div class="price-note">Cancel anytime</div>
       <p class="card-description">Full access while you're actively prepping. Good for early-stage candidates building their foundation over time.</p>
-    </div>
-
-    <div class="card-cta-row">
-      <button class="btn-cta btn-pro-monthly" onclick="window.location.href='auth.html?mode=register&plan=monthly'">
-        Get started
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
     </div>
 
     <div class="card-features">
@@ -770,6 +760,12 @@
 
       </div>
     </div>
+    <div class="card-cta-row">
+      <button class="btn-cta btn-pro-monthly" onclick="window.location.href='auth.html?mode=register&plan=monthly'">
+        Get the Pro Plan
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
   </div>
 
   <!-- RECRUITING PASS -->
@@ -787,13 +783,6 @@
       </div>
       <div class="price-note">Full cycle access · No renewals</div>
       <p class="card-description">Pay once. Prep from summer through superday. Everything unlocked for your entire recruiting cycle — no monthly decisions, no canceling.</p>
-    </div>
-
-    <div class="card-cta-row">
-      <button class="btn-cta btn-pass" onclick="window.location.href='auth.html?mode=register&plan=pass'">
-        Get the Recruiting Pass
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
     </div>
 
     <div class="card-features">
@@ -841,6 +830,12 @@
         </div>
 
       </div>
+    </div>
+    <div class="card-cta-row">
+      <button class="btn-cta btn-pass" onclick="window.location.href='auth.html?mode=register&plan=pass'">
+        Get the Recruiting Pass
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
   </div>
 
