@@ -293,14 +293,15 @@
   .card-pro .card-description { color: var(--pro-text-secondary); }
 
   /* CTA */
-  .card-cta-row { padding: 24px 32px; margin-top: auto; }
+  .card-cta-row { padding: 0 32px 32px; margin-top: auto; }
 
   .btn-cta {
-    width: 100%; padding: 13px;
+    width: 100%; padding: 14px;
     border-radius: 9px; border: none; cursor: pointer;
     font-family: inherit; font-size: 14px; font-weight: 600;
     letter-spacing: -.1px; transition: all .15s;
     display: flex; align-items: center; justify-content: center; gap: 7px;
+    box-sizing: border-box; height: 52px;
   }
   .btn-free {
     background: var(--bg); color: var(--text-primary);
@@ -702,11 +703,13 @@
       <div class="card-tier-row">
         <span class="card-tier-name">Pro</span>
       </div>
+      <div style="margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+        <span style="font-size:12px;text-decoration:line-through;color:var(--text-tertiary);">$20/mo</span>
+        <span style="font-size:10px;font-weight:700;color:#16A34A;background:#D1FAE5;padding:2px 6px;border-radius:4px;letter-spacing:.03em;">25% OFF</span>
+      </div>
       <div class="card-price">
         <span class="price-amount">$14.99</span>
         <span class="price-period">/ month</span>
-        <span style="font-size:12px;text-decoration:line-through;color:var(--text-tertiary);padding-bottom:6px;">$20</span>
-        <span style="font-size:11px;font-weight:700;color:#16A34A;background:#D1FAE5;padding:2px 6px;border-radius:4px;padding-bottom:6px;">25% off</span>
       </div>
       <div class="price-note">Cancel anytime</div>
       <p class="card-description">Full access while you're actively prepping. Good for early-stage candidates building their foundation over time.</p>
