@@ -909,6 +909,9 @@
   let Q_TEXT = {};  // populated at boot from /api/questions
 
   // ── GREETING ──────────────────────────────────────────────
+  function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '…' : (s || ''); }
+  function escHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
   function setGreeting(name) {
     const h = new Date().getHours();
     const period = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
@@ -1218,6 +1221,9 @@
 
     const token = localStorage.getItem('apex_token');
     const name  = localStorage.getItem('apex_user');
+    // Apply cached plan immediately so sidebar never shows stale "Free plan"
+    const cachedPlan = localStorage.getItem('apex_plan') || 'free';
+    const cachedGraded = parseInt(localStorage.getItem('apex_graded_today') || '0');
 
     // Guests land here too — show a welcoming empty state, don't redirect
     if (!token) {
@@ -1232,7 +1238,6 @@
       buildWeakSpots([], []);
       buildRec([], []);
       buildSummary([], [], 0);
-      buildActivityGrid([]);
       return;
     }
 
@@ -1246,6 +1251,10 @@
     } else {
       setGreeting('');
     }
+    // Init sidebar immediately with cached plan — no flash of "Free plan"
+    window._userPlan = cachedPlan;
+    window._gradedToday = cachedGraded;
+    initSidebarMenu(cachedPlan, cachedGraded);
 
     // Build empty state immediately so page isn't blank
     buildTopicCards({}, {});
@@ -1281,29 +1290,13 @@
           // Store for heatmap
           window._activityData = data.activity || [];
           window._streakCount = data.streak || 0;
-          // Init sidebar menu
+          // Cache plan for next load + update sidebar
           window._userPlan = data.plan || 'free';
           window._gradedToday = data.gradedToday || 0;
           window._memberSince = data.memberSince || null;
+          localStorage.setItem('apex_plan', data.plan || 'free');
+          localStorage.setItem('apex_graded_today', String(data.gradedToday || 0));
           initSidebarMenu(window._userPlan, window._gradedToday);
-          // Update plan display
-          if (data.plan) {
-            const planEl = document.getElementById('sidebarPlan');
-            if (planEl) {
-              if (data.plan === 'pass') {
-                planEl.textContent = 'Recruiting Pass';
-                planEl.style.color = '#D97706';
-              } else if (data.plan === 'monthly') {
-                planEl.textContent = 'Monthly plan';
-                planEl.style.color = '#2563EB';
-              } else {
-                const remaining = Math.max(0, 5 - (data.gradedToday || 0));
-                planEl.textContent = `Free plan · ${remaining} grade${remaining !== 1 ? 's' : ''} left today`;
-              }
-              const upgradeBtn = document.querySelector('.upgrade-btn');
-              if (upgradeBtn && data.plan !== 'free') upgradeBtn.style.display = 'none';
-            }
-          }
         }
       } catch(e) {
         console.log('Progress load error:', e.message);
