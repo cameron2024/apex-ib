@@ -635,12 +635,14 @@
       <!-- Dots colored by topic -->
       ${pts.map((p,i) => {
         const dotColor = _trendFilter === 'All' ? (TOPIC_COLORS[p.topic] || mainColor) : mainColor;
-        const qText = (Q_TEXT[p.question_id] || '').slice(0, 60);
+        const qText = Q_TEXT[p.question_id] || '';
         const topicLabel = TOPIC_LABELS_T[p.topic] || p.topic;
         const dateStr = p.created_at ? new Date(p.created_at * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
         const scoreColor = p.score >= 90 ? '#16A34A' : p.score >= 75 ? '#D97706' : '#DC2626';
         return `<circle class="trend-dot" cx="${xOf(i)}" cy="${yOf(p.score)}" r="4" fill="${dotColor}" stroke="white" stroke-width="1.5"
-          onclick="toggleTip(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"/>`;
+          onclick="toggleTip(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"
+          onmouseenter="showTipHover(event,${JSON.stringify(p.score)},${JSON.stringify(topicLabel)},${JSON.stringify(qText)},${JSON.stringify(dateStr)},${JSON.stringify(scoreColor)})"
+          onmouseleave="hideHover()"/>`;
       }).join('')}
     </svg>`;
 
@@ -667,19 +669,21 @@
   }
 
   var _activeDot = null;
+  var _hoverLocked = false; // true when click has locked a dot open
 
-  function toggleTip(e, score, topicLabel, qText, dateStr, scoreColor) {
+  function showTipHover(e, score, topicLabel, qText, dateStr, scoreColor) {
+    if (_hoverLocked) return; // click is showing a different dot — don't override
+    _renderTip(e.target, score, topicLabel, qText, dateStr, scoreColor);
+  }
+
+  function hideHover() {
+    if (_hoverLocked) return;
+    hideTip();
+  }
+
+  function _renderTip(dot, score, topicLabel, qText, dateStr, scoreColor) {
     const tip = document.getElementById('trendTooltip');
-    const dot = e.target;
-
-    // Clicking the same dot again — dismiss
-    if (_activeDot === dot) {
-      hideTip();
-      return;
-    }
-
-    // Deactivate previous dot
-    if (_activeDot) {
+    if (_activeDot && _activeDot !== dot) {
       _activeDot.setAttribute('r', '4');
       _activeDot.classList.remove('trend-dot-active');
     }
@@ -688,30 +692,41 @@
     dot.classList.add('trend-dot-active');
 
     tip.innerHTML =
+      '<div class="tip-date" style="margin-bottom:4px;">' + (dateStr || '') + '</div>' +
       '<div class="tip-topic" style="color:' + scoreColor + '">' + topicLabel + '</div>' +
       '<div class="tip-score" style="color:' + scoreColor + '">' + score + '<span style="font-size:12px;font-weight:400;color:var(--text-tertiary)">/100</span></div>' +
-      (qText ? '<div class="tip-q">' + qText + (qText.length >= 60 ? '…' : '') + '</div>' : '') +
-      (dateStr ? '<div class="tip-date">' + dateStr + '</div>' : '');
+      (qText ? '<div class="tip-q">' + qText + '</div>' : '');
 
     const wrap = dot.closest('.trend-chart-wrap');
     const wrapRect = wrap.getBoundingClientRect();
     const dotRect = dot.getBoundingClientRect();
-    const tipW = 230;
-    // Position above the dot
+    const tipW = 240;
     const dotCX = dotRect.left + dotRect.width / 2 - wrapRect.left;
     let left = dotCX - tipW / 2;
     if (left < 4) left = 4;
     if (left + tipW > wrapRect.width - 4) left = wrapRect.width - tipW - 4;
     const dotCY = dotRect.top + dotRect.height / 2 - wrapRect.top;
     tip.style.left = left + 'px';
-    tip.style.top = Math.max(4, dotCY - 90) + 'px';
-
+    tip.style.top = Math.max(4, dotCY - 100) + 'px';
     tip.classList.add('visible');
+  }
+
+  function toggleTip(e, score, topicLabel, qText, dateStr, scoreColor) {
+    const dot = e.target;
+    if (_activeDot === dot && _hoverLocked) {
+      // Clicking active locked dot — unlock and dismiss
+      _hoverLocked = false;
+      hideTip();
+      return;
+    }
+    _hoverLocked = true;
+    _renderTip(dot, score, topicLabel, qText, dateStr, scoreColor);
 
     // Dismiss on outside click
     setTimeout(function () {
       document.addEventListener('click', function outsideClick(ev) {
-        if (!tip.contains(ev.target) && ev.target !== dot) {
+        if (ev.target !== dot) {
+          _hoverLocked = false;
           hideTip();
           document.removeEventListener('click', outsideClick);
         }
