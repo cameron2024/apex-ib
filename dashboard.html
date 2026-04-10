@@ -791,7 +791,40 @@
   
   
 
-  </style>
+  
+  .summary-card { transition: border-color .15s, transform .15s, box-shadow .15s; }
+  .summary-card:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+  .modal-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 24px; border-bottom: 1px solid var(--border);
+    font-size: 13px; color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+  }
+  .modal-row:last-child { border-bottom: none; }
+  .modal-row-q { flex: 1; line-height: 1.5; }
+  .modal-row-score {
+    font-size: 12px; font-weight: 700; padding: 2px 8px;
+    border-radius: 20px; flex-shrink: 0;
+  }
+  .modal-row-score.high { background: #D1FAE5; color: #065F46; }
+  .modal-row-score.mid  { background: #FEF3C7; color: #B45309; }
+  .modal-row-score.low  { background: #FEE2E2; color: #B91C1C; }
+  .modal-tag {
+    font-size: 10.5px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; flex-shrink: 0;
+  }
+  .modal-section-header {
+    padding: 14px 24px 8px; font-size: 10px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-tertiary); background: var(--bg);
+    border-bottom: 1px solid var(--border); position: sticky; top: 0;
+  }
+  .modal-topic-bar-row { padding: 12px 24px; border-bottom: 1px solid var(--border); }
+  .modal-topic-bar-row:last-child { border-bottom: none; }
+  .modal-topic-label { font-size: 13px; font-weight: 500; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .modal-bar-track { height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .modal-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+  .modal-empty { padding: 48px 24px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
+</style>
 </head>
 <body data-page="dashboard">
 
@@ -817,22 +850,22 @@
 
   <!-- SUMMARY CARDS -->
   <div class="summary-bar">
-    <div class="summary-card green">
+    <div class="summary-card green" onclick="openModal('mastered')" style="cursor:pointer;">
       <div class="summary-label">Questions Mastered</div>
       <div class="summary-value" id="statMastered">—</div>
       <div class="summary-sub" id="statMasteredSub">of 565 total</div>
     </div>
-    <div class="summary-card amber">
+    <div class="summary-card amber" onclick="openModal('scores')" style="cursor:pointer;">
       <div class="summary-label">Avg. Score</div>
       <div class="summary-value" id="statAvgScore">—<span style="font-size:16px;color:var(--text-tertiary)">/100</span></div>
       <div class="summary-sub" id="statAvgScoreSub">No sessions yet</div>
     </div>
-    <div class="summary-card blue">
+    <div class="summary-card blue" onclick="openModal('topics')" style="cursor:pointer;">
       <div class="summary-label">Weakest Area</div>
       <div class="summary-value" id="statWeakest" style="font-size:20px;padding-top:4px;">—</div>
       <div class="summary-sub" id="statWeakestSub">Based on your scores</div>
     </div>
-    <div class="summary-card neutral">
+    <div class="summary-card neutral" onclick="openModal('sessions')" style="cursor:pointer;">
       <div class="summary-label">Sessions</div>
       <div class="summary-value" id="statSessions">—</div>
       <div class="summary-sub" id="statSessionsSub">Total questions answered</div>
@@ -887,6 +920,17 @@
     </div>
   </div>
 
+
+<!-- SUMMARY MODALS -->
+<div id="summaryModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="e => { if(e.target===this) closeModal(); }">
+  <div id="summaryModal" style="background:white;border-radius:16px;width:90%;max-width:640px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.18);overflow:hidden;">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div id="modalTitle" style="font-family:'DM Serif Display',serif;font-size:20px;letter-spacing:-.3px;"></div>
+      <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-tertiary);line-height:1;padding:4px 8px;">&times;</button>
+    </div>
+    <div id="modalBody" style="overflow-y:auto;flex:1;"></div>
+  </div>
+</div>
 </main>
 
 <script src="sidebar.js"></script>
@@ -1282,6 +1326,8 @@
             answeredByTopic[r.topic] = (answeredByTopic[r.topic] || 0) + 1;
           });
 
+          _modalResults = data.results || [];
+          _modalHistory = data.history || [];
           buildTopicCards(masteredByTopic, answeredByTopic);
           buildWeakSpots(data.results || [], data.history || []);
           buildRec(data.results || [], data.history || []);
@@ -1317,6 +1363,130 @@
       });
     }, 100);
   }
+
+
+  // ── SUMMARY CARD MODALS ─────────────────────────────────────────────────────
+  var _modalResults = [], _modalHistory = [];
+
+  function openModal(type) {
+    const overlay = document.getElementById('summaryModalOverlay');
+    const title   = document.getElementById('modalTitle');
+    const body    = document.getElementById('modalBody');
+    const TOPIC_LABELS_M = { Accounting:'Accounting', Enterprise_Value:'Enterprise Value', Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO' };
+    const TOPIC_TAG_COLORS = { Accounting:'#EEF2FF;color:#4338CA', Enterprise_Value:'#FFF7ED;color:#C2410C', Valuation:'#F0FDF4;color:#15803D', DCF:'#EFF6FF;color:#1D4ED8', Mergers_MA:'#FDF4FF;color:#7E22CE', LBO:'#FFF1F2;color:#BE123C' };
+    const tagStyle = t => { const c = TOPIC_TAG_COLORS[t] || 'var(--bg);color:var(--text-secondary)'; return 'background:#' + c; };
+    const scoreClass = s => s >= 85 ? 'high' : s >= 65 ? 'mid' : 'low';
+
+    function escM(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    if (type === 'mastered') {
+      title.textContent = 'Questions Mastered';
+      const mastered = _modalResults.filter(r => r.status === 'mastered');
+      if (!mastered.length) { body.innerHTML = '<div class="modal-empty">No mastered questions yet — keep practicing!</div>'; }
+      else {
+        const bestScore = {};
+        _modalHistory.forEach(h => { if (!bestScore[h.question_id] || h.score > bestScore[h.question_id]) bestScore[h.question_id] = h.score; });
+        body.innerHTML = mastered.map(r => {
+          const q = escM(trunc(Q_TEXT[r.question_id] || r.topic + ' question', 120));
+          const s = bestScore[r.question_id] || 95;
+          const tag = TOPIC_LABELS_M[r.topic] || r.topic;
+          const tc = TOPIC_TAG_COLORS[r.topic] || 'var(--bg);color:var(--text-secondary)';
+          return '<a class="modal-row" href="practice-screen.html?topic=' + r.topic + '&focus=' + r.question_id + '" style="text-decoration:none;color:inherit;">' +
+            '<div class="modal-row-q">' + q + '</div>' +
+            '<span class="modal-tag" style="background:' + tc.split(';')[0] + ';' + (tc.split(';')[1]||'') + '">' + tag + '</span>' +
+            '<span class="modal-row-score ' + scoreClass(s) + '">' + s + '/100</span>' +
+            '</a>';
+        }).join('');
+      }
+    }
+
+    else if (type === 'scores') {
+      title.textContent = 'Score Breakdown';
+      if (!_modalHistory.length) { body.innerHTML = '<div class="modal-empty">No answers yet — start practicing to see your scores.</div>'; }
+      else {
+        const bestByQ = {};
+        _modalHistory.forEach(h => { if (!bestByQ[h.question_id] || h.score > bestByQ[h.question_id].score) bestByQ[h.question_id] = h; });
+        const sorted = Object.values(bestByQ).sort((a,b) => b.score - a.score);
+        body.innerHTML = sorted.map(h => {
+          const q = escM(trunc(Q_TEXT[h.question_id] || h.topic + ' question', 120));
+          const tc = TOPIC_TAG_COLORS[h.topic] || 'var(--bg);color:var(--text-secondary)';
+          const tag = TOPIC_LABELS_M[h.topic] || h.topic;
+          return '<a class="modal-row" href="practice-screen.html?topic=' + h.topic + '&focus=' + h.question_id + '" style="text-decoration:none;color:inherit;">' +
+            '<div class="modal-row-q">' + q + '</div>' +
+            '<span class="modal-tag" style="background:' + tc.split(';')[0] + ';' + (tc.split(';')[1]||'') + '">' + tag + '</span>' +
+            '<span class="modal-row-score ' + scoreClass(h.score) + '">' + h.score + '/100</span>' +
+            '</a>';
+        }).join('');
+      }
+    }
+
+    else if (type === 'topics') {
+      title.textContent = 'Topic Averages';
+      if (!_modalHistory.length) { body.innerHTML = '<div class="modal-empty">No answers yet — practice questions to see topic averages.</div>'; }
+      else {
+        const topicData = {};
+        _modalHistory.forEach(h => {
+          if (!topicData[h.topic]) topicData[h.topic] = { scores:[], mastered:0 };
+          topicData[h.topic].scores.push(h.score);
+        });
+        _modalResults.forEach(r => { if (r.status === 'mastered' && topicData[r.topic]) topicData[r.topic].mastered++; });
+        const rows = Object.entries(topicData).map(([topic, d]) => {
+          const avg = Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length);
+          return { topic, avg, attempts: d.scores.length, mastered: d.mastered };
+        }).sort((a,b) => a.avg - b.avg);
+        const barColor = avg => avg >= 85 ? '#16A34A' : avg >= 65 ? '#D97706' : '#DC2626';
+        body.innerHTML = rows.map(r => {
+          const label = TOPIC_LABELS_M[r.topic] || r.topic;
+          return '<div class="modal-topic-bar-row">' +
+            '<div class="modal-topic-label"><span>' + label + '</span><span style="font-weight:700;">' + r.avg + '/100</span></div>' +
+            '<div class="modal-bar-track"><div class="modal-bar-fill" style="width:' + r.avg + '%;background:' + barColor(r.avg) + ';"></div></div>' +
+            '<div style="font-size:11px;color:var(--text-tertiary);margin-top:5px;">' + r.attempts + ' answer' + (r.attempts!==1?'s':'') + ' · ' + r.mastered + ' mastered</div>' +
+            '</div>';
+        }).join('');
+      }
+    }
+
+    else if (type === 'sessions') {
+      title.textContent = 'Session History';
+      if (!_modalHistory.length) { body.innerHTML = '<div class="modal-empty">No sessions yet — start practicing to track your sessions.</div>'; }
+      else {
+        const byDay = {};
+        _modalHistory.forEach(h => {
+          const d = new Date(h.created_at * 1000).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+          if (!byDay[d]) byDay[d] = { answers:[], scores:[] };
+          byDay[d].answers.push(h);
+          byDay[d].scores.push(h.score);
+        });
+        body.innerHTML = Object.entries(byDay).reverse().map(([date, d]) => {
+          const avg = Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length);
+          return '<div class="modal-section-header" style="position:static;">' + date + ' &nbsp;·&nbsp; ' + d.answers.length + ' answer' + (d.answers.length!==1?'s':'') + ' &nbsp;·&nbsp; avg ' + avg + '/100</div>' +
+            d.answers.slice(0,5).map(h => {
+              const q = escM(trunc(Q_TEXT[h.question_id] || h.topic + ' question', 100));
+              return '<a class="modal-row" href="practice-screen.html?topic=' + h.topic + '&focus=' + h.question_id + '" style="text-decoration:none;color:inherit;">' +
+                '<div class="modal-row-q">' + q + '</div>' +
+                '<span class="modal-row-score ' + scoreClass(h.score) + '">' + h.score + '/100</span>' +
+                '</a>';
+            }).join('') +
+            (d.answers.length > 5 ? '<div style="padding:8px 24px;font-size:12px;color:var(--text-tertiary);">+ ' + (d.answers.length-5) + ' more</div>' : '');
+        }).join('');
+      }
+    }
+
+    overlay.style.display = 'flex';
+    document.addEventListener('keydown', _modalEsc);
+  }
+
+  function closeModal() {
+    document.getElementById('summaryModalOverlay').style.display = 'none';
+    document.removeEventListener('keydown', _modalEsc);
+  }
+
+  function _modalEsc(e) { if (e.key === 'Escape') closeModal(); }
+
+  // Close on overlay click
+  document.getElementById('summaryModalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
 
   init();
   // ── HEATMAP ──────────────────────────────────────────────
