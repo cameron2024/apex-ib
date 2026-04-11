@@ -31,6 +31,7 @@
     flex-direction: column;
     gap: 20px;
     max-width: 640px;
+    margin: 0 auto;
   }
 
   .settings-card {
@@ -137,6 +138,19 @@
     white-space: nowrap;
   }
   .btn-avatar-change:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .btn-avatar-remove {
+    padding: 7px 14px;
+    background: none;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    font-family: inherit;
+    color: var(--accent-red);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-avatar-remove:hover { background: #FEF2F2; border-color: var(--accent-red); }
 
   /* ── BUTTONS ── */
   .card-footer {
@@ -169,6 +183,14 @@
     color: var(--text-tertiary);
     transition: all 0.2s;
   }
+  .forgot-link {
+    font-size: 12.5px;
+    color: var(--accent-blue);
+    text-decoration: none;
+    margin-left: auto;
+    margin-right: 10px;
+  }
+  .forgot-link:hover { text-decoration: underline; }
   .save-status.success { color: var(--accent-green); }
   .save-status.error   { color: var(--accent-red); }
 
@@ -290,6 +312,7 @@
             <div class="avatar-hint">Click photo to upload a new one</div>
           </div>
           <button class="btn-avatar-change" onclick="window._triggerAvatarUpload && window._triggerAvatarUpload(); setTimeout(refreshAvatar, 500);">Change photo</button>
+          <button class="btn-avatar-remove" id="removePhotoBtn" onclick="removePhoto()" style="display:none;">Remove</button>
         </div>
         <div class="field">
           <label for="nameInput">Display name</label>
@@ -336,6 +359,7 @@
       </div>
       <div class="card-footer">
         <span class="save-status" id="pwdStatus"></span>
+        <a href="auth.html?mode=forgot" class="forgot-link">Forgot password?</a>
         <button class="btn-save" id="pwdSaveBtn" onclick="savePassword()">Update password</button>
       </div>
     </div>
@@ -399,6 +423,7 @@
     const url = localStorage.getItem('apex_avatar');
     const el = document.getElementById('settingsAvatar');
     const existing = el.querySelector('img');
+    const removeBtn = document.getElementById('removePhotoBtn');
     if (url && !existing) {
       const img = document.createElement('img');
       img.src = url;
@@ -408,6 +433,21 @@
     } else if (!url && existing) {
       existing.remove();
     }
+    if (removeBtn) removeBtn.style.display = url ? '' : 'none';
+  }
+
+  function removePhoto() {
+    localStorage.removeItem('apex_avatar');
+    const el = document.getElementById('settingsAvatar');
+    const img = el.querySelector('img');
+    if (img) img.remove();
+    // Reset sidebar avatar too
+    const sidebarAv = document.getElementById('sidebarAvatar');
+    if (sidebarAv) {
+      sidebarAv.style.backgroundImage = '';
+      sidebarAv.textContent = initials;
+    }
+    document.getElementById('removePhotoBtn').style.display = 'none';
   }
   refreshAvatar();
 
