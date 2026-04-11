@@ -236,6 +236,10 @@
     // Hide upgrade button for paid users
     const upgradeBtn = document.getElementById('upgradeBtn');
     if (upgradeBtn && plan !== 'free') upgradeBtn.style.display = 'none';
+
+    // Re-apply avatar photo last — pages may have set textContent = initials
+    // after injectSidebar ran, which wipes child nodes including our <img>
+    applyAvatarToSidebar();
   }
 
   // ── USER MENU ─────────────────────────────────────────────
