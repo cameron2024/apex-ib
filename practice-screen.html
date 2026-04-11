@@ -703,22 +703,26 @@
 
   .next-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
     flex-wrap: wrap;
+    margin-top: 2px;
   }
 
   .btn-mark-mastered {
     background: none;
-    border: 1.5px solid var(--accent-green);
+    border: 1px solid var(--border);
     color: var(--accent-green);
     padding: 9px 16px;
     border-radius: var(--radius-sm);
     font-size: 13px;
     font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   /* ── SAVE BUTTON ── */
@@ -743,8 +747,8 @@
   .btn-save-question svg { flex-shrink: 0; }
 
   .btn-mark-mastered:hover {
-    background: var(--accent-green);
-    color: white;
+    border-color: var(--accent-green);
+    background: #F0FDF4;
   }
 
   /* MASTERY CELEBRATION */
@@ -1140,7 +1144,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <div class="feedback-section-title">What you got right</div>
-            <span class="feedback-section-count" id="correctCount"></span>
+
           </div>
           <div class="feedback-points" id="feedbackCorrect"></div>
         </div>
@@ -1151,7 +1155,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </div>
             <div class="feedback-section-title">What you missed or got wrong</div>
-            <span class="feedback-section-count" id="missedCount"></span>
+
           </div>
           <div class="feedback-points" id="feedbackMissed"></div>
         </div>
@@ -1726,14 +1730,14 @@ Return JSON only.`;
 
     // Correct points
     const correct = (result.correct || []).slice(0, 3);
-    document.getElementById('correctCount').textContent = correct.length ? correct.length + ' point' + (correct.length !== 1 ? 's' : '') : '';
+    document.getElementById('correctCount').textContent = '';
     document.getElementById('feedbackCorrect').innerHTML = correct.length
       ? correct.map(p => `<div class="feedback-point point-correct"><span class="point-dot green"></span><span>${p}</span></div>`).join('')
       : `<div class="feedback-point point-empty"><span class="point-dot gray"></span><span>Nothing clearly correct identified.</span></div>`;
 
     // Missed points
     const missed = (result.missed || []).slice(0, 3);
-    document.getElementById('missedCount').textContent = missed.length ? missed.length + ' point' + (missed.length !== 1 ? 's' : '') : '';
+    document.getElementById('missedCount').textContent = '';
     document.getElementById('feedbackMissed').innerHTML = missed.length
       ? missed.map(p => {
           const isCritical = p.toLowerCase().startsWith('critical');
