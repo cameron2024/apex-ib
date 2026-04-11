@@ -304,14 +304,14 @@
       </div>
       <div class="card-body">
         <div class="avatar-section">
-          <div class="settings-avatar" id="settingsAvatar" onclick="window._triggerAvatarUpload && window._triggerAvatarUpload(); refreshAvatar();" title="Change photo">
+          <div class="settings-avatar" id="settingsAvatar" onclick="window._triggerAvatarUpload()" title="Change photo">
             <span id="settingsAvatarInitials">?</span>
           </div>
           <div class="avatar-info">
             <div class="avatar-name" id="settingsAvatarName">—</div>
             <div class="avatar-hint">Click photo to upload a new one</div>
           </div>
-          <button class="btn-avatar-change" onclick="window._triggerAvatarUpload && window._triggerAvatarUpload(); setTimeout(refreshAvatar, 500);">Change photo</button>
+          <button class="btn-avatar-change" onclick="window._triggerAvatarUpload()">Change photo</button>
           <button class="btn-avatar-remove" id="removePhotoBtn" onclick="removePhoto()" style="display:none;">Remove</button>
         </div>
         <div class="field">
@@ -418,8 +418,46 @@
   document.getElementById('settingsAvatarInitials').textContent = initials;
   document.getElementById('settingsAvatarName').textContent = name || 'Your name';
 
-  // Apply avatar photo if set
-  function refreshAvatar() {
+  // Override _triggerAvatarUpload so refreshAvatar fires AFTER the image
+  // is fully processed and saved — not on a blind setTimeout
+  window._triggerAvatarUpload = function () {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const raw = new Image();
+        raw.onload = function () {
+          const canvas = document.createElement('canvas');
+          const SIZE = 220;
+          canvas.width = SIZE; canvas.height = SIZE;
+          const ctx = canvas.getContext('2d');
+          const min = Math.min(raw.width, raw.height);
+          const sx = (raw.width  - min) / 2;
+          const sy = (raw.height - min) / 2;
+          ctx.drawImage(raw, sx, sy, min, min, 0, 0, SIZE, SIZE);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          localStorage.setItem('apex_avatar', dataUrl);
+          // Update sidebar avatar manually (sidebar internals are in an IIFE)
+          const sidebarAv = document.getElementById('sidebarAvatar');
+          if (sidebarAv) {
+            sidebarAv.style.backgroundImage = 'url(' + dataUrl + ')';
+            sidebarAv.style.backgroundSize = 'cover';
+            sidebarAv.style.backgroundPosition = 'center';
+            sidebarAv.textContent = '';
+          }
+          // Now refresh the settings page avatar — data is guaranteed to be in localStorage
+          refreshAvatar();
+        };
+        raw.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
     const url = localStorage.getItem('apex_avatar');
     const el = document.getElementById('settingsAvatar');
     const existing = el.querySelector('img');
