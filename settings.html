@@ -444,10 +444,16 @@
           // Update sidebar avatar manually (sidebar internals are in an IIFE)
           const sidebarAv = document.getElementById('sidebarAvatar');
           if (sidebarAv) {
-            sidebarAv.style.backgroundImage = 'url(' + dataUrl + ')';
-            sidebarAv.style.backgroundSize = 'cover';
-            sidebarAv.style.backgroundPosition = 'center';
-            sidebarAv.textContent = '';
+            sidebarAv.style.position = 'relative';
+            let sidebarImg = sidebarAv.querySelector('img.sidebar-av-photo');
+            if (!sidebarImg) {
+              sidebarImg = document.createElement('img');
+              sidebarImg.className = 'sidebar-av-photo';
+              sidebarImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:1;';
+              sidebarAv.appendChild(sidebarImg);
+            }
+            sidebarImg.src = dataUrl;
+            sidebarAv.style.backgroundImage = '';
           }
           // Now refresh the settings page avatar — data is guaranteed to be in localStorage
           refreshAvatar();
@@ -488,8 +494,9 @@
     // Reset sidebar avatar too
     const sidebarAv = document.getElementById('sidebarAvatar');
     if (sidebarAv) {
+      const sidebarImg = sidebarAv.querySelector('img.sidebar-av-photo');
+      if (sidebarImg) sidebarImg.remove();
       sidebarAv.style.backgroundImage = '';
-      sidebarAv.textContent = initials;
     }
     document.getElementById('removePhotoBtn').style.display = 'none';
   }
