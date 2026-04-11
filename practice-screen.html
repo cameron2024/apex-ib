@@ -1610,8 +1610,8 @@ Return JSON only.`;
     document.getElementById('verdictBadge').style.opacity = '0.5';
     document.getElementById('feedbackCorrect').innerHTML = '<div class="feedback-point point-empty"><span class="point-dot gray"></span><span>Analyzing your answer…</span></div>';
     document.getElementById('feedbackMissed').innerHTML = '<div class="feedback-point point-empty"><span class="point-dot gray"></span><span>Identifying gaps…</span></div>';
-    document.getElementById('correctCount').textContent = '';
-    document.getElementById('missedCount').textContent = '';
+    const _cc = document.getElementById('correctCount'); if (_cc) _cc.textContent = '';
+    const _mc = document.getElementById('missedCount'); if (_mc) _mc.textContent = '';
     document.getElementById('modelAnswer').textContent = '';
     document.getElementById('modelAnswer').style.display = 'none';
     document.getElementById('modelAnswerToggle').classList.remove('open');
@@ -1730,14 +1730,14 @@ Return JSON only.`;
 
     // Correct points
     const correct = (result.correct || []).slice(0, 3);
-    document.getElementById('correctCount').textContent = '';
+    const _cc = document.getElementById('correctCount'); if (_cc) _cc.textContent = '';
     document.getElementById('feedbackCorrect').innerHTML = correct.length
       ? correct.map(p => `<div class="feedback-point point-correct"><span class="point-dot green"></span><span>${p}</span></div>`).join('')
       : `<div class="feedback-point point-empty"><span class="point-dot gray"></span><span>Nothing clearly correct identified.</span></div>`;
 
     // Missed points
     const missed = (result.missed || []).slice(0, 3);
-    document.getElementById('missedCount').textContent = '';
+    const _mc = document.getElementById('missedCount'); if (_mc) _mc.textContent = '';
     document.getElementById('feedbackMissed').innerHTML = missed.length
       ? missed.map(p => {
           const isCritical = p.toLowerCase().startsWith('critical');
