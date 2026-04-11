@@ -160,20 +160,34 @@ body {
 /* Plan rings */
 .user-avatar-wrap { position: relative; flex-shrink: 0; }
 .plan-ring { position: absolute; inset: -2px; border-radius: 50%; pointer-events: none; }
-.plan-ring-monthly { border: 2px solid #2563EB; }
+
+/* Free — warm-gray dashed ring, no glow */
+.plan-ring-free {
+  border: 1.5px dashed #B8B3AA;
+}
+
+/* Pro (monthly) — solid blue with outer glow */
+.plan-ring-monthly {
+  border: 2px solid #2563EB;
+  box-shadow: 0 0 0 2.5px rgba(37, 99, 235, 0.14), 0 0 10px rgba(37, 99, 235, 0.28);
+}
+
+/* Recruiting Pass — gold gradient, unchanged */
 .plan-ring-pass {
   border: 2px solid transparent;
   background: linear-gradient(var(--surface), var(--surface)) padding-box,
               linear-gradient(135deg, #D97706, #FCD34D, #D97706) border-box;
 }
+
 .plan-icon {
   position: absolute; bottom: -3px; right: -3px;
   width: 14px; height: 14px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 8px; border: 1.5px solid var(--surface);
 }
+.plan-icon-free    { background: #8C8680; color: white; }
 .plan-icon-monthly { background: #2563EB; color: white; }
-.plan-icon-pass { background: #D97706; color: white; }
+.plan-icon-pass    { background: #D97706; color: white; }
 
 /* ── USER MENU POPUP ─────────────────────────────────────── */
 .user-menu {
@@ -233,7 +247,7 @@ body {
   font-size: 10.5px; font-weight: 600; margin-top: 5px;
   padding: 2px 8px; border-radius: 20px; letter-spacing: .01em;
 }
-.badge-free    { background: var(--bg);  color: var(--text-tertiary); border: 1px solid var(--border); }
+.badge-free    { background: #EFEDE9; color: #78736C; border: 1px solid #C4C0B8; }
 .badge-monthly { background: #EFF6FF;    color: #2563EB; }
 .badge-pass    { background: #FEF3C7;    color: #D97706; }
 

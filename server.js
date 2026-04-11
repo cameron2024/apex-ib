@@ -321,6 +321,51 @@ const server = http.createServer(async (req, res) => {
     } catch(e){console.error('Webhook error:',e.message);return json(res,400,{error:e.message});}
   }
 
+  // AUTH: CHANGE PASSWORD
+  if (req.method==='POST' && url==='/api/auth/change-password') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {currentPassword,newPassword} = await readBody(req);
+      if(!currentPassword||!newPassword) return json(res,400,{error:'Both fields required'});
+      if(newPassword.length<6) return json(res,400,{error:'New password must be at least 6 characters'});
+      const r = await pool.query('SELECT password_hash FROM users WHERE id=$1',[user.userId]);
+      if(!r.rows[0]||!checkPwd(currentPassword,r.rows[0].password_hash)) return json(res,401,{error:'Current password is incorrect'});
+      await pool.query('UPDATE users SET password_hash=$1 WHERE id=$2',[hashPwd(newPassword),user.userId]);
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // AUTH: UPDATE PROFILE (display name)
+  if (req.method==='POST' && url==='/api/auth/update-profile') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {name} = await readBody(req);
+      if(!name||!name.trim()) return json(res,400,{error:'Name required'});
+      const displayName = name.trim().slice(0,80);
+      await pool.query('UPDATE users SET name=$1 WHERE id=$2',[displayName,user.userId]);
+      return json(res,200,{ok:true,name:displayName});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // STRIPE: BILLING PORTAL
+  if (req.method==='POST' && url==='/api/stripe/portal') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    if(!STRIPE_SECRET_KEY) return json(res,503,{error:'Stripe not configured'});
+    try {
+      const r = await pool.query('SELECT stripe_customer_id FROM users WHERE id=$1',[user.userId]);
+      const customerId = r.rows[0]?.stripe_customer_id;
+      if(!customerId) return json(res,400,{error:'No billing account found. Please contact support.'});
+      const session = await stripeRequest('POST','/v1/billing_portal/sessions',{
+        customer: customerId,
+        return_url: APP_URL+'/billing.html'
+      });
+      if(session.error) return json(res,400,{error:session.error.message});
+      return json(res,200,{url:session.url});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // NEW ENDPOINTS INSERTED ABOVE
+
   // ADMIN: SET PLAN
   if (req.method==='POST' && url==='/api/admin/set-plan') {
     const adminKey=req.headers['x-admin-secret']||'';

@@ -330,29 +330,6 @@
 
   .word-count { font-size: 12px; color: var(--text-tertiary); }
 
-  .shortcut-hint {
-    font-size: 12px;
-    color: var(--text-tertiary);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: opacity 0.4s ease;
-  }
-  .shortcut-hint.hidden { opacity: 0; pointer-events: none; }
-  .shortcut-key {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    background: var(--bg);
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 11px;
-    font-family: inherit;
-    color: var(--text-secondary);
-    letter-spacing: 0.01em;
-  }
-
   /* VOICE INPUT */
   .voice-panel {
     background: var(--surface);
@@ -1046,10 +1023,6 @@
         <textarea class="answer-textarea" id="answerTextarea" placeholder="Type your answer here. Be specific — imagine you're sitting across from an interviewer..." oninput="updateWordCount()"></textarea>
         <div class="textarea-footer">
           <span class="word-count" id="wordCount">0 words</span>
-          <span class="shortcut-hint" id="shortcutHint">
-            <span class="shortcut-key" id="shortcutKeyLabel"></span>
-            to submit
-          </span>
         </div>
       </div>
     </div>
@@ -1417,13 +1390,6 @@
   // ─── SUBMIT ───────────────────────────────────────────────
   // ─── SUBMIT ───────────────────────────────────────────────
   async function submitAnswer() {
-
-    // Dismiss shortcut hint after first use
-    if (!localStorage.getItem('apex_seen_shortcut')) {
-      localStorage.setItem('apex_seen_shortcut', '1');
-      const hint = document.getElementById('shortcutHint');
-      if (hint) hint.classList.add('hidden');
-    }
 
     const overlay = document.getElementById('analyzingOverlay');
 
@@ -2292,7 +2258,8 @@ Generate 3 drill questions targeting this exact gap.`;
     if (userPlan === 'guest') {
       gradedToday++;
       window._gradedToday = gradedToday;
-      const guestKey = 'apex_guest_grades_' + new Date().toISOString().slice(0,10);
+      const _gd2 = new Date();
+      const guestKey = 'apex_guest_grades_' + _gd2.getFullYear() + '-' + String(_gd2.getMonth()+1).padStart(2,'0') + '-' + String(_gd2.getDate()).padStart(2,'0');
       localStorage.setItem(guestKey, String(gradedToday));
       updatePlanUI();
     }
@@ -2481,7 +2448,8 @@ Generate 3 drill questions targeting this exact gap.`;
   if (!localStorage.getItem('apex_token')) {
     userPlan = 'guest';
     window._userPlan = 'guest';
-    const guestKey = 'apex_guest_grades_' + new Date().toISOString().slice(0,10);
+    const _gd = new Date();
+    const guestKey = 'apex_guest_grades_' + _gd.getFullYear() + '-' + String(_gd.getMonth()+1).padStart(2,'0') + '-' + String(_gd.getDate()).padStart(2,'0');
     gradedToday = parseInt(localStorage.getItem(guestKey) || '0');
     window._gradedToday = gradedToday;
     const nameEl = document.getElementById('sidebarUserName');
@@ -2511,18 +2479,6 @@ Generate 3 drill questions targeting this exact gap.`;
 
 
   // ── KEYBOARD SHORTCUTS ───────────────────────────────────
-  // ── SHORTCUT HINT INIT ──
-  (function initShortcutHint() {
-    const hint = document.getElementById('shortcutHint');
-    const label = document.getElementById('shortcutKeyLabel');
-    if (!hint || !label) return;
-    const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
-    label.textContent = isMac ? '⌘ Enter' : 'Ctrl + Enter';
-    if (localStorage.getItem('apex_seen_shortcut')) {
-      hint.classList.add('hidden');
-    }
-  })();
-
   document.addEventListener('keydown', function(e) {
     // Cmd+Enter (Mac) or Ctrl+Enter (Windows) — next question
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {

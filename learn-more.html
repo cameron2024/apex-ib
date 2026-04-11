@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn More — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .page-header {
+    animation: fadeUp 0.35s ease both;
+    margin-bottom: 36px;
+  }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .page-sub { font-size: 14px; color: var(--text-secondary); }
+
+  .content-col { max-width: 680px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* ── HERO BANNER ── */
+  .hero-banner {
+    background: var(--text-primary);
+    border-radius: var(--radius);
+    padding: 32px 36px;
+    color: white;
+    animation: fadeUp 0.35s ease 0.05s both;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-banner::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+  }
+  .hero-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: 60px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 10px;
+  }
+  .hero-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    letter-spacing: -0.4px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .hero-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.72);
+    max-width: 480px;
+    position: relative;
+  }
+
+  /* ── SECTION CARDS ── */
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp 0.35s ease both;
+  }
+  .section-card:nth-child(3) { animation-delay: 0.08s; }
+  .section-card:nth-child(4) { animation-delay: 0.12s; }
+  .section-card:nth-child(5) { animation-delay: 0.16s; }
+  .section-card:nth-child(6) { animation-delay: 0.20s; }
+
+  .section-header {
+    padding: 18px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .section-title { font-size: 14px; font-weight: 600; }
+  .section-sub   { font-size: 12.5px; color: var(--text-tertiary); margin-top: 1px; }
+
+  .section-body { padding: 20px 24px; }
+
+  /* ── HOW IT WORKS STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    padding: 0 0 20px 0;
+    position: relative;
+  }
+  .step:last-child { padding-bottom: 0; }
+  .step-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .step-connector {
+    width: 1px;
+    flex: 1;
+    background: var(--border);
+    margin: 6px 0;
+    min-height: 20px;
+  }
+  .step:last-child .step-connector { display: none; }
+  .step-content { flex: 1; padding-top: 4px; }
+  .step-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ── TOPIC GRID ── */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 500px) { .topic-grid { grid-template-columns: 1fr; } }
+
+  .topic-tile {
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: border-color 0.15s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .topic-tile:hover { border-color: var(--border-strong); }
+
+  .topic-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .dot-accounting  { background: #4338CA; }
+  .dot-enterprise  { background: #C2410C; }
+  .dot-valuation   { background: #15803D; }
+  .dot-dcf         { background: #1D4ED8; }
+  .dot-ma          { background: #7E22CE; }
+  .dot-lbo         { background: #BE123C; }
+
+  .topic-tile-name  { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
+  .topic-tile-count { font-size: 12px; color: var(--text-tertiary); }
+
+  /* ── FAQ ── */
+  .faq-list { display: flex; flex-direction: column; gap: 0; }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+  }
+  .faq-item:last-child { border-bottom: none; }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-primary);
+    user-select: none;
+  }
+  .faq-question:hover { color: var(--text-primary); }
+  .faq-chevron {
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+    color: var(--text-tertiary);
+    transition: transform 0.2s ease;
+  }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); }
+
+  .faq-answer {
+    display: none;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    padding: 0 0 14px 0;
+  }
+  .faq-item.open .faq-answer { display: block; }
+
+  /* ── CTA ── */
+  .cta-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    animation: fadeUp 0.35s ease 0.24s both;
+  }
+  .cta-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .cta-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .cta-btns { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .btn-cta-primary {
+    padding: 10px 22px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .btn-cta-primary:hover { opacity: 0.85; }
+  .btn-cta-outline {
+    padding: 10px 22px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .btn-cta-outline:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+  .contact-line {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin-top: 16px;
+  }
+  .contact-line a { color: var(--accent-blue); text-decoration: none; }
+  .contact-line a:hover { text-decoration: underline; }
+</style>
+</head>
+
+<body data-page="learn-more">
+<div id="sidebar-mount"></div>
+
+<main class="main">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Learn More</div>
+      <div class="page-sub">Everything you need to know about Apex</div>
+    </div>
+  </div>
+
+  <div class="content-col">
+
+    <!-- HERO -->
+    <div class="hero-banner">
+      <div class="hero-eyebrow">About Apex</div>
+      <div class="hero-heading">The smarter way to prep<br>for IB interviews</div>
+      <div class="hero-body">Apex is an AI-powered interview prep platform built specifically for investment banking. Instead of flashcards, Apex grades your actual spoken or typed answers the same way a real interviewer would — and tells you exactly what you missed.</div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">⚡</div>
+        <div>
+          <div class="section-title">How it works</div>
+          <div class="section-sub">Three steps from question to feedback</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-line">
+              <div class="step-num">1</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-label">Pick a topic or question</div>
+              <div class="step-desc">Browse 565 questions across Accounting, Valuation, DCF, M&A, LBO, and Enterprise Value — or let Apex surface your weakest areas automatically.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-line">
+              <div class="step-num">2</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-label">Answer by text or voice</div>
+              <div class="step-desc">Type your answer or record it out loud to simulate the real interview environment. Both modes feed into the same grading system.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-line">
+              <div class="step-num">3</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-label">Get AI-graded feedback</div>
+              <div class="step-desc">Apex scores your answer and explains exactly what was strong, what was missing, and what a model response looks like. Your results feed into performance tracking over time.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOPICS -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">📚</div>
+        <div>
+          <div class="section-title">Question categories</div>
+          <div class="section-sub">565 questions across 6 core IB topics</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <a class="topic-tile" href="practice-screen.html?topic=Accounting">
+            <div class="topic-dot dot-accounting"></div>
+            <div>
+              <div class="topic-tile-name">Accounting</div>
+              <div class="topic-tile-count">Financial statements, ratios, adjustments</div>
+            </div>
+          </a>
+          <a class="topic-tile" href="practice-screen.html?topic=Valuation">
+            <div class="topic-dot dot-valuation"></div>
+            <div>
+              <div class="topic-tile-name">Valuation</div>
+              <div class="topic-tile-count">Comps, precedents, methodologies</div>
+            </div>
+          </a>
+          <a class="topic-tile" href="practice-screen.html?topic=DCF">
+            <div class="topic-dot dot-dcf"></div>
+            <div>
+              <div class="topic-tile-name">Discounted Cash Flow</div>
+              <div class="topic-tile-count">WACC, FCF, terminal value</div>
+            </div>
+          </a>
+          <a class="topic-tile" href="practice-screen.html?topic=Mergers_MA">
+            <div class="topic-dot dot-ma"></div>
+            <div>
+              <div class="topic-tile-name">Mergers &amp; Acquisitions</div>
+              <div class="topic-tile-count">Deal structures, accretion/dilution</div>
+            </div>
+          </a>
+          <a class="topic-tile" href="practice-screen.html?topic=LBO">
+            <div class="topic-dot dot-lbo"></div>
+            <div>
+              <div class="topic-tile-name">Leveraged Buyouts</div>
+              <div class="topic-tile-count">Returns, debt structures, PE mechanics</div>
+            </div>
+          </a>
+          <a class="topic-tile" href="practice-screen.html?topic=Enterprise_Value">
+            <div class="topic-dot dot-enterprise"></div>
+            <div>
+              <div class="topic-tile-name">Enterprise Value</div>
+              <div class="topic-tile-count">EV vs equity, bridge items, multiples</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">💬</div>
+        <div>
+          <div class="section-title">FAQ</div>
+          <div class="section-sub">Common questions</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="faq-list">
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              How does the AI grading actually work?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="faq-answer">Apex sends your answer to an AI model alongside the question and a detailed grading rubric built by experienced bankers. The model evaluates correctness, depth, and clarity — and returns a structured score with specific feedback. It's the same evaluation loop a senior analyst would do in your head after an interview, automated.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              What's the difference between Monthly Pro and the Recruiting Pass?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="faq-answer">Monthly Pro is a recurring subscription ($29/month) with unlimited grading and all platform features. The Recruiting Pass is a one-time payment ($99) for lifetime access — better value if you're prepping over a full cycle and don't want to think about a recurring charge.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              Can I practice for free without an account?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="faq-answer">Yes. Guests get 5 AI-graded answers per day without signing up. Creating a free account also gives you 5 daily grades, but adds performance tracking, saved questions, and weak spot analysis that persist between sessions.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              How do I cancel my subscription?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="faq-answer">Go to Subscription in your account menu and click "Manage billing." This opens the Stripe billing portal where you can cancel, update your payment method, or download invoices. Your access continues until the end of the billing period.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              Does voice mode work the same as text mode?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="faq-answer">Yes — voice responses are transcribed and evaluated using the same grading model as text. Voice mode is useful for simulating a real interview cadence, but the feedback quality is identical. For best results, use Chrome on desktop.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              What level are the questions — junior analyst, senior?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="faq-answer">Questions are calibrated for IB first-round and superday interviews — the level you'd face recruiting for analyst and associate roles. Each question is tagged Basic or Advanced. Advanced questions match the depth interviewers at BB and EB firms typically probe for.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-card">
+      <div class="cta-title">Ready to start?</div>
+      <div class="cta-sub">Jump into the question bank and see where you stand. No prep required — the feedback tells you exactly what to work on.</div>
+      <div class="cta-btns">
+        <a class="btn-cta-primary" href="practice-screen.html">Start practicing</a>
+        <a class="btn-cta-outline" href="pricing.html">View pricing</a>
+      </div>
+      <div class="contact-line">Questions? Reach out at <a href="mailto:support@apex-ib.com">support@apex-ib.com</a></div>
+    </div>
+
+  </div>
+</main>
+
+<script src="sidebar.js"></script>
+<script>
+  const token = localStorage.getItem('apex_token');
+  const name  = localStorage.getItem('apex_user') || '';
+
+  if (token) {
+    fetch('/api/progress/load', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json()).then(data => {
+        window._userPlan = data.plan || 'free';
+        window._gradedToday = data.gradedToday || 0;
+        window._memberSince = data.memberSince || null;
+        initSidebarMenu(window._userPlan, window._gradedToday);
+        const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const avatarEl = document.getElementById('sidebarAvatar');
+        const nameEl   = document.getElementById('sidebarUserName');
+        if (avatarEl) avatarEl.textContent = initials;
+        if (nameEl)   nameEl.textContent = name;
+      }).catch(() => {});
+  } else {
+    // Guest
+    window._userPlan = 'guest';
+    const _gd = new Date();
+    const guestKey = 'apex_guest_grades_' + _gd.getFullYear() + '-' + String(_gd.getMonth()+1).padStart(2,'0') + '-' + String(_gd.getDate()).padStart(2,'0');
+    window._gradedToday = parseInt(localStorage.getItem(guestKey) || '0');
+    initSidebarMenu('guest', window._gradedToday);
+    const nameEl = document.getElementById('sidebarUserName');
+    if (nameEl) nameEl.textContent = 'Guest';
+  }
+
+  function toggleFaq(questionEl) {
+    const item = questionEl.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+</script>
+</body>
+</html>

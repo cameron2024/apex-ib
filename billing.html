@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscription — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    animation: fadeUp 0.35s ease both;
+  }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .page-sub { font-size: 14px; color: var(--text-secondary); }
+
+  .billing-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 640px;
+  }
+
+  /* ── CURRENT PLAN CARD ── */
+  .plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp 0.35s ease both;
+  }
+
+  .plan-card-body {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .plan-badge-large {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .plan-badge-free    { background: #EFEDE9; border: 1.5px dashed #B8B3AA; }
+  .plan-badge-monthly {
+    background: #EFF6FF;
+    border: 2px solid #2563EB;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.10), 0 0 12px rgba(37,99,235,0.20);
+  }
+  .plan-badge-pass    {
+    background: #FEF3C7;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    box-shadow: 0 0 0 2px #D97706;
+  }
+
+  .plan-info { flex: 1; }
+  .plan-name { font-size: 17px; font-weight: 600; margin-bottom: 3px; }
+  .plan-name-free    { color: var(--text-primary); }
+  .plan-name-monthly { color: #2563EB; }
+  .plan-name-pass    { color: #D97706; }
+  .plan-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+  .plan-price {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .plan-price-amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .plan-price-period { font-size: 12px; color: var(--text-tertiary); }
+
+  .plan-features {
+    padding: 0 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .plan-feature {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+  }
+  .plan-feature svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--accent-green); }
+
+  .plan-card-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary-billing {
+    padding: 9px 18px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary-billing:hover { opacity: 0.85; }
+  .btn-primary-billing.blue { background: #2563EB; }
+  .btn-primary-billing.amber { background: #D97706; }
+
+  .btn-outline-billing {
+    padding: 8px 16px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-outline-billing:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+  .btn-cancel-sub {
+    padding: 8px 16px;
+    background: none;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--accent-red);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: auto;
+  }
+  .btn-cancel-sub:hover { background: #FEF2F2; border-color: var(--accent-red); }
+
+  /* ── UPGRADE CARD ── */
+  .upgrade-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    animation: fadeUp 0.35s ease 0.05s both;
+  }
+
+  .upgrade-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .upgrade-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .upgrade-card-sub { font-size: 12.5px; color: var(--text-tertiary); margin-top: 1px; }
+
+  .upgrade-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 500px) { .upgrade-options { grid-template-columns: 1fr; } }
+
+  .upgrade-option {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .upgrade-option:hover { border-color: var(--border-strong); }
+  .upgrade-option.highlighted { border-color: #2563EB; background: #F8FBFF; }
+  .upgrade-option.highlighted-pass { border-color: #D97706; background: #FFFBF2; }
+
+  .upgrade-option-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .upgrade-option-price {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -0.4px;
+    margin-bottom: 8px;
+  }
+  .upgrade-option-price span { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text-tertiary); }
+  .upgrade-option-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+  .upgrade-option-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: #2563EB;
+    color: white;
+  }
+  .upgrade-option-badge.pass { background: #D97706; }
+
+  .upgrade-cta {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+  }
+
+  /* ── INFO CARD ── */
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    animation: fadeUp 0.35s ease 0.1s both;
+  }
+  .info-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .info-card-title svg { width: 14px; height: 14px; opacity: 0.6; }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row-label { color: var(--text-secondary); }
+  .info-row-value { font-weight: 500; color: var(--text-primary); }
+  .info-row-value.green { color: var(--accent-green); }
+  .info-row-value.blue  { color: #2563EB; }
+  .info-row-value.amber { color: #D97706; }
+
+  /* ── PORTAL SPINNER ── */
+  .portal-loading {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-tertiary);
+  }
+  .portal-loading.show { display: flex; }
+  .spin {
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--text-secondary);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+
+<body data-page="billing">
+<div id="sidebar-mount"></div>
+
+<main class="main">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Subscription</div>
+      <div class="page-sub" id="billingSubtitle">Manage your plan and billing</div>
+    </div>
+  </div>
+
+  <div class="billing-layout" id="billingLayout">
+    <!-- Populated by JS -->
+    <div style="padding:60px 0;text-align:center;color:var(--text-tertiary);font-size:14px;">Loading…</div>
+  </div>
+
+</main>
+
+<script src="sidebar.js"></script>
+<script>
+  const token = localStorage.getItem('apex_token');
+  if (!token) { window.location.href = 'auth.html'; }
+
+  const PLAN_FEATURES = {
+    free: [
+      '5 AI-graded answers per day',
+      'Access to all 6 question categories',
+      'Basic feedback on each answer',
+    ],
+    monthly: [
+      'Unlimited AI-graded answers',
+      'Access to all 565+ questions',
+      'Detailed feedback with scoring rubrics',
+      'Performance tracking & weak spot analysis',
+      'Saved questions library',
+    ],
+    pass: [
+      'Everything in Monthly Pro',
+      'One-time payment — no subscription',
+      'Lifetime access to all questions',
+      'Priority updates and new content',
+    ]
+  };
+
+  let userPlan = 'free';
+  let gradedToday = 0;
+  let memberSince = null;
+
+  async function loadBilling() {
+    try {
+      const r = await fetch('/api/progress/load', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await r.json();
+      userPlan    = data.plan || 'free';
+      gradedToday = data.gradedToday || 0;
+      memberSince = data.memberSince || null;
+
+      window._userPlan = userPlan;
+      window._gradedToday = gradedToday;
+      window._memberSince = memberSince;
+
+      const name = localStorage.getItem('apex_user') || '';
+      const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const avatarEl = document.getElementById('sidebarAvatar');
+      const nameEl   = document.getElementById('sidebarUserName');
+      if (avatarEl) avatarEl.textContent = initials;
+      if (nameEl)   nameEl.textContent = name;
+
+      initSidebarMenu(userPlan, gradedToday);
+      renderBilling();
+    } catch(e) {
+      document.getElementById('billingLayout').innerHTML =
+        `<div style="padding:60px 0;text-align:center;color:var(--accent-red);font-size:14px;">Failed to load billing info.</div>`;
+    }
+  }
+
+  function renderBilling() {
+    const layout = document.getElementById('billingLayout');
+    layout.innerHTML = '';
+
+    // ── CURRENT PLAN CARD ──
+    const planCard = document.createElement('div');
+    planCard.className = 'plan-card';
+
+    const planEmoji   = userPlan === 'pass' ? '◆' : userPlan === 'monthly' ? '★' : '○';
+    const planLabel   = userPlan === 'pass' ? 'Recruiting Pass' : userPlan === 'monthly' ? 'Monthly Pro' : 'Free';
+    const planClass   = userPlan === 'pass' ? 'pass' : userPlan === 'monthly' ? 'monthly' : 'free';
+    const priceAmount = userPlan === 'pass' ? '$99' : userPlan === 'monthly' ? '$29' : '$0';
+    const pricePeriod = userPlan === 'pass' ? 'one-time' : userPlan === 'monthly' ? '/ month' : 'forever';
+    const planDesc    = userPlan === 'pass'
+      ? 'Full lifetime access with one payment. No subscription, no renewal.'
+      : userPlan === 'monthly'
+      ? 'Unlimited grading, full question bank, performance analytics.'
+      : 'Limited grading to help you get started.';
+
+    const features = PLAN_FEATURES[userPlan] || PLAN_FEATURES.free;
+    const featuresHtml = features.map(f => `
+      <div class="plan-feature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        ${f}
+      </div>`).join('');
+
+    const memberLine = memberSince
+      ? `<div class="info-row"><span class="info-row-label">Member since</span><span class="info-row-value">${new Date(memberSince*1000).toLocaleDateString('en-US',{month:'long',year:'numeric'})}</span></div>`
+      : '';
+
+    const footerBtns = userPlan === 'free'
+      ? `<button class="btn-primary-billing blue" onclick="window.startCheckout('monthly')">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+           Upgrade to Pro
+         </button>
+         <button class="btn-outline-billing" onclick="window.startCheckout('pass')">Get Recruiting Pass</button>`
+      : userPlan === 'monthly'
+      ? `<button class="btn-primary-billing amber" onclick="window.startCheckout('pass')">
+           ◆ Upgrade to Recruiting Pass
+         </button>
+         <button class="btn-outline-billing" id="portalBtn" onclick="openPortal()">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+           Manage billing
+         </button>
+         <span class="portal-loading" id="portalLoading"><span class="spin"></span>Opening portal…</span>
+         <button class="btn-cancel-sub" onclick="openPortal()">Cancel subscription</button>`
+      : `<button class="btn-outline-billing" id="portalBtn" onclick="openPortal()">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+           Manage billing
+         </button>
+         <span class="portal-loading" id="portalLoading"><span class="spin"></span>Opening portal…</span>`;
+
+    planCard.innerHTML = `
+      <div class="plan-card-body">
+        <div class="plan-badge-large plan-badge-${planClass}">${planEmoji}</div>
+        <div class="plan-info">
+          <div class="plan-name plan-name-${planClass}">${planLabel}</div>
+          <div class="plan-desc">${planDesc}</div>
+        </div>
+        <div class="plan-price">
+          <div class="plan-price-amount">${priceAmount}</div>
+          <div class="plan-price-period">${pricePeriod}</div>
+        </div>
+      </div>
+      <div class="plan-features">${featuresHtml}</div>
+      <div class="plan-card-footer">${footerBtns}</div>`;
+
+    layout.appendChild(planCard);
+
+    // ── ACCOUNT INFO CARD ──
+    const infoCard = document.createElement('div');
+    infoCard.className = 'info-card';
+    const gradesLeft = Math.max(0, 5 - gradedToday);
+    const gradesLine = userPlan === 'free'
+      ? `<div class="info-row"><span class="info-row-label">Grades remaining today</span><span class="info-row-value ${gradesLeft > 0 ? '' : 'green'}">${gradesLeft} of 5</span></div>`
+      : `<div class="info-row"><span class="info-row-label">Grades</span><span class="info-row-value green">Unlimited</span></div>`;
+    const statusLine = `<div class="info-row"><span class="info-row-label">Plan status</span><span class="info-row-value ${planClass === 'free' ? '' : planClass}">${userPlan === 'pass' ? 'Active — Lifetime' : userPlan === 'monthly' ? 'Active — Monthly' : 'Free tier'}</span></div>`;
+
+    infoCard.innerHTML = `
+      <div class="info-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Account details
+      </div>
+      ${statusLine}
+      ${gradesLine}
+      ${memberLine}`;
+
+    layout.appendChild(infoCard);
+  }
+
+  // ── STRIPE PORTAL ──
+  async function openPortal() {
+    const btn = document.getElementById('portalBtn');
+    const loading = document.getElementById('portalLoading');
+    if (btn) btn.style.display = 'none';
+    if (loading) loading.classList.add('show');
+    try {
+      const r = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+      });
+      const data = await r.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Could not open billing portal. Please contact support.');
+        if (btn) btn.style.display = '';
+        if (loading) loading.classList.remove('show');
+      }
+    } catch(e) {
+      alert('Something went wrong. Please try again.');
+      if (btn) btn.style.display = '';
+      if (loading) loading.classList.remove('show');
+    }
+  }
+
+  loadBilling();
+</script>
+</body>
+</html>

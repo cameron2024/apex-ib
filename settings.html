@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    animation: fadeUp 0.35s ease both;
+  }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .page-sub { font-size: 14px; color: var(--text-secondary); }
+
+  /* ── SETTINGS LAYOUT ── */
+  .settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 640px;
+  }
+
+  .settings-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp 0.35s ease both;
+  }
+  .settings-card:nth-child(2) { animation-delay: 0.05s; }
+  .settings-card:nth-child(3) { animation-delay: 0.10s; }
+
+  .card-header {
+    padding: 18px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-header-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-header-icon svg { width: 14px; height: 14px; opacity: 0.7; }
+  .card-header-text { flex: 1; }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .card-desc  { font-size: 12.5px; color: var(--text-tertiary); margin-top: 1px; }
+
+  .card-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── FORM FIELDS ── */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field-row { display: flex; gap: 12px; }
+  .field-row .field { flex: 1; }
+
+  label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus { border-color: var(--border-strong); background: white; }
+  input:disabled { opacity: 0.5; cursor: not-allowed; }
+  input.error { border-color: var(--accent-red); }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  /* ── AVATAR SECTION ── */
+  .avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  .settings-avatar {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 600; color: white;
+    flex-shrink: 0;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+  }
+  .settings-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .avatar-info { flex: 1; }
+  .avatar-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .avatar-hint { font-size: 12px; color: var(--text-tertiary); }
+  .btn-avatar-change {
+    padding: 7px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    font-family: inherit;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-avatar-change:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+  /* ── BUTTONS ── */
+  .card-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--bg);
+  }
+
+  .btn-save {
+    padding: 8px 18px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-save:hover { opacity: 0.85; }
+  .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .save-status {
+    font-size: 12.5px;
+    color: var(--text-tertiary);
+    transition: all 0.2s;
+  }
+  .save-status.success { color: var(--accent-green); }
+  .save-status.error   { color: var(--accent-red); }
+
+  /* ── DANGER ZONE ── */
+  .danger-card { border-color: #FEE2E2; }
+  .danger-card .card-header { border-color: #FEE2E2; }
+  .danger-card .card-header-icon { background: #FEF2F2; border-color: #FECACA; }
+  .danger-card .card-header-icon svg { color: var(--accent-red); opacity: 1; }
+  .danger-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .danger-item-text { flex: 1; }
+  .danger-item-label { font-size: 13.5px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+  .danger-item-desc  { font-size: 12px; color: var(--text-tertiary); }
+  .btn-danger {
+    padding: 7px 14px;
+    background: none;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    font-family: inherit;
+    color: var(--accent-red);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-danger:hover { background: #FEF2F2; border-color: var(--accent-red); }
+
+  /* ── DELETE CONFIRM MODAL ── */
+  .modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.15s ease both;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: white;
+    border-radius: 14px;
+    padding: 28px 28px 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    animation: modalPop 0.2s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes modalPop {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-icon { font-size: 28px; margin-bottom: 12px; }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 8px; }
+  .modal-desc { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn-modal-cancel {
+    padding: 8px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-family: inherit;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-modal-cancel:hover { border-color: var(--border-strong); }
+  .btn-modal-confirm {
+    padding: 8px 16px;
+    background: var(--accent-red);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-family: inherit; font-weight: 500;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .btn-modal-confirm:hover { opacity: 0.85; }
+</style>
+</head>
+
+<body data-page="settings">
+<div id="sidebar-mount"></div>
+
+<main class="main">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Manage your account and preferences</div>
+    </div>
+  </div>
+
+  <div class="settings-grid">
+
+    <!-- PROFILE -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="card-header-text">
+          <div class="card-title">Profile</div>
+          <div class="card-desc">Your name and photo</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="avatar-section">
+          <div class="settings-avatar" id="settingsAvatar" onclick="window._triggerAvatarUpload && window._triggerAvatarUpload(); refreshAvatar();" title="Change photo">
+            <span id="settingsAvatarInitials">?</span>
+          </div>
+          <div class="avatar-info">
+            <div class="avatar-name" id="settingsAvatarName">—</div>
+            <div class="avatar-hint">Click photo to upload a new one</div>
+          </div>
+          <button class="btn-avatar-change" onclick="window._triggerAvatarUpload && window._triggerAvatarUpload(); setTimeout(refreshAvatar, 500);">Change photo</button>
+        </div>
+        <div class="field">
+          <label for="nameInput">Display name</label>
+          <input type="text" id="nameInput" placeholder="Your name" maxlength="80">
+        </div>
+        <div class="field">
+          <label for="emailDisplay">Email address</label>
+          <input type="email" id="emailDisplay" disabled>
+          <span class="field-hint">Email cannot be changed. Contact support if needed.</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="save-status" id="profileStatus"></span>
+        <button class="btn-save" id="profileSaveBtn" onclick="saveProfile()">Save changes</button>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <div class="card-header-text">
+          <div class="card-title">Security</div>
+          <div class="card-desc">Change your password</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label for="currentPwd">Current password</label>
+          <input type="password" id="currentPwd" placeholder="Enter current password">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="newPwd">New password</label>
+            <input type="password" id="newPwd" placeholder="At least 6 characters">
+          </div>
+          <div class="field">
+            <label for="confirmPwd">Confirm new password</label>
+            <input type="password" id="confirmPwd" placeholder="Repeat new password">
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="save-status" id="pwdStatus"></span>
+        <button class="btn-save" id="pwdSaveBtn" onclick="savePassword()">Update password</button>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="settings-card danger-card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="card-header-text">
+          <div class="card-title">Danger zone</div>
+          <div class="card-desc">Irreversible actions</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="danger-item">
+          <div class="danger-item-text">
+            <div class="danger-item-label">Delete account</div>
+            <div class="danger-item-desc">Permanently remove your account and all practice history. This cannot be undone.</div>
+          </div>
+          <button class="btn-danger" onclick="openDeleteModal()">Delete account</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Delete your account?</div>
+    <div class="modal-desc">This will permanently delete your account, all practice history, and performance data. This action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-modal-confirm" id="deleteConfirmBtn" onclick="confirmDelete()">Yes, delete everything</button>
+    </div>
+  </div>
+</div>
+
+<script src="sidebar.js"></script>
+<script>
+  const token = localStorage.getItem('apex_token');
+  if (!token) { window.location.href = 'auth.html'; }
+
+  // ── INIT ──
+  const name  = localStorage.getItem('apex_user') || '';
+  const email = localStorage.getItem('apex_email') || '';
+
+  document.getElementById('nameInput').value = name;
+  document.getElementById('emailDisplay').value = email;
+
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '?';
+  document.getElementById('settingsAvatarInitials').textContent = initials;
+  document.getElementById('settingsAvatarName').textContent = name || 'Your name';
+
+  // Apply avatar photo if set
+  function refreshAvatar() {
+    const url = localStorage.getItem('apex_avatar');
+    const el = document.getElementById('settingsAvatar');
+    const existing = el.querySelector('img');
+    if (url && !existing) {
+      const img = document.createElement('img');
+      img.src = url;
+      el.insertBefore(img, el.firstChild);
+    } else if (url && existing) {
+      existing.src = url;
+    } else if (!url && existing) {
+      existing.remove();
+    }
+  }
+  refreshAvatar();
+
+  // Sidebar init
+  if (token) {
+    fetch('/api/progress/load', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json()).then(data => {
+        window._userPlan = data.plan || 'free';
+        window._gradedToday = data.gradedToday || 0;
+        window._memberSince = data.memberSince || null;
+        initSidebarMenu(window._userPlan, window._gradedToday);
+        const avatarEl = document.getElementById('sidebarAvatar');
+        const nameEl   = document.getElementById('sidebarUserName');
+        if (nameEl) nameEl.textContent = name;
+        if (avatarEl) avatarEl.textContent = initials;
+      }).catch(() => {});
+  }
+
+  // ── SAVE PROFILE ──
+  async function saveProfile() {
+    const newName = document.getElementById('nameInput').value.trim();
+    const btn = document.getElementById('profileSaveBtn');
+    const status = document.getElementById('profileStatus');
+    if (!newName) { setStatus(status, 'error', 'Name cannot be empty'); return; }
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/auth/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ name: newName })
+      });
+      const data = await r.json();
+      if (!r.ok) { setStatus(status, 'error', data.error || 'Failed to save'); return; }
+      localStorage.setItem('apex_user', data.name);
+      document.getElementById('settingsAvatarName').textContent = data.name;
+      document.getElementById('sidebarUserName') && (document.getElementById('sidebarUserName').textContent = data.name);
+      setStatus(status, 'success', '✓ Saved');
+    } catch(e) {
+      setStatus(status, 'error', 'Something went wrong');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // ── SAVE PASSWORD ──
+  async function savePassword() {
+    const current = document.getElementById('currentPwd').value;
+    const newPwd  = document.getElementById('newPwd').value;
+    const confirm = document.getElementById('confirmPwd').value;
+    const btn     = document.getElementById('pwdSaveBtn');
+    const status  = document.getElementById('pwdStatus');
+
+    if (!current || !newPwd || !confirm) { setStatus(status, 'error', 'All fields required'); return; }
+    if (newPwd !== confirm) { setStatus(status, 'error', 'Passwords don\'t match'); return; }
+    if (newPwd.length < 6)  { setStatus(status, 'error', 'Minimum 6 characters'); return; }
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ currentPassword: current, newPassword: newPwd })
+      });
+      const data = await r.json();
+      if (!r.ok) { setStatus(status, 'error', data.error || 'Failed'); return; }
+      document.getElementById('currentPwd').value = '';
+      document.getElementById('newPwd').value = '';
+      document.getElementById('confirmPwd').value = '';
+      setStatus(status, 'success', '✓ Password updated');
+    } catch(e) {
+      setStatus(status, 'error', 'Something went wrong');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function setStatus(el, type, msg) {
+    el.textContent = msg;
+    el.className = 'save-status ' + type;
+    if (type === 'success') setTimeout(() => { el.textContent = ''; el.className = 'save-status'; }, 3000);
+  }
+
+  // ── DELETE MODAL ──
+  function openDeleteModal()  { document.getElementById('deleteModal').classList.add('open'); }
+  function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); }
+
+  async function confirmDelete() {
+    const btn = document.getElementById('deleteConfirmBtn');
+    btn.disabled = true;
+    btn.textContent = 'Deleting…';
+    // For now, clear localStorage and sign out (full server-side deletion can be added later)
+    localStorage.clear();
+    window.location.href = 'auth.html';
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+  });
+</script>
+</body>
+</html>
