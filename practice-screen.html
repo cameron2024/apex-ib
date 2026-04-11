@@ -469,160 +469,181 @@
 
   @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* VERDICT HEADER */
+  /* ── VERDICT HEADER ── */
   .verdict-header {
-    padding: 20px 24px;
+    padding: 22px 28px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
   }
+
+  .verdict-left { display: flex; flex-direction: column; gap: 6px; }
 
   .verdict-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 8px 16px;
-    border-radius: 99px;
-    border: 2px solid currentColor;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 13px;
+    border-radius: 6px;
+    width: fit-content;
+    letter-spacing: 0.01em;
   }
+  .verdict-badge svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .verdict-badge.mastered  { color: #15803D; background: #F0FDF4; }
+  .verdict-badge.strong    { color: #1D4ED8; background: #EFF6FF; }
+  .verdict-badge.needs-work { color: #B45309; background: #FFFBEB; }
+  .verdict-badge.miss      { color: #B91C1C; background: #FEF2F2; }
 
-  .verdict-badge.mastered { color: var(--accent-green); background: #F0FDF4; }
-  .verdict-badge.strong { color: var(--accent-blue); background: #EFF6FF; }
-  .verdict-badge.needs-work { color: var(--accent-amber); background: #FFFBEB; }
-  .verdict-badge.miss { color: var(--accent-red); background: #FEF2F2; }
+  .verdict-label-sub { font-size: 12.5px; color: var(--text-tertiary); padding-left: 2px; }
 
-  .verdict-score-wrap {
-    display: flex;
-    align-items: baseline;
-    gap: 3px;
-  }
-
+  .verdict-score-wrap { display: flex; align-items: baseline; gap: 2px; flex-shrink: 0; }
   .verdict-score {
     font-family: 'DM Serif Display', serif;
-    font-size: 44px;
-    letter-spacing: -1px;
+    font-size: 48px;
+    letter-spacing: -2px;
     line-height: 1;
     color: var(--text-primary);
   }
+  .verdict-score-sub { font-size: 18px; color: var(--text-tertiary); margin-bottom: 4px; font-weight: 300; }
 
-  .verdict-score-sub {
-    font-size: 16px;
-    color: var(--text-tertiary);
-    margin-bottom: 4px;
+  /* ── SCORE DIMENSIONS ── */
+  .score-dims-row {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
   }
 
-  /* SCORE DIMENSIONS */
-  .score-dims-row {
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
+  .dim-item { display: flex; flex-direction: column; gap: 8px; }
+  .dim-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .dim-label { font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0.01em; }
+  .dim-score { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text-primary); letter-spacing: -0.5px; }
+
+  .dim-bar-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .dim-bar-fill { height: 100%; border-radius: 2px; transition: width 1s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+  .dim-bar-fill.high { background: #16A34A; }
+  .dim-bar-fill.mid  { background: #D97706; }
+  .dim-bar-fill.low  { background: #DC2626; }
+
+  /* ── FEEDBACK BODY ── */
+  .feedback-body {
+    padding: 24px 28px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-  }
-
-  .dim-item { display: flex; flex-direction: column; gap: 5px; }
-
-  .dim-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-
-  .dim-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
-  .dim-score { font-size: 12px; font-weight: 700; color: var(--text-primary); }
-
-  .dim-bar-track {
-    height: 6px;
-    background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .dim-bar-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .dim-bar-fill.high { background: var(--accent-green); }
-  .dim-bar-fill.mid { background: var(--accent-amber); }
-  .dim-bar-fill.low { background: var(--accent-red); }
-
-  /* FEEDBACK CONTENT */
-  .feedback-body {
+    gap: 22px;
     font-family: 'DM Sans', sans-serif;
   }
+
+  .feedback-section { display: flex; flex-direction: column; gap: 10px; }
+
+  .feedback-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .feedback-section-icon {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .feedback-section-icon.correct { background: #F0FDF4; }
+  .feedback-section-icon.missed  { background: #FEF2F2; }
+  .feedback-section-icon svg { width: 11px; height: 11px; }
 
   .feedback-section-title {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-tertiary);
-    margin-bottom: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.01em;
     font-family: 'DM Sans', sans-serif;
+    margin-bottom: 0;
   }
+  .feedback-section-count { font-size: 11.5px; color: var(--text-tertiary); margin-left: auto; }
 
-  .feedback-points { display: flex; flex-direction: column; gap: 8px; }
+  .feedback-points { display: flex; flex-direction: column; gap: 6px; }
 
   .feedback-point {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     font-size: 13.5px;
     line-height: 1.65;
     color: var(--text-secondary);
     align-items: flex-start;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
     font-family: 'DM Sans', sans-serif;
   }
+  .feedback-point.point-correct  { background: #FAFFFE; border-color: #DCFCE7; }
+  .feedback-point.point-missed   { background: #FFFAFA; border-color: #FEE2E2; }
+  .feedback-point.point-critical { background: #FFF7F7; border-color: #FECACA; }
+  .feedback-point.point-empty    { background: transparent; border-color: transparent; color: var(--text-tertiary); font-style: italic; }
 
-  .point-icon { font-size: 13px; flex-shrink: 0; margin-top: 2px; }
+  .point-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .point-dot.green { background: #16A34A; }
+  .point-dot.red   { background: #DC2626; }
+  .point-dot.amber { background: #D97706; }
+  .point-dot.gray  { background: var(--border-strong); }
 
   .feedback-point strong { color: var(--text-primary); font-weight: 600; }
 
-  /* MODEL ANSWER TOGGLE */
+  /* ── MODEL ANSWER ── */
+  .model-answer-section { border-top: 1px solid var(--border); padding-top: 0; }
+
   .model-answer-toggle {
     display: flex;
     align-items: center;
-    gap: 7px;
-    margin-top: 18px;
+    gap: 8px;
+    width: 100%;
     background: none;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 7px 12px;
-    font-size: 12px;
-    font-weight: 600;
+    border: none;
+    padding: 14px 0;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
-    width: fit-content;
+    transition: color 0.15s;
+    text-align: left;
   }
-  .model-answer-toggle:hover {
-    background: var(--bg);
-    color: var(--text-primary);
-  }
-  .model-answer-toggle.open {
-    color: var(--text-primary);
-    background: var(--bg);
-  }
+  .model-answer-toggle:hover { color: var(--text-primary); }
+  .model-answer-toggle.open  { color: var(--text-primary); }
 
-  /* MODEL ANSWER BOX */
+  .toggle-chevron {
+    margin-left: auto;
+    width: 16px; height: 16px;
+    color: var(--text-tertiary);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  .model-answer-toggle.open .toggle-chevron { transform: rotate(180deg); }
+
   .model-answer-box {
-    margin-top: 10px;
-    background: #F8F7F4;
+    background: var(--bg);
     border: 1px solid var(--border);
-    border-left: 3px solid var(--text-primary);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
     font-size: 13.5px;
-    line-height: 1.7;
-    color: var(--text-primary);
+    line-height: 1.75;
+    color: var(--text-secondary);
     font-family: 'DM Sans', sans-serif;
     white-space: pre-wrap;
     animation: slideUp 0.2s ease;
+    margin-bottom: 4px;
+  }
   }
 
   /* NEXT QUESTION — hero */
@@ -1041,9 +1062,12 @@
 
       <!-- VERDICT HEADER -->
       <div class="verdict-header" id="verdictHeader">
-        <div class="verdict-badge" id="verdictBadge">
-          <span id="verdictIcon">—</span>
-          <span id="verdictLabel">—</span>
+        <div class="verdict-left">
+          <div class="verdict-badge" id="verdictBadge">
+            <span id="verdictIcon"></span>
+            <span id="verdictLabel">—</span>
+          </div>
+          <div class="verdict-label-sub" id="verdictSub"></div>
         </div>
         <div class="verdict-score-wrap">
           <div class="verdict-score" id="verdictScore">—</div>
@@ -1110,18 +1134,37 @@
       <!-- FEEDBACK BODY -->
       <div class="feedback-body" id="feedbackBody">
 
-        <div class="feedback-section-title">What you got right</div>
-        <div class="feedback-points" id="feedbackCorrect"></div>
+        <div class="feedback-section">
+          <div class="feedback-section-header">
+            <div class="feedback-section-icon correct">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="feedback-section-title">What you got right</div>
+            <span class="feedback-section-count" id="correctCount"></span>
+          </div>
+          <div class="feedback-points" id="feedbackCorrect"></div>
+        </div>
 
-        <div class="feedback-section-title" style="margin-top:18px;">What you missed or got wrong</div>
-        <div class="feedback-points" id="feedbackMissed"></div>
+        <div class="feedback-section">
+          <div class="feedback-section-header">
+            <div class="feedback-section-icon missed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="feedback-section-title">What you missed or got wrong</div>
+            <span class="feedback-section-count" id="missedCount"></span>
+          </div>
+          <div class="feedback-points" id="feedbackMissed"></div>
+        </div>
 
         <!-- MODEL ANSWER — collapsed by default -->
-        <button class="model-answer-toggle" id="modelAnswerToggle" onclick="toggleModelAnswer()">
-          <span id="modelAnswerToggleIcon">▶</span>
-          Show model answer
-        </button>
-        <div class="model-answer-box" id="modelAnswer" style="display:none"></div>
+        <div class="model-answer-section">
+          <button class="model-answer-toggle" id="modelAnswerToggle" onclick="toggleModelAnswer()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            Model answer
+            <svg class="toggle-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="model-answer-box" id="modelAnswer" style="display:none"></div>
+        </div>
 
       </div>
 
@@ -1561,12 +1604,12 @@ Return JSON only.`;
     document.getElementById('verdictLabel').textContent = 'Grading';
     document.getElementById('verdictBadge').className = 'verdict-badge';
     document.getElementById('verdictBadge').style.opacity = '0.5';
-    document.getElementById('feedbackCorrect').innerHTML = '<div class="feedback-point" style="color:var(--text-tertiary)"><span class="point-icon">·</span><span>Analyzing your answer…</span></div>';
-    document.getElementById('feedbackMissed').innerHTML = '<div class="feedback-point" style="color:var(--text-tertiary)"><span class="point-icon">·</span><span>Identifying gaps…</span></div>';
+    document.getElementById('feedbackCorrect').innerHTML = '<div class="feedback-point point-empty"><span class="point-dot gray"></span><span>Analyzing your answer…</span></div>';
+    document.getElementById('feedbackMissed').innerHTML = '<div class="feedback-point point-empty"><span class="point-dot gray"></span><span>Identifying gaps…</span></div>';
+    document.getElementById('correctCount').textContent = '';
+    document.getElementById('missedCount').textContent = '';
     document.getElementById('modelAnswer').textContent = '';
     document.getElementById('modelAnswer').style.display = 'none';
-    document.getElementById('modelAnswerToggle').textContent = '';
-    document.getElementById('modelAnswerToggle').innerHTML = '<span>▶</span> Show model answer';
     document.getElementById('modelAnswerToggle').classList.remove('open');
     document.getElementById('nextQText').textContent = 'Analyzing your answer…';
     document.getElementById('nextQReason').textContent = '';
@@ -1597,12 +1640,30 @@ Return JSON only.`;
 
   function updateVerdict(overall) {
     const badge = document.getElementById('verdictBadge');
-    const icon = document.getElementById('verdictIcon');
+    const icon  = document.getElementById('verdictIcon');
     const label = document.getElementById('verdictLabel');
-    if (overall >= 92) { badge.className = 'verdict-badge mastered'; icon.textContent = '★'; label.textContent = 'Mastered'; }
-    else if (overall >= 80) { badge.className = 'verdict-badge strong'; icon.textContent = '◎'; label.textContent = 'Strong'; }
-    else if (overall >= 65) { badge.className = 'verdict-badge needs-work'; icon.textContent = '△'; label.textContent = 'Needs Work'; }
-    else { badge.className = 'verdict-badge miss'; icon.textContent = '✕'; label.textContent = 'Miss'; }
+    const sub   = document.getElementById('verdictSub');
+    if (overall >= 92) {
+      badge.className = 'verdict-badge mastered';
+      icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+      label.textContent = 'Mastered';
+      if (sub) sub.textContent = 'Excellent command of this concept';
+    } else if (overall >= 80) {
+      badge.className = 'verdict-badge strong';
+      icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+      label.textContent = 'Strong';
+      if (sub) sub.textContent = 'Solid answer with minor gaps';
+    } else if (overall >= 65) {
+      badge.className = 'verdict-badge needs-work';
+      icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/><circle cx="12" cy="12" r="10"/></svg>';
+      label.textContent = 'Needs Work';
+      if (sub) sub.textContent = 'Review the gaps below';
+    } else {
+      badge.className = 'verdict-badge miss';
+      icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      label.textContent = 'Miss';
+      if (sub) sub.textContent = 'Revisit this topic before moving on';
+    }
   }
 
   function updateDimBars(scores) {
@@ -1645,23 +1706,7 @@ Return JSON only.`;
 
     verdictScore.textContent = overall;
 
-    if (overall >= 92) {
-      verdictBadge.className = 'verdict-badge mastered';
-      verdictIcon.textContent = '★';
-      verdictLabel.textContent = 'Mastered';
-    } else if (overall >= 80) {
-      verdictBadge.className = 'verdict-badge strong';
-      verdictIcon.textContent = '◎';
-      verdictLabel.textContent = 'Strong';
-    } else if (overall >= 65) {
-      verdictBadge.className = 'verdict-badge needs-work';
-      verdictIcon.textContent = '△';
-      verdictLabel.textContent = 'Needs Work';
-    } else {
-      verdictBadge.className = 'verdict-badge miss';
-      verdictIcon.textContent = '✕';
-      verdictLabel.textContent = 'Miss';
-    }
+    updateVerdict(overall);
 
     // Dimension bars — animate after brief delay
     const dimMap = [
@@ -1681,24 +1726,24 @@ Return JSON only.`;
 
     // Correct points
     const correct = (result.correct || []).slice(0, 3);
+    document.getElementById('correctCount').textContent = correct.length ? correct.length + ' point' + (correct.length !== 1 ? 's' : '') : '';
     document.getElementById('feedbackCorrect').innerHTML = correct.length
-      ? correct.map(p => `<div class="feedback-point"><span class="point-icon">✅</span><span>${p}</span></div>`).join('')
-      : `<div class="feedback-point"><span class="point-icon" style="color:var(--text-tertiary)">—</span><span style="color:var(--text-tertiary)">Nothing clearly correct identified.</span></div>`;
+      ? correct.map(p => `<div class="feedback-point point-correct"><span class="point-dot green"></span><span>${p}</span></div>`).join('')
+      : `<div class="feedback-point point-empty"><span class="point-dot gray"></span><span>Nothing clearly correct identified.</span></div>`;
 
     // Missed points
     const missed = (result.missed || []).slice(0, 3);
+    document.getElementById('missedCount').textContent = missed.length ? missed.length + ' point' + (missed.length !== 1 ? 's' : '') : '';
     document.getElementById('feedbackMissed').innerHTML = missed.length
       ? missed.map(p => {
           const isCritical = p.toLowerCase().startsWith('critical');
-          const icon = isCritical ? '❌' : '⚠️';
-          return `<div class="feedback-point"><span class="point-icon">${icon}</span><span>${p}</span></div>`;
+          return `<div class="feedback-point ${isCritical ? 'point-critical' : 'point-missed'}"><span class="point-dot ${isCritical ? 'red' : 'amber'}"></span><span>${p}</span></div>`;
         }).join('')
-      : `<div class="feedback-point"><span class="point-icon">✅</span><span>No significant gaps — excellent answer.</span></div>`;
+      : `<div class="feedback-point point-correct"><span class="point-dot green"></span><span>No significant gaps — excellent answer.</span></div>`;
 
     // Model answer — populate but keep hidden until user toggles
     document.getElementById('modelAnswer').textContent = result.model_answer || '';
     document.getElementById('modelAnswer').style.display = 'none';
-    document.getElementById('modelAnswerToggle').innerHTML = '<span>▶</span> Show model answer';
     document.getElementById('modelAnswerToggle').classList.remove('open');
 
     // Show "Mark as Mastered" button
@@ -1854,11 +1899,9 @@ Return JSON only.`;
     const isOpen = box.style.display !== 'none';
     if (isOpen) {
       box.style.display = 'none';
-      btn.innerHTML = '<span>▶</span> Show model answer';
       btn.classList.remove('open');
     } else {
       box.style.display = 'block';
-      btn.innerHTML = '<span>▼</span> Hide model answer';
       btn.classList.add('open');
     }
   }
@@ -2258,8 +2301,7 @@ Generate 3 drill questions targeting this exact gap.`;
     if (userPlan === 'guest') {
       gradedToday++;
       window._gradedToday = gradedToday;
-      const _gd2 = new Date();
-      const guestKey = 'apex_guest_grades_' + _gd2.getFullYear() + '-' + String(_gd2.getMonth()+1).padStart(2,'0') + '-' + String(_gd2.getDate()).padStart(2,'0');
+      const guestKey = 'apex_guest_grades_' + new Date().toISOString().slice(0,10);
       localStorage.setItem(guestKey, String(gradedToday));
       updatePlanUI();
     }
@@ -2448,8 +2490,7 @@ Generate 3 drill questions targeting this exact gap.`;
   if (!localStorage.getItem('apex_token')) {
     userPlan = 'guest';
     window._userPlan = 'guest';
-    const _gd = new Date();
-    const guestKey = 'apex_guest_grades_' + _gd.getFullYear() + '-' + String(_gd.getMonth()+1).padStart(2,'0') + '-' + String(_gd.getDate()).padStart(2,'0');
+    const guestKey = 'apex_guest_grades_' + new Date().toISOString().slice(0,10);
     gradedToday = parseInt(localStorage.getItem(guestKey) || '0');
     window._gradedToday = gradedToday;
     const nameEl = document.getElementById('sidebarUserName');
