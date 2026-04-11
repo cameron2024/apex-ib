@@ -461,6 +461,7 @@
     const url = localStorage.getItem('apex_avatar');
     const el = document.getElementById('settingsAvatar');
     const existing = el.querySelector('img');
+    const initialsEl = document.getElementById('settingsAvatarInitials');
     const removeBtn = document.getElementById('removePhotoBtn');
     if (url && !existing) {
       const img = document.createElement('img');
@@ -471,6 +472,7 @@
     } else if (!url && existing) {
       existing.remove();
     }
+    if (initialsEl) initialsEl.style.display = url ? 'none' : '';
     if (removeBtn) removeBtn.style.display = url ? '' : 'none';
   }
 
@@ -479,6 +481,8 @@
     const el = document.getElementById('settingsAvatar');
     const img = el.querySelector('img');
     if (img) img.remove();
+    const initialsEl = document.getElementById('settingsAvatarInitials');
+    if (initialsEl) initialsEl.style.display = '';
     // Reset sidebar avatar too
     const sidebarAv = document.getElementById('sidebarAvatar');
     if (sidebarAv) {
