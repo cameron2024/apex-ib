@@ -109,8 +109,6 @@
     if (!el) return;
     const existing = el.querySelector('img.sidebar-av-photo');
     if (url) {
-      // Use an absolutely-positioned <img> so it always covers initials,
-      // even when pages set avatarEl.textContent = initials afterward
       if (!existing) {
         const img = document.createElement('img');
         img.className = 'sidebar-av-photo';
@@ -217,19 +215,19 @@
 
     card.setAttribute('onclick', 'window._sidebarToggleMenu()');
 
-    // Avatar ring for paid users
+    // Avatar ring for all logged-in plans
     const avatar = document.getElementById('sidebarAvatar');
-    if (avatar && (plan === 'monthly' || plan === 'pass')) {
+    if (avatar && (plan === 'free' || plan === 'monthly' || plan === 'pass')) {
       const wrap = document.createElement('div');
       wrap.className = 'user-avatar-wrap';
       avatar.parentNode.insertBefore(wrap, avatar);
       wrap.appendChild(avatar);
       const ring = document.createElement('div');
-      ring.className = 'plan-ring ' + (plan === 'pass' ? 'plan-ring-pass' : 'plan-ring-monthly');
+      ring.className = 'plan-ring ' + (plan === 'pass' ? 'plan-ring-pass' : plan === 'monthly' ? 'plan-ring-monthly' : 'plan-ring-free');
       wrap.appendChild(ring);
       const icon = document.createElement('div');
-      icon.className = 'plan-icon ' + (plan === 'pass' ? 'plan-icon-pass' : 'plan-icon-monthly');
-      icon.textContent = plan === 'pass' ? '◆' : '★';
+      icon.className = 'plan-icon ' + (plan === 'pass' ? 'plan-icon-pass' : plan === 'monthly' ? 'plan-icon-monthly' : 'plan-icon-free');
+      icon.textContent = plan === 'pass' ? '◆' : plan === 'monthly' ? '★' : '○';
       wrap.appendChild(icon);
     }
 
@@ -256,7 +254,7 @@
 
     const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
 
-    let bc = 'badge-free', bt = '✦ Free plan';
+    let bc = 'badge-free', bt = '○ Free plan';
     if (plan === 'monthly') { bc = 'badge-monthly'; bt = '★ Monthly'; }
     if (plan === 'pass')    { bc = 'badge-pass';    bt = '◆ Recruiting Pass'; }
 
@@ -271,12 +269,27 @@
            ${Math.max(0, 5 - gt)} of 5 free grades left today
          </div>` : '';
 
-    const upgradeRow = plan === 'free'
+    const planActionRow = plan === 'free'
       ? `<div class="menu-divider"></div>
-         <a class="menu-item" href="pricing.html">
+         <a class="menu-item" href="pricing.html" style="color:#2563EB;font-weight:500;">
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
            Upgrade to Pro
-         </a>` : '';
+         </a>`
+      : plan === 'monthly'
+      ? `<div class="menu-divider"></div>
+         <a class="menu-item" href="pricing.html" style="color:#D97706;font-weight:500;">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+           Upgrade plan
+         </a>
+         <a class="menu-item" href="billing.html">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+           Manage subscription
+         </a>`
+      : `<div class="menu-divider"></div>
+         <a class="menu-item" href="billing.html">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+           Manage subscription
+         </a>`;
 
     const menu = document.createElement('div');
     menu.id = 'userMenu';
@@ -297,7 +310,16 @@
         </div>
       </div>
       ${gradeRow}
-      ${upgradeRow}
+      ${planActionRow}
+      <div class="menu-divider"></div>
+      <a class="menu-item" href="settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+      <a class="menu-item" href="learn-more.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Learn more
+      </a>
       <div class="menu-divider"></div>
       <div class="menu-item menu-item-danger" onclick="doLogout()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
