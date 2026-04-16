@@ -91,9 +91,26 @@
     if (!mount) return;
     mount.outerHTML = SIDEBAR_HTML;
 
-    // Mark active nav item based on current page
+    // Mark active nav item based on current page + URL
     const page = document.body.dataset.page;
-    if (page) {
+    const currentHref = window.location.pathname + window.location.search;
+
+    // First try exact URL match (handles topic links like ?topic=Accounting)
+    let matched = false;
+    document.querySelectorAll('.nav-item').forEach(item => {
+      const itemPath = item.getAttribute('href') || '';
+      // Normalize: strip leading slash differences, compare pathname+search
+      const a = document.createElement('a');
+      a.href = itemPath;
+      const itemFull = a.pathname + a.search;
+      if (itemFull === currentHref) {
+        item.classList.add('active');
+        matched = true;
+      }
+    });
+
+    // Fallback: match by data-page (for pages without query params)
+    if (!matched && page) {
       const active = document.querySelector(`.nav-item[data-page="${page}"]`);
       if (active) active.classList.add('active');
     }
