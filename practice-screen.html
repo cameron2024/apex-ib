@@ -1618,6 +1618,11 @@ Return JSON only.`;
     document.getElementById('nextQText').textContent = 'Analyzing your answer…';
     document.getElementById('nextQReason').textContent = '';
     document.getElementById('drillQueuePreview').style.display = 'none';
+    // Reset next-section visibility for fresh render
+    document.getElementById('nextQPreview').style.display = '';
+    document.getElementById('nextSection').style.cssText = '';
+    const nextLabelReset = document.querySelector('#nextSection .next-label');
+    if (nextLabelReset) nextLabelReset.style.display = '';
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -1817,14 +1822,16 @@ Return JSON only.`;
         document.getElementById('drillQueuePreview').style.display = 'none';
       } else if (isAlreadyDrilling) {
         // Last drill question done — drill complete, move on
-        nextBadge.textContent = 'Drill complete';
-        nextBadge.className = 'next-label-badge';
-        labelText.textContent = 'Up next';
-        nextQText.textContent = 'Continue to next question in the bank';
-        nextQReason.textContent = overall >= 75 ? '✓ Drill done — good work' : '📌 Review the model answer above before moving on';
         btnLabel.textContent = 'Next question';
         drillQueue = [];
         inDrillMode = false;
+        document.getElementById('nextQPreview').style.display = 'none';
+        document.getElementById('nextSection').style.paddingTop = '0';
+        document.getElementById('nextSection').style.paddingBottom = '0';
+        document.getElementById('nextSection').style.background = 'none';
+        document.getElementById('nextSection').style.borderBottom = 'none';
+        const nextLabelEl2 = document.querySelector('#nextSection .next-label');
+        if (nextLabelEl2) nextLabelEl2.style.display = 'none';
         document.getElementById('drillQueuePreview').style.display = 'none';
       } else {
         // Fresh miss on a bank question — offer drill with a skip option
@@ -1869,15 +1876,17 @@ Return JSON only.`;
         }
       }
     } else {
-      // Mid range (75-94) — just advance normally
-      nextBadge.textContent = 'Next question';
-      nextBadge.className = 'next-label-badge';
-      labelText.textContent = 'Up next';
-      nextQText.textContent = 'Continue to next question in the bank';
-      nextQReason.textContent = overall >= 75 ? '✓ Good answer — keep building' : '';
+      // Mid range (75-94) — just advance normally, no preview needed
       btnLabel.textContent = 'Next question';
       drillQueue = [];
       inDrillMode = false;
+      document.getElementById('nextQPreview').style.display = 'none';
+      document.getElementById('nextSection').style.paddingTop = '0';
+      document.getElementById('nextSection').style.paddingBottom = '0';
+      document.getElementById('nextSection').style.background = 'none';
+      document.getElementById('nextSection').style.borderBottom = 'none';
+      const nextLabelEl = document.querySelector('#nextSection .next-label');
+      if (nextLabelEl) nextLabelEl.style.display = 'none';
       document.getElementById('drillQueuePreview').style.display = 'none';
       const skipEl2 = document.getElementById('drillSkipLink');
       if (skipEl2) skipEl2.style.display = 'none';
