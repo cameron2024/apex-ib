@@ -1912,9 +1912,12 @@ Return JSON only.`;
 
   function markMastered() {
     showMasteryCelebration();
-    document.getElementById('btnMarkMastered').textContent = '★ Marked as Mastered';
-    document.getElementById('btnMarkMastered').disabled = true;
-    document.getElementById('btnMarkMastered').style.opacity = '0.5';
+    const btn = document.getElementById('btnMarkMastered');
+    btn.textContent = '✓ Marked as Mastered';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    // Hide the main next/retry buttons and let the celebration CTA take over
+    document.getElementById('btnLoadNext').style.display = 'none';
   }
 
   function showMasteryCelebration() {
@@ -1927,6 +1930,10 @@ Return JSON only.`;
         <div class="mastery-celebration-icon">🏆</div>
         <div class="mastery-celebration-title">Question Mastered</div>
         <div class="mastery-celebration-sub">This question has been marked as mastered and removed from your queue.</div>
+        <button class="btn-primary" style="margin-top:14px;" onclick="confirmNextQuestion()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+          Next question
+        </button>
       `;
       document.getElementById('feedbackPanel').after(cel);
     }
