@@ -917,6 +917,7 @@
       <div class="question-meta">
         <span class="q-tag accounting" id="qTagTopic">Accounting</span>
         <span class="q-tag difficulty" id="qTagDifficulty">Fundamental</span>
+        <span class="q-tag reason" id="qTagReason" style="display:none;background:#F0F9FF;color:#0369A1;border:1px solid #BAE6FD;"></span>
         <span class="q-number" id="qNumber">Q1</span>
         <button class="btn-save-question" id="btnSaveQuestion" onclick="toggleSaveQuestion()" title="Save question">
           <svg id="saveIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
@@ -2042,14 +2043,35 @@ Return JSON only.`;
     return smartOrder(base);
   }
 
-  function selectTopic(topic) {
+  async function selectTopic(topic) {
     if (!QUESTION_BANK.length) return; // not loaded yet
     currentTopic = topic;
-    filteredQuestions = getFilteredQuestions(topic);
+
+    // If user came in with ?mode=smart or ?mode=review_weak, fetch the adaptive set instead
+    if (window._adaptiveMode && authToken) {
+      const adaptive = await loadAdaptiveSet(topic, window._adaptiveMode);
+      if (adaptive && adaptive.length > 0) {
+        filteredQuestions = adaptive;
+      } else {
+        // Fall back to smart-ordered topic set if adaptive returned empty
+        filteredQuestions = getFilteredQuestions(topic);
+      }
+      // Consume the flag so subsequent topic switches go back to normal
+      window._adaptiveMode = null;
+    } else {
+      filteredQuestions = getFilteredQuestions(topic);
+    }
     currentIndex = 0;
     drillQueue = [];
     inDrillMode = false;
     drillParentId = null;
+
+    // If a specific question was requested via ?focus=ID, jump to it
+    if (window._focusQid) {
+      const idx = filteredQuestions.findIndex(q => q.id === window._focusQid);
+      if (idx >= 0) currentIndex = idx;
+      window._focusQid = null;
+    }
 
     // Update nav active state
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -2062,7 +2084,7 @@ Return JSON only.`;
     document.getElementById('topbarTopicPill').textContent = label;
 
     // Preserve sessionResults — do NOT wipe progress on topic switch
-    loadQuestionAt(0);
+    loadQuestionAt(currentIndex);
     updateProgressUI();
   }
 
@@ -2276,6 +2298,36 @@ Generate 3 drill questions targeting this exact gap.`;
     // Update save button state for this question
     updateSaveButtonState(q.id);
 
+    // Adaptive reason badge (set when ?mode=smart or ?mode=review_weak)
+    const reasonTag = document.getElementById('qTagReason');
+    if (reasonTag) {
+      const reason = window._adaptiveReasons && window._adaptiveReasons[q.id];
+      if (reason) {
+        reasonTag.textContent = reason;
+        reasonTag.style.display = '';
+        // Slightly different color for "Struggling" vs "New" vs "Review"
+        if (reason.startsWith('Struggling')) {
+          reasonTag.style.background = '#FEF2F2';
+          reasonTag.style.color = '#B91C1C';
+          reasonTag.style.border = '1px solid #FECACA';
+        } else if (reason.startsWith('Review')) {
+          reasonTag.style.background = '#FEF3C7';
+          reasonTag.style.color = '#92400E';
+          reasonTag.style.border = '1px solid #FCD34D';
+        } else if (reason.startsWith('New')) {
+          reasonTag.style.background = '#F0FDF4';
+          reasonTag.style.color = '#15803D';
+          reasonTag.style.border = '1px solid #BBF7D0';
+        } else {
+          reasonTag.style.background = '#F0F9FF';
+          reasonTag.style.color = '#0369A1';
+          reasonTag.style.border = '1px solid #BAE6FD';
+        }
+      } else {
+        reasonTag.style.display = 'none';
+      }
+    }
+
     updateProgressUI();
   }
 
@@ -2325,7 +2377,82 @@ Generate 3 drill questions targeting this exact gap.`;
       localStorage.setItem(guestKey, String(gradedToday));
       updatePlanUI();
     }
+    // ── Conversion nudges ──
+    triggerNudges(score);
   }
+
+  // Track streak of 85+ scores within session for value-anchored nudges
+  window._highScoreStreak = window._highScoreStreak || 0;
+  window._guestQAnswered = window._guestQAnswered || 0;
+  window._softWallShown = false;
+  window._streakNudgeShown = false;
+
+  function triggerNudges(score) {
+    // Soft wall: after the 3rd answered question as a guest, show signup nudge once
+    if (userPlan === 'guest' && !localStorage.getItem('apex_token')) {
+      window._guestQAnswered++;
+      if (window._guestQAnswered >= 3 && !window._softWallShown && !sessionStorage.getItem('apex_softwall_dismissed')) {
+        window._softWallShown = true;
+        showSoftWall();
+        return;
+      }
+    }
+    // Streak nudge: 3 consecutive 85+ scores → "you're on a roll, consider Pro"
+    if (score >= 85) window._highScoreStreak++;
+    else window._highScoreStreak = 0;
+    if (window._highScoreStreak >= 3 && !window._streakNudgeShown && userPlan === 'free') {
+      window._streakNudgeShown = true;
+      if (!sessionStorage.getItem('apex_streak_nudge_dismissed')) {
+        showStreakNudge();
+      }
+    }
+  }
+
+  function showSoftWall() {
+    if (document.getElementById('apexSoftWall')) return;
+    const div = document.createElement('div');
+    div.id = 'apexSoftWall';
+    div.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:white;border:1px solid var(--border);border-radius:14px;padding:18px 22px;box-shadow:0 12px 32px rgba(0,0,0,0.14);max-width:480px;width:calc(100% - 48px);z-index:300;display:flex;align-items:center;gap:14px;animation:fadeUp .3s ease both;';
+    div.innerHTML = `
+      <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;font-size:20px;">💾</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:3px;">Save your progress?</div>
+        <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.45;">You've answered 3 questions. Create a free account to track your weak spots — and get 2 more free grades today.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+        <a href="auth.html?mode=register" style="padding:7px 14px;background:var(--text-primary);color:white;border-radius:6px;font-size:12.5px;font-weight:600;text-decoration:none;text-align:center;">Sign up</a>
+        <button onclick="dismissSoftWall()" style="padding:6px 14px;background:none;border:none;color:var(--text-tertiary);font-size:11.5px;cursor:pointer;font-family:inherit;">Later</button>
+      </div>`;
+    document.body.appendChild(div);
+  }
+
+  window.dismissSoftWall = function() {
+    const el = document.getElementById('apexSoftWall');
+    if (el) el.remove();
+    sessionStorage.setItem('apex_softwall_dismissed', '1');
+  };
+
+  function showStreakNudge() {
+    if (document.getElementById('apexStreakNudge')) return;
+    const div = document.createElement('div');
+    div.id = 'apexStreakNudge';
+    div.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--text-primary);color:white;border-radius:14px;padding:18px 22px;box-shadow:0 12px 32px rgba(0,0,0,0.22);max-width:340px;z-index:300;animation:fadeUp .3s ease both;';
+    div.innerHTML = `
+      <div style="font-size:16px;font-weight:600;margin-bottom:6px;">🔥 You're on a roll.</div>
+      <div style="font-size:13px;line-height:1.5;opacity:0.85;margin-bottom:14px;">Three strong answers in a row. Pro unlocks adaptive review queues and unlimited grading.</div>
+      <div style="display:flex;gap:8px;">
+        <a href="pricing.html" style="padding:7px 14px;background:white;color:var(--text-primary);border-radius:6px;font-size:12.5px;font-weight:600;text-decoration:none;">See Pro — $14.99/mo</a>
+        <button onclick="dismissStreakNudge()" style="padding:6px 12px;background:none;border:1px solid rgba(255,255,255,0.25);color:white;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;">Maybe later</button>
+      </div>`;
+    document.body.appendChild(div);
+    setTimeout(() => { if (document.getElementById('apexStreakNudge')) document.getElementById('apexStreakNudge').remove(); }, 12000);
+  }
+
+  window.dismissStreakNudge = function() {
+    const el = document.getElementById('apexStreakNudge');
+    if (el) el.remove();
+    sessionStorage.setItem('apex_streak_nudge_dismissed', '1');
+  };
 
   // ─── INIT ─────────────────────────────────────────────────
   function init() {
@@ -2347,8 +2474,12 @@ Generate 3 drill questions targeting this exact gap.`;
 
     const params = new URLSearchParams(window.location.search);
     const topicParam = params.get('topic');
+    const modeParam = params.get('mode'); // 'smart' | 'review_weak' | null
+    const focusParam = params.get('focus'); // a specific question id to jump to
     const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
     const startTopic = validTopics.includes(topicParam) ? topicParam : 'All';
+    window._adaptiveMode = (modeParam === 'smart' || modeParam === 'review_weak') ? modeParam : null;
+    window._focusQid = focusParam;
 
     if (authToken) {
       // Logged in: fetch progress first, then render with smart ordering
@@ -2357,6 +2488,25 @@ Generate 3 drill questions targeting this exact gap.`;
       // Not logged in: render immediately, show auth modal if not already dismissed
       selectTopic(startTopic);
     }
+  }
+
+  // Load adaptive practice set from server (smart or review_weak modes)
+  async function loadAdaptiveSet(topic, mode) {
+    if (!authToken) return null;
+    try {
+      const r = await fetch(`/api/practice/next-set?n=15&topic=${encodeURIComponent(topic)}&mode=${mode}`, {
+        headers: { 'Authorization': 'Bearer ' + authToken }
+      });
+      if (!r.ok) return null;
+      const data = await r.json();
+      // data.set is [{id, reason, stage, question:{...}}]
+      window._adaptiveReasons = {};
+      const qs = (data.set || []).map(item => {
+        window._adaptiveReasons[item.id] = item.reason;
+        return item.question;
+      }).filter(Boolean);
+      return qs;
+    } catch(e) { return null; }
   }
 
   // ─── LOAD QUESTIONS & BOOT ──────────────────────────────
@@ -2470,28 +2620,87 @@ Generate 3 drill questions targeting this exact gap.`;
   }
 
   // ── Boot: check for saved token ─────────────────────────────
-  // ─── SAVED QUESTIONS ─────────────────────────────────────
-  function getSavedQuestions() {
-    try { return JSON.parse(localStorage.getItem('apex_saved_questions') || '[]'); }
-    catch(e) { return []; }
-  }
+  // ─── SAVED QUESTIONS (DB-backed for logged-in, localStorage for guests) ────
+  let _savedSet = new Set(); // in-memory cache of saved question IDs
 
   function isQuestionSaved(qId) {
-    return getSavedQuestions().some(q => q.id === qId);
+    return _savedSet.has(qId);
   }
 
-  function toggleSaveQuestion() {
+  async function loadSavedSet() {
+    const tok = localStorage.getItem('apex_token');
+    if (tok) {
+      // Migrate any leftover localStorage to DB
+      try {
+        const raw = localStorage.getItem('apex_saved_questions');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const ids = parsed.map(q => q && q.id).filter(Boolean);
+            if (ids.length > 0) {
+              await fetch('/api/saved/migrate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
+                body: JSON.stringify({ questionIds: ids })
+              });
+            }
+          }
+          localStorage.removeItem('apex_saved_questions');
+        }
+      } catch(e) {}
+      // Fetch from server
+      try {
+        const r = await fetch('/api/saved/list', { headers: { 'Authorization': 'Bearer ' + tok } });
+        if (r.ok) {
+          const data = await r.json();
+          _savedSet = new Set((data.items || []).map(it => it.id));
+        }
+      } catch(e) {}
+    } else {
+      // Guest: keep using localStorage
+      try {
+        const parsed = JSON.parse(localStorage.getItem('apex_saved_questions') || '[]');
+        _savedSet = new Set(parsed.map(q => q && q.id).filter(Boolean));
+      } catch(e) {}
+    }
+  }
+
+  async function toggleSaveQuestion() {
     const q = filteredQuestions[currentIndex];
     if (!q) return;
-    let saved = getSavedQuestions();
-    const idx = saved.findIndex(s => s.id === q.id);
-    if (idx >= 0) {
-      saved.splice(idx, 1);
-    } else {
-      saved.push({ id: q.id, question: q.question, topic: q.topic, difficulty: q.difficulty, model_answer: q.model_answer, savedAt: Date.now() });
-    }
-    localStorage.setItem('apex_saved_questions', JSON.stringify(saved));
+    const tok = localStorage.getItem('apex_token');
+    const wasSaved = _savedSet.has(q.id);
+    // Optimistic UI
+    if (wasSaved) _savedSet.delete(q.id);
+    else _savedSet.add(q.id);
     updateSaveButtonState(q.id);
+
+    if (tok) {
+      try {
+        const r = await fetch(wasSaved ? '/api/saved/remove' : '/api/saved/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
+          body: JSON.stringify({ questionId: q.id })
+        });
+        if (!r.ok) {
+          // Rollback on failure
+          if (wasSaved) _savedSet.add(q.id);
+          else _savedSet.delete(q.id);
+          updateSaveButtonState(q.id);
+        }
+      } catch(e) {
+        if (wasSaved) _savedSet.add(q.id);
+        else _savedSet.delete(q.id);
+        updateSaveButtonState(q.id);
+      }
+    } else {
+      // Guest path: update localStorage
+      const arr = [..._savedSet].map(id => {
+        const qObj = (window._allQuestions || []).find(qq => qq.id === id) || { id };
+        return { id, question: qObj.question, topic: qObj.topic, difficulty: qObj.difficulty, model_answer: qObj.model_answer, savedAt: Date.now() };
+      });
+      localStorage.setItem('apex_saved_questions', JSON.stringify(arr));
+    }
   }
 
   function updateSaveButtonState(qId) {
@@ -2501,10 +2710,12 @@ Generate 3 drill questions targeting this exact gap.`;
     if (!btn) return;
     const saved = isQuestionSaved(qId);
     btn.classList.toggle('saved', saved);
-    label.textContent = saved ? 'Saved' : 'Save';
-    // Fill bookmark icon when saved
-    icon.setAttribute('fill', saved ? 'currentColor' : 'none');
+    if (label) label.textContent = saved ? 'Saved' : 'Save';
+    if (icon) icon.setAttribute('fill', saved ? 'currentColor' : 'none');
   }
+
+  // Kick off saved-set load early
+  loadSavedSet();
 
   // Guest mode — allow practice without login, track grades in localStorage
   if (!localStorage.getItem('apex_token')) {

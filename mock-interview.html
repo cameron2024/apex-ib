@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock Interview — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  .page-title { font-family: 'DM Serif Display', serif; font-size: 28px; letter-spacing: -.4px; line-height: 1.2; margin-bottom: 5px; }
+  .page-sub { font-size: 14px; color: var(--text-secondary); }
+  .page-header { margin-bottom: 28px; animation: fadeUp .35s ease both; }
+
+  /* ── FORMAT PICKER ─────────────────────── */
+  .format-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+    animation: fadeUp .4s ease both;
+  }
+  @media (max-width: 880px) { .format-grid { grid-template-columns: 1fr; } }
+
+  .format-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    cursor: pointer;
+    transition: all .18s;
+    display: flex; flex-direction: column;
+    text-align: left;
+    font-family: inherit;
+    color: var(--text-primary);
+  }
+  .format-card:hover { border-color: var(--text-primary); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.05); }
+  .format-card.selected { border-color: var(--text-primary); background: #FAFAF8; }
+
+  .format-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; }
+  .format-name { font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -.3px; margin-bottom: 8px; }
+  .format-meta { font-size: 13px; color: var(--text-secondary); line-height: 1.5; flex: 1; margin-bottom: 14px; }
+  .format-stats { display: flex; gap: 14px; margin-top: auto; }
+  .format-stat { font-size: 12px; color: var(--text-tertiary); }
+  .format-stat strong { display: block; font-size: 17px; color: var(--text-primary); font-weight: 600; margin-bottom: 1px; }
+
+  .custom-panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 24px;
+    display: none;
+    animation: fadeUp .25s ease both;
+  }
+  .custom-panel.visible { display: block; }
+  .custom-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .custom-label { font-size: 13px; font-weight: 500; color: var(--text-primary); min-width: 100px; }
+  .custom-input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; background: var(--bg); }
+  .custom-input:focus { outline: none; border-color: var(--text-primary); }
+  .topic-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .topic-chip { padding: 6px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 99px; cursor: pointer; font-size: 12.5px; font-family: inherit; transition: all .15s; }
+  .topic-chip.selected { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+
+  .start-bar { display: flex; align-items: center; gap: 14px; }
+  .btn-start-mock {
+    padding: 12px 24px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn-start-mock:hover { opacity: .85; }
+  .btn-start-mock:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ── ELIGIBILITY NOTICE ────────────────── */
+  .elig-notice {
+    background: #FEF3C7;
+    border: 1px solid #FCD34D;
+    color: #92400E;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 24px;
+    display: none;
+  }
+  .elig-notice.error { background: #FEE2E2; border-color: #FCA5A5; color: #B91C1C; }
+  .elig-notice.info { background: #EFF6FF; border-color: #BFDBFE; color: #1D4ED8; }
+  .elig-notice a { color: inherit; font-weight: 600; text-decoration: underline; }
+  .elig-notice.visible { display: block; }
+
+  /* ── ACTIVE SESSION VIEW ──────────────── */
+  .mock-active { display: none; animation: fadeUp .3s ease both; }
+  .mock-active.visible { display: block; }
+
+  .mock-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mock-progress { font-size: 14px; color: var(--text-secondary); }
+  .mock-progress strong { color: var(--text-primary); font-weight: 600; }
+  .mock-timer {
+    font-family: 'DM Mono', 'SF Mono', Menlo, monospace;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 8px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    min-width: 78px;
+    text-align: center;
+  }
+  .mock-timer.warning { background: #FEF3C7; border-color: #FCD34D; color: #92400E; }
+  .mock-timer.danger { background: #FEE2E2; border-color: #FCA5A5; color: #B91C1C; }
+
+  .mock-q-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 30px;
+    margin-bottom: 20px;
+  }
+  .mock-q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .q-tag { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 4px; }
+  .q-tag.accounting  { background: #EEF2FF; color: #4338CA; }
+  .q-tag.enterprise  { background: #FFF7ED; color: #C2410C; }
+  .q-tag.valuation   { background: #F0FDF4; color: #15803D; }
+  .q-tag.dcf         { background: #EFF6FF; color: #1D4ED8; }
+  .q-tag.mergers     { background: #FDF4FF; color: #7E22CE; }
+  .q-tag.lbo         { background: #FFF1F2; color: #BE123C; }
+
+  .mock-q-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -.3px;
+    line-height: 1.35;
+    color: var(--text-primary);
+    margin-bottom: 18px;
+  }
+  .mock-textarea {
+    width: 100%;
+    min-height: 180px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text-primary);
+    resize: vertical;
+  }
+  .mock-textarea:focus { outline: none; border-color: var(--text-primary); background: white; }
+
+  .mock-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+  .mock-helper { font-size: 12px; color: var(--text-tertiary); }
+  .mock-action-btns { display: flex; gap: 8px; }
+  .btn-mock-action {
+    padding: 9px 18px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: white;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-mock-action:hover { border-color: var(--text-primary); color: var(--text-primary); }
+  .btn-mock-action.primary { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+  .btn-mock-action.primary:hover { opacity: .85; }
+
+  /* Grading interstitial */
+  .grading-screen {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(247,246,243,0.96);
+    z-index: 500;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    backdrop-filter: blur(6px);
+  }
+  .grading-screen.visible { display: flex; }
+  .grading-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--text-primary);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .grading-text { font-size: 15px; color: var(--text-secondary); }
+  .grading-sub { font-size: 12.5px; color: var(--text-tertiary); }
+
+  /* Prior sessions list */
+  .prior-sessions { margin-top: 32px; }
+  .prior-title { font-size: 13px; font-weight: 600; color: var(--text-tertiary); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 12px; }
+  .prior-list { display: flex; flex-direction: column; gap: 8px; }
+  .prior-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s;
+  }
+  .prior-item:hover { border-color: var(--text-primary); }
+  .prior-meta { font-size: 12.5px; color: var(--text-tertiary); }
+  .prior-score { font-size: 18px; font-weight: 600; }
+  .prior-score.high { color: #15803D; }
+  .prior-score.mid { color: #B45309; }
+  .prior-score.low { color: #B91C1C; }
+</style>
+</head>
+
+<body data-page="mock">
+
+<div id="sidebar-mount"></div>
+
+<main class="main">
+
+  <div class="page-header">
+    <div class="page-title">Mock Interview</div>
+    <div class="page-sub">Timed, end-of-session report. Mirrors a real interview rhythm — no real-time feedback until you submit.</div>
+  </div>
+
+  <div class="elig-notice" id="eligNotice"></div>
+
+  <!-- FORMAT PICKER -->
+  <div id="formatPickerView">
+    <div class="format-grid">
+      <button class="format-card" data-format="first_round" onclick="selectFormat('first_round')">
+        <div class="format-label">Recruiting Start</div>
+        <div class="format-name">First Round</div>
+        <div class="format-meta">A balanced mix of accounting, DCF, and valuation. Closest to a first-round technical screen.</div>
+        <div class="format-stats">
+          <div class="format-stat"><strong>8</strong> questions</div>
+          <div class="format-stat"><strong>~30</strong> min</div>
+        </div>
+      </button>
+      <button class="format-card" data-format="superday" onclick="selectFormat('superday')">
+        <div class="format-label">Final Round</div>
+        <div class="format-name">Superday</div>
+        <div class="format-meta">Heavier on DCF, LBO, and M&amp;A. Tests sustained focus under time pressure.</div>
+        <div class="format-stats">
+          <div class="format-stat"><strong>12</strong> questions</div>
+          <div class="format-stat"><strong>~60</strong> min</div>
+        </div>
+      </button>
+      <button class="format-card" data-format="custom" onclick="selectFormat('custom')">
+        <div class="format-label">Your Choice</div>
+        <div class="format-name">Custom</div>
+        <div class="format-meta">Pick topics and length yourself — useful for drilling specific areas before the real thing.</div>
+        <div class="format-stats">
+          <div class="format-stat"><strong>4-20</strong> questions</div>
+          <div class="format-stat"><strong>Any</strong> topics</div>
+        </div>
+      </button>
+    </div>
+
+    <div class="custom-panel" id="customPanel">
+      <div class="custom-row">
+        <div class="custom-label">Length</div>
+        <input class="custom-input" type="number" id="customCount" min="4" max="20" value="8" style="width:80px;">
+        <span style="font-size:13px;color:var(--text-tertiary);">questions</span>
+      </div>
+      <div class="custom-row">
+        <div class="custom-label" style="align-self:flex-start;">Topics</div>
+        <div class="topic-chips">
+          <button class="topic-chip selected" data-t="Accounting">Accounting</button>
+          <button class="topic-chip selected" data-t="Enterprise_Value">Enterprise Value</button>
+          <button class="topic-chip selected" data-t="Valuation">Valuation</button>
+          <button class="topic-chip selected" data-t="DCF">DCF</button>
+          <button class="topic-chip selected" data-t="Mergers_MA">M&amp;A</button>
+          <button class="topic-chip selected" data-t="LBO">LBO</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="start-bar">
+      <button class="btn-start-mock" id="btnStartMock" onclick="startMock()" disabled>Pick a format to begin</button>
+      <span style="font-size:12.5px;color:var(--text-tertiary);">You'll see your full report card at the end.</span>
+    </div>
+
+    <!-- PRIOR SESSIONS -->
+    <div class="prior-sessions" id="priorSessions" style="display:none;">
+      <div class="prior-title">Your Previous Mocks</div>
+      <div class="prior-list" id="priorList"></div>
+    </div>
+  </div>
+
+  <!-- ACTIVE SESSION -->
+  <div class="mock-active" id="mockActiveView">
+    <div class="mock-topbar">
+      <div class="mock-progress">
+        Question <strong id="qProgress">1 of 8</strong>
+        <span style="margin-left:14px;color:var(--text-tertiary);" id="formatLabel">First Round</span>
+      </div>
+      <div class="mock-timer" id="mockTimer">02:00</div>
+    </div>
+
+    <div class="mock-q-card">
+      <div class="mock-q-meta">
+        <span class="q-tag" id="mockQTopic">Topic</span>
+      </div>
+      <div class="mock-q-text" id="mockQText">Loading…</div>
+      <textarea class="mock-textarea" id="mockTextarea" placeholder="Type your answer here. You won't see grading until the session ends."></textarea>
+      <div class="mock-actions">
+        <div class="mock-helper">Tip: write as you'd speak — quick, structured, clear. No need for perfection.</div>
+        <div class="mock-action-btns">
+          <button class="btn-mock-action" onclick="skipQuestion()">Skip</button>
+          <button class="btn-mock-action primary" id="btnNextQ" onclick="saveAndNext()">Save &amp; next →</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--text-tertiary);">
+      <button onclick="confirmExit()" style="background:none;border:none;color:var(--text-tertiary);font-family:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline;">Exit without grading</button>
+      <span id="elapsedTotal">Elapsed: 0:00</span>
+    </div>
+  </div>
+</main>
+
+<!-- GRADING INTERSTITIAL -->
+<div class="grading-screen" id="gradingScreen">
+  <div class="grading-spinner"></div>
+  <div class="grading-text">Grading your interview…</div>
+  <div class="grading-sub" id="gradingSub">This usually takes 15–30 seconds.</div>
+</div>
+
+<script src="sidebar.js"></script>
+<script>
+  const token = localStorage.getItem('apex_token');
+  const name  = localStorage.getItem('apex_user');
+
+  // Auth wall — mocks require an account
+  if (!token) {
+    document.querySelector('.main').innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:16px;">
+        <div style="font-size:40px;">🎤</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;">Mock interviews need an account</h2>
+        <p style="font-size:14px;color:var(--text-secondary);max-width:380px;line-height:1.65;">A free account includes 1 mock interview — your first end-to-end session is on us.</p>
+        <a href="auth.html?mode=register&next=mock-interview.html" style="padding:10px 22px;background:var(--text-primary);color:white;border-radius:8px;font-size:13.5px;font-weight:600;text-decoration:none;">Create free account</a>
+      </div>`;
+  }
+
+  if (name && token) {
+    const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    if (document.getElementById('sidebarAvatar')) document.getElementById('sidebarAvatar').textContent = initials;
+    if (document.getElementById('sidebarUserName')) document.getElementById('sidebarUserName').textContent = name;
+  }
+
+  // Pull plan for sidebar
+  if (token) {
+    fetch('/api/progress/load', { headers: { 'Authorization': 'Bearer ' + token }})
+      .then(r => r.json()).then(d => {
+        window._userPlan = d.plan || 'free';
+        window._gradedToday = d.gradedToday || 0;
+        if (typeof initSidebarMenu === 'function') initSidebarMenu(window._userPlan, window._gradedToday);
+      }).catch(()=>{});
+  }
+
+  // ── STATE ──
+  let chosenFormat = null;
+  let session = null; // {sessionId, format, label, minutes, questions:[{id,question,topic}]}
+  let qIdx = 0;
+  let answers = {}; // {qid: {answer, seconds_taken}}
+  let qStartTime = 0;
+  let sessionStartTime = 0;
+  let timerInterval = null;
+  let elapsedInterval = null;
+  const PER_QUESTION_SECONDS = 120;
+
+  const TOPIC_CLASS = { Accounting:'accounting', Enterprise_Value:'enterprise', Valuation:'valuation', DCF:'dcf', Mergers_MA:'mergers', LBO:'lbo' };
+  const TOPIC_LABEL = { Accounting:'Accounting', Enterprise_Value:'Enterprise Value', Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO' };
+
+  // ── FORMAT PICKER ──
+  function selectFormat(fmt) {
+    chosenFormat = fmt;
+    document.querySelectorAll('.format-card').forEach(c => c.classList.remove('selected'));
+    document.querySelector(`.format-card[data-format="${fmt}"]`).classList.add('selected');
+    document.getElementById('customPanel').classList.toggle('visible', fmt === 'custom');
+    const btn = document.getElementById('btnStartMock');
+    btn.disabled = false;
+    btn.textContent = fmt === 'first_round' ? 'Start First Round (8 questions)' :
+                      fmt === 'superday'   ? 'Start Superday (12 questions)' :
+                                             'Start Custom Mock';
+  }
+
+  // Custom topic chip toggle
+  document.querySelectorAll('.topic-chip').forEach(chip => {
+    chip.onclick = () => chip.classList.toggle('selected');
+  });
+
+  // ── CHECK ELIGIBILITY ON LOAD ──
+  async function checkEligibility() {
+    if (!token) return;
+    try {
+      const r = await fetch('/api/mock/eligibility', { headers: { 'Authorization': 'Bearer ' + token } });
+      const elig = await r.json();
+      const notice = document.getElementById('eligNotice');
+      if (!elig.ok) {
+        notice.className = 'elig-notice error visible';
+        notice.innerHTML = `${elig.message} <a href="pricing.html">View plans →</a>`;
+        document.getElementById('btnStartMock').disabled = true;
+        document.getElementById('btnStartMock').textContent = 'Upgrade required';
+      } else if (elig.plan === 'free') {
+        notice.className = 'elig-notice info visible';
+        notice.textContent = `Free plan includes 1 mock interview. After this one, upgrade to Pro for 2/month or Recruiting Pass for unlimited.`;
+      } else if (elig.plan === 'monthly') {
+        notice.className = 'elig-notice info visible';
+        notice.textContent = `${elig.remaining || 0} mock interview${elig.remaining !== 1 ? 's' : ''} remaining this month.`;
+      }
+    } catch(e) {}
+  }
+
+  // ── LOAD PRIOR SESSIONS ──
+  async function loadPriorSessions() {
+    if (!token) return;
+    try {
+      const r = await fetch('/api/mock/list', { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!r.ok) return;
+      const data = await r.json();
+      const completed = (data.sessions || []).filter(s => s.completed_at);
+      if (completed.length === 0) return;
+      const section = document.getElementById('priorSessions');
+      const list = document.getElementById('priorList');
+      const FORMAT_LABEL = { first_round: 'First Round', superday: 'Superday', custom: 'Custom' };
+      list.innerHTML = completed.slice(0, 6).map(s => {
+        const date = new Date(s.completed_at * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        const score = s.overall_score || 0;
+        const cls = score >= 85 ? 'high' : score >= 70 ? 'mid' : 'low';
+        return `
+          <a class="prior-item" href="mock-results.html?id=${s.id}">
+            <div>
+              <div style="font-size:14px;font-weight:500;">${FORMAT_LABEL[s.format] || s.format}</div>
+              <div class="prior-meta">${date}</div>
+            </div>
+            <div class="prior-score ${cls}">${score}<span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">/100</span></div>
+          </a>`;
+      }).join('');
+      section.style.display = 'block';
+    } catch(e) {}
+  }
+
+  // ── START SESSION ──
+  async function startMock() {
+    if (!chosenFormat) return;
+    const btn = document.getElementById('btnStartMock');
+    btn.disabled = true; btn.textContent = 'Starting…';
+    const body = { format: chosenFormat };
+    if (chosenFormat === 'custom') {
+      const count = parseInt(document.getElementById('customCount').value) || 8;
+      const topics = [...document.querySelectorAll('.topic-chip.selected')].map(c => c.dataset.t);
+      if (topics.length === 0) { alert('Pick at least one topic.'); btn.disabled = false; btn.textContent = 'Start Custom Mock'; return; }
+      body.count = count;
+      body.topics = topics;
+    }
+    try {
+      const r = await fetch('/api/mock/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(body)
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        alert(data.message || data.error || 'Failed to start mock');
+        btn.disabled = false; btn.textContent = 'Start';
+        return;
+      }
+      session = data;
+      // Switch view
+      document.getElementById('formatPickerView').style.display = 'none';
+      document.getElementById('mockActiveView').classList.add('visible');
+      document.getElementById('formatLabel').textContent = data.label;
+      // Warn before leaving once session has started
+      window.addEventListener('beforeunload', confirmBeforeUnload);
+      qIdx = 0; answers = {};
+      sessionStartTime = Date.now();
+      startElapsedTimer();
+      loadCurrentQuestion();
+    } catch(e) {
+      alert('Network error: ' + e.message);
+      btn.disabled = false; btn.textContent = 'Start';
+    }
+  }
+
+  function confirmBeforeUnload(e) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+
+  function startElapsedTimer() {
+    elapsedInterval = setInterval(() => {
+      const sec = Math.floor((Date.now() - sessionStartTime) / 1000);
+      const m = Math.floor(sec / 60); const s = sec % 60;
+      document.getElementById('elapsedTotal').textContent = `Elapsed: ${m}:${String(s).padStart(2,'0')}`;
+    }, 1000);
+  }
+
+  // ── PER-QUESTION FLOW ──
+  function loadCurrentQuestion() {
+    const q = session.questions[qIdx];
+    if (!q) return;
+    document.getElementById('qProgress').textContent = `${qIdx + 1} of ${session.questions.length}`;
+    document.getElementById('mockQText').textContent = q.question;
+    const topicEl = document.getElementById('mockQTopic');
+    topicEl.textContent = TOPIC_LABEL[q.topic] || q.topic;
+    topicEl.className = 'q-tag ' + (TOPIC_CLASS[q.topic] || 'accounting');
+    document.getElementById('mockTextarea').value = answers[q.id]?.answer || '';
+    document.getElementById('mockTextarea').focus();
+    // Update next button label on last question
+    document.getElementById('btnNextQ').textContent = (qIdx === session.questions.length - 1) ? 'Submit interview →' : 'Save & next →';
+    startQuestionTimer();
+  }
+
+  function startQuestionTimer() {
+    qStartTime = Date.now();
+    let remaining = PER_QUESTION_SECONDS;
+    const timerEl = document.getElementById('mockTimer');
+    timerEl.className = 'mock-timer';
+    updateTimer(remaining);
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      remaining--;
+      updateTimer(remaining);
+      if (remaining <= 30) timerEl.className = 'mock-timer warning';
+      if (remaining <= 10) timerEl.className = 'mock-timer danger';
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        // Soft auto-advance after time
+        saveAndNext();
+      }
+    }, 1000);
+  }
+
+  function updateTimer(remaining) {
+    const safe = Math.max(0, remaining);
+    const m = Math.floor(safe / 60); const s = safe % 60;
+    document.getElementById('mockTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  function saveCurrentAnswer() {
+    const q = session.questions[qIdx];
+    const txt = document.getElementById('mockTextarea').value.trim();
+    const secondsTaken = Math.floor((Date.now() - qStartTime) / 1000);
+    answers[q.id] = { answer: txt, seconds_taken: secondsTaken };
+  }
+
+  function saveAndNext() {
+    saveCurrentAnswer();
+    if (qIdx < session.questions.length - 1) {
+      qIdx++;
+      loadCurrentQuestion();
+    } else {
+      submitSession();
+    }
+  }
+
+  function skipQuestion() {
+    const q = session.questions[qIdx];
+    answers[q.id] = { answer: '', seconds_taken: Math.floor((Date.now() - qStartTime) / 1000) };
+    if (qIdx < session.questions.length - 1) {
+      qIdx++;
+      loadCurrentQuestion();
+    } else {
+      submitSession();
+    }
+  }
+
+  function confirmExit() {
+    if (confirm('Exit without grading? Your answers will not be saved.')) {
+      window.removeEventListener('beforeunload', confirmBeforeUnload);
+      window.location.href = 'dashboard.html';
+    }
+  }
+
+  async function submitSession() {
+    window.removeEventListener('beforeunload', confirmBeforeUnload);
+    if (timerInterval) clearInterval(timerInterval);
+    if (elapsedInterval) clearInterval(elapsedInterval);
+    document.getElementById('gradingScreen').classList.add('visible');
+    // Update the "this usually takes…" line based on question count
+    const sub = document.getElementById('gradingSub');
+    const expected = Math.round(session.questions.length * 2.5);
+    if (sub) sub.textContent = `About ${expected}-${expected + 10} seconds for ${session.questions.length} questions.`;
+    try {
+      const r = await fetch('/api/mock/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ sessionId: session.sessionId, answers })
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        alert('Submission failed: ' + (data.error || 'unknown error'));
+        document.getElementById('gradingScreen').classList.remove('visible');
+        return;
+      }
+      window.location.href = `mock-results.html?id=${session.sessionId}`;
+    } catch(e) {
+      alert('Network error: ' + e.message);
+      document.getElementById('gradingScreen').classList.remove('visible');
+    }
+  }
+
+  // ── BOOT ──
+  if (token) {
+    checkEligibility();
+    loadPriorSessions();
+  }
+</script>
+
+</body>
+</html>

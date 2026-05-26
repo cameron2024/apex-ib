@@ -197,6 +197,46 @@
   .form-body { display:none; animation:formIn .2s ease; }
   .form-body.active { display:block; }
   @keyframes formIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ONBOARDING STEPS */
+  .onb-step { display:none; }
+  .onb-step.active { display:block; animation:formIn .25s ease; }
+  .onb-progress { display:flex; gap:5px; margin-bottom:18px; }
+  .onb-progress-dot { flex:1; height:3px; background:var(--border); border-radius:2px; transition:background .2s; }
+  .onb-progress-dot.active { background:var(--text-primary); }
+  .onb-question {
+    font-family:'DM Serif Display',serif;
+    font-size:18px; letter-spacing:-.2px; line-height:1.3;
+    margin-bottom:8px; color:var(--text-primary);
+  }
+  .onb-help { font-size:13px; color:var(--text-secondary); margin-bottom:18px; line-height:1.5; }
+  .onb-options { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
+  .onb-opt {
+    padding:11px 14px; background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; cursor:pointer; font-size:13.5px; font-family:inherit;
+    color:var(--text-primary); text-align:left;
+    transition:border-color .15s, background .15s;
+  }
+  .onb-opt:hover { border-color:var(--text-primary); }
+  .onb-opt.selected {
+    background:var(--text-primary); color:white; border-color:var(--text-primary);
+  }
+  .onb-chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px; }
+  .onb-chip {
+    padding:7px 14px; background:var(--bg); border:1px solid var(--border);
+    border-radius:99px; cursor:pointer; font-size:13px; font-family:inherit;
+    color:var(--text-primary); transition:all .15s;
+  }
+  .onb-chip:hover { border-color:var(--text-primary); }
+  .onb-chip.selected {
+    background:var(--text-primary); color:white; border-color:var(--text-primary);
+  }
+  .onb-step-actions { display:flex; gap:8px; margin-top:8px; }
+  .onb-skip {
+    background:none; border:none; color:var(--text-tertiary);
+    font-size:13px; font-family:inherit; cursor:pointer;
+    text-decoration:underline; text-underline-offset:2px;
+  }
 </style>
 </head>
 <body>
@@ -270,6 +310,65 @@
     <button class="submit-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
   </div>
 
+  <!-- ONBOARDING (shown after register) -->
+  <div class="form-body" id="formOnboarding">
+    <div class="onb-progress">
+      <div class="onb-progress-dot active" id="onbDot1"></div>
+      <div class="onb-progress-dot" id="onbDot2"></div>
+      <div class="onb-progress-dot" id="onbDot3"></div>
+    </div>
+
+    <!-- Step 1: Interview date -->
+    <div class="onb-step active" data-step="1">
+      <div class="onb-question">When's your interview?</div>
+      <div class="onb-help">Apex will pace your review queue around the date.</div>
+      <div class="onb-options" id="onbDateOptions">
+        <button class="onb-opt" data-days="7">This week</button>
+        <button class="onb-opt" data-days="14">In 2 weeks</button>
+        <button class="onb-opt" data-days="30">In ~1 month</button>
+        <button class="onb-opt" data-days="60">2+ months out</button>
+        <button class="onb-opt" data-days="0">No date yet</button>
+      </div>
+      <div class="onb-step-actions">
+        <button class="submit-btn" onclick="onbNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Weak topics -->
+    <div class="onb-step" data-step="2">
+      <div class="onb-question">What feels weakest?</div>
+      <div class="onb-help">Pick any that apply. Your first practice session will lean into these.</div>
+      <div class="onb-chips" id="onbTopicChips">
+        <button class="onb-chip" data-topic="Accounting">Accounting</button>
+        <button class="onb-chip" data-topic="Enterprise_Value">Enterprise Value</button>
+        <button class="onb-chip" data-topic="Valuation">Valuation</button>
+        <button class="onb-chip" data-topic="DCF">DCF</button>
+        <button class="onb-chip" data-topic="Mergers_MA">M&amp;A</button>
+        <button class="onb-chip" data-topic="LBO">LBO</button>
+      </div>
+      <div class="onb-step-actions">
+        <button class="submit-btn" onclick="onbNext()">Next →</button>
+        <button class="onb-skip" onclick="onbNext(true)">Skip</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Role -->
+    <div class="onb-step" data-step="3">
+      <div class="onb-question">What are you prepping for?</div>
+      <div class="onb-help">So we know which question style to emphasize.</div>
+      <div class="onb-options" id="onbRoleOptions">
+        <button class="onb-opt" data-role="IB">Investment Banking</button>
+        <button class="onb-opt" data-role="PE">Private Equity</button>
+        <button class="onb-opt" data-role="Consulting">Consulting</button>
+        <button class="onb-opt" data-role="Other">Other / not sure yet</button>
+      </div>
+      <div class="onb-step-actions">
+        <button class="submit-btn" id="onbFinishBtn" onclick="onbFinish()">Finish →</button>
+        <button class="onb-skip" onclick="onbFinish(true)">Skip</button>
+      </div>
+    </div>
+  </div>
+
   <div class="auth-error" id="authError"></div>
 
   <div class="switch-row">
@@ -322,7 +421,11 @@
       const text = await res.text();
       let d; try { d = JSON.parse(text); } catch(e) { throw new Error('Server error'); }
       if (!res.ok) throw new Error(d.error || 'Login failed');
-      onSuccess(d.token, d.name);
+      localStorage.setItem('apex_token', d.token);
+      localStorage.setItem('apex_user', d.name);
+      // If account isn't onboarded yet, show onboarding; otherwise go to dashboard
+      if (d.onboarded === false) { showOnboarding(); return; }
+      redirectToDest();
     } catch(e) { showError(e.message); }
     finally { btn.disabled = false; btn.textContent = 'Sign In'; }
   }
@@ -343,7 +446,10 @@
       const text = await res.text();
       let d; try { d = JSON.parse(text); } catch(e) { throw new Error('Server error'); }
       if (!res.ok) throw new Error(d.error || 'Registration failed');
-      onSuccess(d.token, d.name);
+      localStorage.setItem('apex_token', d.token);
+      localStorage.setItem('apex_user', d.name);
+      // Show onboarding interview before redirecting
+      showOnboarding();
     } catch(e) { showError(e.message); }
     finally { btn.disabled = false; btn.textContent = 'Create Account'; }
   }
@@ -353,11 +459,94 @@
     window.location.href = dest;
   }
 
+  function redirectToDest() {
+    const dest = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
+    window.location.replace(dest);
+  }
+
   function onSuccess(token, name) {
     localStorage.setItem('apex_token', token);
     localStorage.setItem('apex_user', name);
-    const dest = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
-    window.location.replace(dest);
+    redirectToDest();
+  }
+
+  // ── ONBOARDING ────────────────────────────────────────────
+  let _onbStep = 1;
+  let _onbState = { interviewDays: null, weakTopics: [], role: '' };
+
+  function showOnboarding() {
+    // Hide login/register tabs and switch row, show onboarding form
+    document.getElementById('formLogin').classList.remove('active');
+    document.getElementById('formRegister').classList.remove('active');
+    document.getElementById('formOnboarding').classList.add('active');
+    document.querySelector('.tab-row').style.display = 'none';
+    document.querySelector('.switch-row').style.display = 'none';
+    document.getElementById('panelHeading').textContent = "Let's tune Apex to you";
+    document.getElementById('panelSub').textContent = '3 quick questions.';
+    // Hide the guest link too
+    const guestLink = document.querySelector('.auth-panel button[onclick="goGuest()"]');
+    if (guestLink && guestLink.parentElement) guestLink.parentElement.style.display = 'none';
+    // Wire up option clicks
+    document.querySelectorAll('#onbDateOptions .onb-opt').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#onbDateOptions .onb-opt').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        _onbState.interviewDays = parseInt(btn.dataset.days);
+      };
+    });
+    document.querySelectorAll('#onbTopicChips .onb-chip').forEach(btn => {
+      btn.onclick = () => {
+        btn.classList.toggle('selected');
+        const t = btn.dataset.topic;
+        if (btn.classList.contains('selected')) {
+          if (!_onbState.weakTopics.includes(t)) _onbState.weakTopics.push(t);
+        } else {
+          _onbState.weakTopics = _onbState.weakTopics.filter(x => x !== t);
+        }
+      };
+    });
+    document.querySelectorAll('#onbRoleOptions .onb-opt').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#onbRoleOptions .onb-opt').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        _onbState.role = btn.dataset.role;
+      };
+    });
+  }
+
+  function onbNext(skip) {
+    if (_onbStep === 1 && !skip && _onbState.interviewDays === null) {
+      showError('Pick one option, or hit Skip on the next step.');
+      return;
+    }
+    showError('');
+    _onbStep++;
+    document.querySelectorAll('.onb-step').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.onb-step[data-step="${_onbStep}"]`).classList.add('active');
+    document.getElementById('onbDot' + _onbStep).classList.add('active');
+  }
+
+  async function onbFinish(skip) {
+    const btn = document.getElementById('onbFinishBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    const tok = localStorage.getItem('apex_token');
+    let interviewDate = null;
+    if (!skip && _onbState.interviewDays && _onbState.interviewDays > 0) {
+      interviewDate = Math.floor(Date.now()/1000) + _onbState.interviewDays * 86400;
+    }
+    try {
+      await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
+        body: JSON.stringify({
+          interviewDate,
+          weakTopics: _onbState.weakTopics,
+          role: _onbState.role
+        })
+      });
+    } catch(e) {}
+    // Redirect regardless (don't trap the user if save fails)
+    redirectToDest();
   }
 
   // ── SOCIAL PROOF FEED ─────────────────────────────────────

@@ -97,6 +97,122 @@
     color: var(--text-tertiary);
   }
 
+  /* Interview countdown */
+  .interview-countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FCD34D;
+    padding: 5px 11px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .interview-countdown.distant {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    border-color: #BFDBFE;
+  }
+  .interview-countdown.urgent {
+    background: #FEE2E2;
+    color: #B91C1C;
+    border-color: #FCA5A5;
+  }
+
+  /* ── HERO ACTIONS ────────────────────────── */
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.4s ease 0.04s both;
+  }
+
+  .hero-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    cursor: pointer;
+    transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card:hover {
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+  }
+
+  .hero-card.primary {
+    background: var(--text-primary);
+    color: white;
+    border-color: var(--text-primary);
+  }
+  .hero-card.primary:hover { border-color: #000; }
+
+  .hero-card-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 6px;
+  }
+
+  .hero-card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .hero-card-sub {
+    font-size: 13px;
+    opacity: 0.7;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .hero-card-cta {
+    margin-top: 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .hero-card.primary .hero-card-cta { color: white; }
+  .hero-card:not(.primary) .hero-card-cta { color: var(--accent-blue); }
+
+  .hero-pill {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 10px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.18);
+    padding: 3px 9px;
+    border-radius: 99px;
+    letter-spacing: 0.02em;
+  }
+  .hero-card:not(.primary) .hero-pill {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+
+  @media (max-width: 900px) {
+    .hero-actions { grid-template-columns: 1fr; }
+  }
+
   /* ── SESSION SUMMARY BAR ─────────────────── */
   .summary-bar {
     display: grid;
@@ -845,7 +961,30 @@
         <span id="streakText">— day streak</span>
       </div>
       <div class="today-goal" id="todayGoal">Loading…</div>
+      <div id="interviewCountdown" style="display:none;"></div>
     </div>
+  </div>
+
+  <!-- HERO ACTIONS -->
+  <div class="hero-actions">
+    <a class="hero-card primary" href="practice-screen.html?mode=smart">
+      <div class="hero-card-label">Recommended</div>
+      <div class="hero-card-title" id="smartPracticeTitle">Smart Practice</div>
+      <div class="hero-card-sub" id="smartPracticeSub">Adaptive set tuned to your weak areas and review schedule.</div>
+      <div class="hero-card-cta">Start session →</div>
+    </a>
+    <a class="hero-card" href="practice-screen.html?mode=review_weak" id="reviewWeakCard">
+      <div class="hero-card-label">Targeted</div>
+      <div class="hero-card-title">Review Weak Areas</div>
+      <div class="hero-card-sub" id="reviewWeakSub">Loading…</div>
+      <div class="hero-card-cta">Drill gaps →</div>
+    </a>
+    <a class="hero-card" href="mock-interview.html" id="mockInterviewCard">
+      <div class="hero-card-label">Simulate</div>
+      <div class="hero-card-title">Mock Interview</div>
+      <div class="hero-card-sub" id="mockInterviewSub">Timed, end-of-session report card. Mirrors real superdays.</div>
+      <div class="hero-card-cta">Start mock →</div>
+    </a>
   </div>
 
   <!-- SUMMARY CARDS -->
@@ -1344,6 +1483,12 @@
           localStorage.setItem('apex_plan', data.plan || 'free');
           localStorage.setItem('apex_graded_today', String(data.gradedToday || 0));
           initSidebarMenu(window._userPlan, window._gradedToday);
+
+          // Hero actions + interview countdown
+          renderInterviewCountdown(data.interviewDate);
+          renderReviewWeakCard(data.results || []);
+          renderMockCard();
+          renderSmartPracticeSub(data.results || []);
         }
       } catch(e) {
         console.log('Progress load error:', e.message);
@@ -1535,6 +1680,83 @@
     document.getElementById('hmTotalQs').textContent = totalQs;
   }
 
+  // ── HERO ACTIONS & COUNTDOWN ─────────────────────────────
+  function renderInterviewCountdown(interviewDate) {
+    const el = document.getElementById('interviewCountdown');
+    if (!el || !interviewDate) { if (el) el.style.display = 'none'; return; }
+    const now = Math.floor(Date.now() / 1000);
+    const daysLeft = Math.ceil((interviewDate - now) / 86400);
+    if (daysLeft < 0) { el.style.display = 'none'; return; }
+    let cls = 'interview-countdown';
+    let label;
+    if (daysLeft === 0) { cls += ' urgent'; label = 'Interview today'; }
+    else if (daysLeft === 1) { cls += ' urgent'; label = '1 day to interview'; }
+    else if (daysLeft <= 7) { cls += ' urgent'; label = daysLeft + ' days to interview'; }
+    else if (daysLeft <= 21) { label = daysLeft + ' days to interview'; }
+    else { cls += ' distant'; label = daysLeft + ' days to interview'; }
+    el.className = cls;
+    el.style.display = 'inline-flex';
+    el.innerHTML = '🎯 ' + label;
+  }
+
+  function renderSmartPracticeSub(results) {
+    const sub = document.getElementById('smartPracticeSub');
+    if (!sub) return;
+    const total = results.length;
+    if (total === 0) {
+      sub.textContent = 'Start with a balanced introductory set across all six IB topics.';
+    } else {
+      const dueCount = results.filter(r => r.next_due && r.next_due <= Math.floor(Date.now()/1000)).length;
+      if (dueCount > 0) {
+        sub.textContent = `${dueCount} question${dueCount !== 1 ? 's' : ''} due for review, mixed with new material from your weak topics.`;
+      } else {
+        sub.textContent = 'A balanced set of new questions weighted toward your weak topics.';
+      }
+    }
+  }
+
+  function renderReviewWeakCard(results) {
+    const sub = document.getElementById('reviewWeakSub');
+    const card = document.getElementById('reviewWeakCard');
+    if (!sub || !card) return;
+    const weak = results.filter(r => r.mastery_stage === 'struggling' || r.mastery_stage === 'learning');
+    if (weak.length === 0) {
+      sub.textContent = 'No weak spots identified yet — answer more questions to populate.';
+      card.style.opacity = '0.7';
+    } else {
+      const struggling = weak.filter(r => r.mastery_stage === 'struggling').length;
+      sub.textContent = `${weak.length} question${weak.length !== 1 ? 's' : ''} flagged${struggling > 0 ? ` (${struggling} struggling)` : ''}. Drill until they're solid.`;
+      card.style.opacity = '1';
+    }
+  }
+
+  function renderMockCard() {
+    const sub = document.getElementById('mockInterviewSub');
+    const card = document.getElementById('mockInterviewCard');
+    if (!sub || !card || !token) return;
+    fetch('/api/mock/eligibility', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json())
+      .then(elig => {
+        // Remove any existing pill
+        const existingPill = card.querySelector('.hero-pill');
+        if (existingPill) existingPill.remove();
+        if (!elig.ok) {
+          const pill = document.createElement('span');
+          pill.className = 'hero-pill';
+          pill.textContent = 'Upgrade';
+          card.appendChild(pill);
+          sub.textContent = elig.message || 'Upgrade to unlock more mock interviews.';
+          card.href = 'pricing.html';
+        } else if (elig.plan === 'free') {
+          sub.textContent = 'Timed end-to-end. Free plan includes 1 mock — your first session is free.';
+        } else if (elig.plan === 'monthly') {
+          sub.textContent = `${elig.remaining || 0} mock interview${elig.remaining !== 1 ? 's' : ''} remaining this month.`;
+        } else {
+          sub.textContent = 'Unlimited mock interviews. Timed superdays, first-round mixes, or custom.';
+        }
+      })
+      .catch(() => {});
+  }
   // ── SIDEBAR MENU ──────────────────────────────────────────
 
 

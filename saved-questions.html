@@ -10,40 +10,6 @@
 <link rel="stylesheet" href="shared.css">
 
 <style>
-
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-  
-
-  
-  
-
-  /* ── PAGE HEADER ── */
   .page-header {
     display: flex;
     align-items: flex-end;
@@ -51,8 +17,6 @@
     margin-bottom: 28px;
     animation: fadeUp 0.35s ease both;
   }
-
-  
 
   .page-title {
     font-family: 'DM Serif Display', serif;
@@ -64,7 +28,6 @@
 
   .page-sub { font-size: 14px; color: var(--text-secondary); }
 
-  /* ── FILTER BAR ── */
   .filter-bar {
     display: flex;
     align-items: center;
@@ -95,7 +58,6 @@
     color: var(--text-tertiary);
   }
 
-  /* ── SAVED QUESTIONS LIST ── */
   .questions-list {
     display: flex;
     flex-direction: column;
@@ -112,12 +74,11 @@
     align-items: flex-start;
     gap: 14px;
     transition: border-color 0.15s;
-    cursor: pointer;
   }
 
   .saved-card:hover { border-color: var(--border-strong); }
 
-  .saved-card-
+  .saved-card-body { flex: 1; min-width: 0; }
 
   .saved-q-text {
     font-size: 14.5px;
@@ -189,7 +150,6 @@
 
   .btn-unsave:hover { border-color: var(--accent-red); color: var(--accent-red); }
 
-  /* ── ANSWER DRAWER ── */
   .answer-drawer {
     display: none;
     background: var(--bg);
@@ -228,7 +188,6 @@
     margin-top: 4px;
   }
 
-  /* ── EMPTY STATE ── */
   .empty-state {
     text-align: center;
     padding: 80px 40px;
@@ -257,42 +216,34 @@
 
   .btn-go-practice:hover { opacity: 0.85; }
 
-  
-  
-  
+  /* Migration toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--text-primary);
+    color: white;
+    padding: 12px 18px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    z-index: 100;
+    animation: fadeUp 0.3s ease both;
+  }
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-  </style>
+  .loading-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-tertiary);
+    font-size: 14px;
+  }
+</style>
 </head>
 
 <body data-page="saved">
 
 <div id="sidebar-mount"></div>
 
-<!-- MAIN -->
 <main class="main">
 
   <div class="page-header">
@@ -313,7 +264,9 @@
     <span class="filter-count" id="filterCount"></span>
   </div>
 
-  <div class="questions-list" id="questionsList"></div>
+  <div class="questions-list" id="questionsList">
+    <div class="loading-state">Loading your saved questions…</div>
+  </div>
 
 </main>
 
@@ -322,25 +275,43 @@
   // ── AUTH ──
   const token = localStorage.getItem('apex_token');
   const name = localStorage.getItem('apex_user');
-  if (name) {
-    const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-    document.getElementById('sidebarAvatar').textContent = initials;
-    document.getElementById('sidebarUserName').textContent = name;
+
+  // Show sign-in wall for guests immediately
+  if (!token) {
+    document.querySelector('.main').innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:16px;">
+        <div style="font-size:40px;">🔖</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:-.3px;color:var(--text-primary);">Saved questions need an account</h2>
+        <p style="font-size:14px;color:var(--text-secondary);max-width:360px;line-height:1.65;">
+          Bookmark questions for focused review and revisit them anytime, on any device. Create a free account to start saving.
+        </p>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <a href="auth.html?mode=register" style="padding:10px 20px;background:var(--text-primary);color:white;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Create free account</a>
+          <a href="auth.html" style="padding:10px 20px;background:white;color:var(--text-primary);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Sign in</a>
+        </div>
+        <a href="practice-screen.html" style="font-size:13px;color:var(--text-tertiary);text-decoration:none;margin-top:4px;">← Back to practice</a>
+      </div>`;
   }
 
-  // Fetch plan
+  // Sidebar identity
+  if (name && token) {
+    const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    if (document.getElementById('sidebarAvatar')) document.getElementById('sidebarAvatar').textContent = initials;
+    if (document.getElementById('sidebarUserName')) document.getElementById('sidebarUserName').textContent = name;
+  }
+
+  // Fetch plan for sidebar
   if (token) {
     fetch('/api/progress/load', { headers: { 'Authorization': 'Bearer ' + token } })
       .then(r => r.json()).then(data => {
         window._userPlan = data.plan || 'free';
         window._gradedToday = data.gradedToday || 0;
         window._memberSince = data.memberSince || null;
-        initSidebarMenu(window._userPlan, window._gradedToday);
+        if (typeof initSidebarMenu === 'function') initSidebarMenu(window._userPlan, window._gradedToday);
       }).catch(() => {});
   }
 
-
-  // ── DATA ──
+  // ── DATA / CONSTANTS ──
   const TOPIC_LABELS = {
     'Accounting': 'Accounting',
     'Enterprise_Value': 'Enterprise Value',
@@ -359,24 +330,66 @@
     'LBO': 'lbo'
   };
 
-  function getSaved() {
-    try { return JSON.parse(localStorage.getItem('apex_saved_questions') || '[]'); }
-    catch(e) { return []; }
-  }
-
-  function unsave(qId) {
-    const saved = getSaved().filter(q => q.id !== qId);
-    localStorage.setItem('apex_saved_questions', JSON.stringify(saved));
-    render();
-  }
-
-  function formatDate(ts) {
-    const d = new Date(ts);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
-
   let currentFilter = 'all';
+  let _savedItems = []; // [{id, savedAt, question: {...}}]
 
+  // ── API ──
+  async function apiList() {
+    const r = await fetch('/api/saved/list', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!r.ok) throw new Error('Failed to load');
+    const data = await r.json();
+    return data.items || [];
+  }
+
+  async function apiRemove(questionId) {
+    const r = await fetch('/api/saved/remove', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ questionId })
+    });
+    return r.ok;
+  }
+
+  async function apiMigrate(questionIds) {
+    const r = await fetch('/api/saved/migrate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ questionIds })
+    });
+    return r.ok ? (await r.json()) : null;
+  }
+
+  // ── ONE-TIME MIGRATION FROM LOCALSTORAGE ──
+  async function migrateIfNeeded() {
+    try {
+      const raw = localStorage.getItem('apex_saved_questions');
+      if (!raw) return 0;
+      let parsed;
+      try { parsed = JSON.parse(raw); } catch(e) { localStorage.removeItem('apex_saved_questions'); return 0; }
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        localStorage.removeItem('apex_saved_questions');
+        return 0;
+      }
+      const ids = parsed.map(q => q && q.id).filter(Boolean);
+      if (ids.length === 0) {
+        localStorage.removeItem('apex_saved_questions');
+        return 0;
+      }
+      const result = await apiMigrate(ids);
+      localStorage.removeItem('apex_saved_questions');
+      return result?.migrated || 0;
+    } catch(e) { return 0; }
+  }
+
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+  }
+
+  // ── FILTERS / RENDER ──
   function setFilter(filter, btn) {
     currentFilter = filter;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -384,9 +397,10 @@
     render();
   }
 
-  function toggleAnswer(qId) {
-    const drawer = document.getElementById('drawer-' + qId);
-    const btn = document.getElementById('toggle-' + qId);
+  function toggleAnswer(safeId) {
+    const drawer = document.getElementById('drawer-' + safeId);
+    const btn = document.getElementById('toggle-' + safeId);
+    if (!drawer || !btn) return;
     if (drawer.classList.contains('open')) {
       drawer.classList.remove('open');
       btn.textContent = '▶ Show model answer';
@@ -396,24 +410,44 @@
     }
   }
 
-  function practiceThis(qId) {
-    // Navigate to the topic that contains this question, it will load via smart ordering
-    const saved = getSaved();
-    const q = saved.find(s => s.id === qId);
-    if (q) {
-      window.location.href = `practice-screen.html?topic=${q.topic}&focus=${qId}`;
+  function practiceThis(qId, topic) {
+    window.location.href = `practice-screen.html?topic=${encodeURIComponent(topic)}&focus=${encodeURIComponent(qId)}`;
+  }
+
+  async function unsave(qId) {
+    const ok = await apiRemove(qId);
+    if (ok) {
+      _savedItems = _savedItems.filter(s => s.id !== qId);
+      render();
+    } else {
+      alert('Failed to remove. Try again.');
     }
   }
 
+  function formatDate(ts) {
+    if (!ts) return '';
+    const d = new Date(ts * 1000);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function safeIdFor(qid) {
+    return String(qid).replace(/[^a-zA-Z0-9_-]/g, '_');
+  }
+
   function render() {
-    const all = getSaved();
-    const filtered = currentFilter === 'all' ? all : all.filter(q => q.topic === currentFilter);
+    const all = _savedItems;
+    const filtered = currentFilter === 'all'
+      ? all
+      : all.filter(item => item.question.topic === currentFilter);
 
-    // Update count
-    const countEl = document.getElementById('filterCount');
-    countEl.textContent = filtered.length === 0 ? '' : `${filtered.length} question${filtered.length !== 1 ? 's' : ''}`;
+    document.getElementById('filterCount').textContent =
+      filtered.length === 0 ? '' : `${filtered.length} question${filtered.length !== 1 ? 's' : ''}`;
 
-    // Update subtitle
     document.getElementById('pageSubtitle').textContent =
       all.length === 0 ? 'Questions you bookmark during practice will appear here' :
       `${all.length} question${all.length !== 1 ? 's' : ''} saved`;
@@ -443,17 +477,13 @@
       return;
     }
 
-    // Sort newest first
-    const sorted = [...filtered].sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
-
-    list.innerHTML = sorted.map(q => {
+    list.innerHTML = filtered.map(item => {
+      const q = item.question;
       const topicLabel = TOPIC_LABELS[q.topic] || q.topic;
       const topicClass = TOPIC_CLASS[q.topic] || 'accounting';
       const diffLabel = q.difficulty === 'hard' ? 'Advanced' : 'Basic';
-      const dateStr = q.savedAt ? formatDate(q.savedAt) : '';
-      const safeId = CSS.escape ? CSS.escape(q.id) : q.id.replace(/[^a-zA-Z0-9_-]/g, '_');
-      const answerId = 'drawer-' + safeId;
-      const toggleId = 'toggle-' + safeId;
+      const dateStr = formatDate(item.savedAt);
+      const safeId = safeIdFor(item.id);
 
       return `
         <div class="saved-card" id="card-${safeId}">
@@ -465,47 +495,36 @@
               ${dateStr ? `<span class="saved-date">Saved ${dateStr}</span>` : ''}
             </div>
             ${q.model_answer ? `
-              <button class="toggle-answer-btn" id="${toggleId}" onclick="toggleAnswer('${safeId}')">▶ Show model answer</button>
-              <div class="answer-drawer" id="${answerId}">
+              <button class="toggle-answer-btn" id="toggle-${safeId}" onclick="toggleAnswer('${safeId}')">▶ Show model answer</button>
+              <div class="answer-drawer" id="drawer-${safeId}">
                 <div class="answer-drawer-label">Model Answer</div>
                 <div class="answer-text">${escapeHtml(q.model_answer)}</div>
               </div>
             ` : ''}
           </div>
           <div class="saved-card-actions">
-            <button class="btn-practice-saved" onclick="practiceThis('${q.id}')">Practice →</button>
-            <button class="btn-unsave" onclick="unsave('${q.id}')">Remove</button>
+            <button class="btn-practice-saved" onclick="practiceThis('${escapeHtml(item.id)}','${escapeHtml(q.topic)}')">Practice →</button>
+            <button class="btn-unsave" onclick="unsave('${escapeHtml(item.id)}')">Remove</button>
           </div>
         </div>`;
     }).join('');
   }
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // Show sign-in wall for guests
-  if (!localStorage.getItem('apex_token')) {
-    document.querySelector('.main').innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:16px;">
-        <div style="font-size:40px;">🔖</div>
-        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:-.3px;color:var(--text-primary);">Saved questions need an account</h2>
-        <p style="font-size:14px;color:var(--text-secondary);max-width:360px;line-height:1.65;">
-          Bookmark questions for focused review and revisit them anytime. Create a free account to start saving.
-        </p>
-        <div style="display:flex;gap:10px;margin-top:8px;">
-          <a href="auth.html?mode=register" style="padding:10px 20px;background:var(--text-primary);color:white;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Create free account</a>
-          <a href="auth.html" style="padding:10px 20px;background:white;color:var(--text-primary);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Sign in</a>
-        </div>
-        <a href="practice-screen.html" style="font-size:13px;color:var(--text-tertiary);text-decoration:none;margin-top:4px;">← Back to practice</a>
-      </div>`;
-  } else {
-  // Init
-  render();
-
-  } // end else (logged in)
-
+  // ── BOOT ──
+  (async function init() {
+    if (!token) return;
+    const migrated = await migrateIfNeeded();
+    try {
+      _savedItems = await apiList();
+      render();
+      if (migrated > 0) {
+        showToast(`✓ Synced ${migrated} bookmark${migrated !== 1 ? 's' : ''} to your account — now available on all devices.`);
+      }
+    } catch(e) {
+      document.getElementById('questionsList').innerHTML =
+        `<div class="empty-state"><div class="empty-icon">⚠</div><div class="empty-title">Couldn't load saved questions</div><div class="empty-sub">${escapeHtml(e.message)}. Try refreshing the page.</div></div>`;
+    }
+  })();
 </script>
 
 </body>

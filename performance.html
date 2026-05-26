@@ -330,6 +330,35 @@
     <div class="page-sub" id="pageSubtitle">Loading your data…</div>
   </div>
 
+  <!-- INSIGHTS CARD -->
+  <div class="insights-card fade-1" id="insightsCard" style="display:none;background:white;border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin-bottom:24px;box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:4px;">Your Coach</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-.3px;">Insights</div>
+      </div>
+      <div id="insightsTimeBadge" style="display:none;background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0;padding:7px 14px;border-radius:99px;font-size:12.5px;font-weight:600;align-self:center;"></div>
+    </div>
+    <div id="insightsBody" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:7px;">Diagnosis</div>
+        <div id="insightDiagnosis" style="font-size:14px;line-height:1.55;color:var(--text-primary);">—</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:7px;">Weak Pattern</div>
+        <div id="insightWeak" style="font-size:14px;line-height:1.55;color:var(--text-primary);">—</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:7px;">Next Action</div>
+        <div id="insightAction" style="font-size:14px;line-height:1.55;color:var(--text-primary);margin-bottom:12px;">—</div>
+        <a id="insightCta" href="practice-screen.html?mode=smart" style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:var(--text-primary);color:white;border-radius:6px;font-size:12.5px;font-weight:600;text-decoration:none;">Start session →</a>
+      </div>
+    </div>
+  </div>
+  <div id="insightsLoading" class="fade-1" style="display:none;background:white;border:1px solid var(--border);border-radius:14px;padding:18px 24px;margin-bottom:24px;font-size:13.5px;color:var(--text-tertiary);">
+    Generating your personalized insights…
+  </div>
+
   <!-- READINESS SCORE -->
   <div class="readiness-hero fade-2" id="readinessHero">
     <div class="readiness-dial">
@@ -1003,6 +1032,9 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
         window._memberSince = data.memberSince || null;
         initSidebarMenu(window._userPlan, window._gradedToday);
 
+        // Fetch personalized insights (server-side Claude call, cached 1hr)
+        loadInsights(token, results.length);
+
         document.getElementById('pageSubtitle').textContent =
           history.length > 0
             ? history.length + ' answer' + (history.length !== 1 ? 's' : '') + ' recorded · ' + (readiness ? readiness.score : '—') + '% readiness'
@@ -1022,6 +1054,52 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
       }
     })();
   } // end else (logged in)
+
+  // ── INSIGHTS ──────────────────────────────────────────────
+  async function loadInsights(token, answeredCount) {
+    const card = document.getElementById('insightsCard');
+    const loading = document.getElementById('insightsLoading');
+    if (!card || !loading) return;
+    if (answeredCount < 5) {
+      // Show a placeholder rather than firing a call we know will fail
+      card.style.display = 'block';
+      document.getElementById('insightDiagnosis').textContent =
+        `Answer at least 5 questions to unlock personalized insights. You're at ${answeredCount}.`;
+      document.getElementById('insightWeak').textContent = '—';
+      document.getElementById('insightAction').textContent = 'Practice a few more, then come back here.';
+      return;
+    }
+    loading.style.display = 'block';
+    try {
+      const r = await fetch('/api/insights', { headers: { 'Authorization': 'Bearer ' + token } });
+      loading.style.display = 'none';
+      if (!r.ok) return;
+      const data = await r.json();
+      if (!data.ready) {
+        card.style.display = 'block';
+        document.getElementById('insightDiagnosis').textContent = data.message || '—';
+        return;
+      }
+      card.style.display = 'block';
+      document.getElementById('insightDiagnosis').textContent = data.diagnosis || '—';
+      document.getElementById('insightWeak').textContent = data.weak_pattern || '—';
+      document.getElementById('insightAction').textContent = data.next_action || '—';
+      // Time-to-mastery badge
+      const badge = document.getElementById('insightsTimeBadge');
+      if (badge && data.timeToMastery) {
+        badge.textContent = `Interview-ready in ~${data.timeToMastery} day${data.timeToMastery !== 1 ? 's' : ''}`;
+        badge.style.display = 'inline-block';
+      }
+      // Bias the CTA toward the weakest topic when we have one
+      if (data.weakestTopic) {
+        const cta = document.getElementById('insightCta');
+        if (cta) cta.href = `practice-screen.html?mode=review_weak&topic=${encodeURIComponent(data.weakestTopic)}`;
+      }
+    } catch(e) {
+      loading.style.display = 'none';
+    }
+  }
+
   // ── SIDEBAR MENU ──────────────────────────────────────────
 
 
