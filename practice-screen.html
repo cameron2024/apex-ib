@@ -2073,9 +2073,16 @@ Return JSON only.`;
       window._focusQid = null;
     }
 
-    // Update nav active state
+    // Update nav active state — target the actual sidebar items by href
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    const navEl = document.getElementById('nav-' + topic);
+    let navEl;
+    if (topic === 'All') {
+      // "Practice All" link
+      navEl = document.querySelector('.nav-item[data-page="practice"]');
+    } else {
+      // Topic links match by href
+      navEl = document.querySelector('.nav-item[href="practice-screen.html?topic=' + topic + '"]');
+    }
     if (navEl) navEl.classList.add('active');
 
     // Update breadcrumb + pill
