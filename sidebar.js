@@ -49,11 +49,11 @@
 
     <div class="nav-section-label" style="margin-top:10px;">Topics</div>
     <a class="nav-item" href="practice-screen.html?topic=Accounting">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A1.5 1.5 0 015.5 3H19a1 1 0 011 1v15.5a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 19.5z"/><path d="M4 17.5h16"/><path d="M9 7.5h6M9 10.5h6"/><text x="12" y="15.5" text-anchor="middle" font-size="6" font-weight="700" font-family="sans-serif" fill="currentColor" stroke="none">$</text></svg>
       Accounting
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Enterprise_Value">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l6-4 6 4v13"/><path d="M3 21h12"/><path d="M7 12h.01M7 16h.01M11 12h.01M11 16h.01"/><circle cx="17.5" cy="15.5" r="3"/><line x1="19.6" y1="17.6" x2="22" y2="20"/><text x="17.5" y="17" text-anchor="middle" font-size="4" font-weight="700" font-family="sans-serif" fill="currentColor" stroke="none">$</text></svg>
       Enterprise Value
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Valuation">
@@ -61,15 +61,15 @@
       Valuation
     </a>
     <a class="nav-item" href="practice-screen.html?topic=DCF">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6v13"/><path d="M12 8h-3.5a2 2 0 100 4h3a2 2 0 110 4H7"/><path d="M16 8l4 4-4 4"/><path d="M20 12h-6"/></svg>
       Discounted Cash Flow
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Mergers_MA">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l4 4v6l5 5"/><path d="M21 5l-4 4v6l-5 5"/><path d="M5 7l-2-2 2-2"/><path d="M19 7l2-2-2-2"/></svg>
       Mergers &amp; Acquisitions
     </a>
     <a class="nav-item" href="practice-screen.html?topic=LBO">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="16" width="18" height="5" rx="0.5"/><rect x="6" y="11" width="12" height="5" rx="0.5"/><rect x="9" y="6" width="6" height="5" rx="0.5"/><path d="M15 4l-3-2-3 2"/></svg>
       Leveraged Buyouts
     </a>
   </nav>
