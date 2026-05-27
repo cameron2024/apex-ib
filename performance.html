@@ -1206,8 +1206,52 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
     z-index: 2;
     transition: left 1s cubic-bezier(.22,1,.36,1);
   }
-  .rb-spark-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-  .rb-spark { width: 100%; height: 80px; }
+  .rb-spark-wrap {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
+  }
+  .rb-spark { width: 100%; height: 90px; display: block; }
+  .rb-spark circle { cursor: pointer; transition: r .12s ease; }
+  .rb-spark circle:hover { r: 4.5; }
+  .rb-spark-tip {
+    position: absolute;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+    transition: opacity .15s ease, transform .15s ease;
+    z-index: 20;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+    max-width: 240px;
+    min-width: 160px;
+    line-height: 1.45;
+  }
+  .rb-spark-tip.visible { opacity: 1; transform: translateY(0) scale(1); }
+  .rb-tip-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .rb-tip-score { font-family: 'DM Serif Display', serif; font-size: 18px; letter-spacing: -.3px; }
+  .rb-tip-score.high { color: #15803D; }
+  .rb-tip-score.mid  { color: #B45309; }
+  .rb-tip-score.low  { color: #B91C1C; }
+  .rb-tip-date { font-size: 11px; color: var(--text-tertiary); }
+  .rb-tip-topic { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--text-tertiary); margin-bottom: 4px; }
+  .rb-tip-q { font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; }
+  .rb-tip-link {
+    display: block; margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 11.5px; font-weight: 600; color: var(--accent-blue);
+    text-decoration: none;
+  }
+  .rb-tip-link:hover { color: #1D4ED8; }
   .rb-spark-meta {
     display: flex; justify-content: space-between; margin-top: 8px;
     font-size: 11.5px; color: var(--text-tertiary);
@@ -1303,9 +1347,9 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
       document.getElementById('rbCta').href = `practice-screen.html?mode=review_weak&topic=${encodeURIComponent(d.weakestTopic)}`;
     }
 
-    // Sparkline data — last ~20 session scores (reverse to chronological)
+    // Sparkline data — last ~20 session records (reverse to chronological)
     const history = (window._historyForBreakdown || []).slice(0, 20).reverse();
-    const sparkSvg = buildSpark(history.map(h => h.score));
+    const sparkSvg = buildSpark(history);
 
     // Topics holding you back: avg < 85, sorted by gap descending
     const weakTopics = (d.topicAvgs || []).filter(t => t.avg < 85).sort((a,b) => a.avg - b.avg).slice(0, 4);
@@ -1352,11 +1396,13 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
         <div class="rb-section-title">Recent score trend</div>
         <div class="rb-spark-wrap">
           ${sparkSvg}
+          <div class="rb-spark-tip" id="rbSparkTip"></div>
           <div class="rb-spark-meta">
             <span>Earliest: ${history.length > 0 ? history[0].score : '—'}%</span>
             <span>${history.length} session${history.length !== 1 ? 's' : ''}</span>
             <span>Latest: ${history.length > 0 ? history[history.length-1].score : '—'}%</span>
           </div>
+          <div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;text-align:center;">Hover or tap any point for details</div>
         </div>
       </div>
 
@@ -1400,21 +1446,31 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
     }, 80);
   }
 
-  function buildSpark(scores) {
-    if (!scores || scores.length < 2) {
+  function buildSpark(records) {
+    if (!records || records.length < 2) {
       return '<div style="text-align:center;color:var(--text-tertiary);font-size:12px;padding:24px 0;">Need at least 2 sessions for a trend.</div>';
     }
-    const w = 600, h = 80, pad = 4;
+    const w = 600, h = 90, pad = 6;
     const min = 0, max = 100;
-    const pts = scores.map((s, i) => {
-      const x = pad + (i * (w - 2 * pad)) / (scores.length - 1);
-      const y = h - pad - ((s - min) / (max - min)) * (h - 2 * pad);
+    const pts = records.map((r, i) => {
+      const x = pad + (i * (w - 2 * pad)) / (records.length - 1);
+      const y = h - pad - ((r.score - min) / (max - min)) * (h - 2 * pad);
       return [x, y];
     });
     const path = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
     const area = path + ` L${pts[pts.length-1][0].toFixed(1)},${h-pad} L${pts[0][0].toFixed(1)},${h-pad} Z`;
-    // Target line at 85
     const tgtY = h - pad - ((85 - min) / (max - min)) * (h - 2 * pad);
+
+    // Cache records for tooltip lookups
+    window._rbSparkRecords = records;
+
+    const dots = pts.map((p, i) => {
+      const r = records[i];
+      const isLast = i === pts.length - 1;
+      const color = r.score >= 85 ? '#15803D' : r.score >= 65 ? '#D97706' : '#DC2626';
+      return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${isLast ? 3.5 : 2.4}" fill="${color}" data-idx="${i}" onmouseenter="rbSparkHover(event, this)" onmouseleave="rbSparkLeave()" onclick="rbSparkClick(event, this)"/>`;
+    }).join('');
+
     return `<svg class="rb-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
       <defs>
         <linearGradient id="rbSparkGrad" x1="0" x2="0" y1="0" y2="1">
@@ -1426,8 +1482,90 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
       <text x="${w-4}" y="${tgtY-3}" text-anchor="end" font-size="10" fill="#1A1814" opacity="0.5">85%</text>
       <path d="${area}" fill="url(#rbSparkGrad)"/>
       <path d="${path}" fill="none" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      ${pts.map((p, i) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${i === pts.length-1 ? 3.5 : 2.2}" fill="${i === pts.length-1 ? '#15803D' : '#84CC16'}"/>`).join('')}
+      ${dots}
     </svg>`;
+  }
+
+  // ── SPARKLINE TOOLTIP INTERACTION ──
+  let _rbSparkLocked = false;
+
+  function rbSparkHover(e, circle) {
+    if (_rbSparkLocked) return;
+    rbSparkShowTip(circle);
+  }
+  function rbSparkLeave() {
+    if (_rbSparkLocked) return;
+    rbSparkHideTip();
+  }
+  function rbSparkClick(e, circle) {
+    e.stopPropagation();
+    if (_rbSparkLocked) {
+      _rbSparkLocked = false;
+      rbSparkHideTip();
+      return;
+    }
+    _rbSparkLocked = true;
+    rbSparkShowTip(circle);
+    setTimeout(() => {
+      const outsideHandler = (ev) => {
+        if (!ev.target.closest('.rb-spark-tip') && ev.target !== circle) {
+          _rbSparkLocked = false;
+          rbSparkHideTip();
+          document.removeEventListener('click', outsideHandler);
+        }
+      };
+      document.addEventListener('click', outsideHandler);
+    }, 0);
+  }
+
+  function rbSparkShowTip(circle) {
+    const idx = parseInt(circle.getAttribute('data-idx'));
+    const rec = (window._rbSparkRecords || [])[idx];
+    if (!rec) return;
+    const tip = document.getElementById('rbSparkTip');
+    if (!tip) return;
+
+    const date = new Date(rec.created_at * 1000);
+    const dateStr = date.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+    const timeStr = date.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    const topicLabel = RB_TOPIC_LABELS[rec.topic] || rec.topic;
+    const qText = (Q_TEXT && Q_TEXT[rec.question_id]) ? Q_TEXT[rec.question_id] : '';
+    const qTrunc = qText.length > 90 ? qText.slice(0, 87) + '…' : qText;
+    const sCls = rec.score >= 85 ? 'high' : rec.score >= 65 ? 'mid' : 'low';
+
+    tip.innerHTML = `
+      <div class="rb-tip-topic">${topicLabel}</div>
+      <div class="rb-tip-row">
+        <span class="rb-tip-score ${sCls}">${rec.score}<span style="font-size:10px;color:var(--text-tertiary);font-family:inherit;letter-spacing:0;">/100</span></span>
+        <span class="rb-tip-date">${dateStr} · ${timeStr}</span>
+      </div>
+      ${qTrunc ? `<div class="rb-tip-q">${qTrunc.replace(/</g,'&lt;')}</div>` : ''}
+      ${rec.question_id ? `<a class="rb-tip-link" href="practice-screen.html?topic=${rec.topic}&focus=${rec.question_id}">Drill this question →</a>` : ''}
+    `;
+
+    // Position relative to the spark-wrap
+    const wrap = circle.closest('.rb-spark-wrap');
+    const wrapRect = wrap.getBoundingClientRect();
+    const circleRect = circle.getBoundingClientRect();
+    const cx = circleRect.left + circleRect.width / 2 - wrapRect.left;
+    const cy = circleRect.top - wrapRect.top;
+    // Show tip first to measure
+    tip.style.left = '0px'; tip.style.top = '0px';
+    tip.classList.add('visible');
+    const tipRect = tip.getBoundingClientRect();
+    let left = cx - tipRect.width / 2;
+    let top = cy - tipRect.height - 10;
+    // Clamp horizontal to wrap bounds
+    left = Math.max(6, Math.min(left, wrap.clientWidth - tipRect.width - 6));
+    // Flip below if would go above wrap
+    if (top < 6) top = cy + 14;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+
+  function rbSparkHideTip() {
+    const tip = document.getElementById('rbSparkTip');
+    if (tip) tip.classList.remove('visible');
   }
 </script>
 
