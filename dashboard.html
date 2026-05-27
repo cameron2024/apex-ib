@@ -851,27 +851,44 @@
     border-radius: 3px;
     background: var(--bg);
     position: relative;
+    cursor: pointer;
+    transition: transform .12s ease;
   }
+  .heatmap-cell:hover { transform: scale(1.25); z-index: 5; }
   .heatmap-cell.level-1 { background: #d1fae5; }
   .heatmap-cell.level-2 { background: #6ee7b7; }
   .heatmap-cell.level-3 { background: #34d399; }
   .heatmap-cell.level-4 { background: #16a34a; }
   .heatmap-cell.today { outline: 2px solid var(--text-primary); outline-offset: -1px; }
-  .heatmap-cell[data-tip]:hover::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
+
+  /* Rich floating tooltip */
+  .hm-tip {
+    position: fixed;
     background: var(--text-primary);
-    color: #fff;
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-    z-index: 10;
+    color: white;
+    padding: 9px 12px;
+    border-radius: 7px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    z-index: 1100;
     pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .14s ease, transform .14s ease;
+    min-width: 140px;
+    max-width: 220px;
   }
+  .hm-tip.visible { opacity: 1; transform: translateY(0); }
+  .hm-tip-date { font-weight: 600; font-size: 12px; margin-bottom: 4px; }
+  .hm-tip-row { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; opacity: 0.85; }
+  .hm-tip-row + .hm-tip-row { margin-top: 2px; }
+  .hm-tip-row .label { opacity: 0.65; }
+  .hm-tip-empty { font-size: 11px; opacity: 0.7; font-style: italic; }
+  .hm-tip-score { font-weight: 600; }
+  .hm-tip-score.high { color: #6ee7b7; }
+  .hm-tip-score.mid  { color: #fde68a; }
+  .hm-tip-score.low  { color: #fca5a5; }
   .heatmap-labels {
     display: flex;
     justify-content: space-between;
@@ -1678,6 +1695,18 @@
     const actMap = {};
     activity.forEach(a => { actMap[a.date] = a.questions_answered; });
 
+    // Build per-day details from session history (window._modalHistory)
+    const TOPIC_LABEL = { Accounting:'Accounting', Enterprise_Value:'Enterprise Value', Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO' };
+    const dayDetails = {};
+    (window._modalHistory || []).forEach(h => {
+      const d = new Date(h.created_at * 1000);
+      const key = d.toISOString().slice(0,10);
+      if (!dayDetails[key]) dayDetails[key] = { scores: [], topics: {}, best: 0 };
+      dayDetails[key].scores.push(h.score);
+      dayDetails[key].topics[h.topic] = (dayDetails[key].topics[h.topic] || 0) + 1;
+      if (h.score > dayDetails[key].best) dayDetails[key].best = h.score;
+    });
+
     let totalQs = 0, activeDays = 0;
     const cells = [];
     for (let i = days - 1; i >= 0; i--) {
@@ -1688,11 +1717,24 @@
       if (count > 0) { totalQs += count; activeDays++; }
       const level = count === 0 ? '' : count <= 2 ? 'level-1' : count <= 5 ? 'level-2' : count <= 10 ? 'level-3' : 'level-4';
       const isToday = i === 0;
-      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const tip = count > 0 ? `${label}: ${count} question${count!==1?'s':''}` : `${label}: No practice`;
       const cell = document.createElement('div');
       cell.className = 'heatmap-cell ' + level + (isToday ? ' today' : '');
-      cell.setAttribute('data-tip', tip);
+
+      // Build tooltip data — store on the element for the floating tip handler
+      const dateLabel = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const det = dayDetails[key];
+      const tipData = { date: dateLabel, count, isToday };
+      if (det && det.scores.length > 0) {
+        const avg = Math.round(det.scores.reduce((s,x)=>s+x,0) / det.scores.length);
+        const topTopic = Object.entries(det.topics).sort((a,b)=>b[1]-a[1])[0];
+        tipData.avg = avg;
+        tipData.best = det.best;
+        tipData.topTopic = TOPIC_LABEL[topTopic[0]] || topTopic[0];
+        tipData.topTopicCount = topTopic[1];
+      }
+      cell._tipData = tipData;
+      cell.addEventListener('mouseenter', e => showHmTip(e.currentTarget));
+      cell.addEventListener('mouseleave', hideHmTip);
       cells.push(cell);
     }
     cells.forEach(c => grid.appendChild(c));
@@ -1703,6 +1745,52 @@
     document.getElementById('hmStreak').textContent = streak + ' day' + (streak !== 1 ? 's' : '');
     document.getElementById('hmActiveDays').textContent = activeDays;
     document.getElementById('hmTotalQs').textContent = totalQs;
+  }
+
+  // ── Floating tooltip for heatmap cells ──
+  function showHmTip(cell) {
+    const data = cell._tipData;
+    if (!data) return;
+    let tip = document.getElementById('hmTip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'hmTip';
+      tip.className = 'hm-tip';
+      document.body.appendChild(tip);
+    }
+    let html = `<div class="hm-tip-date">${data.date}${data.isToday ? ' · Today' : ''}</div>`;
+    if (data.count > 0) {
+      const sc = data.avg ?? 0;
+      const cls = sc >= 80 ? 'high' : sc >= 60 ? 'mid' : 'low';
+      html += `<div class="hm-tip-row"><span class="label">Questions</span><span>${data.count}</span></div>`;
+      if (data.avg != null) {
+        html += `<div class="hm-tip-row"><span class="label">Avg score</span><span class="hm-tip-score ${cls}">${data.avg}/100</span></div>`;
+        html += `<div class="hm-tip-row"><span class="label">Best</span><span>${data.best}/100</span></div>`;
+      }
+      if (data.topTopic) {
+        html += `<div class="hm-tip-row"><span class="label">Most</span><span>${data.topTopic} (${data.topTopicCount})</span></div>`;
+      }
+    } else {
+      html += `<div class="hm-tip-empty">No practice this day</div>`;
+    }
+    tip.innerHTML = html;
+    // Position: above the cell, centered, clamped to viewport
+    const r = cell.getBoundingClientRect();
+    tip.style.left = '0px'; tip.style.top = '0px';  // reset so we can measure
+    tip.classList.add('visible');
+    const tr = tip.getBoundingClientRect();
+    let left = r.left + r.width/2 - tr.width/2;
+    let top  = r.top - tr.height - 8;
+    // If it would go off the top, flip below
+    if (top < 8) top = r.bottom + 8;
+    // Clamp horizontal
+    left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
+    tip.style.left = left + 'px';
+    tip.style.top  = top + 'px';
+  }
+  function hideHmTip() {
+    const tip = document.getElementById('hmTip');
+    if (tip) tip.classList.remove('visible');
   }
 
   // ── HERO ACTIONS & COUNTDOWN ─────────────────────────────
