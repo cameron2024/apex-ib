@@ -164,6 +164,79 @@
   }
   .mock-textarea:focus { outline: none; border-color: var(--text-primary); background: white; }
 
+  /* ── INPUT MODE TOGGLE ─────────────────── */
+  .input-mode-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .mode-tabs {
+    display: inline-flex; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 2px;
+  }
+  .mode-tab {
+    padding: 5px 14px; font-size: 12.5px; font-family: inherit; font-weight: 500;
+    background: none; border: none; border-radius: 6px; cursor: pointer; color: var(--text-secondary);
+    transition: all .15s; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .mode-tab.active { background: white; color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+  .mode-tab svg { width: 12px; height: 12px; }
+
+  /* Voice panel */
+  .voice-panel { display: none; }
+  .voice-panel.visible { display: block; animation: fadeUp .2s ease both; }
+  .voice-controls {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .mic-btn {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform .12s ease, background .15s;
+    position: relative;
+  }
+  .mic-btn:hover { transform: scale(1.05); }
+  .mic-btn.recording {
+    background: #DC2626;
+    animation: micPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes micPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.45); }
+    50%      { box-shadow: 0 0 0 12px rgba(220,38,38,0); }
+  }
+  .mic-btn svg { width: 20px; height: 20px; }
+  .voice-status {
+    flex: 1; min-width: 0;
+  }
+  .voice-status-line {
+    font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px;
+  }
+  .voice-status-sub { font-size: 11.5px; color: var(--text-tertiary); }
+  .voice-waves {
+    display: none; gap: 3px; align-items: center;
+  }
+  .voice-waves.active { display: inline-flex; }
+  .wave-bar { width: 3px; background: #DC2626; border-radius: 2px; animation: waveAnim 0.9s ease-in-out infinite; }
+  .wave-bar:nth-child(2) { animation-delay: .12s; }
+  .wave-bar:nth-child(3) { animation-delay: .24s; }
+  .wave-bar:nth-child(4) { animation-delay: .36s; }
+  @keyframes waveAnim {
+    0%, 100% { height: 6px; }
+    50%      { height: 22px; }
+  }
+  .voice-error {
+    font-size: 12.5px; color: #DC2626; margin-top: 8px; display: none;
+  }
+  .voice-error.visible { display: block; }
+
   .mock-actions {
     display: flex;
     align-items: center;
@@ -324,6 +397,37 @@
         <span class="q-tag" id="mockQTopic">Topic</span>
       </div>
       <div class="mock-q-text" id="mockQText">Loading…</div>
+
+      <div class="input-mode-row">
+        <div class="mode-tabs">
+          <button class="mode-tab active" id="tabText" onclick="switchMode('text')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+            Type
+          </button>
+          <button class="mode-tab" id="tabVoice" onclick="switchMode('voice')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            Speak
+          </button>
+        </div>
+        <span style="font-size:11.5px;color:var(--text-tertiary);" id="modeHint">Type your answer — you can edit until you submit.</span>
+      </div>
+
+      <div class="voice-panel" id="voicePanel">
+        <div class="voice-controls">
+          <button class="mic-btn" id="micBtn" onclick="toggleRecording()" type="button" aria-label="Toggle recording">
+            <svg id="micBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <div class="voice-status">
+            <div class="voice-status-line" id="voiceStatus">Tap to start recording</div>
+            <div class="voice-status-sub" id="voiceStatusSub">Your words appear below as you speak.</div>
+          </div>
+          <div class="voice-waves" id="voiceWaves">
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          </div>
+        </div>
+        <div class="voice-error" id="voiceError"></div>
+      </div>
+
       <textarea class="mock-textarea" id="mockTextarea" placeholder="Type your answer here. You won't see grading until the session ends."></textarea>
       <div class="mock-actions">
         <div class="mock-helper">Tip: write as you'd speak — quick, structured, clear. No need for perfection.</div>
@@ -622,6 +726,115 @@
       document.getElementById('gradingScreen').classList.remove('visible');
     }
   }
+
+  // ── VOICE MODE ──
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let isRecording = false;
+  let inputMode = 'text';      // 'text' | 'voice'
+  let finalTranscript = '';    // committed speech for current question
+  let interimTranscript = '';
+
+  if (SpeechRec) {
+    recognition = new SpeechRec();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setVoiceStatus('Listening…', 'Speak now — text appears below.');
+      document.getElementById('voiceWaves').classList.add('active');
+      document.getElementById('voiceError').classList.remove('visible');
+    };
+    recognition.onresult = (event) => {
+      interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) finalTranscript += t + ' ';
+        else interimTranscript += t;
+      }
+      const ta = document.getElementById('mockTextarea');
+      ta.value = (finalTranscript + interimTranscript).trim();
+    };
+    recognition.onerror = (e) => {
+      const err = document.getElementById('voiceError');
+      if (e.error === 'not-allowed') err.textContent = 'Microphone access denied. Allow mic in your browser, then refresh.';
+      else if (e.error === 'no-speech') err.textContent = 'No speech detected — try speaking louder or closer to the mic.';
+      else if (e.error === 'network') err.textContent = 'Speech service unreachable. Switch to Type mode.';
+      else err.textContent = 'Speech error: ' + e.error + '. Try Type mode.';
+      err.classList.add('visible');
+      stopRecordingUI();
+    };
+    recognition.onend = () => {
+      // Auto-restart while user still wants to record (browser may timeout)
+      if (isRecording) { try { recognition.start(); } catch(e) {} }
+      else stopRecordingUI();
+    };
+  }
+
+  function switchMode(mode) {
+    inputMode = mode;
+    document.getElementById('tabText').classList.toggle('active', mode === 'text');
+    document.getElementById('tabVoice').classList.toggle('active', mode === 'voice');
+    document.getElementById('voicePanel').classList.toggle('visible', mode === 'voice');
+    document.getElementById('modeHint').textContent = mode === 'voice'
+      ? 'Speak — your transcript will appear in the box and stays editable.'
+      : 'Type your answer — you can edit until you submit.';
+    if (mode === 'voice' && !SpeechRec) {
+      const err = document.getElementById('voiceError');
+      err.textContent = 'Speech recognition not supported in this browser. Use Chrome or Edge.';
+      err.classList.add('visible');
+      document.getElementById('micBtn').disabled = true;
+    }
+    if (mode === 'text' && isRecording) toggleRecording(); // stop if switching away
+  }
+
+  function toggleRecording() {
+    if (!recognition) return;
+    if (isRecording) {
+      isRecording = false;
+      try { recognition.stop(); } catch(e) {}
+      stopRecordingUI();
+    } else {
+      isRecording = true;
+      // Pre-load any existing text so we don't wipe it
+      const existing = document.getElementById('mockTextarea').value.trim();
+      finalTranscript = existing ? existing + ' ' : '';
+      interimTranscript = '';
+      document.getElementById('micBtn').classList.add('recording');
+      try { recognition.start(); } catch(e) {
+        // start() throws if already running — reset and ignore
+        isRecording = false;
+        stopRecordingUI();
+      }
+    }
+  }
+
+  function stopRecordingUI() {
+    isRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+    document.getElementById('voiceWaves').classList.remove('active');
+    setVoiceStatus('Tap to start recording', 'Your words appear below as you speak.');
+  }
+
+  function setVoiceStatus(line, sub) {
+    document.getElementById('voiceStatus').textContent = line;
+    document.getElementById('voiceStatusSub').textContent = sub;
+  }
+
+  // Stop recording when leaving a question
+  const _origSaveCurrent = saveCurrentAnswer;
+  saveCurrentAnswer = function() {
+    if (isRecording) {
+      isRecording = false;
+      try { recognition.stop(); } catch(e) {}
+      stopRecordingUI();
+    }
+    _origSaveCurrent();
+    // Reset transcript state for next question
+    finalTranscript = '';
+    interimTranscript = '';
+  };
 
   // ── BOOT ──
   if (token) {
