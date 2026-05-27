@@ -778,15 +778,25 @@
   
   /* ── HEATMAP MODAL ─────────────────────── */
   .heatmap-overlay {
-    display: none;
+    display: flex;
     position: fixed;
     inset: 0;
-    background: rgba(26,24,20,0.45);
+    background: rgba(26,24,20,0);
     z-index: 999;
     align-items: center;
     justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .22s ease, background .22s ease, visibility 0s linear .22s;
+    backdrop-filter: blur(0px);
   }
-  .heatmap-overlay.visible { display: flex; }
+  .heatmap-overlay.visible {
+    visibility: visible;
+    opacity: 1;
+    background: rgba(26,24,20,0.45);
+    backdrop-filter: blur(4px);
+    transition: opacity .22s ease, background .22s ease, visibility 0s;
+  }
   .heatmap-modal {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -795,7 +805,22 @@
     max-width: 540px;
     width: 90%;
     box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    transform: translateY(8px) scale(0.96);
+    opacity: 0;
+    transition: transform .26s cubic-bezier(.22,1,.36,1), opacity .22s ease;
   }
+  .heatmap-overlay.visible .heatmap-modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  .streak-badge {
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .streak-badge:hover {
+    transform: translateY(-1px);
+    border-color: var(--border-strong, #d4cfc6);
+  }
+  .streak-badge:active { transform: translateY(0) scale(0.98); }
   .heatmap-header {
     display: flex;
     justify-content: space-between;
