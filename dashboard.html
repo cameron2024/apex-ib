@@ -797,6 +797,49 @@
     backdrop-filter: blur(4px);
     transition: opacity .22s ease, background .22s ease, visibility 0s;
   }
+
+  /* Summary modal — same smooth open as heatmap */
+  .summary-modal-overlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,24,20,0);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .22s ease, background .22s ease, visibility 0s linear .22s;
+    backdrop-filter: blur(0px);
+  }
+  .summary-modal-overlay.visible {
+    visibility: visible;
+    opacity: 1;
+    background: rgba(26,24,20,0.45);
+    backdrop-filter: blur(4px);
+    transition: opacity .22s ease, background .22s ease, visibility 0s;
+  }
+  .summary-modal {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 640px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 64px rgba(0,0,0,.18);
+    overflow: hidden;
+    transform: translateY(8px) scale(0.96);
+    opacity: 0;
+    transition: transform .26s cubic-bezier(.22,1,.36,1), opacity .22s ease;
+  }
+  .summary-modal-overlay.visible .summary-modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  /* Summary card click feedback */
+  .summary-card:active { transform: translateY(0) scale(0.98); }
   .heatmap-modal {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -1103,8 +1146,8 @@
 
 
 <!-- SUMMARY MODALS -->
-<div id="summaryModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="e => { if(e.target===this) closeModal(); }">
-  <div id="summaryModal" style="background:white;border-radius:16px;width:90%;max-width:640px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.18);overflow:hidden;">
+<div id="summaryModalOverlay" class="summary-modal-overlay">
+  <div id="summaryModal" class="summary-modal">
     <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
       <div id="modalTitle" style="font-family:'DM Serif Display',serif;font-size:20px;letter-spacing:-.3px;"></div>
       <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-tertiary);line-height:1;padding:4px 8px;">&times;</button>
@@ -1660,12 +1703,12 @@
       }
     }
 
-    overlay.style.display = 'flex';
+    overlay.classList.add('visible');
     document.addEventListener('keydown', _modalEsc);
   }
 
   function closeModal() {
-    document.getElementById('summaryModalOverlay').style.display = 'none';
+    document.getElementById('summaryModalOverlay').classList.remove('visible');
     document.removeEventListener('keydown', _modalEsc);
   }
 
