@@ -94,9 +94,28 @@
     font-size: 12px;
     font-weight: 500;
     color: var(--text-secondary);
+    transition: background .15s, border-color .15s, color .15s;
   }
 
-  .topic-dot { width: 7px; height: 7px; background: var(--text-primary); border-radius: 50%; opacity: 0.5; }
+  .topic-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-primary); opacity: 0.5;
+    transition: background .15s, opacity .15s;
+  }
+
+  /* Per-topic header pill colors — match the question-card q-tag palette */
+  .topic-pill.accounting { background: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
+  .topic-pill.accounting .topic-dot { background: #4338CA; opacity: 1; }
+  .topic-pill.enterprise { background: #FFF7ED; color: #C2410C; border-color: #FED7AA; }
+  .topic-pill.enterprise .topic-dot { background: #C2410C; opacity: 1; }
+  .topic-pill.valuation  { background: #F0FDF4; color: #15803D; border-color: #BBF7D0; }
+  .topic-pill.valuation .topic-dot  { background: #15803D; opacity: 1; }
+  .topic-pill.dcf        { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+  .topic-pill.dcf .topic-dot        { background: #1D4ED8; opacity: 1; }
+  .topic-pill.mergers    { background: #FDF4FF; color: #7E22CE; border-color: #E9D5FF; }
+  .topic-pill.mergers .topic-dot    { background: #7E22CE; opacity: 1; }
+  .topic-pill.lbo        { background: #FFF1F2; color: #BE123C; border-color: #FECDD3; }
+  .topic-pill.lbo .topic-dot        { background: #BE123C; opacity: 1; }
 
   .btn-ghost {
     background: none;
@@ -2084,6 +2103,20 @@ Return JSON only.`;
     const label = TOPIC_LABELS[topic] || topic;
     document.getElementById('breadcrumbTopic').textContent = label;
     document.getElementById('topbarTopicPill').textContent = label;
+    // Apply per-topic color to the header pill
+    const PILL_TOPIC_CLASS = {
+      'Accounting':      'accounting',
+      'Enterprise_Value':'enterprise',
+      'Valuation':       'valuation',
+      'DCF':             'dcf',
+      'Mergers_MA':      'mergers',
+      'LBO':             'lbo',
+    };
+    const pillWrap = document.querySelector('.topic-pill');
+    if (pillWrap) {
+      pillWrap.classList.remove('accounting','enterprise','valuation','dcf','mergers','lbo');
+      if (PILL_TOPIC_CLASS[topic]) pillWrap.classList.add(PILL_TOPIC_CLASS[topic]);
+    }
 
     // Preserve sessionResults — do NOT wipe progress on topic switch
     loadQuestionAt(currentIndex);
