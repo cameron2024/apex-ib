@@ -121,6 +121,25 @@
 
     // Apply saved avatar immediately
     applyAvatarToSidebar();
+
+    // Apply cached identity + plan IMMEDIATELY (before the API call resolves)
+    // so the sidebar shows the right state on the very first paint.
+    try {
+      const cachedName  = localStorage.getItem('apex_user');
+      const cachedPlan  = localStorage.getItem('apex_plan');
+      const cachedGrad  = parseInt(localStorage.getItem('apex_graded_today') || '0');
+      if (cachedName) {
+        const nm = document.getElementById('sidebarUserName');
+        if (nm) nm.textContent = cachedName;
+        const av = document.getElementById('sidebarAvatar');
+        if (av && !av.querySelector('img')) {
+          const initials = cachedName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+          av.textContent = initials;
+        }
+      }
+      if (cachedPlan) initSidebarMenu(cachedPlan, cachedGrad);
+      else if (!localStorage.getItem('apex_token')) initSidebarMenu('guest', 0);
+    } catch(e) {}
   }
 
   // ── AVATAR HELPERS ────────────────────────────────────────
@@ -220,6 +239,12 @@
     const card = document.getElementById('userCard');
     if (!card) return;
 
+    // Cache for instant render on next page nav
+    try {
+      if (plan && plan !== 'guest') localStorage.setItem('apex_plan', plan);
+      if (typeof gradedToday === 'number') localStorage.setItem('apex_graded_today', String(gradedToday));
+    } catch(e) {}
+
     // Guests → redirect to auth on click
     if (plan === 'guest') {
       card.setAttribute('onclick', "window.location.href='auth.html'");
@@ -239,10 +264,16 @@
     // Avatar ring for all logged-in plans
     const avatar = document.getElementById('sidebarAvatar');
     if (avatar && (plan === 'free' || plan === 'monthly' || plan === 'pass')) {
-      const wrap = document.createElement('div');
-      wrap.className = 'user-avatar-wrap';
-      avatar.parentNode.insertBefore(wrap, avatar);
-      wrap.appendChild(avatar);
+      // Idempotent: only wrap if not already wrapped
+      let wrap = avatar.closest('.user-avatar-wrap');
+      if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.className = 'user-avatar-wrap';
+        avatar.parentNode.insertBefore(wrap, avatar);
+        wrap.appendChild(avatar);
+      }
+      // Remove any prior ring/icon then re-create matching the current plan
+      wrap.querySelectorAll('.plan-ring, .plan-icon').forEach(el => el.remove());
       const ring = document.createElement('div');
       ring.className = 'plan-ring ' + (plan === 'pass' ? 'plan-ring-pass' : plan === 'monthly' ? 'plan-ring-monthly' : 'plan-ring-free');
       wrap.appendChild(ring);
@@ -254,9 +285,11 @@
 
     updateSidebarPlanText(plan, gradedToday);
 
-    // Hide upgrade button for paid users
+    // Upgrade button: show for free, hide for paid (idempotent)
     const upgradeBtn = document.getElementById('upgradeBtn');
-    if (upgradeBtn && plan !== 'free') upgradeBtn.style.display = 'none';
+    if (upgradeBtn) {
+      upgradeBtn.style.display = (plan === 'free') ? '' : 'none';
+    }
 
     // Re-apply avatar photo last — pages may have set textContent = initials
     // after injectSidebar ran, which wipes child nodes including our <img>

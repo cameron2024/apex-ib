@@ -2073,17 +2073,8 @@ Return JSON only.`;
       window._focusQid = null;
     }
 
-    // Update nav active state — target the actual sidebar items by href
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    let navEl;
-    if (topic === 'All') {
-      // "Practice All" link
-      navEl = document.querySelector('.nav-item[data-page="practice"]');
-    } else {
-      // Topic links match by href
-      navEl = document.querySelector('.nav-item[href="practice-screen.html?topic=' + topic + '"]');
-    }
-    if (navEl) navEl.classList.add('active');
+    // Nav active state is set by sidebar.js on page load based on URL params.
+    // Don't touch it here — re-applying causes a brief flash.
 
     // Update breadcrumb + pill
     const label = TOPIC_LABELS[topic] || topic;
