@@ -326,20 +326,22 @@
   const PLAN_FEATURES = {
     free: [
       '5 AI-graded answers per day',
-      'Access to all 6 question categories',
+      'Access to all 565+ questions across 6 topics',
+      '1 mock interview (lifetime)',
       'Basic feedback on each answer',
     ],
     monthly: [
       'Unlimited AI-graded answers',
-      'Access to all 565+ questions',
-      'Detailed feedback with scoring rubrics',
-      'Performance tracking & weak spot analysis',
-      'Saved questions library',
+      '1 mock interview per day (24hr cooldown)',
+      'Adaptive review queue with spaced repetition',
+      'AI-generated performance insights',
+      'Saved questions & weak spot analysis',
     ],
     pass: [
-      'Everything in Monthly Pro',
+      'Everything in Pro',
+      'Unlimited mock interviews',
       'One-time payment — no subscription',
-      'Lifetime access to all questions',
+      'Full recruiting cycle access',
       'Priority updates and new content',
     ]
   };
@@ -388,7 +390,7 @@
     const planEmoji   = userPlan === 'pass' ? '◆' : userPlan === 'monthly' ? '★' : '○';
     const planLabel   = userPlan === 'pass' ? 'Recruiting Pass' : userPlan === 'monthly' ? 'Monthly Pro' : 'Free';
     const planClass   = userPlan === 'pass' ? 'pass' : userPlan === 'monthly' ? 'monthly' : 'free';
-    const priceAmount = userPlan === 'pass' ? '$99' : userPlan === 'monthly' ? '$14.99' : '$0';
+    const priceAmount = userPlan === 'pass' ? '$39.99' : userPlan === 'monthly' ? '$14.99' : '$0';
     const priceWas    = userPlan === 'monthly' ? '$20' : null;
     const pricePeriod = userPlan === 'pass' ? 'one-time' : userPlan === 'monthly' ? '/ month' : 'forever';
     const planDesc    = userPlan === 'pass'

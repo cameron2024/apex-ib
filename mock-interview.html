@@ -530,10 +530,10 @@
         document.getElementById('btnStartMock').textContent = 'Upgrade required';
       } else if (elig.plan === 'free') {
         notice.className = 'elig-notice info visible';
-        notice.textContent = `Free plan includes 1 mock interview. After this one, upgrade to Pro for 2/month or Recruiting Pass for unlimited.`;
+        notice.textContent = `Free plan includes 1 mock interview. After this one, upgrade to Pro for 1/day or Recruiting Pass for unlimited.`;
       } else if (elig.plan === 'monthly') {
         notice.className = 'elig-notice info visible';
-        notice.textContent = `${elig.remaining || 0} mock interview${elig.remaining !== 1 ? 's' : ''} remaining this month.`;
+        notice.textContent = `Pro: 1 mock interview per 24 hours. You're good to go.`;
       }
     } catch(e) {}
   }

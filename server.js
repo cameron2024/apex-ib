@@ -33,7 +33,6 @@ const STRIPE_PASS_PRICE_ID = process.env.STRIPE_PASS_PRICE_ID || '';
 const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 const FREE_DAILY_LIMIT = 5;
 const FREE_MOCK_LIMIT = 1;        // lifetime
-const MONTHLY_MOCK_LIMIT = 2;     // per calendar month
 const ONE_DAY = 86400;
 const INSIGHTS_CACHE_SEC = 3600;  // 1 hour
 
@@ -427,13 +426,31 @@ async function checkMockEligibility(userId) {
     return { ok: true, plan, remaining: FREE_MOCK_LIMIT - used };
   }
   if (plan === 'monthly') {
-    const monthStart = Math.floor(new Date(new Date().setUTCDate(1)).setUTCHours(0,0,0,0) / 1000);
-    const r = await pool.query('SELECT COUNT(*) FROM mock_sessions WHERE user_id=$1 AND started_at >= $2', [userId, monthStart]);
-    const used = parseInt(r.rows[0].count);
-    if (used >= MONTHLY_MOCK_LIMIT) {
-      return { ok: false, plan, reason: 'monthly_limit', message: 'Pro Monthly includes 2 mock interviews per month. Upgrade to Recruiting Pass for unlimited.' };
+    // Pro: 1 mock per rolling 24h window (24hr after the most recent mock start)
+    const r = await pool.query(
+      'SELECT started_at FROM mock_sessions WHERE user_id=$1 ORDER BY started_at DESC LIMIT 1',
+      [userId]
+    );
+    const lastStart = r.rows[0] ? parseInt(r.rows[0].started_at) : 0;
+    const now = nowSec();
+    const cooldownUntil = lastStart + ONE_DAY;
+    if (lastStart && now < cooldownUntil) {
+      const secsLeft = cooldownUntil - now;
+      const hoursLeft = Math.floor(secsLeft / 3600);
+      const minsLeft = Math.ceil((secsLeft % 3600) / 60);
+      const niceTime = hoursLeft > 0
+        ? `${hoursLeft}h ${minsLeft}m`
+        : `${minsLeft}m`;
+      return {
+        ok: false,
+        plan,
+        reason: 'daily_limit',
+        message: `Pro includes 1 mock interview per day. Next mock available in ${niceTime}.`,
+        nextAvailableAt: cooldownUntil,
+        secondsRemaining: secsLeft
+      };
     }
-    return { ok: true, plan, remaining: MONTHLY_MOCK_LIMIT - used };
+    return { ok: true, plan };
   }
   return { ok: true, plan };
 }

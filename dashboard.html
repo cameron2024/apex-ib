@@ -1863,7 +1863,7 @@
         } else if (elig.plan === 'free') {
           sub.textContent = 'Timed end-to-end. Free plan includes 1 mock — your first session is free.';
         } else if (elig.plan === 'monthly') {
-          sub.textContent = `${elig.remaining || 0} mock interview${elig.remaining !== 1 ? 's' : ''} remaining this month.`;
+          sub.textContent = 'Pro includes 1 mock interview per day. Ready when you are.';
         } else {
           sub.textContent = 'Unlimited mock interviews. Timed superdays, first-round mixes, or custom.';
         }
