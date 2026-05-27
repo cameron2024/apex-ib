@@ -1020,6 +1020,10 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
         const history  = data.history  || [];
         const streak   = data.streak   || 0;
 
+        // Stash for the readiness breakdown modal
+        window._historyForBreakdown = history;
+        window._resultsForBreakdown = results;
+
         const readiness = computeReadiness(results, history);
         renderReadiness(readiness, streak);
         renderTrend(history, streak);
@@ -1089,6 +1093,11 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
       if (badge && data.timeToMastery) {
         badge.textContent = `Interview-ready in ~${data.timeToMastery} day${data.timeToMastery !== 1 ? 's' : ''}`;
         badge.style.display = 'inline-block';
+        badge.style.cursor = 'pointer';
+        badge.title = 'Click to see how this is calculated';
+        badge.onclick = openReadinessBreakdown;
+        // Stash for the breakdown
+        window._insightsForBreakdown = data;
       }
       // Bias the CTA toward the weakest topic when we have one
       if (data.weakestTopic) {
@@ -1103,6 +1112,323 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
   // ── SIDEBAR MENU ──────────────────────────────────────────
 
 
+</script>
+
+<!-- READINESS BREAKDOWN MODAL -->
+<style>
+  .rb-overlay {
+    display: flex;
+    position: fixed; inset: 0;
+    background: rgba(26,24,20,0); z-index: 700;
+    align-items: center; justify-content: center;
+    visibility: hidden; opacity: 0;
+    transition: opacity .22s ease, background .22s ease, visibility 0s linear .22s;
+    backdrop-filter: blur(0px);
+  }
+  .rb-overlay.visible {
+    visibility: visible; opacity: 1;
+    background: rgba(26,24,20,0.45);
+    backdrop-filter: blur(4px);
+    transition: opacity .22s ease, background .22s ease, visibility 0s;
+  }
+  .rb-modal {
+    background: white;
+    border-radius: 16px;
+    width: 92%; max-width: 680px; max-height: 88vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 64px rgba(0,0,0,.18);
+    overflow: hidden;
+    transform: translateY(8px) scale(0.96); opacity: 0;
+    transition: transform .26s cubic-bezier(.22,1,.36,1), opacity .22s ease;
+  }
+  .rb-overlay.visible .rb-modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  .rb-header {
+    padding: 22px 26px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .rb-title { font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -.3px; line-height: 1.2; }
+  .rb-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+  .rb-close { background: none; border: none; cursor: pointer; font-size: 24px; color: var(--text-tertiary); line-height: 1; padding: 4px 8px; }
+  .rb-body { padding: 22px 26px; overflow-y: auto; flex: 1; }
+  .rb-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-bottom: 22px;
+  }
+  .rb-stat {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .rb-stat-label { font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; }
+  .rb-stat-value { font-family: 'DM Serif Display', serif; font-size: 26px; letter-spacing: -.5px; line-height: 1; }
+  .rb-stat-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; }
+  .rb-stat-value.pos { color: #15803D; }
+  .rb-stat-value.neg { color: #B91C1C; }
+  .rb-section { margin-bottom: 22px; }
+  .rb-section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-tertiary); margin-bottom: 10px;
+  }
+  .rb-progress-wrap {
+    position: relative;
+    background: var(--bg);
+    height: 26px;
+    border-radius: 13px;
+    border: 1px solid var(--border);
+    overflow: visible;
+  }
+  .rb-progress-fill {
+    height: 100%; border-radius: 13px;
+    background: linear-gradient(90deg, #16A34A, #84CC16);
+    transition: width 1s cubic-bezier(.22,1,.36,1);
+  }
+  .rb-progress-target {
+    position: absolute; top: -4px; bottom: -4px;
+    width: 2px; background: #1A1814;
+    border-radius: 1px;
+  }
+  .rb-progress-target::after {
+    content: '85% target';
+    position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+    font-size: 10.5px; font-weight: 600; color: var(--text-primary);
+    white-space: nowrap;
+  }
+  .rb-progress-now {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: white; border: 2px solid var(--text-primary);
+    width: 14px; height: 14px; border-radius: 50%;
+    z-index: 2;
+    transition: left 1s cubic-bezier(.22,1,.36,1);
+  }
+  .rb-spark-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .rb-spark { width: 100%; height: 80px; }
+  .rb-spark-meta {
+    display: flex; justify-content: space-between; margin-top: 8px;
+    font-size: 11.5px; color: var(--text-tertiary);
+  }
+  .rb-topic-row {
+    display: grid; grid-template-columns: 120px 1fr 70px;
+    align-items: center; gap: 12px; padding: 8px 0;
+  }
+  .rb-topic-row + .rb-topic-row { border-top: 1px solid #F2F0EC; }
+  .rb-topic-name { font-size: 13.5px; color: var(--text-primary); font-weight: 500; }
+  .rb-topic-bar { background: var(--bg); height: 6px; border-radius: 3px; overflow: hidden; }
+  .rb-topic-bar-fill { height: 100%; border-radius: 3px; transition: width .8s cubic-bezier(.22,1,.36,1); }
+  .rb-topic-gap { font-size: 12px; text-align: right; font-weight: 600; }
+  .rb-formula {
+    background: #FFFBEB; border: 1px solid #FEF3C7;
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 13px; line-height: 1.6; color: #78350F;
+  }
+  .rb-formula strong { color: #422006; }
+  .rb-assumptions {
+    margin-top: 10px;
+    font-size: 11.5px; color: var(--text-tertiary); line-height: 1.55;
+  }
+  .rb-cta-row {
+    padding: 16px 26px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .rb-cta-btn {
+    padding: 10px 18px;
+    background: var(--text-primary); color: white;
+    border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  #insightsTimeBadge { transition: transform .15s ease; }
+  #insightsTimeBadge:hover { transform: translateY(-1px); }
+  #insightsTimeBadge:active { transform: translateY(0) scale(0.98); }
+</style>
+
+<div class="rb-overlay" id="rbOverlay" onclick="if(event.target===this)closeReadinessBreakdown()">
+  <div class="rb-modal">
+    <div class="rb-header">
+      <div>
+        <div class="rb-title" id="rbTitle">Why this estimate</div>
+        <div class="rb-subtitle" id="rbSubtitle">Here's how the days-to-ready number is calculated.</div>
+      </div>
+      <button class="rb-close" onclick="closeReadinessBreakdown()">&times;</button>
+    </div>
+    <div class="rb-body" id="rbBody"></div>
+    <div class="rb-cta-row">
+      <span style="font-size:12px;color:var(--text-tertiary);">Estimate updates as you practice.</span>
+      <a id="rbCta" class="rb-cta-btn" href="practice-screen.html?mode=review_weak">
+        Drill weakest topic
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const RB_TOPIC_LABELS = { Accounting:'Accounting', Enterprise_Value:'Enterprise Value', Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO' };
+
+  function openReadinessBreakdown() {
+    const d = window._insightsForBreakdown;
+    if (!d || !d.timeToMastery) return;
+    renderReadinessBreakdown(d);
+    document.getElementById('rbOverlay').classList.add('visible');
+    document.addEventListener('keydown', _rbEsc);
+  }
+  function closeReadinessBreakdown() {
+    document.getElementById('rbOverlay').classList.remove('visible');
+    document.removeEventListener('keydown', _rbEsc);
+  }
+  function _rbEsc(e) { if (e.key === 'Escape') closeReadinessBreakdown(); }
+
+  function renderReadinessBreakdown(d) {
+    const days = d.timeToMastery;
+    const overall = d.overall;
+    const gap = Math.max(0, 85 - overall);
+    const weeklyRate = +(d.trajectory / 2).toFixed(1); // trajectory is over 14 days ≈ 2 weeks
+    const target = new Date(Date.now() + days * 86400 * 1000);
+    const dateLabel = target.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+
+    document.getElementById('rbTitle').textContent = `Why ~${days} day${days !== 1 ? 's' : ''} to interview-ready`;
+    document.getElementById('rbSubtitle').textContent = `At your current pace, you'd hit 85% around ${dateLabel}.`;
+
+    // Update CTA href to focus the weakest topic
+    if (d.weakestTopic) {
+      document.getElementById('rbCta').href = `practice-screen.html?mode=review_weak&topic=${encodeURIComponent(d.weakestTopic)}`;
+    }
+
+    // Sparkline data — last ~20 session scores (reverse to chronological)
+    const history = (window._historyForBreakdown || []).slice(0, 20).reverse();
+    const sparkSvg = buildSpark(history.map(h => h.score));
+
+    // Topics holding you back: avg < 85, sorted by gap descending
+    const weakTopics = (d.topicAvgs || []).filter(t => t.avg < 85).sort((a,b) => a.avg - b.avg).slice(0, 4);
+
+    const trajCls = d.trajectory > 0 ? 'pos' : d.trajectory < 0 ? 'neg' : '';
+    const trajSign = d.trajectory > 0 ? '+' : '';
+
+    // Progress bar position (0% to 100% but visually clamped so we always see room before target)
+    const progressPct = Math.min(95, Math.max(5, overall));
+    const targetPct = 85;
+
+    const html = `
+      <div class="rb-stats">
+        <div class="rb-stat">
+          <div class="rb-stat-label">Right now</div>
+          <div class="rb-stat-value">${overall}%</div>
+          <div class="rb-stat-sub">Overall accuracy across ${(d.topicAvgs || []).reduce((s,t)=>s+t.count,0)} answers</div>
+        </div>
+        <div class="rb-stat">
+          <div class="rb-stat-label">Weekly rate</div>
+          <div class="rb-stat-value ${trajCls}">${trajSign}${weeklyRate}<span style="font-size:13px;color:var(--text-tertiary);font-family:inherit;letter-spacing:0;"> pts/wk</span></div>
+          <div class="rb-stat-sub">Recent ${d.recentAvg ?? '—'}% vs prior ${d.priorAvg ?? '—'}%</div>
+        </div>
+        <div class="rb-stat">
+          <div class="rb-stat-label">Gap to 85%</div>
+          <div class="rb-stat-value">${gap}<span style="font-size:13px;color:var(--text-tertiary);font-family:inherit;letter-spacing:0;"> pts</span></div>
+          <div class="rb-stat-sub">${days} day${days !== 1 ? 's' : ''} at current pace</div>
+        </div>
+      </div>
+
+      <div class="rb-section">
+        <div class="rb-section-title">Progress toward interview-ready</div>
+        <div class="rb-progress-wrap" style="margin-top:30px;">
+          <div class="rb-progress-fill" id="rbFill" style="width:0%"></div>
+          <div class="rb-progress-target" style="left:${targetPct}%"></div>
+          <div class="rb-progress-now" id="rbNow" style="left:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-tertiary);margin-top:8px;">
+          <span>0%</span><span>Today: ${overall}%</span><span>100%</span>
+        </div>
+      </div>
+
+      <div class="rb-section">
+        <div class="rb-section-title">Recent score trend</div>
+        <div class="rb-spark-wrap">
+          ${sparkSvg}
+          <div class="rb-spark-meta">
+            <span>Earliest: ${history.length > 0 ? history[0].score : '—'}%</span>
+            <span>${history.length} session${history.length !== 1 ? 's' : ''}</span>
+            <span>Latest: ${history.length > 0 ? history[history.length-1].score : '—'}%</span>
+          </div>
+        </div>
+      </div>
+
+      ${weakTopics.length > 0 ? `
+      <div class="rb-section">
+        <div class="rb-section-title">Topics holding you back</div>
+        ${weakTopics.map(t => {
+          const tgap = Math.max(0, 85 - t.avg);
+          const tcls = t.avg >= 80 ? 'mid' : 'low';
+          const color = t.avg >= 80 ? '#D97706' : '#DC2626';
+          return `<div class="rb-topic-row">
+            <div class="rb-topic-name">${RB_TOPIC_LABELS[t.topic] || t.topic}</div>
+            <div class="rb-topic-bar"><div class="rb-topic-bar-fill" style="width:${t.avg}%;background:${color};"></div></div>
+            <div class="rb-topic-gap" style="color:${color};">${t.avg}% <span style="opacity:.6;font-weight:400;">−${tgap}</span></div>
+          </div>`;
+        }).join('')}
+      </div>` : ''}
+
+      <div class="rb-section">
+        <div class="rb-section-title">How this is calculated</div>
+        <div class="rb-formula">
+          You're improving at <strong>${trajSign}${weeklyRate} points per week</strong>.
+          You need to close a <strong>${gap}-point gap</strong> to reach the 85% interview-ready threshold.
+          At that pace, that takes about <strong>${days} day${days !== 1 ? 's' : ''}</strong>.
+        </div>
+        <div class="rb-assumptions">
+          <strong style="color:var(--text-secondary);">Assumes:</strong>
+          continued daily practice and a consistent improvement rate. Slower if you skip days,
+          faster if you focus on weak topics. The estimate is recalculated whenever you answer new questions.
+        </div>
+      </div>
+    `;
+
+    document.getElementById('rbBody').innerHTML = html;
+    // Animate progress bar after render
+    setTimeout(() => {
+      const fill = document.getElementById('rbFill');
+      const now = document.getElementById('rbNow');
+      if (fill) fill.style.width = progressPct + '%';
+      if (now) now.style.left = progressPct + '%';
+    }, 80);
+  }
+
+  function buildSpark(scores) {
+    if (!scores || scores.length < 2) {
+      return '<div style="text-align:center;color:var(--text-tertiary);font-size:12px;padding:24px 0;">Need at least 2 sessions for a trend.</div>';
+    }
+    const w = 600, h = 80, pad = 4;
+    const min = 0, max = 100;
+    const pts = scores.map((s, i) => {
+      const x = pad + (i * (w - 2 * pad)) / (scores.length - 1);
+      const y = h - pad - ((s - min) / (max - min)) * (h - 2 * pad);
+      return [x, y];
+    });
+    const path = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const area = path + ` L${pts[pts.length-1][0].toFixed(1)},${h-pad} L${pts[0][0].toFixed(1)},${h-pad} Z`;
+    // Target line at 85
+    const tgtY = h - pad - ((85 - min) / (max - min)) * (h - 2 * pad);
+    return `<svg class="rb-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="rbSparkGrad" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#16A34A" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#16A34A" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <line x1="0" y1="${tgtY}" x2="${w}" y2="${tgtY}" stroke="#1A1814" stroke-width="1" stroke-dasharray="3 3" opacity="0.3"/>
+      <text x="${w-4}" y="${tgtY-3}" text-anchor="end" font-size="10" fill="#1A1814" opacity="0.5">85%</text>
+      <path d="${area}" fill="url(#rbSparkGrad)"/>
+      <path d="${path}" fill="none" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${pts.map((p, i) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${i === pts.length-1 ? 3.5 : 2.2}" fill="${i === pts.length-1 ? '#15803D' : '#84CC16'}"/>`).join('')}
+    </svg>`;
+  }
 </script>
 
 </body>
