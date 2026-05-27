@@ -49,7 +49,7 @@
 
     <div class="nav-section-label" style="margin-top:10px;">Topics</div>
     <a class="nav-item" href="practice-screen.html?topic=Accounting">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A1.5 1.5 0 015.5 3H19a1 1 0 011 1v15.5a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 19.5z"/><path d="M4 17.5h16"/><path d="M9 7.5h6M9 10.5h6"/><text x="12" y="15.5" text-anchor="middle" font-size="6" font-weight="700" font-family="sans-serif" fill="currentColor" stroke="none">$</text></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-6"/><path d="M12 9V3"/><path d="M3 15h18"/><path d="M3 9h18"/><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
       Accounting
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Enterprise_Value">
@@ -57,11 +57,11 @@
       Enterprise Value
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Valuation">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h8"/><path d="M12 16h6"/><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M8 11h7"/></svg>
       Valuation
     </a>
     <a class="nav-item" href="practice-screen.html?topic=DCF">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6v13"/><path d="M12 8h-3.5a2 2 0 100 4h3a2 2 0 110 4H7"/><path d="M16 8l4 4-4 4"/><path d="M20 12h-6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v5"/><path d="M16 14v7"/><path d="M20 10v11"/><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"/><path d="M4 18v3"/><path d="M8 14v7"/></svg>
       Discounted Cash Flow
     </a>
     <a class="nav-item" href="practice-screen.html?topic=Mergers_MA">
@@ -69,7 +69,7 @@
       Mergers &amp; Acquisitions
     </a>
     <a class="nav-item" href="practice-screen.html?topic=LBO">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="16" width="18" height="5" rx="0.5"/><rect x="6" y="11" width="12" height="5" rx="0.5"/><rect x="9" y="6" width="6" height="5" rx="0.5"/><path d="M15 4l-3-2-3 2"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z"/><path d="M16 10h.01"/><path d="M2 8v1a2 2 0 0 0 2 2h1"/></svg>
       Leveraged Buyouts
     </a>
   </nav>
