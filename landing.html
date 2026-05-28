@@ -9,6 +9,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
 
+<script>
+  // Redirect logged-in users to dashboard BEFORE any body content paints
+  (function() {
+    try {
+      if (localStorage.getItem('apex_token')) {
+        document.documentElement.style.display = 'none';
+        window.location.replace('dashboard.html');
+      }
+    } catch(e) {}
+  })();
+</script>
+
 <style>
   :root {
     --bg: #F7F6F3;
@@ -945,11 +957,6 @@
 </footer>
 
 <script>
-  // If logged in, send to dashboard
-  if (localStorage.getItem('apex_token')) {
-    window.location.replace('dashboard.html');
-  }
-
   // Sticky nav border
   const nav = document.getElementById('nav');
   function updateNav() {

@@ -883,6 +883,27 @@
     }
     #saveIndicator.visible { opacity: 1; }
   </style>
+  <script>
+    // Synchronously derive topic state from URL so the topbar pill renders with
+    // the correct text + color on first paint (avoids the "All Topics" flash).
+    (function() {
+      var LABELS = {
+        'All':'All Topics','Accounting':'Accounting','Enterprise_Value':'Enterprise Value',
+        'Valuation':'Valuation','DCF':'Discounted Cash Flow',
+        'Mergers_MA':'Mergers & Acquisitions','LBO':'Leveraged Buyouts'
+      };
+      var CLASSES = {
+        'Accounting':'accounting','Enterprise_Value':'enterprise','Valuation':'valuation',
+        'DCF':'dcf','Mergers_MA':'mergers','LBO':'lbo'
+      };
+      var t = 'All';
+      try { t = new URLSearchParams(location.search).get('topic') || 'All'; } catch(e) {}
+      if (!LABELS[t]) t = 'All';
+      window._initialTopic = t;
+      window._initialTopicLabel = LABELS[t];
+      window._initialTopicClass = CLASSES[t] || '';
+    })();
+  </script>
 </head>
 <body data-page="practice">
 
@@ -892,6 +913,7 @@
 
 <!-- SIDEBAR -->
 <div id="sidebar-mount"></div>
+<script src="sidebar.js"></script>
 
 <!-- MAIN -->
 <main class="main">
@@ -905,12 +927,23 @@
 
   <div class="topbar">
     <div class="breadcrumb">
-      Practice <span class="breadcrumb-sep">›</span> <span id="breadcrumbTopic">All Topics</span>
+      Practice <span class="breadcrumb-sep">›</span> <span id="breadcrumbTopic"></span>
     </div>
-    <div class="topic-pill">
+    <div class="topic-pill" id="topicPillWrap">
       <span class="topic-dot"></span>
-      <span id="topbarTopicPill">All Topics</span>
+      <span id="topbarTopicPill"></span>
     </div>
+    <script>
+      // Apply initial topic state synchronously — runs before paint
+      (function() {
+        var label = window._initialTopicLabel || 'All Topics';
+        document.getElementById('topbarTopicPill').textContent = label;
+        document.getElementById('breadcrumbTopic').textContent = label;
+        if (window._initialTopicClass) {
+          document.getElementById('topicPillWrap').classList.add(window._initialTopicClass);
+        }
+      })();
+    </script>
     <div class="topbar-right">
       <button id="btnBrowseQuestions" onclick="openQuestionList()" title="Browse all questions in this topic" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;background:white;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;color:var(--text-secondary);cursor:pointer;transition:all .15s;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -1208,7 +1241,7 @@
   <div class="analyzing-sub">Checking technical accuracy, structure, and completeness</div>
 </div>
 
-<script src="sidebar.js"></script>
+
 <script>
   let currentMode = 'voice';
 
