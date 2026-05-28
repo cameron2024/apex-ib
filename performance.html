@@ -283,6 +283,63 @@
   /* FULL-WIDTH SECTION */
   .full-section { margin-bottom:24px; }
 
+  /* MOCK HISTORY */
+  .mh-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mh-stat {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .mh-stat-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 5px; }
+  .mh-stat-val { font-family: 'DM Serif Display', serif; font-size: 24px; letter-spacing: -.5px; line-height: 1; }
+  .mh-stat-val.pos { color: #15803D; }
+  .mh-stat-val.neg { color: #B91C1C; }
+  .mh-stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+  .mh-list { padding: 4px 0; }
+  .mh-row {
+    display: grid; grid-template-columns: 140px 110px 1fr 80px 30px;
+    align-items: center; gap: 14px;
+    padding: 12px 22px;
+    border-bottom: 1px solid #F2F0EC;
+    text-decoration: none; color: inherit;
+    transition: background .12s;
+  }
+  .mh-row:last-child { border-bottom: none; }
+  .mh-row:hover { background: var(--bg); }
+  .mh-row-format { font-size: 13.5px; font-weight: 500; }
+  .mh-row-date { font-size: 12.5px; color: var(--text-tertiary); }
+  .mh-row-bar-wrap { background: var(--bg); height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+  .mh-row-bar-fill { height: 100%; transition: width .8s cubic-bezier(.22,1,.36,1); }
+  .mh-row-bar-fill.high { background: #16A34A; }
+  .mh-row-bar-fill.mid { background: #D97706; }
+  .mh-row-bar-fill.low { background: #DC2626; }
+  .mh-row-score { font-size: 17px; font-weight: 600; font-family: 'DM Serif Display', serif; text-align: right; }
+  .mh-row-score.high { color: #15803D; }
+  .mh-row-score.mid { color: #B45309; }
+  .mh-row-score.low { color: #B91C1C; }
+  .mh-row-arrow { color: var(--text-tertiary); font-size: 14px; }
+
+  .mh-empty {
+    padding: 40px 22px; text-align: center;
+  }
+  .mh-empty-icon { font-size: 32px; margin-bottom: 12px; }
+  .mh-empty-title { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 6px; }
+  .mh-empty-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.5; max-width: 380px; margin: 0 auto 16px; }
+  .mh-empty-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px; background: var(--text-primary); color: white;
+    border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;
+  }
+  @media (max-width: 720px) {
+    .mh-stats { grid-template-columns: repeat(2, 1fr); }
+    .mh-row { grid-template-columns: 1fr 60px; gap: 8px; }
+    .mh-row-date, .mh-row-bar-wrap { display: none; }
+  }
+
   
   
   
@@ -444,6 +501,21 @@
       <a class="drill-btn" href="practice-screen.html" id="drillBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Start Drilling These
+      </a>
+    </div>
+  </div>
+
+  <!-- MOCK INTERVIEW HISTORY -->
+  <div class="panel full-section fade-4" id="mockHistoryPanel" style="display:none;">
+    <div class="panel-header">
+      <span class="panel-title">Mock Interviews</span>
+      <span class="panel-label" id="mockHistoryLabel">Loading…</span>
+    </div>
+    <div id="mockHistoryBody"></div>
+    <div style="border-top:1px solid var(--border);padding:14px 22px;display:flex;justify-content:flex-end;">
+      <a class="drill-btn" href="mock-interview.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        Run a Mock
       </a>
     </div>
   </div>
@@ -1040,6 +1112,9 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
         // Fetch personalized insights (server-side Claude call, cached 1hr)
         loadInsights(token, results.length);
 
+        // Mock interview history panel
+        loadMockHistory(token);
+
         document.getElementById('pageSubtitle').textContent =
           history.length > 0
             ? history.length + ' answer' + (history.length !== 1 ? 's' : '') + ' recorded · ' + (readiness ? readiness.score : '—') + '% readiness'
@@ -1107,6 +1182,86 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
       }
     } catch(e) {
       loading.style.display = 'none';
+    }
+  }
+
+  // ── MOCK INTERVIEW HISTORY ───────────────────────────────
+  async function loadMockHistory(token) {
+    try {
+      const r = await fetch('/api/mock/list', { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!r.ok) return;
+      const data = await r.json();
+      const completed = (data.sessions || []).filter(s => s.completed_at && s.overall_score !== null);
+      const panel = document.getElementById('mockHistoryPanel');
+      const label = document.getElementById('mockHistoryLabel');
+      const body = document.getElementById('mockHistoryBody');
+      if (!panel || !body) return;
+      panel.style.display = '';
+
+      if (completed.length === 0) {
+        label.textContent = '';
+        body.innerHTML = `
+          <div class="mh-empty">
+            <div class="mh-empty-icon">🎤</div>
+            <div class="mh-empty-title">No mocks yet</div>
+            <div class="mh-empty-sub">Run a timed end-to-end session to get a single report card on your performance. Free plan includes 1 lifetime mock.</div>
+            <a class="mh-empty-cta" href="mock-interview.html">Take your first mock →</a>
+          </div>`;
+        return;
+      }
+
+      const FORMAT_LABEL = { first_round: 'First Round', superday: 'Superday', custom: 'Custom' };
+      const scores = completed.map(s => s.overall_score);
+      const best = Math.max(...scores);
+      const latest = scores[0];
+      const avg = Math.round(scores.reduce((a,b) => a+b, 0) / scores.length);
+      const prevScore = scores[1];
+      const delta = (prevScore != null) ? latest - prevScore : null;
+
+      label.textContent = `${completed.length} completed`;
+
+      const statsHtml = `
+        <div class="mh-stats">
+          <div class="mh-stat">
+            <div class="mh-stat-label">Completed</div>
+            <div class="mh-stat-val">${completed.length}</div>
+            <div class="mh-stat-sub">${completed.length === 1 ? 'session' : 'sessions'}</div>
+          </div>
+          <div class="mh-stat">
+            <div class="mh-stat-label">Best score</div>
+            <div class="mh-stat-val">${best}</div>
+            <div class="mh-stat-sub">out of 100</div>
+          </div>
+          <div class="mh-stat">
+            <div class="mh-stat-label">Latest</div>
+            <div class="mh-stat-val ${latest >= 85 ? 'pos' : latest < 65 ? 'neg' : ''}">${latest}</div>
+            <div class="mh-stat-sub">${delta != null ? (delta >= 0 ? '+' : '') + delta + ' vs prior' : 'first mock'}</div>
+          </div>
+          <div class="mh-stat">
+            <div class="mh-stat-label">Average</div>
+            <div class="mh-stat-val">${avg}</div>
+            <div class="mh-stat-sub">across all mocks</div>
+          </div>
+        </div>
+      `;
+
+      const rowsHtml = `<div class="mh-list">` + completed.slice(0, 6).map(s => {
+        const date = new Date(s.completed_at * 1000);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const cls = s.overall_score >= 85 ? 'high' : s.overall_score >= 70 ? 'mid' : 'low';
+        return `
+          <a class="mh-row" href="mock-results.html?id=${s.id}">
+            <div class="mh-row-format">${FORMAT_LABEL[s.format] || s.format}</div>
+            <div class="mh-row-date">${dateStr}</div>
+            <div class="mh-row-bar-wrap"><div class="mh-row-bar-fill ${cls}" style="width:${Math.max(2, s.overall_score)}%"></div></div>
+            <div class="mh-row-score ${cls}">${s.overall_score}<span style="font-size:10px;color:var(--text-tertiary);font-weight:400;font-family:inherit;">/100</span></div>
+            <div class="mh-row-arrow">→</div>
+          </a>`;
+      }).join('') + `</div>`;
+
+      body.innerHTML = statsHtml + rowsHtml;
+    } catch(e) {
+      // Silently fail — panel stays hidden
     }
   }
 
