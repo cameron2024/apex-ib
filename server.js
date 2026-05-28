@@ -1104,7 +1104,7 @@ const server = http.createServer(async (req, res) => {
 
   // ── STATIC FILES ─────────────────────────────────────────
   let filePath=path.join(__dirname,req.url.split('?')[0]);
-  if(req.url.split('?')[0]==='/') filePath=path.join(__dirname,'dashboard.html');
+  if(req.url.split('?')[0]==='/') filePath=path.join(__dirname,'landing.html');
   const ext=path.extname(filePath);
   const ct=ext==='.html'?'text/html':ext==='.js'?'application/javascript':ext==='.css'?'text/css':ext==='.json'?'application/json':'text/plain';
   fs.readFile(filePath,(err,content)=>{

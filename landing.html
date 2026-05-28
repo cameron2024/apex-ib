@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex — IB Interview Prep That Tells You When You're Ready</title>
+<meta name="description" content="Apex grades your actual answers like a banker would, then tracks your gap to interview-ready in days. Not flashcards. Not multiple choice. Real graded prose with adaptive review.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --surface: #FFFFFF;
+    --border: #E8E5DF;
+    --border-strong: #D4CFC6;
+    --text-primary: #1A1814;
+    --text-secondary: #57534E;
+    --text-tertiary: #8A857E;
+    --accent-blue: #2563EB;
+    --accent-green: #15803D;
+    --accent-amber: #B45309;
+    --accent-red: #B91C1C;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.55;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ───────────────────────────────────── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(247,246,243,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s;
+  }
+  .nav.scrolled { border-bottom-color: var(--border); }
+  .nav-inner {
+    max-width: 1180px; margin: 0 auto;
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; letter-spacing: -.3px;
+    text-decoration: none; color: var(--text-primary);
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--text-primary);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nav-links { display: flex; align-items: center; gap: 22px; }
+  .nav-link {
+    font-size: 14px; color: var(--text-secondary); text-decoration: none;
+    transition: color .15s;
+  }
+  .nav-link:hover { color: var(--text-primary); }
+  .nav-cta {
+    padding: 8px 16px; background: var(--text-primary); color: white;
+    border-radius: 7px; font-size: 13.5px; font-weight: 600;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .nav-cta:hover { opacity: .85; }
+  @media (max-width: 640px) {
+    .nav-links .hide-mobile { display: none; }
+  }
+
+  /* ── SECTION SHELL ─────────────────────────── */
+  .section { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+  /* ── HERO ───────────────────────────────────── */
+  .hero {
+    padding: 70px 0 60px;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 12px;
+    background: white; border: 1px solid var(--border);
+    border-radius: 99px;
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
+    margin-bottom: 22px;
+  }
+  .hero-eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-green); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+  }
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 56px; line-height: 1.04; letter-spacing: -1.5px;
+    margin-bottom: 22px;
+  }
+  .hero-title em { font-style: italic; color: var(--accent-green); }
+  .hero-sub {
+    font-size: 18px; line-height: 1.6; color: var(--text-secondary);
+    margin-bottom: 32px; max-width: 540px;
+  }
+  .hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .btn-primary {
+    padding: 13px 22px;
+    background: var(--text-primary); color: white;
+    border: none; border-radius: 9px;
+    font-size: 14.5px; font-weight: 600; font-family: inherit;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+  .btn-secondary {
+    padding: 13px 22px;
+    background: white; color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    font-size: 14.5px; font-weight: 600; font-family: inherit;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: border-color .15s, background .15s;
+  }
+  .btn-secondary:hover { border-color: var(--text-primary); background: var(--bg); }
+  .hero-trust {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12.5px; color: var(--text-tertiary);
+  }
+  .hero-trust-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border-strong); }
+
+  /* Readiness mockup card */
+  .hero-mockup {
+    position: relative;
+    perspective: 1500px;
+  }
+  .mock-card {
+    background: white; border: 1px solid var(--border);
+    border-radius: 16px; padding: 26px;
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.18), 0 1px 3px rgba(0,0,0,0.04);
+    transform: rotate(0.7deg);
+    animation: floatCard 5s ease-in-out infinite;
+  }
+  @keyframes floatCard {
+    0%, 100% { transform: rotate(0.7deg) translateY(0); }
+    50% { transform: rotate(0.5deg) translateY(-6px); }
+  }
+  .mock-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .mock-eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;
+  }
+  .mock-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; letter-spacing: -.3px;
+  }
+  .mock-badge {
+    background: #F0FDF4; color: var(--accent-green);
+    border: 1px solid #BBF7D0;
+    padding: 6px 12px; border-radius: 99px;
+    font-size: 11.5px; font-weight: 600;
+  }
+  .mock-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .mock-stat {
+    flex: 1;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 9px; padding: 12px 14px;
+  }
+  .mock-stat-label { font-size: 9.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px; }
+  .mock-stat-val { font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -.5px; line-height: 1; }
+  .mock-stat-val.pos { color: var(--accent-green); }
+  .mock-stat-sub { font-size: 10.5px; color: var(--text-secondary); margin-top: 3px; }
+
+  /* Progress bar in mockup */
+  .mock-progress-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px; }
+  .mock-progress-wrap {
+    position: relative; height: 18px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 99px;
+    margin-bottom: 16px;
+  }
+  .mock-progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent-green), #84CC16);
+    width: 76%;
+    animation: fillIn 1.8s cubic-bezier(.22,1,.36,1) .3s both;
+  }
+  @keyframes fillIn { from { width: 0; } }
+  .mock-progress-marker {
+    position: absolute; top: -3px; bottom: -3px; left: 85%;
+    width: 2px; background: var(--text-primary); border-radius: 1px;
+  }
+  .mock-progress-marker::after {
+    content: '85%'; position: absolute; top: -16px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 9.5px; font-weight: 700; color: var(--text-primary);
+    background: white; padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  /* Mini insight in mockup */
+  .mock-insight {
+    background: #FFFBEB; border: 1px solid #FEF3C7;
+    border-radius: 9px; padding: 12px 14px;
+    font-size: 12px; line-height: 1.5; color: #78350F;
+  }
+  .mock-insight strong { color: #422006; }
+
+  /* ── SECTION HEADER ────────────────────────── */
+  .section-header { text-align: center; margin-bottom: 50px; }
+  .section-eyebrow {
+    font-size: 11.5px; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px; line-height: 1.1; letter-spacing: -.8px;
+    margin-bottom: 12px;
+  }
+  .section-sub {
+    font-size: 16px; color: var(--text-secondary); max-width: 580px; margin: 0 auto;
+  }
+
+  /* ── DIFFERENTIATOR ROW ─────────────────────── */
+  .diff-section { padding: 90px 0 80px; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .diff-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 50px; max-width: 1000px; margin: 0 auto;
+    align-items: stretch;
+  }
+  .diff-col {
+    border-radius: 14px; padding: 28px;
+    border: 1px solid var(--border);
+  }
+  .diff-col.bad { background: var(--bg); }
+  .diff-col.good { background: white; border-color: var(--text-primary); position: relative; }
+  .diff-col.good::before {
+    content: 'Apex'; position: absolute; top: -12px; left: 28px;
+    background: var(--text-primary); color: white;
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .05em;
+  }
+  .diff-header { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 16px; letter-spacing: -.3px; }
+  .diff-col.bad .diff-header { color: var(--text-secondary); }
+  .diff-list { list-style: none; }
+  .diff-item {
+    display: flex; gap: 11px; padding: 9px 0;
+    border-bottom: 1px solid #F2F0EC; font-size: 13.5px; line-height: 1.5;
+  }
+  .diff-item:last-child { border-bottom: none; }
+  .diff-icon { flex-shrink: 0; width: 18px; height: 18px; }
+  .diff-col.bad .diff-icon { color: var(--text-tertiary); }
+  .diff-col.good .diff-icon { color: var(--accent-green); }
+  .diff-col.bad .diff-item { color: var(--text-secondary); }
+
+  /* ── HOW IT WORKS ──────────────────────────── */
+  .how-section { padding: 90px 0 80px; }
+  .how-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px; max-width: 1000px; margin: 0 auto;
+  }
+  .how-step {
+    background: white; border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px 26px;
+    position: relative;
+  }
+  .how-num {
+    width: 32px; height: 32px;
+    background: var(--text-primary); color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 15px;
+    margin-bottom: 18px;
+  }
+  .how-title { font-family: 'DM Serif Display', serif; font-size: 19px; margin-bottom: 8px; letter-spacing: -.3px; }
+  .how-text { font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); }
+
+  /* ── TOPICS ─────────────────────────────────── */
+  .topics-section { padding: 80px 0; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .topic-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; max-width: 920px; margin: 0 auto;
+  }
+  .topic-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 22px 20px;
+    display: flex; align-items: center; gap: 14px;
+    transition: border-color .15s, transform .15s;
+  }
+  .topic-card:hover { border-color: var(--text-primary); transform: translateY(-2px); }
+  .topic-icon-wrap {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .topic-icon-wrap svg { width: 19px; height: 19px; }
+  .topic-card.accounting .topic-icon-wrap { background: #EEF2FF; color: #4338CA; }
+  .topic-card.enterprise .topic-icon-wrap { background: #FFF7ED; color: #C2410C; }
+  .topic-card.valuation  .topic-icon-wrap { background: #F0FDF4; color: #15803D; }
+  .topic-card.dcf        .topic-icon-wrap { background: #EFF6FF; color: #1D4ED8; }
+  .topic-card.mergers    .topic-icon-wrap { background: #FDF4FF; color: #7E22CE; }
+  .topic-card.lbo        .topic-icon-wrap { background: #FFF1F2; color: #BE123C; }
+  .topic-name { font-family: 'DM Serif Display', serif; font-size: 17px; letter-spacing: -.2px; margin-bottom: 2px; }
+  .topic-count { font-size: 12px; color: var(--text-tertiary); }
+
+  /* ── FEATURE STRIPE ────────────────────────── */
+  .features-section { padding: 90px 0 80px; }
+  .feature-list {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 24px; max-width: 1000px; margin: 0 auto;
+  }
+  .feature {
+    background: white; border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px;
+  }
+  .feature-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--bg); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .feature-icon svg { width: 20px; height: 20px; color: var(--text-primary); }
+  .feature-title { font-family: 'DM Serif Display', serif; font-size: 20px; letter-spacing: -.3px; margin-bottom: 7px; }
+  .feature-text { font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); }
+
+  /* ── FOUNDER NOTE ─────────────────────────── */
+  .founder-section { padding: 90px 0 80px; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .founder-card {
+    max-width: 720px; margin: 0 auto;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 16px; padding: 38px;
+    position: relative;
+  }
+  .founder-quote-mark {
+    position: absolute; top: 16px; left: 18px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 80px; color: var(--border);
+    line-height: 1; font-style: italic;
+  }
+  .founder-text {
+    font-size: 16px; line-height: 1.65; color: var(--text-primary);
+    margin-bottom: 22px; font-style: italic; position: relative; z-index: 1;
+  }
+  .founder-attribution {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .founder-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--text-primary); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 17px;
+  }
+  .founder-name { font-weight: 600; font-size: 14px; }
+  .founder-role { font-size: 12.5px; color: var(--text-tertiary); }
+
+  /* ── PRICING TEASER ────────────────────────── */
+  .pricing-section { padding: 90px 0 80px; }
+  .price-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 18px; max-width: 1000px; margin: 0 auto;
+  }
+  .price-card {
+    background: white; border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px 26px;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .price-card.featured { border-color: var(--text-primary); border-width: 2px; }
+  .price-card.featured::before {
+    content: 'Best value'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--text-primary); color: white;
+    padding: 5px 14px; border-radius: 99px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .05em;
+  }
+  .price-name { font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -.3px; margin-bottom: 6px; }
+  .price-tagline { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.5; min-height: 38px; }
+  .price-amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px; letter-spacing: -.8px; line-height: 1;
+    margin-bottom: 4px;
+  }
+  .price-period { font-size: 12.5px; color: var(--text-tertiary); margin-bottom: 22px; }
+  .price-features { list-style: none; margin-bottom: 24px; flex: 1; }
+  .price-feat {
+    display: flex; gap: 9px; padding: 7px 0;
+    font-size: 13px; color: var(--text-secondary); line-height: 1.45;
+  }
+  .price-feat svg { flex-shrink: 0; width: 14px; height: 14px; color: var(--accent-green); margin-top: 3px; }
+  .price-cta {
+    padding: 11px; text-align: center;
+    border-radius: 8px; font-size: 13.5px; font-weight: 600;
+    text-decoration: none;
+    transition: opacity .15s;
+  }
+  .price-cta.dark { background: var(--text-primary); color: white; }
+  .price-cta.light { background: var(--bg); color: var(--text-primary); border: 1px solid var(--border-strong); }
+  .price-cta:hover { opacity: .9; }
+
+  /* ── FAQ ────────────────────────────────────── */
+  .faq-section { padding: 90px 0 80px; background: var(--surface); border-top: 1px solid var(--border); }
+  .faq-list { max-width: 760px; margin: 0 auto; }
+  .faq-item {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .faq-q {
+    padding: 18px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; font-size: 15px; font-weight: 500;
+    user-select: none;
+  }
+  .faq-q svg {
+    width: 16px; height: 16px; color: var(--text-tertiary);
+    transition: transform .25s ease;
+  }
+  .faq-item.open .faq-q svg { transform: rotate(180deg); }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height .3s ease;
+  }
+  .faq-item.open .faq-a { max-height: 400px; }
+  .faq-a-inner {
+    padding: 0 22px 20px;
+    font-size: 14px; line-height: 1.65; color: var(--text-secondary);
+  }
+
+  /* ── FINAL CTA ─────────────────────────────── */
+  .final-cta {
+    padding: 100px 28px 80px;
+    text-align: center;
+  }
+  .final-cta-inner {
+    max-width: 720px; margin: 0 auto;
+    background: var(--text-primary); color: white;
+    border-radius: 20px; padding: 56px 40px;
+  }
+  .final-cta-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px; line-height: 1.15; letter-spacing: -.6px;
+    margin-bottom: 14px;
+  }
+  .final-cta-sub {
+    font-size: 16px; line-height: 1.55; opacity: 0.78;
+    margin-bottom: 28px;
+  }
+  .final-cta .btn-primary {
+    background: white; color: var(--text-primary);
+  }
+  .final-cta .btn-secondary {
+    background: transparent; color: white; border-color: rgba(255,255,255,0.25);
+  }
+  .final-cta .btn-secondary:hover { background: rgba(255,255,255,0.06); border-color: white; }
+
+  /* ── FOOTER ────────────────────────────────── */
+  footer {
+    padding: 40px 28px 30px;
+    text-align: center;
+    font-size: 12.5px; color: var(--text-tertiary);
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--text-secondary); text-decoration: none; margin: 0 8px; }
+  footer a:hover { color: var(--text-primary); }
+
+  /* ── MOBILE ───────────────────────────────── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 50px; padding: 50px 0; }
+    .hero-title { font-size: 40px; }
+    .hero-sub { font-size: 16px; }
+    .section-title { font-size: 32px; }
+    .diff-grid { grid-template-columns: 1fr; gap: 18px; }
+    .how-grid { grid-template-columns: 1fr; }
+    .topic-grid { grid-template-columns: 1fr 1fr; }
+    .feature-list { grid-template-columns: 1fr; }
+    .price-grid { grid-template-columns: 1fr; }
+    .final-cta-inner { padding: 40px 24px; }
+    .final-cta-title { font-size: 28px; }
+  }
+  @media (max-width: 540px) {
+    .topic-grid { grid-template-columns: 1fr; }
+    .hero-title { font-size: 34px; }
+    .section-title { font-size: 28px; }
+  }
+
+  /* Fade-in on scroll */
+  .fade-up { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ────────────────────── -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none" width="16" height="16">
+          <path d="M8 2L13 5V11L8 14L3 11V5L8 2Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="8" cy="8" r="2" fill="white"/>
+        </svg>
+      </div>
+      Apex
+    </a>
+    <div class="nav-links">
+      <a class="nav-link hide-mobile" href="#how">How it works</a>
+      <a class="nav-link hide-mobile" href="#features">Features</a>
+      <a class="nav-link hide-mobile" href="pricing.html">Pricing</a>
+      <a class="nav-link" href="auth.html">Sign in</a>
+      <a class="nav-cta" href="auth.html?mode=register">Get started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ───────────────────── -->
+<section class="section hero">
+  <div>
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      Built by an Amherst student in IB recruiting now
+    </div>
+    <h1 class="hero-title">Practice like the interview. <em>Know exactly when you're ready.</em></h1>
+    <p class="hero-sub">
+      Apex grades your actual spoken or typed answers the way a banker would — and tells you how many days of practice are left until you're interview-ready. No flashcards. No multiple choice. No piles of PDFs.
+    </p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="practice-screen.html?topic=Accounting&focus=acc_001">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Try one question, no signup
+      </a>
+      <a class="btn-secondary" href="auth.html?mode=register">
+        Create free account →
+      </a>
+    </div>
+    <div class="hero-trust">
+      <span>565 curated questions</span>
+      <span class="hero-trust-dot"></span>
+      <span>6 IB topics</span>
+      <span class="hero-trust-dot"></span>
+      <span>Free tier — no card</span>
+    </div>
+  </div>
+
+  <!-- Readiness mockup -->
+  <div class="hero-mockup">
+    <div class="mock-card">
+      <div class="mock-header">
+        <div>
+          <div class="mock-eyebrow">Your performance</div>
+          <div class="mock-title">Readiness</div>
+        </div>
+        <div class="mock-badge">Interview-ready in ~9 days</div>
+      </div>
+      <div class="mock-row">
+        <div class="mock-stat">
+          <div class="mock-stat-label">Right now</div>
+          <div class="mock-stat-val">76%</div>
+          <div class="mock-stat-sub">Across 87 answers</div>
+        </div>
+        <div class="mock-stat">
+          <div class="mock-stat-label">Weekly rate</div>
+          <div class="mock-stat-val pos">+6 pts</div>
+          <div class="mock-stat-sub">Recent vs prior</div>
+        </div>
+        <div class="mock-stat">
+          <div class="mock-stat-label">Gap to 85%</div>
+          <div class="mock-stat-val">9 pts</div>
+          <div class="mock-stat-sub">Down from 22</div>
+        </div>
+      </div>
+      <div class="mock-progress-label">Progress to interview-ready</div>
+      <div class="mock-progress-wrap">
+        <div class="mock-progress-fill"></div>
+        <div class="mock-progress-marker"></div>
+      </div>
+      <div class="mock-insight">
+        <strong>Diagnosis:</strong> You've climbed from 64% to 82% over two weeks — solid trajectory. The remaining gap is concentrated in <strong>DCF terminal value</strong>: you've mixed up Gordon Growth and exit multiple in 4 of your last 6 misses.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DIFFERENTIATOR ──────────── -->
+<section class="diff-section">
+  <div class="section">
+    <div class="section-header fade-up">
+      <div class="section-eyebrow">The difference</div>
+      <h2 class="section-title">Most prep tools quiz you.<br>Apex measures you.</h2>
+      <p class="section-sub">After spending months prepping for IB recruiting myself, I built Apex around one question: how do you know when you're actually ready?</p>
+    </div>
+    <div class="diff-grid fade-up">
+      <div class="diff-col bad">
+        <div class="diff-header">Typical question banks &amp; PDFs</div>
+        <ul class="diff-list">
+          <li class="diff-item">
+            <svg class="diff-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <div>Read the model answer, hope you'd say something similar in the interview</div>
+          </li>
+          <li class="diff-item">
+            <svg class="diff-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <div>Flip flashcards, mark them "got it" or "didn't" — no objective check</div>
+          </li>
+          <li class="diff-item">
+            <svg class="diff-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <div>Click sequentially through topics — same order each time, no adaptation</div>
+          </li>
+          <li class="diff-item">
+            <svg class="diff-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <div>Walk into the interview hoping it'll be enough</div>
+          </li>
+        </ul>
+      </div>
+      <div class="diff-col good">
+        <div class="diff-header">The Apex approach</div>
+        <ul class="diff-list">
+          <li class="diff-item">
+            <svg class="diff-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <div>Type or speak your real answer — graded 0–100 with specific feedback on what's missing</div>
+          </li>
+          <li class="diff-item">
+            <svg class="diff-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <div>Adaptive queue: questions you missed resurface; mastered ones wait</div>
+          </li>
+          <li class="diff-item">
+            <svg class="diff-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <div>Mock interview mode: timed superdays with end-of-session report card</div>
+          </li>
+          <li class="diff-item">
+            <svg class="diff-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <div>Walk in <strong style="color:var(--text-primary);">knowing</strong>: a number tells you you're ready</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ────────────── -->
+<section class="how-section" id="how">
+  <div class="section">
+    <div class="section-header fade-up">
+      <div class="section-eyebrow">How it works</div>
+      <h2 class="section-title">Three steps. No setup.</h2>
+      <p class="section-sub">From the first question to a personalized prep plan in under 60 seconds.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-step fade-up">
+        <div class="how-num">1</div>
+        <div class="how-title">Answer like you'd interview</div>
+        <div class="how-text">Type or speak your actual response — no multiple choice, no flipping a card. Just answer the question the way you would across a banker's desk.</div>
+      </div>
+      <div class="how-step fade-up">
+        <div class="how-num">2</div>
+        <div class="how-title">Get a real grade, instantly</div>
+        <div class="how-text">Apex scores you 0–100 against a rubric built from real banker grading. You'll see what you got right, what you missed, and the concept gap.</div>
+      </div>
+      <div class="how-step fade-up">
+        <div class="how-num">3</div>
+        <div class="how-title">See exactly what's next</div>
+        <div class="how-text">Your weak topics surface first. Your time-to-ready estimate updates as you go. The next session is already built for you.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TOPICS ─────────────────── -->
+<section class="topics-section">
+  <div class="section">
+    <div class="section-header fade-up">
+      <div class="section-eyebrow">Coverage</div>
+      <h2 class="section-title">All six IB topics, 565 questions.</h2>
+      <p class="section-sub">Curated to match what actually gets asked at top banks — first round through superday.</p>
+    </div>
+    <div class="topic-grid fade-up">
+      <div class="topic-card accounting">
+        <div class="topic-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-6"/><path d="M12 9V3"/><path d="M3 15h18"/><path d="M3 9h18"/><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+        </div>
+        <div>
+          <div class="topic-name">Accounting</div>
+          <div class="topic-count">Three statements, working capital, depreciation</div>
+        </div>
+      </div>
+      <div class="topic-card enterprise">
+        <div class="topic-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l6-4 6 4v13"/><path d="M3 21h12"/><path d="M7 12h.01M7 16h.01M11 12h.01M11 16h.01"/><circle cx="17.5" cy="15.5" r="3"/><line x1="19.6" y1="17.6" x2="22" y2="20"/></svg>
+        </div>
+        <div>
+          <div class="topic-name">Enterprise Value</div>
+          <div class="topic-count">EV vs equity value, bridge calculations</div>
+        </div>
+      </div>
+      <div class="topic-card valuation">
+        <div class="topic-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h8"/><path d="M12 16h6"/><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M8 11h7"/></svg>
+        </div>
+        <div>
+          <div class="topic-name">Valuation</div>
+          <div class="topic-count">Comps, precedents, football fields</div>
+        </div>
+      </div>
+      <div class="topic-card dcf">
+        <div class="topic-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v5"/><path d="M16 14v7"/><path d="M20 10v11"/><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"/><path d="M4 18v3"/><path d="M8 14v7"/></svg>
+        </div>
+        <div>
+          <div class="topic-name">Discounted Cash Flow</div>
+          <div class="topic-count">UFCF, WACC, terminal value</div>
+        </div>
+      </div>
+      <div class="topic-card mergers">
+        <div class="topic-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg>
+        </div>
+        <div>
+          <div class="topic-name">Mergers &amp; Acquisitions</div>
+          <div class="topic-count">Accretion/dilution, sources &amp; uses</div>
+        </div>
+      </div>
+      <div class="topic-card lbo">
+        <div class="topic-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z"/><path d="M16 10h.01"/><path d="M2 8v1a2 2 0 0 0 2 2h1"/></svg>
+        </div>
+        <div>
+          <div class="topic-name">Leveraged Buyouts</div>
+          <div class="topic-count">Returns drivers, debt structure, IRR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ────────────────── -->
+<section class="features-section" id="features">
+  <div class="section">
+    <div class="section-header fade-up">
+      <div class="section-eyebrow">What's inside</div>
+      <h2 class="section-title">Built around how you actually learn.</h2>
+      <p class="section-sub">Not just a question bank. A system that adapts as you do.</p>
+    </div>
+    <div class="feature-list">
+      <div class="feature fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5Z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>
+        </div>
+        <div class="feature-title">AI grading, not flashcards</div>
+        <div class="feature-text">Type or speak your answer. Get a 0–100 score with specific feedback on what's strong, what's missing, and the concept gap to drill next.</div>
+      </div>
+      <div class="feature fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="feature-title">Adaptive review queue</div>
+        <div class="feature-text">Spaced repetition surfaces missed questions before you forget them. Mastered questions wait. The session is built for you, not picked at random.</div>
+      </div>
+      <div class="feature fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="feature-title">Mock interview mode</div>
+        <div class="feature-text">Timed First Round (8 questions, 30 min), Superday (12 questions, 60 min), or custom. No grading until you submit — then a single end-of-session report card.</div>
+      </div>
+      <div class="feature fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </div>
+        <div class="feature-title">Plain-English insights</div>
+        <div class="feature-text">Every number on your dashboard is followed by a sentence explaining what it means and what to do. "DCF terminal value: you've mixed up Gordon Growth and exit multiple in 4 of 6 misses."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOUNDER NOTE ────────────── -->
+<section class="founder-section">
+  <div class="section">
+    <div class="founder-card fade-up">
+      <div class="founder-quote-mark">"</div>
+      <p class="founder-text">
+        I built Apex because every IB prep tool I tried felt the same: piles of questions with no way to know if I was actually learning. I'd "do the 400 guide" and walk out unsure whether I'd just memorized phrases or actually understood the concepts. Apex grades you the way an interviewer would — and tells you the gap to closed. It's the tool I wish I had three months ago.
+      </p>
+      <div class="founder-attribution">
+        <div class="founder-avatar">C</div>
+        <div>
+          <div class="founder-name">Cameron, Amherst '28</div>
+          <div class="founder-role">Building Apex while recruiting for IB this cycle</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING TEASER ──────────── -->
+<section class="pricing-section">
+  <div class="section">
+    <div class="section-header fade-up">
+      <div class="section-eyebrow">Pricing</div>
+      <h2 class="section-title">Start free. Upgrade when you're serious.</h2>
+      <p class="section-sub">No card required to start. Cancel anytime on the monthly plan.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card fade-up">
+        <div class="price-name">Free</div>
+        <div class="price-tagline">Try the product, no commitment.</div>
+        <div class="price-amount">$0</div>
+        <div class="price-period">forever</div>
+        <ul class="price-features">
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 5 graded answers per day</li>
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> All 565 questions</li>
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 1 mock interview (lifetime)</li>
+        </ul>
+        <a class="price-cta light" href="auth.html?mode=register">Start free</a>
+      </div>
+      <div class="price-card featured fade-up">
+        <div class="price-name">Pro</div>
+        <div class="price-tagline">For active prep — unlimited grading and 1 mock per day.</div>
+        <div class="price-amount">$14.99</div>
+        <div class="price-period">/ month — cancel anytime</div>
+        <ul class="price-features">
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Unlimited graded answers</li>
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 1 mock interview per 24hrs</li>
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Adaptive review queue</li>
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> AI performance insights</li>
+        </ul>
+        <a class="price-cta dark" href="auth.html?mode=register&plan=monthly">Start Pro</a>
+      </div>
+      <div class="price-card fade-up">
+        <div class="price-name">Recruiting Pass</div>
+        <div class="price-tagline">Full recruiting cycle, one payment, unlimited mocks.</div>
+        <div class="price-amount">$39.99</div>
+        <div class="price-period">one-time — no renewals</div>
+        <ul class="price-features">
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Everything in Pro</li>
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Unlimited mock interviews</li>
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Full recruiting cycle access</li>
+          <li class="price-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Priority question updates</li>
+        </ul>
+        <a class="price-cta light" href="auth.html?mode=register&plan=pass">Get the Pass</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ─────────────────────── -->
+<section class="faq-section">
+  <div class="section">
+    <div class="section-header fade-up">
+      <div class="section-eyebrow">FAQ</div>
+      <h2 class="section-title">Questions before you start</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How is the grading actually accurate?
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">
+          Each question has a rubric — what bankers actually look for in the answer. Apex sends your answer alongside the rubric and a banker-style grading prompt to a frontier AI model, which returns a 0–100 score plus specific feedback. It's calibrated against the same standard senior bankers use mentally when evaluating you across the desk.
+        </div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Do I need an account to try it?
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">
+          No — try one question right now, no signup or card required. Guests get 5 graded answers per day. Creating an account is free and adds progress tracking, saved questions, and the time-to-ready estimate.
+        </div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Is this an alternative to the 400 guide or WSP?
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">
+          The 400 guide gives you the model answers. WSP teaches you the concepts. Neither tells you if <em>you</em> can deliver the answers in the room. Apex is the missing piece — the active practice and objective feedback that converts knowledge into reps.
+        </div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Does voice mode work?
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">
+          Yes — voice mode is available in mock interviews and supported in Chrome and Edge. Your voice is transcribed in-browser and graded the same way as typed answers. Useful for getting the rhythm of speaking your answers out loud, the way you will in the actual interview.
+        </div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Who built this?
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">
+          Cameron, an Amherst '28 student currently going through IB recruiting. Apex came out of three months of his own prep — building the tool he wished existed. New questions and features ship weekly because he's still in the trenches.
+        </div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What's the difference between Pro and the Recruiting Pass?
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">
+          Pro is $14.99/month with 1 mock interview per 24 hours — cancel anytime. The Recruiting Pass is $39.99 one-time with unlimited mock interviews for the entire recruiting cycle. If you're prepping for more than 3 months, the Pass is the better deal.
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FINAL CTA ────────────────── -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <h2 class="final-cta-title">Don't walk in hoping.<br>Walk in <em style="font-style:italic;">knowing</em>.</h2>
+    <p class="final-cta-sub">Try one question right now. No signup. See what graded prep actually feels like.</p>
+    <div style="display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <a class="btn-primary" href="practice-screen.html?topic=Accounting&focus=acc_001">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Try one question
+      </a>
+      <a class="btn-secondary" href="auth.html?mode=register">Create free account</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <a href="pricing.html">Pricing</a> ·
+    <a href="auth.html">Sign in</a> ·
+    <a href="learn-more.html">About</a>
+  </div>
+  <div style="margin-top:14px;">© Apex IB · Built by a student, for students</div>
+</footer>
+
+<script>
+  // If logged in, send to dashboard
+  if (localStorage.getItem('apex_token')) {
+    window.location.replace('dashboard.html');
+  }
+
+  // Sticky nav border
+  const nav = document.getElementById('nav');
+  function updateNav() {
+    if (window.scrollY > 8) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  }
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
+
+  // Fade-up on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+
+  // FAQ toggle
+  function toggleFaq(el) {
+    el.parentElement.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
