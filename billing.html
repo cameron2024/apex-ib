@@ -390,9 +390,9 @@
     const planEmoji   = userPlan === 'pass' ? '◆' : userPlan === 'monthly' ? '★' : '○';
     const planLabel   = userPlan === 'pass' ? 'Recruiting Pass' : userPlan === 'monthly' ? 'Monthly Pro' : 'Free';
     const planClass   = userPlan === 'pass' ? 'pass' : userPlan === 'monthly' ? 'monthly' : 'free';
-    const priceAmount = userPlan === 'pass' ? '$39.99' : userPlan === 'monthly' ? '$14.99' : '$0';
+    const priceAmount = userPlan === 'pass' ? '$39.99' : userPlan === 'monthly' ? '$19.99' : '$0';
     const priceWas    = userPlan === 'monthly' ? '$20' : null;
-    const pricePeriod = userPlan === 'pass' ? 'one-time' : userPlan === 'monthly' ? '/ month' : 'forever';
+    const pricePeriod = userPlan === 'pass' ? '/ month' : userPlan === 'monthly' ? '/ month' : 'forever';
     const planDesc    = userPlan === 'pass'
       ? 'Full lifetime access with one payment. No subscription, no renewal.'
       : userPlan === 'monthly'

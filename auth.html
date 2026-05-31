@@ -3,603 +3,862 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apex — Sign In</title>
+<title>Apex — Sign in</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
+
+<script>
+  // If already signed in, send to dashboard before any paint
+  (function() {
+    try {
+      if (localStorage.getItem('apex_token')) {
+        document.documentElement.style.display = 'none';
+        window.location.replace('dashboard.html');
+      }
+    } catch(e) {}
+  })();
+</script>
+
 <style>
   :root {
-    --bg:#F7F6F3; --surface:#FFFFFF; --border:#E8E5DF;
-    --text-primary:#1A1814; --text-secondary:#6B6560; --text-tertiary:#9E9890;
-    --accent-blue:#2563EB; --accent-green:#16A34A;
+    --bg: #F7F6F3;
+    --surface: #FFFFFF;
+    --border: #E8E5DF;
+    --border-strong: #D4CFC6;
+    --text-primary: #1A1814;
+    --text-secondary: #57534E;
+    --text-tertiary: #8A857E;
+    --accent-blue: #2563EB;
+    --accent-green: #15803D;
+    --accent-amber: #B45309;
+    --accent-red: #B91C1C;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html,body { height:100%; overflow:hidden; }
-  body { font-family:'DM Sans',sans-serif; background:var(--bg); display:flex; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
 
-  /* SCROLLING BACKGROUND */
-  .bg-stage {
-    position:fixed; inset:0; z-index:0;
-    display:grid; grid-template-columns:repeat(4,1fr);
-    overflow:hidden; opacity:.14;
+  /* ── LAYOUT ──────────────────── */
+  .auth-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
-  .feed-col { display:flex; flex-direction:column; }
-  .feed-col:nth-child(odd)  { animation:scrollUp   36s linear infinite; }
-  .feed-col:nth-child(even) { animation:scrollDown 30s linear infinite; }
-  @keyframes scrollUp   { from{transform:translateY(0)}    to{transform:translateY(-50%)} }
-  @keyframes scrollDown { from{transform:translateY(-50%)} to{transform:translateY(0)}    }
-  .feed-card {
-    padding:13px 15px; border-bottom:1px solid var(--border);
-    background:white; flex-shrink:0;
-  }
-  .feed-bank-row {
-    display:flex; align-items:center; gap:7px;
-    font-size:12px; font-weight:600; color:var(--text-primary);
-    margin-bottom:4px;
-  }
-  .feed-dot { width:6px;height:6px;border-radius:50%;background:var(--accent-green);flex-shrink:0; }
-  .feed-tier {
-    margin-left:auto; font-size:9px; font-weight:700;
-    letter-spacing:.07em; text-transform:uppercase;
-    padding:2px 5px; border-radius:3px;
-  }
-  .feed-tier.elite { background:#1A1814; color:#FDE68A; }
-  .feed-tier.top   { background:#1E3A5F; color:#BAE6FD; }
-  .feed-tier.mid   { background:#F3F4F6; color:#374151; }
-  .feed-text { font-size:11px; color:var(--text-secondary); line-height:1.5; }
-  .feed-text strong { color:var(--text-primary); font-weight:500; }
 
-  /* GRADIENT FADE */
-  .bg-fade {
-    position:fixed; inset:0; z-index:1; pointer-events:none;
+  /* LEFT — brand panel */
+  .brand-panel {
+    background: var(--text-primary);
+    color: #F7F6F3;
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .brand-bg-gradient {
+    position: absolute; inset: 0;
     background:
-      linear-gradient(to right,
-        rgba(247,246,243,.75) 0%,
-        rgba(247,246,243,.15) 22%,
-        rgba(247,246,243,.0)  42%,
-        rgba(247,246,243,.0)  52%,
-        rgba(247,246,243,.88) 70%,
-        rgba(247,246,243,1)   100%
-      ),
-      linear-gradient(to bottom,
-        rgba(247,246,243,.85) 0%,
-        transparent 12%,
-        transparent 88%,
-        rgba(247,246,243,.85) 100%
-      );
+      radial-gradient(circle at 20% 30%, rgba(132, 204, 22, 0.08), transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.06), transparent 50%);
+    pointer-events: none;
+  }
+  .brand-logo {
+    display: inline-flex; align-items: center; gap: 10px;
+    text-decoration: none; color: white;
+    position: relative; z-index: 1;
+  }
+  .brand-logo-mark {
+    width: 32px; height: 32px;
+    background: white;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .brand-logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; letter-spacing: -.3px;
   }
 
-  /* LEFT COPY */
-  .left-copy {
-    position:fixed; z-index:5;
-    left:56px; top:50%; transform:translateY(-50%);
-    max-width:340px;
-    animation:fadeUp .5s ease both;
+  .brand-main {
+    position: relative; z-index: 1;
+    max-width: 460px;
   }
-  @keyframes fadeUp {
-    from{opacity:0;transform:translateY(calc(-50% + 14px))}
-    to{opacity:1;transform:translateY(-50%)}
+  .brand-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 99px;
+    font-size: 11.5px; font-weight: 500; color: #D6D3CE;
+    margin-bottom: 24px;
   }
-  .left-logo {
-    display:flex; align-items:center; gap:9px;
-    margin-bottom:32px;
+  .brand-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #84CC16; }
+  .brand-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 40px; line-height: 1.08; letter-spacing: -.8px;
+    margin-bottom: 18px;
   }
-  .logo-mark {
-    width:32px; height:32px; background:var(--text-primary);
-    border-radius:8px; display:flex; align-items:center; justify-content:center;
-  }
-  .logo-name { font-family:'DM Serif Display',serif; font-size:18px; letter-spacing:-.3px; }
-  .left-headline {
-    font-family:'DM Serif Display',serif;
-    font-size:38px; letter-spacing:-1px; line-height:1.15;
-    color:var(--text-primary); margin-bottom:13px;
-  }
-  .left-sub {
-    font-size:14px; color:var(--text-secondary);
-    line-height:1.7; margin-bottom:28px;
-  }
-  .left-stats { display:flex; gap:28px; }
-  .stat-val {
-    font-family:'DM Serif Display',serif;
-    font-size:26px; letter-spacing:-.5px; color:var(--text-primary);
-  }
-  .stat-label {
-    font-size:10.5px; color:var(--text-tertiary); margin-top:1px;
-    text-transform:uppercase; letter-spacing:.07em; font-weight:600;
+  .brand-headline em { font-style: italic; color: #BEF264; }
+  .brand-sub {
+    font-size: 15px; line-height: 1.6; color: #C7C3BC;
+    margin-bottom: 36px;
   }
 
-  /* AUTH PANEL */
-  .auth-panel {
-    position:relative; z-index:10;
-    margin-left:auto; width:430px; min-height:100vh;
-    display:flex; flex-direction:column; justify-content:center;
-    padding:52px 46px;
-    background:rgba(255,255,255,.95);
-    backdrop-filter:blur(20px);
-    border-left:1px solid var(--border);
-    animation:slideIn .4s ease both;
+  /* feature highlights */
+  .brand-features { display: flex; flex-direction: column; gap: 14px; }
+  .brand-feat {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 13.5px; color: #E5E3DE; line-height: 1.5;
   }
-  @keyframes slideIn { from{opacity:0;transform:translateX(14px)} to{opacity:1;transform:translateX(0)} }
+  .brand-feat-icon {
+    width: 22px; height: 22px; border-radius: 7px;
+    background: rgba(132, 204, 22, 0.12);
+    border: 1px solid rgba(132, 204, 22, 0.25);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: #BEF264;
+  }
+  .brand-feat-icon svg { width: 12px; height: 12px; }
+  .brand-feat strong { color: white; font-weight: 600; }
 
-  .panel-heading {
-    font-family:'DM Serif Display',serif;
-    font-size:24px; letter-spacing:-.4px; margin-bottom:5px;
+  .brand-footer {
+    position: relative; z-index: 1;
+    font-size: 12px; color: #8A857E;
+    display: flex; align-items: center; gap: 8px;
   }
-  .panel-sub { font-size:13.5px; color:var(--text-secondary); margin-bottom:28px; line-height:1.5; }
+  .brand-footer a { color: #C7C3BC; text-decoration: none; }
+  .brand-footer a:hover { color: white; }
 
-  /* TABS */
-  .tab-row {
-    display:flex; background:var(--bg);
-    border:1px solid var(--border); border-radius:8px;
-    padding:3px; margin-bottom:24px;
+  /* RIGHT — form panel */
+  .form-panel {
+    background: var(--bg);
+    padding: 40px 56px;
+    display: flex; flex-direction: column;
+    overflow-y: auto;
   }
-  .tab-btn {
-    flex:1; padding:8px 12px; border:none; background:none;
-    border-radius:6px; font-size:13.5px; font-weight:500;
-    color:var(--text-tertiary); cursor:pointer;
-    font-family:'DM Sans',sans-serif; transition:all .15s;
+  .form-topbar {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 14px; margin-bottom: 32px;
+    font-size: 13.5px; color: var(--text-secondary);
   }
-  .tab-btn.active {
-    background:white; color:var(--text-primary);
-    box-shadow:0 1px 4px rgba(0,0,0,.1);
-  }
+  .form-topbar a { color: var(--text-primary); text-decoration: none; font-weight: 500; }
+  .form-topbar a:hover { text-decoration: underline; }
 
-  /* FIELDS */
-  .field { margin-bottom:14px; }
-  .field label {
-    display:block; font-size:11px; font-weight:600;
-    text-transform:uppercase; letter-spacing:.07em;
-    color:var(--text-secondary); margin-bottom:6px;
-  }
-  .field input {
-    width:100%; padding:11px 13px;
-    background:var(--bg); border:1px solid var(--border);
-    border-radius:8px; color:var(--text-primary);
-    font-size:14px; font-family:'DM Sans',sans-serif;
-    outline:none; transition:border-color .15s, box-shadow .15s;
-  }
-  .field input:focus {
-    border-color:var(--accent-blue);
-    box-shadow:0 0 0 3px rgba(37,99,235,.1);
-    background:white;
+  .form-content {
+    flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
+    max-width: 420px; width: 100%; margin: 0 auto;
   }
 
-  /* BUTTON */
-  .submit-btn {
-    width:100%; padding:12px; margin-top:6px;
-    background:var(--text-primary); color:white;
-    border:none; border-radius:8px;
-    font-size:14px; font-weight:600;
-    cursor:pointer; font-family:'DM Sans',sans-serif;
-    transition:opacity .15s, transform .1s; letter-spacing:-.1px;
+  .form-eyebrow {
+    font-size: 11.5px; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text-tertiary);
+    margin-bottom: 10px;
   }
-  .submit-btn:hover  { opacity:.86; }
-  .submit-btn:active { transform:scale(.99); }
-  .submit-btn:disabled { opacity:.45; cursor:not-allowed; }
-
-  .auth-error {
-    font-size:13px; color:#DC2626;
-    text-align:center; min-height:18px; margin-top:10px;
+  .form-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px; line-height: 1.12; letter-spacing: -.5px;
+    margin-bottom: 8px;
+  }
+  .form-subtitle {
+    font-size: 14px; color: var(--text-secondary);
+    margin-bottom: 28px; line-height: 1.5;
   }
 
-  .switch-row {
-    margin-top:20px; text-align:center;
-    font-size:13px; color:var(--text-tertiary);
+  /* Tab switcher */
+  .tab-switcher {
+    display: flex;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 22px;
+    position: relative;
   }
-  .switch-row button {
-    background:none; border:none; padding:0;
-    color:var(--accent-blue); font-size:13px;
-    font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer;
+  .tab-switcher-btn {
+    flex: 1; padding: 9px;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 7px;
+    transition: color .2s;
+    position: relative; z-index: 1;
   }
-  .switch-row button:hover { text-decoration:underline; }
+  .tab-switcher-btn.active { color: white; }
+  .tab-switcher-pill {
+    position: absolute;
+    top: 4px; bottom: 4px; left: 4px;
+    width: calc(50% - 4px);
+    background: var(--text-primary);
+    border-radius: 7px;
+    transition: transform .25s cubic-bezier(.22,1,.36,1);
+  }
+  .tab-switcher.register .tab-switcher-pill { transform: translateX(100%); }
 
-  /* FORM VISIBILITY */
-  .form-body { display:none; animation:formIn .2s ease; }
-  .form-body.active { display:block; }
-  @keyframes formIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+  /* Form fields */
+  .field { margin-bottom: 14px; position: relative; }
+  .field-input {
+    width: 100%;
+    padding: 14px 14px 14px 44px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-family: inherit;
+    color: var(--text-primary);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field-input::placeholder { color: var(--text-tertiary); }
+  .field-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(26,24,20,0.06);
+  }
+  .field-icon {
+    position: absolute;
+    left: 15px; top: 50%; transform: translateY(-50%);
+    color: var(--text-tertiary);
+    pointer-events: none;
+    transition: color .15s;
+  }
+  .field-icon svg { width: 16px; height: 16px; display: block; }
+  .field-input:focus + .field-icon,
+  .field:focus-within .field-icon { color: var(--text-primary); }
 
-  /* ONBOARDING STEPS */
-  .onb-step { display:none; }
-  .onb-step.active { display:block; animation:formIn .25s ease; }
-  .onb-progress { display:flex; gap:5px; margin-bottom:18px; }
-  .onb-progress-dot { flex:1; height:3px; background:var(--border); border-radius:2px; transition:background .2s; }
-  .onb-progress-dot.active { background:var(--text-primary); }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field { flex: 1; }
+
+  /* Submit button */
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 6px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    transition: transform .12s ease, box-shadow .12s ease, opacity .15s;
+  }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-submit svg { width: 14px; height: 14px; }
+
+  /* Footer link area */
+  .form-footer {
+    margin-top: 20px;
+    font-size: 13px; color: var(--text-secondary);
+    text-align: center;
+  }
+  .form-footer a, .form-footer .link-btn {
+    color: var(--text-primary);
+    font-weight: 600;
+    text-decoration: none;
+    background: none; border: none; padding: 0; font-family: inherit; font-size: inherit;
+    cursor: pointer;
+  }
+  .form-footer a:hover, .form-footer .link-btn:hover { text-decoration: underline; }
+
+  /* Error message */
+  .form-error {
+    background: #FEF2F2;
+    color: var(--accent-red);
+    border: 1px solid #FECACA;
+    border-radius: 9px;
+    padding: 11px 14px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    display: none;
+    line-height: 1.45;
+  }
+  .form-error.visible { display: block; }
+
+  /* Forms */
+  .auth-form { display: none; }
+  .auth-form.active { display: block; animation: fadeIn .25s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── ONBOARDING ──────────────── */
+  .onboarding-progress {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 28px;
+  }
+  .progress-segment {
+    flex: 1; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-segment.active::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--text-primary);
+    animation: fillSegment .35s ease both;
+  }
+  .progress-segment.complete {
+    background: var(--text-primary);
+  }
+  @keyframes fillSegment { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+  .onb-step { display: none; }
+  .onb-step.active { display: block; animation: fadeIn .3s ease both; }
+
   .onb-question {
-    font-family:'DM Serif Display',serif;
-    font-size:18px; letter-spacing:-.2px; line-height:1.3;
-    margin-bottom:8px; color:var(--text-primary);
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px; line-height: 1.25; letter-spacing: -.3px;
+    margin-bottom: 8px;
   }
-  .onb-help { font-size:13px; color:var(--text-secondary); margin-bottom:18px; line-height:1.5; }
-  .onb-options { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
-  .onb-opt {
-    padding:11px 14px; background:var(--bg); border:1px solid var(--border);
-    border-radius:8px; cursor:pointer; font-size:13.5px; font-family:inherit;
-    color:var(--text-primary); text-align:left;
-    transition:border-color .15s, background .15s;
+  .onb-hint {
+    font-size: 13px; color: var(--text-tertiary);
+    margin-bottom: 20px;
   }
-  .onb-opt:hover { border-color:var(--text-primary); }
-  .onb-opt.selected {
-    background:var(--text-primary); color:white; border-color:var(--text-primary);
+
+  .choice-grid { display: grid; gap: 8px; }
+  .choice-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .choice {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-primary);
+    cursor: pointer;
+    text-align: left;
+    display: flex; align-items: center; gap: 12px;
+    transition: border-color .15s, background .15s;
   }
-  .onb-chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px; }
-  .onb-chip {
-    padding:7px 14px; background:var(--bg); border:1px solid var(--border);
-    border-radius:99px; cursor:pointer; font-size:13px; font-family:inherit;
-    color:var(--text-primary); transition:all .15s;
+  .choice:hover { border-color: var(--border-strong); background: white; }
+  .choice.selected {
+    border-color: var(--text-primary);
+    background: white;
+    box-shadow: 0 0 0 1px var(--text-primary);
   }
-  .onb-chip:hover { border-color:var(--text-primary); }
-  .onb-chip.selected {
-    background:var(--text-primary); color:white; border-color:var(--text-primary);
+  .choice-check {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .15s, background .15s;
   }
-  .onb-step-actions { display:flex; gap:8px; margin-top:8px; }
-  .onb-skip {
-    background:none; border:none; color:var(--text-tertiary);
-    font-size:13px; font-family:inherit; cursor:pointer;
-    text-decoration:underline; text-underline-offset:2px;
+  .choice.selected .choice-check {
+    border-color: var(--text-primary);
+    background: var(--text-primary);
+  }
+  .choice-check svg { width: 10px; height: 10px; color: white; opacity: 0; transition: opacity .15s; }
+  .choice.selected .choice-check svg { opacity: 1; }
+
+  /* Multi-select chip variant */
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .chip {
+    padding: 8px 14px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .chip:hover { border-color: var(--border-strong); }
+  .chip.selected {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: white;
+  }
+
+  /* Date input */
+  .date-row {
+    display: flex; gap: 10px; margin-bottom: 8px;
+  }
+  .date-field {
+    flex: 1; position: relative;
+  }
+  .date-field label {
+    position: absolute; top: 8px; left: 14px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--text-tertiary);
+    pointer-events: none;
+  }
+  .date-field input {
+    width: 100%;
+    padding: 26px 14px 10px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-family: inherit;
+    color: var(--text-primary);
+  }
+  .date-field input:focus { outline: none; border-color: var(--text-primary); box-shadow: 0 0 0 3px rgba(26,24,20,0.06); }
+
+  .onb-actions {
+    display: flex; gap: 10px; margin-top: 22px;
+  }
+  .btn-secondary {
+    padding: 13px 18px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px; font-weight: 500;
+    font-family: inherit; color: var(--text-secondary);
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-secondary:hover { border-color: var(--text-primary); color: var(--text-primary); }
+  .btn-skip {
+    background: none; border: none;
+    font-family: inherit; font-size: 13px; color: var(--text-tertiary);
+    cursor: pointer; padding: 13px 8px;
+  }
+  .btn-skip:hover { color: var(--text-secondary); }
+
+  /* ── MOBILE ─────────────────── */
+  @media (max-width: 880px) {
+    .auth-shell { grid-template-columns: 1fr; min-height: auto; }
+    .brand-panel { padding: 36px 24px; min-height: auto; }
+    .brand-features { display: none; }
+    .brand-headline { font-size: 30px; }
+    .brand-sub { margin-bottom: 0; }
+    .form-panel { padding: 36px 24px; min-height: 60vh; }
+    .form-topbar { margin-bottom: 24px; }
+  }
+  @media (max-width: 540px) {
+    .brand-panel { padding: 28px 22px; }
+    .form-panel { padding: 28px 22px; }
+    .brand-headline { font-size: 26px; }
+    .form-title { font-size: 26px; }
   }
 </style>
 </head>
 <body>
 
-<div class="bg-stage" id="bgStage"></div>
-<div class="bg-fade"></div>
+<div class="auth-shell">
 
-<div class="left-copy">
-  <div class="left-logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="15" height="15">
-        <circle cx="8" cy="8" r="2" fill="white"/><circle cx="16" cy="8" r="2" fill="white"/>
-        <circle cx="8" cy="16" r="2" fill="white"/><circle cx="16" cy="16" r="2" fill="white"/>
-      </svg>
-    </div>
-    <span class="logo-name">Apex</span>
-  </div>
-  <div class="left-headline">Crack your IB<br>interview.</div>
-  <div class="left-sub">AI-graded practice on every technical question you'll face — accounting, valuation, DCF, M&A, and LBO.</div>
-  <div class="left-stats">
-    <div><div class="stat-val">188</div><div class="stat-label">Questions</div></div>
-    <div><div class="stat-val">6</div><div class="stat-label">Topics</div></div>
-    <div><div class="stat-val">AI</div><div class="stat-label">Graded</div></div>
-  </div>
-</div>
-
-<div class="auth-panel">
-  <div class="panel-heading" id="panelHeading">Welcome back</div>
-  <div class="panel-sub" id="panelSub">Sign in to continue your prep.</div>
-
-  <div class="tab-row">
-    <button class="tab-btn active" id="tabLogin"    onclick="showTab('login')">Sign In</button>
-    <button class="tab-btn"        id="tabRegister" onclick="showTab('register')">Create Account</button>
-  </div>
-
-  <div class="form-body active" id="formLogin">
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"
-             onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
-             onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="submit-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
-  </div>
-
-  <div class="form-body" id="formRegister">
-    <div class="field">
-      <label>Full Name</label>
-      <input type="text" id="registerName" placeholder="Your full name" autocomplete="name"
-             onkeydown="if(event.key==='Enter')doRegister()">
-    </div>
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="registerEmail" placeholder="you@example.com" autocomplete="email"
-             onkeydown="if(event.key==='Enter')doRegister()">
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="registerPassword" placeholder="Min 6 characters" autocomplete="new-password"
-             onkeydown="if(event.key==='Enter')doRegister()">
-    </div>
-    <div class="field">
-      <label>Confirm Password</label>
-      <input type="password" id="registerConfirm" placeholder="Re-enter your password" autocomplete="new-password"
-             onkeydown="if(event.key==='Enter')doRegister()">
-    </div>
-    <button class="submit-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
-  </div>
-
-  <!-- ONBOARDING (shown after register) -->
-  <div class="form-body" id="formOnboarding">
-    <div class="onb-progress">
-      <div class="onb-progress-dot active" id="onbDot1"></div>
-      <div class="onb-progress-dot" id="onbDot2"></div>
-      <div class="onb-progress-dot" id="onbDot3"></div>
-    </div>
-
-    <!-- Step 1: Interview date -->
-    <div class="onb-step active" data-step="1">
-      <div class="onb-question">When's your interview?</div>
-      <div class="onb-help">Apex will pace your review queue around the date.</div>
-      <div class="onb-options" id="onbDateOptions">
-        <button class="onb-opt" data-days="7">This week</button>
-        <button class="onb-opt" data-days="14">In 2 weeks</button>
-        <button class="onb-opt" data-days="30">In ~1 month</button>
-        <button class="onb-opt" data-days="60">2+ months out</button>
-        <button class="onb-opt" data-days="0">No date yet</button>
+  <!-- LEFT: BRAND -->
+  <div class="brand-panel">
+    <div class="brand-bg-gradient"></div>
+    <a class="brand-logo" href="/">
+      <div class="brand-logo-mark">
+        <svg viewBox="0 0 16 16" fill="none" width="18" height="18">
+          <path d="M8 2L13 5V11L8 14L3 11V5L8 2Z" stroke="#1A1814" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="8" cy="8" r="2" fill="#1A1814"/>
+        </svg>
       </div>
-      <div class="onb-step-actions">
-        <button class="submit-btn" onclick="onbNext()">Next →</button>
+      <div class="brand-logo-text">Apex</div>
+    </a>
+
+    <div class="brand-main">
+      <div class="brand-eyebrow">
+        <span class="brand-eyebrow-dot"></span>
+        Built by an Amherst student in IB recruiting now
+      </div>
+      <h1 class="brand-headline">Practice like the interview. <em>Know exactly when you're ready.</em></h1>
+      <p class="brand-sub">
+        Apex grades your actual answers the way a banker would — and tells you how many days of practice are left until you're interview-ready.
+      </p>
+
+      <div class="brand-features">
+        <div class="brand-feat">
+          <div class="brand-feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div><strong>565 curated questions</strong> across all six IB topics — calibrated to what's actually asked at top banks.</div>
+        </div>
+        <div class="brand-feat">
+          <div class="brand-feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div><strong>0–100 grading</strong> on every answer with specific feedback on what's strong, what's missing, and the concept gap.</div>
+        </div>
+        <div class="brand-feat">
+          <div class="brand-feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div><strong>Time-to-ready estimate</strong> updates as you practice — a real number, not a vibe.</div>
+        </div>
       </div>
     </div>
 
-    <!-- Step 2: Weak topics -->
-    <div class="onb-step" data-step="2">
-      <div class="onb-question">What feels weakest?</div>
-      <div class="onb-help">Pick any that apply. Your first practice session will lean into these.</div>
-      <div class="onb-chips" id="onbTopicChips">
-        <button class="onb-chip" data-topic="Accounting">Accounting</button>
-        <button class="onb-chip" data-topic="Enterprise_Value">Enterprise Value</button>
-        <button class="onb-chip" data-topic="Valuation">Valuation</button>
-        <button class="onb-chip" data-topic="DCF">DCF</button>
-        <button class="onb-chip" data-topic="Mergers_MA">M&amp;A</button>
-        <button class="onb-chip" data-topic="LBO">LBO</button>
-      </div>
-      <div class="onb-step-actions">
-        <button class="submit-btn" onclick="onbNext()">Next →</button>
-        <button class="onb-skip" onclick="onbNext(true)">Skip</button>
-      </div>
-    </div>
-
-    <!-- Step 3: Role -->
-    <div class="onb-step" data-step="3">
-      <div class="onb-question">What are you prepping for?</div>
-      <div class="onb-help">So we know which question style to emphasize.</div>
-      <div class="onb-options" id="onbRoleOptions">
-        <button class="onb-opt" data-role="IB">Investment Banking</button>
-        <button class="onb-opt" data-role="PE">Private Equity</button>
-        <button class="onb-opt" data-role="Consulting">Consulting</button>
-        <button class="onb-opt" data-role="Other">Other / not sure yet</button>
-      </div>
-      <div class="onb-step-actions">
-        <button class="submit-btn" id="onbFinishBtn" onclick="onbFinish()">Finish →</button>
-        <button class="onb-skip" onclick="onbFinish(true)">Skip</button>
-      </div>
+    <div class="brand-footer">
+      <span>Free tier · No card to start</span>
     </div>
   </div>
 
-  <div class="auth-error" id="authError"></div>
+  <!-- RIGHT: FORM -->
+  <div class="form-panel">
+    <div class="form-topbar" id="topbarSwitch">
+      <span>New to Apex?</span>
+      <a href="#" onclick="setTab('register');return false;">Create an account</a>
+    </div>
 
-  <div class="switch-row">
-    <span id="switchLabel">Don't have an account?</span>&nbsp;
-    <button id="switchBtn" onclick="showTab('register')">Sign up free →</button>
-  </div>
-  <div style="text-align:center;margin-top:14px;">
-    <button onclick="goGuest()" style="background:none;border:none;font-size:12.5px;color:var(--text-tertiary);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">Continue as guest →</button>
+    <div class="form-content">
+      <div class="form-error" id="formError"></div>
+
+      <!-- LOGIN -->
+      <div class="auth-form active" id="formLogin">
+        <div class="form-eyebrow">Welcome back</div>
+        <h2 class="form-title">Sign in to Apex</h2>
+        <p class="form-subtitle">Pick up where you left off — your progress, mocks, and insights are saved.</p>
+
+        <div class="tab-switcher" id="tabSwitcher">
+          <div class="tab-switcher-pill"></div>
+          <button class="tab-switcher-btn active" onclick="setTab('login')">Sign in</button>
+          <button class="tab-switcher-btn" onclick="setTab('register')">Create account</button>
+        </div>
+
+        <form id="loginForm" onsubmit="return doLogin(event)">
+          <div class="field">
+            <input class="field-input" type="email" id="loginEmail" placeholder="you@school.edu" autocomplete="email" required>
+            <div class="field-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <input class="field-input" type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+            <div class="field-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit" id="loginBtn">
+            Sign in
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="auth-form" id="formRegister">
+        <div class="form-eyebrow">Get started</div>
+        <h2 class="form-title">Create your Apex account</h2>
+        <p class="form-subtitle">Takes 60 seconds. We'll ask a few quick questions to personalize your prep.</p>
+
+        <div class="tab-switcher register" id="tabSwitcher2">
+          <div class="tab-switcher-pill"></div>
+          <button class="tab-switcher-btn" onclick="setTab('login')">Sign in</button>
+          <button class="tab-switcher-btn active" onclick="setTab('register')">Create account</button>
+        </div>
+
+        <form id="registerForm" onsubmit="return doRegister(event)">
+          <div class="field">
+            <input class="field-input" type="text" id="regName" placeholder="Your name" autocomplete="name" required>
+            <div class="field-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <input class="field-input" type="email" id="regEmail" placeholder="you@school.edu" autocomplete="email" required>
+            <div class="field-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <input class="field-input" type="password" id="regPassword" placeholder="Password (min 8 characters)" autocomplete="new-password" minlength="8" required>
+            <div class="field-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit" id="registerBtn">
+            Create account
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- ONBOARDING -->
+      <div class="auth-form" id="formOnboarding">
+        <div class="form-eyebrow" id="onbStepLabel">Step 1 of 3</div>
+        <div class="onboarding-progress" id="onbProgress">
+          <div class="progress-segment active"></div>
+          <div class="progress-segment"></div>
+          <div class="progress-segment"></div>
+        </div>
+
+        <!-- STEP 1: timing -->
+        <div class="onb-step active" data-step="1">
+          <h2 class="onb-question">When's your first IB interview?</h2>
+          <p class="onb-hint">We'll use this to set a realistic prep pace and time-to-ready estimate.</p>
+          <div class="choice-grid">
+            <button class="choice" type="button" onclick="pickTiming(this, 'within_2_weeks')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>Within 2 weeks — active recruiting now</span>
+            </button>
+            <button class="choice" type="button" onclick="pickTiming(this, 'within_1_month')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>1 month away</span>
+            </button>
+            <button class="choice" type="button" onclick="pickTiming(this, 'within_3_months')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>1–3 months out</span>
+            </button>
+            <button class="choice" type="button" onclick="pickTiming(this, 'more_than_3_months')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>More than 3 months out — building foundation</span>
+            </button>
+            <button class="choice" type="button" onclick="pickTiming(this, 'unsure')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>Not sure yet</span>
+            </button>
+          </div>
+          <div class="onb-actions">
+            <button class="btn-skip" type="button" onclick="finishOnboarding(true)">Skip for now</button>
+            <button class="btn-submit" type="button" onclick="onbNext()" id="step1Next" style="margin-left:auto;width:auto;padding-left:24px;padding-right:24px;" disabled>
+              Continue
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: weak topics -->
+        <div class="onb-step" data-step="2">
+          <h2 class="onb-question">Which topics feel weakest right now?</h2>
+          <p class="onb-hint">Pick all that apply — we'll surface these questions first.</p>
+          <div class="chip-grid">
+            <button class="chip" type="button" onclick="toggleTopic(this, 'Accounting')">Accounting</button>
+            <button class="chip" type="button" onclick="toggleTopic(this, 'Enterprise_Value')">Enterprise Value</button>
+            <button class="chip" type="button" onclick="toggleTopic(this, 'Valuation')">Valuation</button>
+            <button class="chip" type="button" onclick="toggleTopic(this, 'DCF')">DCF</button>
+            <button class="chip" type="button" onclick="toggleTopic(this, 'Mergers_MA')">M&amp;A</button>
+            <button class="chip" type="button" onclick="toggleTopic(this, 'LBO')">LBO</button>
+          </div>
+          <p class="onb-hint" style="margin-bottom:0;">Or skip if you're not sure yet — Apex will figure it out from your first few sessions.</p>
+          <div class="onb-actions">
+            <button class="btn-secondary" type="button" onclick="onbPrev()">Back</button>
+            <button class="btn-submit" type="button" onclick="onbNext()" id="step2Next" style="margin-left:auto;width:auto;padding-left:24px;padding-right:24px;">
+              Continue
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: role -->
+        <div class="onb-step" data-step="3">
+          <h2 class="onb-question">What are you recruiting for?</h2>
+          <p class="onb-hint">Just so we can prioritize the right question types.</p>
+          <div class="choice-grid">
+            <button class="choice" type="button" onclick="pickRole(this, 'ib_summer')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>IB Summer Analyst</span>
+            </button>
+            <button class="choice" type="button" onclick="pickRole(this, 'ib_fulltime')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>IB Full-Time Analyst</span>
+            </button>
+            <button class="choice" type="button" onclick="pickRole(this, 'pe_hf')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>PE / Hedge Fund</span>
+            </button>
+            <button class="choice" type="button" onclick="pickRole(this, 'er_other')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>Equity Research / Sales &amp; Trading</span>
+            </button>
+            <button class="choice" type="button" onclick="pickRole(this, 'other')">
+              <span class="choice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>Something else</span>
+            </button>
+          </div>
+          <div class="onb-actions">
+            <button class="btn-secondary" type="button" onclick="onbPrev()">Back</button>
+            <button class="btn-submit" type="button" onclick="finishOnboarding(false)" id="step3Finish" style="margin-left:auto;width:auto;padding-left:24px;padding-right:24px;" disabled>
+              Finish
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 
 <script>
-  // Redirect immediately if already logged in
-  if (localStorage.getItem('apex_token') && localStorage.getItem('apex_user')) {
-    const dest = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
-    window.location.replace(dest);
-  }
-
-  // Start on register tab if ?mode=register
-  if (new URLSearchParams(window.location.search).get('mode') === 'register') {
-    showTab('register');
-  }
-
-  // ── TAB SWITCHING ─────────────────────────────────────────
-  function showTab(tab) {
-    const isLogin = tab === 'login';
-    document.getElementById('tabLogin').classList.toggle('active', isLogin);
-    document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+  // ── TAB SWITCHING ──────────────
+  function setTab(which) {
+    const isLogin = which === 'login';
     document.getElementById('formLogin').classList.toggle('active', isLogin);
     document.getElementById('formRegister').classList.toggle('active', !isLogin);
-    document.getElementById('panelHeading').textContent = isLogin ? 'Welcome back' : 'Create your account';
-    document.getElementById('panelSub').textContent     = isLogin ? 'Sign in to continue your prep.' : 'Free to use. No credit card required.';
-    document.getElementById('switchLabel').textContent  = isLogin ? "Don't have an account?" : 'Already have an account?';
-    document.getElementById('switchBtn').textContent    = isLogin ? 'Sign up free →' : 'Sign in →';
-    document.getElementById('switchBtn').onclick        = () => showTab(isLogin ? 'register' : 'login');
-    document.getElementById('authError').textContent    = '';
+    // Sync both tab switchers
+    document.getElementById('tabSwitcher').classList.toggle('register', !isLogin);
+    document.getElementById('tabSwitcher2').classList.toggle('register', !isLogin);
+    // Update top-right link
+    const topbar = document.getElementById('topbarSwitch');
+    topbar.innerHTML = isLogin
+      ? '<span>New to Apex?</span> <a href="#" onclick="setTab(\'register\');return false;">Create an account</a>'
+      : '<span>Have an account?</span> <a href="#" onclick="setTab(\'login\');return false;">Sign in</a>';
+    clearError();
   }
 
-  // ── AUTH CALLS ────────────────────────────────────────────
-  function showError(msg) { document.getElementById('authError').textContent = msg; }
-
-  async function doLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const pass  = document.getElementById('loginPassword').value;
-    const btn   = document.getElementById('loginBtn');
-    if (!email || !pass) return showError('Please fill in all fields');
-    btn.disabled = true; btn.textContent = 'Signing in…'; showError('');
-    try {
-      const res  = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pass}) });
-      const text = await res.text();
-      let d; try { d = JSON.parse(text); } catch(e) { throw new Error('Server error'); }
-      if (!res.ok) throw new Error(d.error || 'Login failed');
-      localStorage.setItem('apex_token', d.token);
-      localStorage.setItem('apex_user', d.name);
-      // If account isn't onboarded yet, show onboarding; otherwise go to dashboard
-      if (d.onboarded === false) { showOnboarding(); return; }
-      redirectToDest();
-    } catch(e) { showError(e.message); }
-    finally { btn.disabled = false; btn.textContent = 'Sign In'; }
+  function showError(msg) {
+    const e = document.getElementById('formError');
+    e.textContent = msg;
+    e.classList.add('visible');
+  }
+  function clearError() {
+    document.getElementById('formError').classList.remove('visible');
   }
 
-  async function doRegister() {
-    const name    = document.getElementById('registerName').value.trim();
-    const email   = document.getElementById('registerEmail').value.trim();
-    const pass    = document.getElementById('registerPassword').value;
-    const confirm = document.getElementById('registerConfirm').value;
-    const btn     = document.getElementById('registerBtn');
-    if (!name)              return showError('Please enter your name');
-    if (!email)             return showError('Please enter your email');
-    if (pass.length < 6)    return showError('Password must be at least 6 characters');
-    if (pass !== confirm)   return showError('Passwords don\'t match');
-    btn.disabled = true; btn.textContent = 'Creating account…'; showError('');
+  // ── LOGIN ──────────────────────
+  async function doLogin(e) {
+    e.preventDefault();
+    clearError();
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.textContent = 'Signing in…';
     try {
-      const res  = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pass, name}) });
-      const text = await res.text();
-      let d; try { d = JSON.parse(text); } catch(e) { throw new Error('Server error'); }
-      if (!res.ok) throw new Error(d.error || 'Registration failed');
-      localStorage.setItem('apex_token', d.token);
-      localStorage.setItem('apex_user', d.name);
-      // Show onboarding interview before redirecting
+      const r = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          email: document.getElementById('loginEmail').value.trim(),
+          password: document.getElementById('loginPassword').value
+        })
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Sign in failed');
+      localStorage.setItem('apex_token', data.token);
+      localStorage.setItem('apex_user', JSON.stringify(data.user));
+      // Honor ?next= or default to dashboard
+      const next = new URLSearchParams(location.search).get('next') || 'dashboard.html';
+      window.location.href = next;
+    } catch(err) {
+      showError(err.message || 'Sign in failed');
+      btn.disabled = false;
+      btn.innerHTML = 'Sign in <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>';
+    }
+    return false;
+  }
+
+  // ── REGISTER ───────────────────
+  async function doRegister(e) {
+    e.preventDefault();
+    clearError();
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = true; btn.textContent = 'Creating account…';
+    try {
+      const r = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          name: document.getElementById('regName').value.trim(),
+          email: document.getElementById('regEmail').value.trim(),
+          password: document.getElementById('regPassword').value
+        })
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Registration failed');
+      localStorage.setItem('apex_token', data.token);
+      localStorage.setItem('apex_user', JSON.stringify(data.user));
+      // Show onboarding
       showOnboarding();
-    } catch(e) { showError(e.message); }
-    finally { btn.disabled = false; btn.textContent = 'Create Account'; }
+    } catch(err) {
+      showError(err.message || 'Registration failed');
+      btn.disabled = false;
+      btn.innerHTML = 'Create account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>';
+    }
+    return false;
   }
 
-  function goGuest() {
-    const dest = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
-    window.location.href = dest;
-  }
-
-  function redirectToDest() {
-    const dest = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
-    window.location.replace(dest);
-  }
-
-  function onSuccess(token, name) {
-    localStorage.setItem('apex_token', token);
-    localStorage.setItem('apex_user', name);
-    redirectToDest();
-  }
-
-  // ── ONBOARDING ────────────────────────────────────────────
-  let _onbStep = 1;
-  let _onbState = { interviewDays: null, weakTopics: [], role: '' };
+  // ── ONBOARDING ─────────────────
+  let onbStep = 1;
+  let onbData = { timing: null, weakTopics: [], role: null };
 
   function showOnboarding() {
-    // Hide login/register tabs and switch row, show onboarding form
     document.getElementById('formLogin').classList.remove('active');
     document.getElementById('formRegister').classList.remove('active');
     document.getElementById('formOnboarding').classList.add('active');
-    document.querySelector('.tab-row').style.display = 'none';
-    document.querySelector('.switch-row').style.display = 'none';
-    document.getElementById('panelHeading').textContent = "Let's tune Apex to you";
-    document.getElementById('panelSub').textContent = '3 quick questions.';
-    // Hide the guest link too
-    const guestLink = document.querySelector('.auth-panel button[onclick="goGuest()"]');
-    if (guestLink && guestLink.parentElement) guestLink.parentElement.style.display = 'none';
-    // Wire up option clicks
-    document.querySelectorAll('#onbDateOptions .onb-opt').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('#onbDateOptions .onb-opt').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        _onbState.interviewDays = parseInt(btn.dataset.days);
-      };
+    document.getElementById('topbarSwitch').style.visibility = 'hidden';
+    clearError();
+    setOnbStep(1);
+  }
+
+  function setOnbStep(n) {
+    onbStep = n;
+    document.querySelectorAll('.onb-step').forEach(s => {
+      s.classList.toggle('active', s.dataset.step == n);
     });
-    document.querySelectorAll('#onbTopicChips .onb-chip').forEach(btn => {
-      btn.onclick = () => {
-        btn.classList.toggle('selected');
-        const t = btn.dataset.topic;
-        if (btn.classList.contains('selected')) {
-          if (!_onbState.weakTopics.includes(t)) _onbState.weakTopics.push(t);
-        } else {
-          _onbState.weakTopics = _onbState.weakTopics.filter(x => x !== t);
-        }
-      };
-    });
-    document.querySelectorAll('#onbRoleOptions .onb-opt').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('#onbRoleOptions .onb-opt').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        _onbState.role = btn.dataset.role;
-      };
+    document.getElementById('onbStepLabel').textContent = `Step ${n} of 3`;
+    const segs = document.querySelectorAll('.progress-segment');
+    segs.forEach((seg, i) => {
+      seg.classList.remove('active', 'complete');
+      if (i + 1 < n) seg.classList.add('complete');
+      else if (i + 1 === n) seg.classList.add('active');
     });
   }
 
-  function onbNext(skip) {
-    if (_onbStep === 1 && !skip && _onbState.interviewDays === null) {
-      showError('Pick one option, or hit Skip on the next step.');
-      return;
-    }
-    showError('');
-    _onbStep++;
-    document.querySelectorAll('.onb-step').forEach(s => s.classList.remove('active'));
-    document.querySelector(`.onb-step[data-step="${_onbStep}"]`).classList.add('active');
-    document.getElementById('onbDot' + _onbStep).classList.add('active');
+  function onbNext() { if (onbStep < 3) setOnbStep(onbStep + 1); }
+  function onbPrev() { if (onbStep > 1) setOnbStep(onbStep - 1); }
+
+  function pickTiming(el, value) {
+    document.querySelectorAll('[data-step="1"] .choice').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    onbData.timing = value;
+    document.getElementById('step1Next').disabled = false;
   }
 
-  async function onbFinish(skip) {
-    const btn = document.getElementById('onbFinishBtn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
-    const tok = localStorage.getItem('apex_token');
-    let interviewDate = null;
-    if (!skip && _onbState.interviewDays && _onbState.interviewDays > 0) {
-      interviewDate = Math.floor(Date.now()/1000) + _onbState.interviewDays * 86400;
-    }
-    try {
-      await fetch('/api/onboarding', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
-        body: JSON.stringify({
-          interviewDate,
-          weakTopics: _onbState.weakTopics,
-          role: _onbState.role
-        })
-      });
-    } catch(e) {}
-    // Redirect regardless (don't trap the user if save fails)
-    redirectToDest();
-  }
-
-  // ── SOCIAL PROOF FEED ─────────────────────────────────────
-  const BANKS = [
-    {name:'Goldman Sachs',tier:'elite'},{name:'Morgan Stanley',tier:'elite'},
-    {name:'JP Morgan',tier:'elite'},{name:'Evercore',tier:'elite'},
-    {name:'Centerview Partners',tier:'elite'},{name:'Lazard',tier:'elite'},
-    {name:'PJT Partners',tier:'elite'},{name:'Moelis & Company',tier:'top'},
-    {name:'Houlihan Lokey',tier:'top'},{name:'Jefferies',tier:'top'},
-    {name:'William Blair',tier:'top'},{name:'Guggenheim Partners',tier:'top'},
-    {name:'Piper Sandler',tier:'top'},{name:'Baird',tier:'top'},
-    {name:'TD Securities',tier:'mid'},{name:'Mizuho',tier:'mid'},
-    {name:'Raymond James',tier:'mid'},{name:'KeyBanc Capital',tier:'mid'},
-    {name:'Stifel Financial',tier:'mid'},{name:'Brown Gibbons Lang',tier:'mid'},
-  ];
-  const SCHOOLS = [
-    'UPenn Wharton','Harvard Business School','Columbia Business School',
-    'NYU Stern','UChicago Booth','Northwestern Kellogg','Duke Fuqua',
-    'Dartmouth Tuck','Michigan Ross','Yale SOM','Georgetown McDonough',
-    'UNC Kenan-Flagler','Cornell Dyson','Emory Goizueta','CMU Tepper',
-    'UCLA Anderson','UT Austin McCombs','Vanderbilt Owen','Indiana Kelley','Notre Dame Mendoza',
-  ];
-  const ADJ  = ['swift','bright','quiet','sharp','clear','crisp','bold','keen','calm','deep','prime','solid','sure','keen','steady'];
-  const NOUN = ['peak','path','edge','rise','wave','tide','flow','core','step','mark','form','base','line','point','reach'];
-  const COL  = ['blue','green','amber','silver','gold','slate','ivory','coral','sage','ruby'];
-  function handle() { return `${ADJ[Math.random()*ADJ.length|0]}-${COL[Math.random()*COL.length|0]}-${NOUN[Math.random()*NOUN.length|0]}-${100+(Math.random()*900|0)}`; }
-
-  function buildFeed() {
-    const stage = document.getElementById('bgStage');
-    for (let c = 0; c < 4; c++) {
-      const col = document.createElement('div');
-      col.className = 'feed-col';
-      const shuffled = [...BANKS].sort(() => Math.random()-.5);
-      const items = [];
-      while (items.length < 28) items.push(...shuffled);
-      items.slice(0,28).forEach(b => {
-        const school = SCHOOLS[Math.random()*SCHOOLS.length|0];
-        const el = document.createElement('div');
-        el.className = 'feed-card';
-        el.innerHTML = `
-          <div class="feed-bank-row">
-            <div class="feed-dot"></div>${b.name}
-            <span class="feed-tier ${b.tier}">${b.tier==='elite'?'Elite Tier':b.tier==='top'?'Top Tier':'Mid Market'}</span>
-          </div>
-          <div class="feed-text"><strong>${handle()}</strong> from<br>${school} accepted an offer at ${b.name}</div>`;
-        col.appendChild(el);
-      });
-      // Clone for seamless infinite scroll
-      [...col.children].forEach(n => col.appendChild(n.cloneNode(true)));
-      stage.appendChild(col);
+  function toggleTopic(el, value) {
+    el.classList.toggle('selected');
+    if (el.classList.contains('selected')) {
+      if (!onbData.weakTopics.includes(value)) onbData.weakTopics.push(value);
+    } else {
+      onbData.weakTopics = onbData.weakTopics.filter(t => t !== value);
     }
   }
-  buildFeed();
+
+  function pickRole(el, value) {
+    document.querySelectorAll('[data-step="3"] .choice').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    onbData.role = value;
+    document.getElementById('step3Finish').disabled = false;
+  }
+
+  async function finishOnboarding(skipped) {
+    const token = localStorage.getItem('apex_token');
+    if (!token) { window.location.href = 'dashboard.html'; return; }
+    if (!skipped) {
+      try {
+        await fetch('/api/onboarding/save', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+          body: JSON.stringify(onbData)
+        });
+      } catch(e) {}
+    }
+    // Send to dashboard with onboarding-complete flag for welcome state
+    const planParam = new URLSearchParams(location.search).get('plan');
+    if (planParam === 'monthly' || planParam === 'pass') {
+      // User came in wanting to subscribe — bounce to pricing
+      window.location.href = `pricing.html?ref=signup&plan=${planParam}`;
+    } else {
+      window.location.href = 'dashboard.html?welcome=1';
+    }
+  }
+
+  // ── INIT ─────────────────────────
+  // If URL says ?mode=register, start on register tab
+  if (new URLSearchParams(location.search).get('mode') === 'register') {
+    setTab('register');
+  }
 </script>
+
 </body>
 </html>

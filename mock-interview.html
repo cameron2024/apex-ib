@@ -408,6 +408,7 @@
           <button class="mode-tab" id="tabVoice" onclick="switchMode('voice')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
             Speak
+            <span id="voiceLock" style="display:none;font-size:9px;font-weight:700;color:#7E22CE;background:#FDF4FF;border:1px solid #E9D5FF;padding:1px 5px;border-radius:4px;margin-left:4px;letter-spacing:.05em;">PASS</span>
           </button>
         </div>
         <span style="font-size:11.5px;color:var(--text-tertiary);" id="modeHint">Type your answer — you can edit until you submit.</span>
@@ -482,6 +483,9 @@
         window._userPlan = d.plan || 'free';
         window._gradedToday = d.gradedToday || 0;
         if (typeof initSidebarMenu === 'function') initSidebarMenu(window._userPlan, window._gradedToday);
+        // Show PASS lock badge if not on Pass
+        const lock = document.getElementById('voiceLock');
+        if (lock && window._userPlan !== 'pass') lock.style.display = 'inline-block';
       }).catch(()=>{});
   }
 
@@ -774,6 +778,11 @@
   }
 
   function switchMode(mode) {
+    // Pass-only: voice mode
+    if (mode === 'voice' && window._userPlan !== 'pass') {
+      showVoiceUpgradeModal();
+      return;
+    }
     inputMode = mode;
     document.getElementById('tabText').classList.toggle('active', mode === 'text');
     document.getElementById('tabVoice').classList.toggle('active', mode === 'voice');
@@ -788,6 +797,30 @@
       document.getElementById('micBtn').disabled = true;
     }
     if (mode === 'text' && isRecording) toggleRecording(); // stop if switching away
+  }
+
+  function showVoiceUpgradeModal() {
+    let m = document.getElementById('voiceUpgradeModal');
+    if (!m) {
+      m = document.createElement('div');
+      m.id = 'voiceUpgradeModal';
+      m.style.cssText = 'position:fixed;inset:0;background:rgba(26,24,20,0.5);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      m.innerHTML = `
+        <div style="background:white;border-radius:16px;max-width:440px;width:100%;padding:32px;box-shadow:0 24px 60px rgba(0,0,0,.2);">
+          <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#FDF4FF;color:#7E22CE;border:1px solid #E9D5FF;border-radius:99px;font-size:10.5px;font-weight:700;letter-spacing:.06em;margin-bottom:14px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            PASS-ONLY FEATURE
+          </div>
+          <h2 style="font-family:'DM Serif Display',serif;font-size:24px;letter-spacing:-.3px;margin-bottom:10px;">Voice mode is a Pass feature</h2>
+          <p style="font-size:14px;color:#57534E;line-height:1.6;margin-bottom:22px;">Practice speaking your answers like you would in the actual interview. Recruiting Pass unlocks voice mode plus unlimited mocks and early access to new question packs.</p>
+          <div style="display:flex;gap:8px;">
+            <a href="pricing.html" style="flex:1;padding:11px;text-align:center;background:#1A1814;color:white;border-radius:8px;font-size:13.5px;font-weight:600;text-decoration:none;">Upgrade to Pass — $39.99/mo</a>
+            <button onclick="document.getElementById('voiceUpgradeModal').remove()" style="padding:11px 16px;background:#F7F6F3;border:1px solid #E8E5DF;border-radius:8px;font-size:13.5px;font-weight:500;font-family:inherit;cursor:pointer;">Not now</button>
+          </div>
+        </div>`;
+      m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+      document.body.appendChild(m);
+    }
   }
 
   function toggleRecording() {
