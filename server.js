@@ -811,6 +811,25 @@ function getPartyMemberCount(partyId) {
   return partyClients.get(partyId)?.size || 0;
 }
 
+// ── STREAK HELPER ────────────────────────────────────────────
+async function computeStreak(userId) {
+  const actR = await pool.query(
+    'SELECT date FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 365', [userId]
+  );
+  const actDates = new Set(actR.rows.map(r => r.date));
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0, 10);
+    if (actDates.has(ds)) streak++;
+    else if (i > 0) break;
+  }
+  return streak;
+}
+
+// Milestone streak values that earn a feed event
+const STREAK_MILESTONES = new Set([3, 7, 14, 30, 60, 100, 365]);
+
 // ── HTTP SERVER ─────────────────────────────────────────────
 const server = http.createServer(async (req, res) => {
   if (req.method==='OPTIONS') {
@@ -940,12 +959,57 @@ const server = http.createServer(async (req, res) => {
       );
       await pool.query('INSERT INTO sessions (user_id,question_id,topic,score,status,created_at) VALUES ($1,$2,$3,$4,$5,$6)',
         [user.userId,questionId,topic,scoreNum,status,nowSec()]);
-      await pool.query(`INSERT INTO activity (user_id,date,questions_answered) VALUES ($1,$2,1)
-        ON CONFLICT (user_id,date) DO UPDATE SET questions_answered=activity.questions_answered+1`,
+      const actInsert = await pool.query(`INSERT INTO activity (user_id,date,questions_answered) VALUES ($1,$2,1)
+        ON CONFLICT (user_id,date) DO UPDATE SET questions_answered=activity.questions_answered+1 RETURNING questions_answered`,
         [user.userId,today()]);
-      // Invalidate insights cache (so next /api/insights regenerates)
+      const questionsToday = parseInt(actInsert.rows[0]?.questions_answered || 1);
+      // Invalidate insights cache
       await pool.query('DELETE FROM insights_cache WHERE user_id=$1', [user.userId]);
-      return json(res,200,{ok:true,mastery:mastery.stage,nextDue:mastery.next_due});
+
+      // ── FEED EVENTS ──────────────────────────────────────
+      // 1. session_complete — emit on every 5th question answered today (batched to avoid spam)
+      if (questionsToday % 5 === 0) {
+        const todaySessionsR = await pool.query(
+          'SELECT score FROM sessions WHERE user_id=$1 AND created_at >= $2',
+          [user.userId, Math.floor(Date.now()/1000) - 86400]
+        );
+        const scores = todaySessionsR.rows.map(r => r.score);
+        const avgScore = scores.length > 0 ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+        await emitFeedEvent(user.userId, 'session_complete', {
+          questionsAnswered: questionsToday,
+          avgScore,
+          topic: topic || 'All',
+        });
+      }
+
+      // 2. streak milestone
+      const streak = await computeStreak(user.userId);
+      if (STREAK_MILESTONES.has(streak)) {
+        // Only emit once per day per milestone (check if we already fired it today)
+        const already = await pool.query(
+          `SELECT id FROM feed_events WHERE user_id=$1 AND type='streak'
+           AND (payload->>'streakDays')::int=$2 AND created_at >= $3`,
+          [user.userId, streak, Math.floor(Date.now()/1000) - 86400]
+        );
+        if (already.rows.length === 0) {
+          await emitFeedEvent(user.userId, 'streak', { streakDays: streak });
+        }
+      }
+
+      // 3. mastery — emit when a question first reaches 'mastered'
+      if (mastery.stage === 'mastered' && (prevConsec < 2)) {
+        const masteredCount = await pool.query(
+          `SELECT COUNT(*) FROM question_results WHERE user_id=$1 AND mastery_stage='mastered'`,
+          [user.userId]
+        );
+        await emitFeedEvent(user.userId, 'mastery', {
+          topic: topic,
+          questionId: questionId,
+          questionCount: parseInt(masteredCount.rows[0].count),
+        });
+      }
+
+      return json(res,200,{ok:true,mastery:mastery.stage,nextDue:mastery.next_due,streak});
     } catch(e){return json(res,500,{error:e.message});}
   }
 
@@ -1165,6 +1229,25 @@ const server = http.createServer(async (req, res) => {
       }
       // Invalidate insights
       await pool.query('DELETE FROM insights_cache WHERE user_id=$1', [user.userId]);
+      // ── FEED EVENT: mock session complete ──
+      await emitFeedEvent(user.userId, 'session_complete', {
+        questionsAnswered: questionIds.length,
+        avgScore: overall,
+        topic: 'Mock Interview',
+        isMock: true,
+      });
+      // Streak check
+      const mockStreak = await computeStreak(user.userId);
+      if (STREAK_MILESTONES.has(mockStreak)) {
+        const already = await pool.query(
+          `SELECT id FROM feed_events WHERE user_id=$1 AND type='streak'
+           AND (payload->>'streakDays')::int=$2 AND created_at >= $3`,
+          [user.userId, mockStreak, Math.floor(Date.now()/1000) - 86400]
+        );
+        if (already.rows.length === 0) {
+          await emitFeedEvent(user.userId, 'streak', { streakDays: mockStreak });
+        }
+      }
       return json(res,200,{ok:true, sessionId, overall, perTopicScores, grades});
     } catch(e){return json(res,500,{error:e.message});}
   }
