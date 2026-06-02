@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Party — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── LANDING ── */
+.party-landing {
+  max-width: 580px;
+  margin: 0 auto;
+  padding-top: 20px;
+}
+
+.party-landing h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.party-landing p {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 36px;
+}
+
+.party-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.party-option {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: left;
+}
+
+.party-option:hover {
+  border-color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.party-option-icon { font-size: 28px; margin-bottom: 10px; }
+
+.party-option-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.party-option-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── FORMS ── */
+.form-section {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-top: 20px;
+}
+
+.form-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+  padding: 0;
+  margin-bottom: 24px;
+  transition: color 0.15s;
+}
+
+.form-back:hover { color: var(--text-primary); }
+
+.form-section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+
+.form-section > p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.form-label span {
+  font-weight: 400;
+  color: var(--text-tertiary);
+  margin-left: 4px;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 3px rgba(26,24,20,0.06);
+}
+
+/* Code display */
+.code-display {
+  background: var(--text-primary);
+  color: white;
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.code-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.code-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 52px;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.code-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+}
+
+.code-copy:hover { background: rgba(255,255,255,0.25); }
+
+/* ── LOBBY ── */
+.lobby-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.lobby-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.lobby-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px;
+  letter-spacing: -0.3px;
+}
+
+.lobby-code-badge {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-family: monospace;
+  color: var(--text-secondary);
+}
+
+.members-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.members-list-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.members-list-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.members-count {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.member-row:last-child { border-bottom: none; }
+
+.member-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.member-name {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.member-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.badge-host { background: #FEF3C7; color: #92400E; }
+.badge-ready { background: #F0FDF4; color: #166534; }
+.badge-online { background: #EFF6FF; color: #2563EB; }
+
+/* Lobby settings */
+.lobby-settings {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: sticky;
+  top: 40px;
+}
+
+.lobby-settings h3 {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.setting-label { font-size: 13px; color: var(--text-secondary); }
+.setting-value { font-size: 13px; font-weight: 600; }
+
+.btn-primary {
+  width: 100%;
+  padding: 11px;
+  background: var(--text-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s;
+  margin-top: 8px;
+}
+
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 10px;
+  background: none;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  margin-top: 6px;
+}
+
+.btn-secondary:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+/* ── SESSION ── */
+.session-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.session-progress {
+  flex: 1;
+}
+
+.session-progress-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.session-progress-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.session-progress-fill {
+  height: 100%;
+  background: var(--text-primary);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.session-topic-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Question card */
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.question-number {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+.question-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  letter-spacing: -0.3px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+/* Answer area */
+.answer-area {
+  margin-bottom: 16px;
+}
+
+.answer-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 140px;
+  outline: none;
+  transition: border-color 0.15s;
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.answer-textarea:focus { border-color: var(--text-primary); }
+.answer-textarea:disabled { background: var(--bg); opacity: 0.7; }
+
+.answer-submit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.submit-answer-btn {
+  padding: 10px 24px;
+  background: var(--text-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s;
+}
+
+.submit-answer-btn:hover { opacity: 0.85; }
+.submit-answer-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.submitted-msg {
+  font-size: 13.5px;
+  color: var(--accent-green);
+  font-weight: 500;
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Waiting indicator */
+.waiting-bar {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.waiting-dots span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  margin: 0 2px;
+  animation: bounce 1.2s infinite;
+}
+
+.waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
+.waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+}
+
+/* ── RESULTS PANEL ── */
+.results-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.results-panel-header {
+  padding: 16px 20px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.results-panel-title {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.model-answer-toggle {
+  font-size: 12px;
+  color: var(--accent-blue);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+  padding: 0;
+}
+
+.model-answer-block {
+  padding: 14px 20px;
+  background: #F0FDF4;
+  border-bottom: 1px solid #BBF7D0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  display: none;
+}
+
+.model-answer-block.open { display: block; }
+
+.model-answer-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #166534;
+  margin-bottom: 6px;
+}
+
+/* Member answer rows */
+.member-answer-row {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.member-answer-row:last-child { border-bottom: none; }
+
+.member-answer-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.member-answer-name { font-size: 13.5px; font-weight: 600; flex: 1; }
+
+.score-chip {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 3px 11px;
+  border-radius: 99px;
+}
+
+.score-chip-high { background: #F0FDF4; color: #166534; }
+.score-chip-mid  { background: #FEF3C7; color: #92400E; }
+.score-chip-low  { background: #FEE2E2; color: #991B1B; }
+
+.verdict-text {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+.answer-toggle-btn {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.answer-text-block {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  display: none;
+}
+
+.answer-text-block.open { display: block; }
+
+.grade-details {
+  margin-top: 8px;
+  display: none;
+}
+
+.grade-details.open { display: block; }
+
+.grade-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.grade-item {
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+}
+
+.grade-item-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin-bottom: 3px;
+}
+
+/* Host controls */
+.host-controls {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* ── FINAL RESULTS ── */
+.final-results {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.final-results h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.final-results > p {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.leaderboard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.leaderboard-row:last-child { border-bottom: none; }
+.leaderboard-row.me { background: #EFF6FF; }
+
+.lb-rank {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  width: 28px;
+  text-align: center;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.lb-rank.gold   { color: #D97706; }
+.lb-rank.silver { color: #6B7280; }
+.lb-rank.bronze { color: #92400E; }
+
+.lb-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.lb-name { flex: 1; font-size: 14px; font-weight: 600; }
+.lb-score {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+}
+</style>
+</head>
+<body data-page="party">
+<div id="sidebar-mount"></div>
+
+<main class="main">
+
+  <!-- ── LANDING VIEW ── -->
+  <div class="view active" id="view-landing">
+    <div class="party-landing fade-1">
+      <h1>Study Party</h1>
+      <p>Practice synchronously with friends. Answer the same questions, compare your grades side by side, and learn from each other's approaches.</p>
+      <div class="party-options">
+        <div class="party-option" onclick="showView('view-create')">
+          <div class="party-option-icon">🎉</div>
+          <div class="party-option-title">Create a party</div>
+          <div class="party-option-desc">Set up a room and invite friends with a 6-digit code.</div>
+        </div>
+        <div class="party-option" onclick="showView('view-join')">
+          <div class="party-option-icon">🔑</div>
+          <div class="party-option-title">Join a party</div>
+          <div class="party-option-desc">Enter a code to join a session someone else created.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CREATE VIEW ── -->
+  <div class="view" id="view-create">
+    <div class="form-section fade-1">
+      <button class="form-back" onclick="showView('view-landing')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <h2>Create a party</h2>
+      <p>Configure your session. Share the code with friends once it's created.</p>
+
+      <div class="form-group">
+        <label class="form-label">Topic <span>(optional)</span></label>
+        <select class="form-select" id="createTopic">
+          <option value="">All topics (mixed)</option>
+          <option value="Accounting">Accounting</option>
+          <option value="Enterprise_Value">Enterprise Value</option>
+          <option value="Valuation">Valuation</option>
+          <option value="DCF">Discounted Cash Flow</option>
+          <option value="Mergers_MA">Mergers & Acquisitions</option>
+          <option value="LBO">Leveraged Buyouts</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Time limit per question <span>(optional)</span></label>
+        <select class="form-select" id="createTimeLimit">
+          <option value="">No limit — host advances manually</option>
+          <option value="60">1 minute</option>
+          <option value="120">2 minutes</option>
+          <option value="180">3 minutes</option>
+          <option value="300">5 minutes</option>
+          <option value="600">10 minutes</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" onclick="createParty()" id="createBtn">Create Party</button>
+    </div>
+  </div>
+
+  <!-- ── WAITING FOR PLAYERS (after create) ── -->
+  <div class="view" id="view-waiting">
+    <div class="form-section fade-1">
+      <h2>Waiting for players</h2>
+      <p>Share this code with your friends. You control when the session starts.</p>
+      <div class="code-display">
+        <div class="code-label">Party Code</div>
+        <div class="code-value" id="displayCode">——</div>
+        <button class="code-copy" onclick="copyCode()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy code
+        </button>
+      </div>
+      <div id="waitingMembersList"></div>
+
+      <div class="form-group" style="margin-top:20px;">
+        <label class="form-label">Number of questions</label>
+        <select class="form-select" id="questionCount">
+          <option value="5">5 questions</option>
+          <option value="10" selected>10 questions</option>
+          <option value="15">15 questions</option>
+          <option value="20">20 questions</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" onclick="startSession()" id="startBtn">Start Session</button>
+      <button class="btn-secondary" onclick="showView('view-landing')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ── JOIN VIEW ── -->
+  <div class="view" id="view-join">
+    <div class="form-section fade-1">
+      <button class="form-back" onclick="showView('view-landing')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <h2>Join a party</h2>
+      <p>Enter the 6-digit code from your host.</p>
+
+      <div class="form-group">
+        <label class="form-label">Party code</label>
+        <input class="form-input" id="joinCode" type="text" inputmode="numeric" maxlength="6"
+               placeholder="123456"
+               style="font-family:monospace;font-size:22px;letter-spacing:0.15em;text-align:center;"
+               oninput="this.value=this.value.replace(/\D/g,'')">
+      </div>
+      <div id="joinError" style="color:var(--accent-red);font-size:13px;margin-top:-10px;margin-bottom:14px;display:none;"></div>
+
+      <button class="btn-primary" onclick="joinParty()" id="joinBtn">Join Party</button>
+    </div>
+  </div>
+
+  <!-- ── LOBBY (joined, waiting for host to start) ── -->
+  <div class="view" id="view-lobby">
+    <div class="lobby-layout fade-1">
+      <div>
+        <div class="lobby-header">
+          <h2>Lobby</h2>
+          <div class="lobby-code-badge" id="lobbyCodeBadge">——</div>
+        </div>
+        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;" id="lobbyStatusMsg">
+          Waiting for the host to start the session…
+        </div>
+        <div class="members-list" id="lobbyMembersList"></div>
+      </div>
+      <div class="lobby-settings">
+        <h3>Session Info</h3>
+        <div class="setting-row">
+          <span class="setting-label">Topic</span>
+          <span class="setting-value" id="lobbyTopic">Mixed</span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Time limit</span>
+          <span class="setting-value" id="lobbyTimeLimit">No limit</span>
+        </div>
+        <div id="hostStartSection" style="display:none;">
+          <div class="form-group" style="margin-top:16px;margin-bottom:8px;">
+            <label class="form-label" style="font-size:12px;">Questions</label>
+            <select class="form-select" id="lobbyQuestionCount" style="font-size:13px;padding:7px 10px;">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="startSession()">Start Session</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SESSION VIEW ── -->
+  <div class="view" id="view-session">
+    <div class="fade-1">
+      <div class="session-header">
+        <div class="session-progress">
+          <div class="session-progress-label">
+            <span id="sessionProgressLabel">Question 1</span>
+            <span id="sessionProgressFraction">1 / 10</span>
+          </div>
+          <div class="session-progress-bar">
+            <div class="session-progress-fill" id="sessionProgressFill" style="width:10%"></div>
+          </div>
+        </div>
+        <div class="session-topic-badge" id="sessionTopicBadge">—</div>
+      </div>
+
+      <!-- Timer (when time limit set) -->
+      <div id="timerBar" style="display:none;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:12px;color:var(--text-secondary);">Time remaining</span>
+          <span id="timerDisplay" style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;"></span>
+        </div>
+        <div style="height:3px;background:var(--border);border-radius:99px;overflow:hidden;">
+          <div id="timerFill" style="height:100%;background:var(--accent-green);border-radius:99px;transition:width 1s linear;"></div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-number" id="sessionQuestionNum">Question 1 of 10</div>
+        <div class="question-text" id="sessionQuestionText">Loading…</div>
+      </div>
+
+      <div class="answer-area" id="answerArea">
+        <textarea class="answer-textarea" id="answerTextarea" placeholder="Type your answer here…"></textarea>
+        <div class="answer-submit-row">
+          <button class="submit-answer-btn" id="submitAnswerBtn" onclick="submitAnswer()">Submit Answer</button>
+          <div class="submitted-msg" id="submittedMsg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+            Submitted — waiting for others
+          </div>
+        </div>
+      </div>
+
+      <div class="waiting-bar" id="waitingBar" style="display:none;">
+        <div class="waiting-dots"><span></span><span></span><span></span></div>
+        Waiting for everyone to answer…
+        <span id="waitingCount" style="margin-left:auto;font-size:12px;font-weight:600;"></span>
+      </div>
+
+      <!-- Results for this question (shown after all answer) -->
+      <div id="questionResults" style="display:none;"></div>
+
+      <!-- Host controls -->
+      <div id="hostBar" style="display:none;margin-top:16px;display:none;">
+        <div class="host-controls" style="border-radius:var(--radius);border:1px solid var(--border);">
+          <button class="submit-answer-btn" onclick="advanceQuestion()" id="advanceBtn" style="flex:1;">
+            Next Question →
+          </button>
+          <div style="flex:1;">
+            <select class="form-select" id="skipMemberSelect" style="font-size:12.5px;padding:8px 10px;margin-bottom:6px;">
+              <option value="">Skip a member's answer…</option>
+            </select>
+            <button class="btn-secondary" onclick="skipMember()" style="font-size:12px;padding:6px;margin-top:0;">Force submit blank</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FINAL RESULTS VIEW ── -->
+  <div class="view" id="view-final">
+    <div class="final-results fade-1">
+      <h1>Session Complete 🎉</h1>
+      <p>Here's how everyone did. Review each question below.</p>
+      <div class="leaderboard" id="finalLeaderboard"></div>
+      <a href="feed.html" style="display:inline-block;margin-top:12px;" class="btn-primary" style="text-decoration:none;">Back to Feed</a>
+    </div>
+  </div>
+
+</main>
+
+<script src="sidebar.js"></script>
+<script>
+const token = localStorage.getItem('apex_token');
+if (!token) window.location.href = 'auth.html';
+
+// ── STATE ──
+let partyCode = null;
+let isHost = false;
+let ws = null;
+let currentQuestion = null;
+let currentQuestionIndex = 0;
+let totalQuestions = 0;
+let timeLimitSec = null;
+let timerInterval = null;
+let timerStarted = null;
+let membersOnline = new Set();
+let answeredMembers = new Set();
+let allMembers = [];
+
+function getMeId() {
+  try {
+    const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return p.userId;
+  } catch(e) { return null; }
+}
+
+const myId = getMeId();
+
+// ── VIEW SWITCHING ──
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+// ── CREATE PARTY ──
+async function createParty() {
+  const btn = document.getElementById('createBtn');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  const topic = document.getElementById('createTopic').value;
+  const timeLimitSec = parseInt(document.getElementById('createTimeLimit').value)||0;
+  try {
+    const r = await fetch('/api/party/create', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({topic: topic||null, timeLimitSec: timeLimitSec||null})
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error);
+    partyCode = data.code;
+    isHost = true;
+    document.getElementById('displayCode').textContent = partyCode;
+    showView('view-waiting');
+    connectWS();
+    renderWaitingMembers([]);
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Create Party';
+}
+
+function copyCode() {
+  navigator.clipboard?.writeText(partyCode).catch(()=>{});
+  const btn = document.querySelector('.code-copy');
+  if (btn) { btn.textContent = '✓ Copied!'; setTimeout(()=>{ btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy code`; }, 1500); }
+}
+
+// ── JOIN PARTY ──
+async function joinParty() {
+  const code = document.getElementById('joinCode').value.trim();
+  const errEl = document.getElementById('joinError');
+  errEl.style.display = 'none';
+  if (code.length !== 6) { errEl.textContent = 'Please enter a 6-digit code.'; errEl.style.display = ''; return; }
+  const btn = document.getElementById('joinBtn');
+  btn.disabled = true; btn.textContent = 'Joining…';
+  try {
+    const r = await fetch('/api/party/join', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({code})
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error||'Could not join party');
+    partyCode = code;
+    isHost = (data.party.hostId == myId);
+    timeLimitSec = data.party.timeLimitSec;
+    allMembers = data.members||[];
+    // Enter lobby
+    document.getElementById('lobbyCodeBadge').textContent = partyCode;
+    document.getElementById('lobbyTopic').textContent = data.party.topic ? data.party.topic.replace('_',' ') : 'Mixed';
+    document.getElementById('lobbyTimeLimit').textContent = timeLimitSec ? (timeLimitSec/60 + ' min') : 'No limit';
+    if (isHost) document.getElementById('hostStartSection').style.display = '';
+    renderLobbyMembers(allMembers);
+    showView('view-lobby');
+    connectWS();
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.style.display = '';
+  }
+  btn.disabled = false; btn.textContent = 'Join Party';
+}
+
+// ── START SESSION (host) ──
+async function startSession() {
+  const countEl = document.getElementById('questionCount') || document.getElementById('lobbyQuestionCount');
+  const n = parseInt(countEl?.value||10);
+  const btn = document.getElementById('startBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Starting…'; }
+  try {
+    const r = await fetch('/api/party/start', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({code: partyCode, questionCount: n})
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error);
+    totalQuestions = data.totalQuestions;
+  } catch(e) {
+    alert('Error: ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Start Session'; }
+  }
+}
+
+// ── WEBSOCKET ──
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const url = `${proto}://${location.host}?token=${encodeURIComponent(token)}&code=${partyCode}`;
+  ws = new WebSocket(url);
+  ws.onopen = () => console.log('WS connected');
+  ws.onmessage = e => handleWSMessage(JSON.parse(e.data));
+  ws.onerror = err => console.error('WS error', err);
+  ws.onclose = () => {
+    // Reconnect after 2s unless we're in final results
+    if (!document.getElementById('view-final').classList.contains('active')) {
+      setTimeout(connectWS, 2000);
+    }
+  };
+}
+
+function handleWSMessage(msg) {
+  switch(msg.type) {
+    case 'connected':
+      break;
+    case 'member_online':
+      membersOnline.add(msg.userId);
+      refreshMemberStatus();
+      break;
+    case 'member_offline':
+      membersOnline.delete(msg.userId);
+      refreshMemberStatus();
+      break;
+    case 'party_started':
+    case 'next_question':
+      answeredMembers.clear();
+      currentQuestionIndex = msg.currentQuestionIndex;
+      totalQuestions = msg.totalQuestions;
+      currentQuestion = msg.question;
+      timeLimitSec = msg.timeLimitSec || timeLimitSec;
+      showSessionQuestion(msg.question, msg.currentQuestionIndex, msg.totalQuestions);
+      showView('view-session');
+      break;
+    case 'member_answered':
+      answeredMembers.add(msg.userId);
+      updateWaitingCount();
+      refreshMemberStatus();
+      break;
+    case 'question_graded':
+      showQuestionResults(msg);
+      break;
+    case 'party_complete':
+      showFinalResults(msg.finalScores);
+      break;
+  }
+}
+
+// ── SESSION UI ──
+function showSessionQuestion(question, index, total) {
+  document.getElementById('sessionQuestionNum').textContent = `Question ${index+1} of ${total}`;
+  document.getElementById('sessionProgressLabel').textContent = `Question ${index+1}`;
+  document.getElementById('sessionProgressFraction').textContent = `${index+1} / ${total}`;
+  document.getElementById('sessionProgressFill').style.width = ((index+1)/total*100) + '%';
+  document.getElementById('sessionTopicBadge').textContent = (question.topic||'').replace('_',' ') || '—';
+  document.getElementById('sessionQuestionText').textContent = question.question;
+  document.getElementById('answerTextarea').value = '';
+  document.getElementById('answerTextarea').disabled = false;
+  document.getElementById('submitAnswerBtn').disabled = false;
+  document.getElementById('submitAnswerBtn').style.display = '';
+  document.getElementById('submittedMsg').style.display = 'none';
+  document.getElementById('answerArea').style.display = '';
+  document.getElementById('waitingBar').style.display = 'none';
+  document.getElementById('questionResults').style.display = 'none';
+  document.getElementById('questionResults').innerHTML = '';
+  if (isHost) {
+    document.getElementById('hostBar').style.display = '';
+    populateSkipSelect();
+  }
+  // Timer
+  clearTimer();
+  if (timeLimitSec) startTimer(timeLimitSec);
+  updateWaitingCount();
+}
+
+function startTimer(secs) {
+  document.getElementById('timerBar').style.display = '';
+  timerStarted = Date.now();
+  const total = secs * 1000;
+  function tick() {
+    const elapsed = Date.now() - timerStarted;
+    const remaining = Math.max(0, total - elapsed);
+    const s = Math.ceil(remaining / 1000);
+    const mins = Math.floor(s/60);
+    const sec = s % 60;
+    document.getElementById('timerDisplay').textContent = `${mins}:${sec.toString().padStart(2,'0')}`;
+    const pct = (remaining/total)*100;
+    const fill = document.getElementById('timerFill');
+    fill.style.width = pct + '%';
+    fill.style.background = pct > 50 ? 'var(--accent-green)' : pct > 20 ? 'var(--accent-amber)' : 'var(--accent-red)';
+    if (remaining <= 0) {
+      clearTimer();
+      // Auto-submit blank if not answered
+      const btn = document.getElementById('submitAnswerBtn');
+      if (btn && !btn.disabled) {
+        document.getElementById('answerTextarea').value = '';
+        submitAnswer();
+      }
+    } else {
+      timerInterval = requestAnimationFrame(tick);
+    }
+  }
+  timerInterval = requestAnimationFrame(tick);
+}
+
+function clearTimer() {
+  if (timerInterval) { cancelAnimationFrame(timerInterval); timerInterval = null; }
+  document.getElementById('timerBar').style.display = 'none';
+}
+
+function updateWaitingCount() {
+  const total = allMembers.length;
+  const answered = answeredMembers.size;
+  const el = document.getElementById('waitingCount');
+  if (el) el.textContent = `${answered}/${total} answered`;
+}
+
+// ── SUBMIT ANSWER ──
+async function submitAnswer() {
+  const text = document.getElementById('answerTextarea').value.trim();
+  document.getElementById('answerTextarea').disabled = true;
+  document.getElementById('submitAnswerBtn').disabled = true;
+  document.getElementById('submitAnswerBtn').style.display = 'none';
+  document.getElementById('submittedMsg').style.display = 'flex';
+  document.getElementById('waitingBar').style.display = 'flex';
+  clearTimer();
+  try {
+    await fetch('/api/party/answer', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({code: partyCode, questionId: currentQuestion.id, answerText: text})
+    });
+  } catch(e) { console.error('Submit error', e); }
+}
+
+// ── ADVANCE (host) ──
+async function advanceQuestion() {
+  const btn = document.getElementById('advanceBtn');
+  btn.disabled = true; btn.textContent = 'Advancing…';
+  try {
+    await fetch('/api/party/next', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({code: partyCode})
+    });
+  } catch(e) { alert('Error: ' + e.message); }
+  btn.disabled = false; btn.textContent = 'Next Question →';
+}
+
+// ── SKIP MEMBER (host) ──
+function populateSkipSelect() {
+  const sel = document.getElementById('skipMemberSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Skip a member\'s answer…</option>';
+  allMembers.forEach(m => {
+    if (!answeredMembers.has(m.user_id) && m.user_id != myId) {
+      const opt = document.createElement('option');
+      opt.value = m.user_id;
+      opt.textContent = m.name;
+      sel.appendChild(opt);
+    }
+  });
+}
+
+async function skipMember() {
+  const sel = document.getElementById('skipMemberSelect');
+  const targetId = sel?.value;
+  if (!targetId) return;
+  try {
+    await fetch('/api/party/skip', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({code: partyCode, targetUserId: parseInt(targetId)})
+    });
+    sel.value = '';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── SHOW QUESTION RESULTS ──
+function showQuestionResults(msg) {
+  clearTimer();
+  document.getElementById('waitingBar').style.display = 'none';
+  document.getElementById('answerArea').style.display = 'none';
+
+  const container = document.getElementById('questionResults');
+  container.style.display = '';
+
+  const sortedResults = [...(msg.results||[])].sort((a,b)=>(b.score||0)-(a.score||0));
+
+  container.innerHTML = `
+    <div class="results-panel">
+      <div class="results-panel-header">
+        <div class="results-panel-title">Results — ${(msg.question?.topic||'').replace('_',' ')}</div>
+        <button class="model-answer-toggle" onclick="toggleModelAnswer(this)">Show model answer</button>
+      </div>
+      <div class="model-answer-block" id="modelAnswerBlock">
+        <div class="model-answer-label">Model Answer</div>
+        ${msg.question?.model_answer || '—'}
+      </div>
+      ${sortedResults.map((r,i) => {
+        const scoreChipClass = r.score >= 80 ? 'score-chip-high' : r.score >= 60 ? 'score-chip-mid' : 'score-chip-low';
+        const isMe = r.userId == myId;
+        return `
+        <div class="member-answer-row" style="${isMe?'background:#F8F9FF;':''}">
+          <div class="member-answer-header">
+            <div class="member-avatar" style="width:26px;height:26px;font-size:9px;">${initials(r.name)}</div>
+            <div class="member-answer-name">${r.name}${isMe?' (you)':''}</div>
+            <div class="score-chip ${scoreChipClass}">${r.score}/100</div>
+          </div>
+          <div class="verdict-text">${r.grade?.verdict||''}</div>
+          <button class="answer-toggle-btn" onclick="toggleAnswer(this)">See their answer</button>
+          <div class="answer-text-block">${r.answerText || '<em>No answer submitted.</em>'}</div>
+          <button class="answer-toggle-btn" onclick="toggleGrade(this)" style="margin-top:6px;">See grade details</button>
+          <div class="grade-details">
+            <div class="grade-row">
+              <div class="grade-item">
+                <div class="grade-item-label">Strengths</div>
+                ${r.grade?.strengths||'—'}
+              </div>
+              <div class="grade-item">
+                <div class="grade-item-label">Gaps</div>
+                ${r.grade?.gaps||'—'}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+      ${isHost ? `
+      <div class="host-controls">
+        <button class="submit-answer-btn" onclick="advanceQuestion()" id="advanceBtn" style="flex:1;">
+          Next Question →
+        </button>
+      </div>` : '<div style="padding:14px 20px;font-size:13px;color:var(--text-secondary);">Waiting for host to advance…</div>'}
+    </div>`;
+}
+
+function toggleModelAnswer(btn) {
+  const block = document.getElementById('modelAnswerBlock');
+  block.classList.toggle('open');
+  btn.textContent = block.classList.contains('open') ? 'Hide model answer' : 'Show model answer';
+}
+
+function toggleAnswer(btn) {
+  const block = btn.nextElementSibling;
+  block.classList.toggle('open');
+  btn.textContent = block.classList.contains('open') ? 'Hide answer' : 'See their answer';
+}
+
+function toggleGrade(btn) {
+  const block = btn.nextElementSibling;
+  block.classList.toggle('open');
+  btn.textContent = block.classList.contains('open') ? 'Hide details' : 'See grade details';
+}
+
+// ── FINAL RESULTS ──
+function showFinalResults(finalScores) {
+  showView('view-final');
+  const rankIcons = ['🥇','🥈','🥉'];
+  const rankClasses = ['gold','silver','bronze'];
+  const lb = document.getElementById('finalLeaderboard');
+  lb.innerHTML = (finalScores||[]).map((m,i) => {
+    const isMe = m.user_id == myId;
+    const scoreStyle = m.avg_score >= 80 ? 'color:var(--accent-green)' : m.avg_score >= 60 ? 'color:var(--accent-amber)' : 'color:var(--accent-red)';
+    return `
+      <div class="leaderboard-row ${isMe?'me':''}">
+        <div class="lb-rank ${rankClasses[i]||''}">${rankIcons[i]||i+1}</div>
+        <div class="lb-avatar">${initials(m.name)}</div>
+        <div class="lb-name">${m.name}${isMe?' (you)':''}</div>
+        <div class="lb-score" style="${scoreStyle}">${m.avg_score}<span style="font-size:14px;opacity:.6;">/100</span></div>
+      </div>`;
+  }).join('');
+}
+
+// ── MEMBER UI HELPERS ──
+function renderWaitingMembers(members) {
+  const list = document.getElementById('waitingMembersList');
+  list.innerHTML = `
+    <div class="members-list">
+      <div class="members-list-header">
+        <div class="members-list-title">In lobby</div>
+        <div class="members-count">${members.length} player${members.length!==1?'s':''}</div>
+      </div>
+      ${members.map(m=>`
+        <div class="member-row">
+          <div class="member-avatar">${initials(m.name||m.user_name||'?')}</div>
+          <div class="member-name">${m.name||m.user_name||'?'}</div>
+          <span class="member-badge badge-online">Online</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderLobbyMembers(members) {
+  const list = document.getElementById('lobbyMembersList');
+  list.innerHTML = `
+    <div class="members-list-header">
+      <div class="members-list-title">Players</div>
+      <div class="members-count">${members.length} joined</div>
+    </div>
+    ${members.map(m=>`
+      <div class="member-row" id="member-${m.user_id}">
+        <div class="member-avatar">${initials(m.name||'?')}</div>
+        <div class="member-name">${m.name||'?'}</div>
+        ${m.user_id == myId ? '<span class="member-badge badge-host">Host</span>' : '<span class="member-badge badge-online">Joined</span>'}
+      </div>`).join('')}`;
+}
+
+function refreshMemberStatus() {
+  // Update waiting members list
+  const waitingList = document.getElementById('waitingMembersList');
+  if (waitingList) {
+    renderWaitingMembers(allMembers.filter(m=>membersOnline.has(m.user_id)||m.user_id==myId));
+  }
+}
+
+function initials(name) {
+  return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+// ── INIT ──
+async function init() {
+  const meR = await fetch('/api/progress/load', { headers: {'Authorization':'Bearer '+token}});
+  const me = await meR.json();
+  if (window.initSidebarMenu) initSidebarMenu(me.plan, me.gradedToday);
+  window._userPlan = me.plan;
+  window._gradedToday = me.gradedToday;
+
+  // If coming from a direct link with ?code=
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (code) {
+    document.getElementById('joinCode').value = code;
+    showView('view-join');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

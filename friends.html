@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Friends — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ── PAGE LAYOUT ── */
+.friends-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.friends-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  letter-spacing: -0.4px;
+}
+
+.friends-header p {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+/* ── SEARCH ── */
+.search-bar {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+.search-bar svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 11px 14px 11px 40px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  background: var(--surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  color: var(--text-primary);
+}
+
+.search-input:focus {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 3px rgba(26,24,20,0.06);
+}
+
+.search-input::placeholder { color: var(--text-tertiary); }
+
+/* ── TABS ── */
+.friends-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  gap: 0;
+}
+
+.friends-tab {
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.friends-tab:hover { color: var(--text-primary); }
+.friends-tab.active { color: var(--text-primary); font-weight: 600; border-bottom-color: var(--text-primary); }
+
+.tab-count {
+  font-size: 11px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 1px 7px;
+  border-radius: 99px;
+  color: var(--text-tertiary);
+}
+
+/* ── USER CARDS ── */
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.user-card-social {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  animation: fadeUp 0.3s ease both;
+}
+
+.user-card-social:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.user-card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.user-card-avatar:hover { opacity: 0.85; }
+
+.user-card-body { flex: 1; min-width: 0; }
+
+.user-card-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-card-name:hover { color: var(--accent-blue); }
+
+.user-card-school {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-card-stats {
+  display: flex;
+  gap: 14px;
+}
+
+.user-card-stat { display: flex; flex-direction: column; gap: 1px; }
+
+.user-card-stat-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.user-card-stat-label {
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.user-card-follow {
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.follow-btn-lg {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 99px;
+  border: 1.5px solid var(--text-primary);
+  background: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.follow-btn-lg:hover { background: var(--text-primary); color: white; }
+
+.follow-btn-lg.following {
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.follow-btn-lg.following:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  background: none;
+}
+
+/* ── PROFILE PANEL ── */
+.profile-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.profile-overlay.visible { opacity: 1; pointer-events: all; }
+
+.profile-panel {
+  background: white;
+  border-radius: 16px;
+  width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+  animation: panelIn 0.22s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.profile-panel-header {
+  padding: 24px 24px 20px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.profile-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-secondary);
+  transition: background 0.15s;
+}
+
+.profile-close:hover { background: var(--border); }
+
+.profile-avatar-lg {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.profile-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+
+.profile-school-line {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.profile-follow-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-follow-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  cursor: pointer;
+}
+
+.profile-follow-stat:hover .profile-follow-count { color: var(--accent-blue); }
+
+.profile-follow-count {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  transition: color 0.15s;
+}
+
+.profile-follow-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profile-follow-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+}
+
+.profile-follow-btn {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 99px;
+  border: 1.5px solid var(--text-primary);
+  background: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  color: var(--text-primary);
+}
+
+.profile-follow-btn:hover { background: var(--text-primary); color: white; }
+.profile-follow-btn.following { border-color: var(--border); color: var(--text-secondary); }
+.profile-follow-btn.following:hover { border-color: var(--accent-red); color: var(--accent-red); background: none; }
+
+.profile-panel-body { padding: 20px 24px; }
+
+.profile-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+}
+
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.profile-stat-card {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.profile-stat-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+}
+
+.profile-stat-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.badge-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.no-badges {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 20px;
+}
+
+/* ── EMPTY STATES ── */
+.friends-empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-secondary);
+  grid-column: 1 / -1;
+}
+
+.friends-empty-icon { font-size: 32px; margin-bottom: 10px; }
+
+.friends-empty h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.friends-empty p { font-size: 13.5px; line-height: 1.5; max-width: 300px; margin: 0 auto; }
+
+/* ── LOADING ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+</style>
+</head>
+<body data-page="friends">
+<div id="sidebar-mount"></div>
+
+<main class="main">
+  <div class="friends-header fade-1">
+    <div>
+      <h1>Friends</h1>
+      <p>Find classmates, follow their progress, and build your network</p>
+    </div>
+  </div>
+
+  <div class="search-bar fade-2">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-input" id="searchInput" type="text" placeholder="Search by name…" oninput="onSearch(this.value)">
+  </div>
+
+  <div class="friends-tabs fade-2">
+    <button class="friends-tab active" onclick="switchTab('search')" id="tab-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Discover
+    </button>
+    <button class="friends-tab" onclick="switchTab('following')" id="tab-following">
+      Following
+      <span class="tab-count" id="followingCount">—</span>
+    </button>
+    <button class="friends-tab" onclick="switchTab('followers')" id="tab-followers">
+      Followers
+      <span class="tab-count" id="followersCount">—</span>
+    </button>
+    <button class="friends-tab" onclick="switchTab('school')" id="tab-school">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      My School
+    </button>
+  </div>
+
+  <div class="user-grid fade-3" id="userGrid">
+    <!-- populated by JS -->
+  </div>
+</main>
+
+<!-- Profile Panel Overlay -->
+<div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
+  <div class="profile-panel" id="profilePanel">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<script src="sidebar.js"></script>
+<script>
+const token = localStorage.getItem('apex_token');
+if (!token) window.location.href = 'auth.html';
+
+let currentTab = 'search';
+let searchTimer = null;
+let mySchool = null;
+
+function initials(name) {
+  return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function scoreColor(s) {
+  if (!s) return '';
+  if (s >= 80) return 'color:var(--accent-green)';
+  if (s >= 60) return 'color:var(--accent-amber)';
+  return 'color:var(--accent-red)';
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.friends-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+tab)?.classList.add('active');
+  loadTab(tab);
+}
+
+function onSearch(val) {
+  clearTimeout(searchTimer);
+  if (currentTab !== 'search') switchTab('search');
+  searchTimer = setTimeout(() => loadSearch(val), 280);
+}
+
+async function loadTab(tab) {
+  if (tab === 'search') { loadSearch(document.getElementById('searchInput').value); return; }
+  if (tab === 'following') { loadFollowList('following'); return; }
+  if (tab === 'followers') { loadFollowList('followers'); return; }
+  if (tab === 'school') { loadSchoolTab(); return; }
+}
+
+// ── SEARCH ──
+async function loadSearch(q) {
+  const grid = document.getElementById('userGrid');
+  if (!q || q.trim().length < 1) {
+    // Show school classmates as default
+    loadSchoolTab();
+    return;
+  }
+  grid.innerHTML = skeletons(4);
+  try {
+    const r = await fetch(`/api/social/search?q=${encodeURIComponent(q)}`, { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    renderUserCards(data.users||[], 'No users found matching that name.');
+  } catch(e) {
+    grid.innerHTML = errorMsg();
+  }
+}
+
+// ── FOLLOW LISTS ──
+async function loadFollowList(type) {
+  const grid = document.getElementById('userGrid');
+  grid.innerHTML = skeletons(4);
+  try {
+    const r = await fetch(`/api/social/${type}`, { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    const users = data.users||[];
+    renderUserCards(users, type==='following' ? "You're not following anyone yet." : "Nobody is following you yet.");
+  } catch(e) {
+    grid.innerHTML = errorMsg();
+  }
+}
+
+// ── SCHOOL TAB ──
+async function loadSchoolTab() {
+  const grid = document.getElementById('userGrid');
+  grid.innerHTML = skeletons(4);
+  if (!mySchool) {
+    grid.innerHTML = `<div class="friends-empty"><div class="friends-empty-icon">🎓</div><h3>No school linked</h3><p>Sign up with a .edu email to connect with classmates.</p></div>`;
+    return;
+  }
+  try {
+    const r = await fetch(`/api/social/search?q=.`, { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    renderUserCards(data.users||[], 'No classmates found yet.');
+  } catch(e) {
+    grid.innerHTML = errorMsg();
+  }
+}
+
+// ── RENDER ──
+function renderUserCards(users, emptyMsg) {
+  const grid = document.getElementById('userGrid');
+  if (users.length === 0) {
+    grid.innerHTML = `<div class="friends-empty"><div class="friends-empty-icon">👥</div><h3>Nobody here yet</h3><p>${emptyMsg}</p></div>`;
+    return;
+  }
+  grid.innerHTML = '';
+  users.forEach((u,i) => {
+    const card = document.createElement('div');
+    card.className = 'user-card-social';
+    card.style.animationDelay = (i * 0.04) + 's';
+    card.innerHTML = `
+      <a href="#" class="user-card-avatar" onclick="openProfile(${u.id});return false;">${initials(u.name)}</a>
+      <div class="user-card-body">
+        <a href="#" class="user-card-name" onclick="openProfile(${u.id});return false;">${u.name}</a>
+        <div class="user-card-school">${u.school_name ? u.school_name + (u.conference ? ' · ' + u.conference : '') : 'Apex user'}</div>
+      </div>
+      <div class="user-card-follow">
+        <button class="follow-btn-lg ${u.isFollowing?'following':''}"
+                data-uid="${u.id}"
+                onclick="toggleFollow(${u.id},this)">
+          ${u.isFollowing ? 'Following' : 'Follow'}
+        </button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ── FOLLOW / UNFOLLOW ──
+async function toggleFollow(userId, btn) {
+  const isFollowing = btn.classList.contains('following');
+  const url = isFollowing ? '/api/social/unfollow' : '/api/social/follow';
+  try {
+    await fetch(url, {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({targetId: userId})
+    });
+    btn.classList.toggle('following');
+    btn.textContent = btn.classList.contains('following') ? 'Following' : 'Follow';
+    loadCounts();
+  } catch(e) {}
+}
+
+// ── PROFILE PANEL ──
+async function openProfile(userId) {
+  const overlay = document.getElementById('profileOverlay');
+  const panel = document.getElementById('profilePanel');
+  panel.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text-tertiary);font-size:14px;">Loading…</div>`;
+  overlay.classList.add('visible');
+  try {
+    const r = await fetch(`/api/social/profile?id=${userId}`, { headers: {'Authorization':'Bearer '+token}});
+    const u = await r.json();
+    const isFollowing = u.isFollowing;
+    panel.innerHTML = `
+      <div class="profile-panel-header">
+        <button class="profile-close" onclick="closeProfile()">×</button>
+        <div class="profile-avatar-lg">${initials(u.name)}</div>
+        <div class="profile-name">${u.name}</div>
+        <div class="profile-school-line">
+          ${u.school ? `🎓 ${u.school.name} · ${u.school.conference}` : 'Apex user'}
+        </div>
+        <div class="profile-follow-row">
+          <div class="profile-follow-stat" onclick="openProfile(${userId})">
+            <div class="profile-follow-count">${u.followers}</div>
+            <div class="profile-follow-label">Followers</div>
+          </div>
+          <div class="profile-follow-divider"></div>
+          <div class="profile-follow-stat">
+            <div class="profile-follow-count">${u.following}</div>
+            <div class="profile-follow-label">Following</div>
+          </div>
+          ${u.id != getMeId() ? `
+          <button class="profile-follow-btn ${isFollowing?'following':''}"
+                  data-uid="${userId}"
+                  onclick="toggleFollowPanel(${userId},this)">
+            ${isFollowing ? 'Following' : 'Follow'}
+          </button>` : ''}
+        </div>
+      </div>
+      <div class="profile-panel-body">
+        <div class="profile-section-label">Performance</div>
+        <div class="profile-stats-grid">
+          <div class="profile-stat-card">
+            <div class="profile-stat-value" style="${scoreColor(u.stats?.overall)}">${u.stats?.overall ?? '—'}${u.stats?.overall != null ? '<span style="font-size:14px;opacity:.6;">/100</span>' : ''}</div>
+            <div class="profile-stat-label">Avg Score</div>
+          </div>
+          <div class="profile-stat-card">
+            <div class="profile-stat-value">${u.stats?.totalAnswered ?? '—'}</div>
+            <div class="profile-stat-label">Answered</div>
+          </div>
+          <div class="profile-stat-card">
+            <div class="profile-stat-value">${u.stats?.streak ?? 0}</div>
+            <div class="profile-stat-label">Day Streak</div>
+          </div>
+        </div>
+        <div class="profile-section-label">Badges</div>
+        ${(u.badges||[]).length > 0
+          ? `<div class="badge-row">${u.badges.map(b=>`<div class="badge-chip">${b.icon} ${b.name}</div>`).join('')}</div>`
+          : `<div class="no-badges">No badges earned yet.</div>`}
+        <div style="font-size:12px;color:var(--text-tertiary);">Member since ${u.memberSince ? new Date(u.memberSince*1000).toLocaleDateString('en-US',{month:'long',year:'numeric'}) : '—'}</div>
+      </div>`;
+  } catch(e) {
+    panel.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text-secondary);">Failed to load profile.</div>`;
+  }
+}
+
+function closeProfile() {
+  document.getElementById('profileOverlay').classList.remove('visible');
+}
+
+async function toggleFollowPanel(userId, btn) {
+  const isFollowing = btn.classList.contains('following');
+  const url = isFollowing ? '/api/social/unfollow' : '/api/social/follow';
+  try {
+    await fetch(url, {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({targetId: userId})
+    });
+    btn.classList.toggle('following');
+    btn.textContent = btn.classList.contains('following') ? 'Following' : 'Follow';
+    // Also update any card in the grid
+    const gridBtn = document.querySelector(`.follow-btn-lg[data-uid="${userId}"]`);
+    if (gridBtn) {
+      gridBtn.classList.toggle('following', btn.classList.contains('following'));
+      gridBtn.textContent = btn.classList.contains('following') ? 'Following' : 'Follow';
+    }
+    loadCounts();
+  } catch(e) {}
+}
+
+function getMeId() {
+  try {
+    const token = localStorage.getItem('apex_token');
+    if (!token) return null;
+    const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return p.userId;
+  } catch(e) { return null; }
+}
+
+// ── COUNTS ──
+async function loadCounts() {
+  try {
+    const [fwingR, fwersR] = await Promise.all([
+      fetch('/api/social/following', { headers: {'Authorization':'Bearer '+token}}),
+      fetch('/api/social/followers', { headers: {'Authorization':'Bearer '+token}}),
+    ]);
+    const following = await fwingR.json();
+    const followers = await fwersR.json();
+    document.getElementById('followingCount').textContent = (following.users||[]).length;
+    document.getElementById('followersCount').textContent = (followers.users||[]).length;
+  } catch(e) {}
+}
+
+// ── HELPERS ──
+function skeletons(n) {
+  return Array(n).fill(0).map(()=>`
+    <div class="user-card-social">
+      <div class="skeleton" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div class="skeleton" style="height:14px;width:60%;margin-bottom:8px;"></div>
+        <div class="skeleton" style="height:12px;width:80%;"></div>
+      </div>
+    </div>`).join('');
+}
+
+function errorMsg() {
+  return `<div class="friends-empty"><div class="friends-empty-icon">⚠️</div><h3>Something went wrong</h3><p>Please try again.</p></div>`;
+}
+
+// ── INIT ──
+async function init() {
+  const meR = await fetch('/api/progress/load', { headers: {'Authorization':'Bearer '+token}});
+  const me = await meR.json();
+  if (window.initSidebarMenu) initSidebarMenu(me.plan, me.gradedToday);
+  window._memberSince = me.memberSince;
+  window._userPlan = me.plan;
+
+  const schoolR = await fetch('/api/school/me', { headers: {'Authorization':'Bearer '+token}});
+  const schoolData = await schoolR.json();
+  mySchool = schoolData.school;
+
+  // Check for ?id= param to open a specific profile
+  const params = new URLSearchParams(window.location.search);
+  const profileId = params.get('id');
+  if (profileId) openProfile(profileId);
+
+  loadCounts();
+  loadTab('search');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProfile(); });
+init();
+</script>
+</body>
+</html>

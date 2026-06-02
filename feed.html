@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feed — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.feed-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 28px;
+  align-items: start;
+}
+
+.feed-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.feed-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  letter-spacing: -0.4px;
+}
+
+.feed-header p {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.feed-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 20px;
+}
+
+.feed-tab {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.feed-tab.active {
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ── FEED EVENTS ── */
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.feed-event {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  transition: border-color 0.15s;
+  animation: fadeUp 0.3s ease both;
+}
+
+.feed-event:hover { border-color: var(--border-strong); }
+
+.event-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.event-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.event-avatar:hover { opacity: 0.85; }
+
+.event-meta { flex: 1; min-width: 0; }
+
+.event-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.event-name:hover { color: var(--accent-blue); }
+
+.event-time {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+.event-type-pill {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+.pill-session { background: #EFF6FF; color: #2563EB; }
+.pill-streak  { background: #FEF3C7; color: #92400E; }
+.pill-badge   { background: #F0FDF4; color: #166534; }
+.pill-party   { background: #FDF4FF; color: #7E22CE; }
+.pill-mastery { background: #FFF7ED; color: #C2410C; }
+
+.event-body {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.event-body strong { font-weight: 600; }
+
+.event-stat-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.event-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-stat-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+
+.event-stat-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Score color */
+.score-high { color: var(--accent-green); }
+.score-mid  { color: var(--accent-amber); }
+.score-low  { color: var(--accent-red); }
+
+/* ── REACTIONS ── */
+.event-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.reaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: none;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-secondary);
+}
+
+.reaction-btn:hover { border-color: var(--border-strong); background: var(--bg); }
+.reaction-btn.reacted { background: #EFF6FF; border-color: #BFDBFE; color: #1D4ED8; }
+
+.reaction-count { font-size: 12px; font-weight: 500; }
+
+.add-reaction-btn {
+  padding: 4px 8px;
+  border-radius: 99px;
+  border: 1px dashed var(--border);
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+.add-reaction-btn:hover { border-color: var(--border-strong); background: var(--bg); }
+
+.comment-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 99px;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+}
+
+.comment-btn:hover { background: var(--bg); color: var(--text-primary); }
+.comment-btn svg { opacity: 0.6; }
+
+/* ── EMOJI PICKER ── */
+.emoji-picker {
+  position: absolute;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 8px;
+  display: flex;
+  gap: 4px;
+  z-index: 100;
+  animation: menuPop 0.15s ease both;
+}
+
+.emoji-option {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.emoji-option:hover { background: var(--bg); }
+
+/* ── COMMENTS ── */
+.comments-section {
+  margin-top: 14px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  display: none;
+}
+
+.comments-section.open { display: block; }
+
+.comment-item {
+  display: flex;
+  gap: 9px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+
+.comment-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.comment-content { flex: 1; }
+
+.comment-author {
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.comment-body {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.45;
+  display: inline;
+}
+
+.comment-time {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.comment-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  align-items: center;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  background: var(--bg);
+  transition: border-color 0.15s;
+}
+
+.comment-input:focus { border-color: var(--border-strong); background: white; }
+
+.comment-submit {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.comment-submit:hover { opacity: 0.8; }
+.comment-submit svg { width: 13px; height: 13px; }
+
+/* ── EMPTY ── */
+.feed-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.feed-empty-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.feed-empty h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.feed-empty p {
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 320px;
+  margin: 0 auto 16px;
+}
+
+.feed-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  background: var(--text-primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.feed-empty-cta:hover { opacity: 0.85; }
+
+/* ── LOAD MORE ── */
+.load-more-btn {
+  width: 100%;
+  padding: 10px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-top: 12px;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+
+.load-more-btn:hover { background: var(--surface); color: var(--text-primary); border-color: var(--border-strong); }
+
+/* ── RIGHT SIDEBAR ── */
+.feed-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 40px; }
+
+.sidebar-widget {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.widget-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 14px;
+}
+
+/* School card */
+.school-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.school-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.school-name { font-size: 14px; font-weight: 600; }
+.school-conf { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.conf-rank {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.conf-rank:last-child { border-bottom: none; }
+
+.conf-rank-pos {
+  font-family: 'DM Serif Display', serif;
+  font-size: 16px;
+  width: 24px;
+  color: var(--text-tertiary);
+}
+
+.conf-rank-pos.top { color: var(--accent-amber); }
+
+.conf-rank-name { flex: 1; padding: 0 8px; }
+.conf-rank-score { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+/* Suggested users */
+.suggested-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.suggested-user:last-child { border-bottom: none; }
+
+.suggested-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.suggested-info { flex: 1; min-width: 0; }
+.suggested-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.suggested-school { font-size: 11.5px; color: var(--text-tertiary); }
+
+.follow-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1.5px solid var(--text-primary);
+  background: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.follow-btn:hover { background: var(--text-primary); color: white; }
+.follow-btn.following { border-color: var(--border); color: var(--text-secondary); }
+.follow-btn.following:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+/* ── LOADING SKELETON ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.skeleton-event {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 1px;
+}
+
+@media (max-width: 960px) {
+  .feed-layout { grid-template-columns: 1fr; }
+  .feed-sidebar { display: none; }
+}
+</style>
+</head>
+<body data-page="feed">
+<div id="sidebar-mount"></div>
+
+<main class="main">
+  <div class="feed-header fade-1">
+    <div>
+      <h1>Feed</h1>
+      <p>Activity from you and people you follow</p>
+    </div>
+    <a href="friends.html" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--accent-blue);text-decoration:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Find friends
+    </a>
+  </div>
+
+  <div class="feed-layout fade-2">
+    <div>
+      <div class="feed-tabs">
+        <button class="feed-tab active" onclick="switchTab('following')">Following</button>
+        <button class="feed-tab" onclick="switchTab('school')">My School</button>
+      </div>
+
+      <div id="feedList" class="feed-list"></div>
+      <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()" style="display:none;">Load more</button>
+    </div>
+
+    <div class="feed-sidebar">
+      <!-- School widget -->
+      <div class="sidebar-widget" id="schoolWidget" style="display:none;">
+        <div class="widget-title">My School</div>
+        <div id="schoolCard"></div>
+        <div class="widget-title" style="margin-top:14px;">Conference Rankings</div>
+        <div id="confRankings"></div>
+      </div>
+
+      <!-- Suggested users -->
+      <div class="sidebar-widget" id="suggestedWidget">
+        <div class="widget-title">People to Follow</div>
+        <div id="suggestedList">
+          <div style="color:var(--text-tertiary);font-size:13px;">Loading…</div>
+        </div>
+        <a href="friends.html" style="display:block;margin-top:12px;font-size:12.5px;color:var(--accent-blue);text-decoration:none;font-weight:500;">Find more people →</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="sidebar.js"></script>
+<script>
+const token = localStorage.getItem('apex_token');
+if (!token) window.location.href = 'auth.html';
+
+let currentTab = 'following';
+let lastCreatedAt = null;
+let loading = false;
+let myUserId = null;
+
+const EMOJIS = ['🔥','👏','💪','🎯','😮'];
+
+const EVENT_TYPE_META = {
+  session_complete: { label: 'Session',  pillClass: 'pill-session' },
+  streak:           { label: 'Streak',   pillClass: 'pill-streak'  },
+  badge_earned:     { label: 'Badge',    pillClass: 'pill-badge'   },
+  party_complete:   { label: 'Party',    pillClass: 'pill-party'   },
+  mastery:          { label: 'Mastery',  pillClass: 'pill-mastery' },
+};
+
+function timeAgo(ts) {
+  const diff = Math.floor(Date.now()/1000) - ts;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function initials(name) {
+  return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function scoreClass(s) {
+  if (s >= 80) return 'score-high';
+  if (s >= 60) return 'score-mid';
+  return 'score-low';
+}
+
+function renderEventBody(event) {
+  const p = event.payload || {};
+  switch(event.type) {
+    case 'session_complete':
+      return `Completed a practice session — <strong>${p.questionsAnswered || '?'} questions</strong> answered with an avg score of <strong class="${scoreClass(p.avgScore)}">${p.avgScore || 0}/100</strong>.`;
+    case 'streak':
+      return `Hit a <strong>${p.streakDays}-day streak</strong> 🔥 — ${p.streakDays} consecutive days of practice.`;
+    case 'badge_earned':
+      return `Earned the <strong>${p.badge?.name || 'badge'}</strong> badge ${p.badge?.icon || '🏅'} — ${p.badge?.description || ''}.`;
+    case 'party_complete':
+      return `Finished a study party with <strong>${p.participants || '?'} people</strong>, scoring <strong class="${scoreClass(p.avgScore)}">${p.avgScore || 0}/100</strong> on average.`;
+    case 'mastery':
+      return `Mastered <strong>${(p.topic||'').replace('_',' ')}</strong> — reached mastery stage on ${p.questionCount || '?'} questions.`;
+    default:
+      return 'Activity recorded.';
+  }
+}
+
+function renderStatRow(event) {
+  const p = event.payload || {};
+  const stats = [];
+  if (event.type === 'session_complete') {
+    if (p.avgScore != null) stats.push({value: p.avgScore, label: 'Avg Score', cls: scoreClass(p.avgScore)});
+    if (p.questionsAnswered) stats.push({value: p.questionsAnswered, label: 'Questions'});
+    if (p.topic) stats.push({value: (p.topic||'').replace('_',' '), label: 'Topic', isText: true});
+  } else if (event.type === 'party_complete') {
+    if (p.avgScore != null) stats.push({value: p.avgScore, label: 'Score', cls: scoreClass(p.avgScore)});
+    if (p.participants) stats.push({value: p.participants, label: 'Players'});
+  } else if (event.type === 'streak') {
+    if (p.streakDays) stats.push({value: p.streakDays, label: 'Days'});
+  }
+  if (stats.length === 0) return '';
+  return `<div class="event-stat-row">${stats.map(s=>`
+    <div class="event-stat">
+      <div class="event-stat-value ${s.cls||''}" style="${s.isText?'font-family:DM Sans,sans-serif;font-size:14px;font-weight:600;':''}">
+        ${s.value}${(!s.isText && s.label==='Avg Score')?'<span style="font-size:13px;opacity:.6;">/100</span>':''}
+      </div>
+      <div class="event-stat-label">${s.label}</div>
+    </div>`).join('')}</div>`;
+}
+
+function buildReactions(eventId, reactions) {
+  const counts = {};
+  const mine = {};
+  for (const [k,v] of Object.entries(reactions||{})) {
+    if (k.startsWith('_mine_')) mine[k.replace('_mine_','')] = true;
+    else counts[k] = v;
+  }
+  const pills = Object.entries(counts)
+    .filter(([,v])=>v>0)
+    .map(([emoji,count])=>`
+      <button class="reaction-btn ${mine[emoji]?'reacted':''}"
+              onclick="toggleReaction(${eventId},'${emoji}',this)"
+              data-emoji="${emoji}">
+        ${emoji} <span class="reaction-count">${count}</span>
+      </button>`).join('');
+  return pills + `<button class="add-reaction-btn" onclick="openEmojiPicker(${eventId},this)" title="Add reaction">+</button>`;
+}
+
+function renderEvent(event) {
+  const meta = EVENT_TYPE_META[event.type] || {label:'Activity', pillClass:'pill-session'};
+  const div = document.createElement('div');
+  div.className = 'feed-event';
+  div.dataset.eventId = event.id;
+  div.innerHTML = `
+    <div class="event-header">
+      <a href="profile.html?id=${event.user_id}" class="event-avatar">${initials(event.user_name)}</a>
+      <div class="event-meta">
+        <a href="profile.html?id=${event.user_id}" class="event-name">${event.user_name}</a>
+        <div class="event-time">${timeAgo(event.created_at)}</div>
+      </div>
+      <span class="event-type-pill ${meta.pillClass}">${meta.label}</span>
+    </div>
+    <div class="event-body">${renderEventBody(event)}</div>
+    ${renderStatRow(event)}
+    <div class="event-actions" id="actions-${event.id}">
+      ${buildReactions(event.id, event.reactions)}
+      <button class="comment-btn" onclick="toggleComments(${event.id}, this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        ${event.commentCount > 0 ? event.commentCount : ''} Comment${event.commentCount!==1?'s':''}
+      </button>
+    </div>
+    <div class="comments-section" id="comments-${event.id}"></div>
+  `;
+  return div;
+}
+
+function renderSkeleton() {
+  return `
+    <div class="skeleton-event"><div class="skeleton" style="height:14px;width:60%;margin-bottom:8px;"></div><div class="skeleton" style="height:12px;width:80%;"></div></div>
+    <div class="skeleton-event"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px;"></div><div class="skeleton" style="height:12px;width:70%;"></div></div>
+    <div class="skeleton-event"><div class="skeleton" style="height:14px;width:65%;margin-bottom:8px;"></div><div class="skeleton" style="height:12px;width:75%;"></div></div>
+  `;
+}
+
+async function loadFeed(reset = false) {
+  if (loading) return;
+  loading = true;
+  const list = document.getElementById('feedList');
+  if (reset) {
+    lastCreatedAt = null;
+    list.innerHTML = renderSkeleton();
+  }
+  try {
+    let url = `/api/social/feed?limit=15`;
+    if (lastCreatedAt) url += `&before=${lastCreatedAt}`;
+    const r = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token }});
+    const data = await r.json();
+    if (reset) list.innerHTML = '';
+    const events = data.events || [];
+    if (events.length === 0 && reset) {
+      list.innerHTML = `
+        <div class="feed-empty">
+          <div class="feed-empty-icon">👥</div>
+          <h3>Your feed is quiet</h3>
+          <p>Follow classmates to see their practice sessions, streaks, and achievements here.</p>
+          <a href="friends.html" class="feed-empty-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            Find people to follow
+          </a>
+        </div>`;
+    } else {
+      events.forEach(e => list.appendChild(renderEvent(e)));
+      if (events.length > 0) lastCreatedAt = events[events.length-1].created_at;
+    }
+    document.getElementById('loadMoreBtn').style.display = events.length >= 15 ? '' : 'none';
+  } catch(e) {
+    if (reset) list.innerHTML = '<div style="padding:20px;color:var(--text-secondary);font-size:14px;">Failed to load feed.</div>';
+  }
+  loading = false;
+}
+
+async function loadMore() { await loadFeed(false); }
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.feed-tab').forEach((btn,i) => {
+    btn.classList.toggle('active', (i===0 && tab==='following') || (i===1 && tab==='school'));
+  });
+  loadFeed(true);
+}
+
+// ── REACTIONS ──
+async function toggleReaction(eventId, emoji, btn) {
+  const reacted = btn.classList.contains('reacted');
+  const url = reacted ? '/api/social/unreact' : '/api/social/react';
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+      body: JSON.stringify({ eventId, emoji })
+    });
+    // Update UI optimistically
+    const countEl = btn.querySelector('.reaction-count');
+    const cur = parseInt(countEl?.textContent||'0');
+    if (reacted) {
+      btn.classList.remove('reacted');
+      if (countEl) countEl.textContent = Math.max(0, cur-1);
+    } else {
+      btn.classList.add('reacted');
+      if (countEl) countEl.textContent = cur+1;
+    }
+  } catch(e) {}
+}
+
+function openEmojiPicker(eventId, btn) {
+  document.querySelectorAll('.emoji-picker').forEach(p=>p.remove());
+  const picker = document.createElement('div');
+  picker.className = 'emoji-picker';
+  EMOJIS.forEach(emoji => {
+    const opt = document.createElement('div');
+    opt.className = 'emoji-option';
+    opt.textContent = emoji;
+    opt.onclick = () => {
+      picker.remove();
+      // Find or create reaction button
+      const actionsEl = document.getElementById('actions-'+eventId);
+      if (!actionsEl) return;
+      let existing = [...actionsEl.querySelectorAll('.reaction-btn')].find(b=>b.dataset.emoji===emoji);
+      if (existing) {
+        toggleReaction(eventId, emoji, existing);
+      } else {
+        // Insert new reaction button before add btn
+        const addBtn = actionsEl.querySelector('.add-reaction-btn');
+        const newBtn = document.createElement('button');
+        newBtn.className = 'reaction-btn reacted';
+        newBtn.dataset.emoji = emoji;
+        newBtn.onclick = function() { toggleReaction(eventId, emoji, this); };
+        newBtn.innerHTML = `${emoji} <span class="reaction-count">1</span>`;
+        actionsEl.insertBefore(newBtn, addBtn);
+        fetch('/api/social/react', {
+          method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+          body: JSON.stringify({eventId, emoji})
+        });
+      }
+    };
+    picker.appendChild(opt);
+  });
+  document.body.appendChild(picker);
+  const r = btn.getBoundingClientRect();
+  picker.style.position = 'fixed';
+  picker.style.top = (r.top - picker.offsetHeight - 8) + 'px';
+  picker.style.left = Math.min(r.left, window.innerWidth - 220) + 'px';
+  setTimeout(() => document.addEventListener('click', function close(e) {
+    if (!picker.contains(e.target) && e.target !== btn) { picker.remove(); document.removeEventListener('click', close); }
+  }), 0);
+}
+
+// ── COMMENTS ──
+async function toggleComments(eventId, btn) {
+  const section = document.getElementById('comments-'+eventId);
+  if (section.classList.contains('open')) {
+    section.classList.remove('open');
+    return;
+  }
+  section.classList.add('open');
+  section.innerHTML = '<div style="font-size:13px;color:var(--text-tertiary);">Loading…</div>';
+  try {
+    const r = await fetch(`/api/social/comments?eventId=${eventId}`, { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    renderComments(section, eventId, data.comments||[]);
+  } catch(e) {
+    section.innerHTML = '<div style="font-size:13px;color:var(--text-tertiary);">Failed to load comments.</div>';
+  }
+}
+
+function renderComments(container, eventId, comments) {
+  container.innerHTML = comments.map(c=>`
+    <div class="comment-item">
+      <div class="comment-avatar">${initials(c.user_name)}</div>
+      <div class="comment-content">
+        <span class="comment-author">${c.user_name}</span>
+        <span class="comment-body">${c.body}</span>
+        <div class="comment-time">${timeAgo(c.created_at)}</div>
+      </div>
+    </div>`).join('') + `
+    <div class="comment-input-row">
+      <input class="comment-input" id="cinput-${eventId}" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')submitComment(${eventId})">
+      <button class="comment-submit" onclick="submitComment(${eventId})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>`;
+}
+
+async function submitComment(eventId) {
+  const input = document.getElementById('cinput-'+eventId);
+  const body = input?.value?.trim();
+  if (!body) return;
+  try {
+    await fetch('/api/social/comment', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({eventId, body})
+    });
+    input.value = '';
+    // Refresh comments
+    const section = document.getElementById('comments-'+eventId);
+    const r = await fetch(`/api/social/comments?eventId=${eventId}`, { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    renderComments(section, eventId, data.comments||[]);
+  } catch(e) {}
+}
+
+// ── SCHOOL WIDGET ──
+async function loadSchoolWidget() {
+  try {
+    const [schoolR, meR] = await Promise.all([
+      fetch('/api/school/me', { headers: {'Authorization':'Bearer '+token}}),
+      fetch('/api/progress/load', { headers: {'Authorization':'Bearer '+token}})
+    ]);
+    const school = (await schoolR.json()).school;
+    if (!school) return;
+    document.getElementById('schoolWidget').style.display = '';
+    document.getElementById('schoolCard').innerHTML = `
+      <div class="school-card">
+        <div class="school-logo">🎓</div>
+        <div>
+          <div class="school-name">${school.name}</div>
+          <div class="school-conf">${school.conference}</div>
+        </div>
+      </div>`;
+    // Load conference leaderboard
+    const lbR = await fetch(`/api/school/leaderboard?conference=${encodeURIComponent(school.conference)}`, { headers: {'Authorization':'Bearer '+token}});
+    const lb = await lbR.json();
+    const schools = (lb.schools||[]).slice(0,5);
+    document.getElementById('confRankings').innerHTML = schools.map((s,i)=>`
+      <div class="conf-rank">
+        <div class="conf-rank-pos ${i<3?'top':''}">${i+1}</div>
+        <div class="conf-rank-name" style="${s.name===school.name?'font-weight:600;':''}">${s.name}</div>
+        <div class="conf-rank-score">${s.avg_score}%</div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+// ── SUGGESTED USERS ──
+async function loadSuggested() {
+  try {
+    // Search for users at same school by fetching leaderboard members
+    const schoolR = await fetch('/api/school/me', { headers: {'Authorization':'Bearer '+token}});
+    const school = (await schoolR.json()).school;
+    if (!school) {
+      document.getElementById('suggestedList').innerHTML = '<div style="font-size:13px;color:var(--text-tertiary);">Follow people to see activity here.</div>';
+      return;
+    }
+    // Search for classmates
+    const r = await fetch(`/api/social/search?q=.`, { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    const users = (data.users||[]).filter(u=>!u.isFollowing).slice(0,4);
+    if (users.length === 0) {
+      document.getElementById('suggestedList').innerHTML = '<div style="font-size:13px;color:var(--text-tertiary);">No suggestions right now.</div>';
+      return;
+    }
+    document.getElementById('suggestedList').innerHTML = users.map(u=>`
+      <div class="suggested-user">
+        <div class="suggested-avatar">${initials(u.name)}</div>
+        <div class="suggested-info">
+          <div class="suggested-name">${u.name}</div>
+          <div class="suggested-school">${u.school_name||'Apex user'}</div>
+        </div>
+        <button class="follow-btn" data-uid="${u.id}" onclick="followUser(${u.id},this)">Follow</button>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function followUser(userId, btn) {
+  try {
+    await fetch('/api/social/follow', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({targetId: userId})
+    });
+    btn.textContent = 'Following';
+    btn.classList.add('following');
+    loadFeed(true);
+  } catch(e) {}
+}
+
+// ── INIT ──
+async function init() {
+  const meR = await fetch('/api/progress/load', { headers: {'Authorization':'Bearer '+token}});
+  const me = await meR.json();
+  if (window.initSidebarMenu) initSidebarMenu(me.plan, me.gradedToday);
+  window._memberSince = me.memberSince;
+  window._userPlan = me.plan;
+  window._gradedToday = me.gradedToday;
+  loadFeed(true);
+  loadSchoolWidget();
+  loadSuggested();
+}
+
+init();
+</script>
+</body>
+</html>
