@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+
+.you-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ── PROFILE CARD ── */
+.profile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: sticky;
+  top: 40px;
+}
+
+.profile-card-top {
+  padding: 28px 24px 22px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.profile-avatar-xl {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+  margin: 0 auto 14px;
+}
+
+.profile-name-lg {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+
+.profile-school-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.profile-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  margin-top: 4px;
+}
+
+.badge-free    { background: #EFEDE9; color: #78736C; border: 1px solid #C4C0B8; }
+.badge-monthly { background: #EFF6FF; color: #2563EB; }
+.badge-pass    { background: #FEF3C7; color: #D97706; }
+
+/* Follow counts */
+.follow-counts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.follow-count-item {
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-right: 1px solid var(--border);
+}
+
+.follow-count-item:last-child { border-right: none; }
+.follow-count-item:hover { background: var(--bg); }
+.follow-count-item.active { background: var(--bg); }
+
+.follow-count-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.follow-count-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Profile links */
+.profile-card-links {
+  padding: 10px;
+}
+
+.profile-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  text-decoration: none;
+  border: none;
+  background: none;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+}
+
+.profile-link:hover { background: var(--bg); color: var(--text-primary); }
+.profile-link svg { width: 15px; height: 15px; opacity: 0.55; flex-shrink: 0; }
+
+.profile-link-divider { height: 1px; background: var(--border); margin: 4px 10px; }
+
+/* ── RIGHT PANEL ── */
+.you-right { min-width: 0; }
+
+/* Section tabs */
+.you-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.you-tab {
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.you-tab:hover { color: var(--text-primary); }
+.you-tab.active { color: var(--text-primary); font-weight: 600; border-bottom-color: var(--text-primary); }
+
+/* ── STATS SECTION ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.stat-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.stat-card.green::after { background: var(--accent-green); }
+.stat-card.blue::after  { background: var(--accent-blue); }
+.stat-card.amber::after { background: var(--accent-amber); }
+.stat-card.purple::after { background: #7C3AED; }
+.stat-card.red::after   { background: var(--accent-red); }
+.stat-card.teal::after  { background: #0891B2; }
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-value sup {
+  font-size: 14px;
+  opacity: 0.6;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* Topic breakdown */
+.topic-breakdown {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.section-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.section-sub {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.topic-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.topic-row:last-child { border-bottom: none; }
+.topic-row:hover { background: var(--bg); }
+
+.topic-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.topic-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.topic-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+.topic-score {
+  font-size: 13px;
+  font-weight: 600;
+  width: 52px;
+  text-align: right;
+}
+
+.topic-count {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  width: 60px;
+  text-align: right;
+}
+
+.topic-stage {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  width: 72px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.stage-mastered  { background: #F0FDF4; color: #166534; }
+.stage-strong    { background: #EFF6FF; color: #1D4ED8; }
+.stage-learning  { background: #FEF3C7; color: #92400E; }
+.stage-struggling { background: #FEE2E2; color: #991B1B; }
+.stage-new       { background: var(--bg); color: var(--text-tertiary); border: 1px solid var(--border); }
+
+/* ── BADGES ── */
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.badge-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: border-color 0.15s;
+}
+
+.badge-card:hover { border-color: var(--border-strong); }
+
+.badge-icon { font-size: 26px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+
+.badge-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.badge-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+.badge-date { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+.badges-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.badges-empty-icon { font-size: 32px; margin-bottom: 10px; }
+.badges-empty h3 { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text-primary); margin-bottom: 6px; }
+.badges-empty p { font-size: 13.5px; line-height: 1.5; }
+
+/* ── FOLLOWERS/FOLLOWING LIST ── */
+.follow-list { display: flex; flex-direction: column; gap: 1px; }
+
+.follow-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.15s;
+  animation: fadeUp 0.25s ease both;
+}
+
+.follow-item:hover { border-color: var(--border-strong); }
+
+.follow-item-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.follow-item-avatar:hover { opacity: 0.85; }
+
+.follow-item-info { flex: 1; min-width: 0; }
+
+.follow-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.follow-item-name:hover { color: var(--accent-blue); }
+
+.follow-item-school {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.follow-item-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  background: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.follow-item-btn:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+.follow-empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-secondary);
+}
+
+.follow-empty-icon { font-size: 28px; margin-bottom: 10px; }
+.follow-empty h3 { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text-primary); margin-bottom: 6px; }
+.follow-empty p { font-size: 13.5px; line-height: 1.5; max-width: 280px; margin: 0 auto 14px; }
+.follow-empty a { font-size: 13px; color: var(--accent-blue); text-decoration: none; font-weight: 500; }
+
+/* ── SKELETON ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+@media (max-width: 900px) {
+  .you-layout { grid-template-columns: 1fr; }
+  .profile-card { position: static; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body data-page="you">
+<div id="sidebar-mount"></div>
+
+<main class="main">
+  <div class="you-layout">
+
+    <!-- ── LEFT: PROFILE CARD ── -->
+    <div class="profile-card fade-1">
+      <div class="profile-card-top">
+        <div class="profile-avatar-xl" id="profileAvatar">?</div>
+        <div class="profile-name-lg" id="profileName">—</div>
+        <div class="profile-school-tag" id="profileSchool" style="display:none;">
+          🎓 <span id="profileSchoolName"></span>
+        </div>
+        <div id="profilePlanBadge"></div>
+        <div style="font-size:12px;color:var(--text-tertiary);margin-top:8px;" id="profileMemberSince"></div>
+      </div>
+
+      <div class="follow-counts">
+        <div class="follow-count-item" id="followersTab" onclick="switchTab('followers')">
+          <div class="follow-count-num" id="followersNum">—</div>
+          <div class="follow-count-label">Followers</div>
+        </div>
+        <div class="follow-count-item" id="followingTab" onclick="switchTab('following')">
+          <div class="follow-count-num" id="followingNum">—</div>
+          <div class="follow-count-label">Following</div>
+        </div>
+      </div>
+
+      <div class="profile-card-links">
+        <a class="profile-link" href="settings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Edit profile & settings
+        </a>
+        <a class="profile-link" href="friends.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Find friends
+        </a>
+        <div class="profile-link-divider"></div>
+        <button class="profile-link" onclick="doLogout()" style="color:var(--accent-red);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign out
+        </button>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: TABS ── -->
+    <div class="you-right fade-2">
+      <div class="you-tabs">
+        <button class="you-tab active" onclick="switchTab('stats')" id="tab-stats">Stats</button>
+        <button class="you-tab" onclick="switchTab('badges')" id="tab-badges">Badges</button>
+        <button class="you-tab" onclick="switchTab('followers')" id="tab-followers">Followers</button>
+        <button class="you-tab" onclick="switchTab('following')" id="tab-following">Following</button>
+      </div>
+
+      <div id="tabContent"></div>
+    </div>
+
+  </div>
+</main>
+
+<script src="sidebar.js"></script>
+<script>
+const token = localStorage.getItem('apex_token');
+if (!token) window.location.href = 'auth.html';
+
+let profileData = null;
+let progressData = null;
+
+function initials(name) {
+  return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function scoreColor(s) {
+  if (s >= 80) return 'var(--accent-green)';
+  if (s >= 60) return 'var(--accent-amber)';
+  return 'var(--accent-red)';
+}
+
+function topicLabel(t) {
+  return { Accounting:'Accounting', Enterprise_Value:'Enterprise Value', Valuation:'Valuation',
+    DCF:'Discounted Cash Flow', Mergers_MA:'Mergers & Acquisitions', LBO:'Leveraged Buyouts' }[t] || t;
+}
+
+function stageClass(s) {
+  return { mastered:'stage-mastered', strong:'stage-strong', learning:'stage-learning', struggling:'stage-struggling' }[s] || 'stage-new';
+}
+
+function timeAgo(ts) {
+  if (!ts) return '';
+  const diff = Math.floor(Date.now()/1000) - ts;
+  if (diff < 86400) return 'Today';
+  if (diff < 86400*7) return Math.floor(diff/86400) + 'd ago';
+  if (diff < 86400*30) return Math.floor(diff/86400/7) + 'w ago';
+  return new Date(ts*1000).toLocaleDateString('en-US',{month:'short',year:'numeric'});
+}
+
+// ── POPULATE PROFILE CARD ──
+function renderProfileCard(profile, progress, school) {
+  document.getElementById('profileAvatar').textContent = initials(profile.name);
+  document.getElementById('profileName').textContent = profile.name;
+
+  if (school) {
+    document.getElementById('profileSchool').style.display = 'inline-flex';
+    document.getElementById('profileSchoolName').textContent = school.name + (school.conference ? ' · ' + school.conference : '');
+  }
+
+  const planMap = {
+    free:    { cls:'badge-free',    label:'○ Free plan' },
+    monthly: { cls:'badge-monthly', label:'★ Pro' },
+    pass:    { cls:'badge-pass',    label:'◆ Recruiting Pass' },
+  };
+  const pm = planMap[profile.plan] || planMap.free;
+  document.getElementById('profilePlanBadge').innerHTML =
+    `<span class="profile-plan-badge ${pm.cls}">${pm.label}</span>`;
+
+  if (profile.memberSince) {
+    document.getElementById('profileMemberSince').textContent =
+      'Member since ' + new Date(profile.memberSince*1000).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  }
+
+  document.getElementById('followersNum').textContent = profile.followers ?? '—';
+  document.getElementById('followingNum').textContent = profile.following ?? '—';
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  document.querySelectorAll('.you-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+tab)?.classList.add('active');
+
+  // Also highlight follow-count items
+  document.getElementById('followersTab')?.classList.toggle('active', tab==='followers');
+  document.getElementById('followingTab')?.classList.toggle('active', tab==='following');
+
+  if (tab === 'stats')     renderStats();
+  if (tab === 'badges')    renderBadges();
+  if (tab === 'followers') loadFollowList('followers');
+  if (tab === 'following') loadFollowList('following');
+}
+
+// ── STATS TAB ──
+function renderStats() {
+  if (!progressData || !profileData) return;
+  const p = progressData;
+  const results = p.results || [];
+
+  const overall = results.length > 0
+    ? Math.round(results.reduce((s,r)=>s+r.score,0)/results.length) : null;
+
+  const masteredCount = results.filter(r=>r.mastery_stage==='mastered').length;
+  const strugglingCount = results.filter(r=>r.mastery_stage==='struggling').length;
+
+  // Per-topic aggregation
+  const byTopic = {};
+  results.forEach(r => {
+    if (!byTopic[r.topic]) byTopic[r.topic] = { scores:[], stages:{} };
+    byTopic[r.topic].scores.push(r.score);
+    byTopic[r.topic].stages[r.mastery_stage] = (byTopic[r.topic].stages[r.mastery_stage]||0)+1;
+  });
+
+  const topicRows = Object.entries(byTopic).map(([topic, d]) => {
+    const avg = Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length);
+    const dominantStage = Object.entries(d.stages).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'new';
+    return { topic, avg, count: d.scores.length, stage: dominantStage };
+  }).sort((a,b) => b.avg - a.avg);
+
+  const content = document.getElementById('tabContent');
+  content.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-label">Avg Score</div>
+        <div class="stat-value" style="color:${overall!=null?scoreColor(overall):'var(--text-primary)'}">
+          ${overall ?? '—'}${overall!=null?'<sup>/100</sup>':''}
+        </div>
+        <div class="stat-sub">across all questions</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Answered</div>
+        <div class="stat-value">${results.length}</div>
+        <div class="stat-sub">total questions</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Streak</div>
+        <div class="stat-value">${p.streak ?? 0}<sup> days</sup></div>
+        <div class="stat-sub">consecutive days</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Mastered</div>
+        <div class="stat-value">${masteredCount}</div>
+        <div class="stat-sub">questions mastered</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Struggling</div>
+        <div class="stat-value">${strugglingCount}</div>
+        <div class="stat-sub">need more work</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-label">Today</div>
+        <div class="stat-value">${p.gradedToday ?? 0}</div>
+        <div class="stat-sub">questions today</div>
+      </div>
+    </div>
+
+    ${topicRows.length > 0 ? `
+    <div class="topic-breakdown">
+      <div class="section-header">
+        <div class="section-title">Performance by Topic</div>
+        <div class="section-sub">Visible to followers</div>
+      </div>
+      ${topicRows.map(t => `
+        <div class="topic-row">
+          <div class="topic-name">${topicLabel(t.topic)}</div>
+          <div class="topic-bar-wrap">
+            <div class="topic-bar-fill" style="width:${t.avg}%;background:${scoreColor(t.avg)};"></div>
+          </div>
+          <div class="topic-score" style="color:${scoreColor(t.avg)}">${t.avg}%</div>
+          <div class="topic-count">${t.count} q's</div>
+          <div class="topic-stage ${stageClass(t.stage)}">${t.stage||'new'}</div>
+        </div>`).join('')}
+    </div>` : `
+    <div style="text-align:center;padding:40px 20px;color:var(--text-secondary);">
+      <div style="font-size:28px;margin-bottom:10px;">📊</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--text-primary);margin-bottom:6px;">No stats yet</div>
+      <div style="font-size:13.5px;">Answer some questions to see your performance breakdown.</div>
+      <a href="practice-screen.html" style="display:inline-block;margin-top:14px;font-size:13px;color:var(--accent-blue);text-decoration:none;font-weight:500;">Start practicing →</a>
+    </div>`}`;
+}
+
+// ── BADGES TAB ──
+function renderBadges() {
+  const badges = profileData?.badges || [];
+  const content = document.getElementById('tabContent');
+  if (badges.length === 0) {
+    content.innerHTML = `
+      <div class="badges-grid">
+        <div class="badges-empty">
+          <div class="badges-empty-icon">🏅</div>
+          <h3>No badges yet</h3>
+          <p>Earn badges by hitting streaks, mastering topics, winning conference challenges, and more.</p>
+        </div>
+      </div>`;
+    return;
+  }
+  content.innerHTML = `
+    <div class="badges-grid">
+      ${badges.map(b=>`
+        <div class="badge-card">
+          <div class="badge-icon">${b.icon||'🏅'}</div>
+          <div>
+            <div class="badge-name">${b.name}</div>
+            <div class="badge-desc">${b.description||''}</div>
+            <div class="badge-date">${timeAgo(b.awarded_at)}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── FOLLOWERS / FOLLOWING TABS ──
+async function loadFollowList(type) {
+  const content = document.getElementById('tabContent');
+  content.innerHTML = `<div style="padding:20px;color:var(--text-tertiary);font-size:13.5px;">Loading…</div>`;
+  try {
+    const r = await fetch(`/api/social/${type}`, { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    const users = data.users || [];
+    if (users.length === 0) {
+      const isEmpty = type === 'followers';
+      content.innerHTML = `
+        <div class="follow-empty">
+          <div class="follow-empty-icon">${isEmpty ? '👀' : '🔭'}</div>
+          <h3>${isEmpty ? 'No followers yet' : 'Not following anyone'}</h3>
+          <p>${isEmpty
+            ? 'When others follow you, they\'ll appear here.'
+            : 'Find classmates and people to follow on the Friends page.'}</p>
+          ${!isEmpty ? `<a href="friends.html">Find friends →</a>` : ''}
+        </div>`;
+      return;
+    }
+    content.innerHTML = `<div class="follow-list">${users.map((u,i)=>`
+      <div class="follow-item" style="animation-delay:${i*0.04}s;">
+        <a href="friends.html?id=${u.id}" class="follow-item-avatar">${initials(u.name)}</a>
+        <div class="follow-item-info">
+          <a href="friends.html?id=${u.id}" class="follow-item-name">${u.name}</a>
+          <div class="follow-item-school">${u.school_name ? u.school_name + (u.conference?' · '+u.conference:'') : 'Apex user'}</div>
+        </div>
+        ${type === 'following' ? `
+        <button class="follow-item-btn" onclick="unfollow(${u.id},this)">Unfollow</button>` : ''}
+      </div>`).join('')}</div>`;
+  } catch(e) {
+    content.innerHTML = `<div style="padding:20px;color:var(--text-secondary);font-size:13.5px;">Failed to load.</div>`;
+  }
+}
+
+async function unfollow(userId, btn) {
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    await fetch('/api/social/unfollow', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({targetId: userId})
+    });
+    btn.closest('.follow-item')?.remove();
+    // Update following count
+    const numEl = document.getElementById('followingNum');
+    if (numEl) numEl.textContent = Math.max(0, (parseInt(numEl.textContent)||1) - 1);
+  } catch(e) { btn.disabled = false; btn.textContent = 'Unfollow'; }
+}
+
+// ── INIT ──
+async function init() {
+  try {
+    const [progressR, profileR, schoolR] = await Promise.all([
+      fetch('/api/progress/load', { headers: {'Authorization':'Bearer '+token}}),
+      fetch('/api/social/profile', { headers: {'Authorization':'Bearer '+token}}),
+      fetch('/api/school/me', { headers: {'Authorization':'Bearer '+token}}),
+    ]);
+    progressData = await progressR.json();
+    profileData = await profileR.json();
+    const schoolData = await schoolR.json();
+
+    if (window.initSidebarMenu) initSidebarMenu(progressData.plan, progressData.gradedToday);
+    window._memberSince = progressData.memberSince;
+    window._userPlan = progressData.plan;
+    window._gradedToday = progressData.gradedToday;
+
+    renderProfileCard(profileData, progressData, schoolData.school);
+    renderStats();
+  } catch(e) {
+    console.error('Init error', e);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
