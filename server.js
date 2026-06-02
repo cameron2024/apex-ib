@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { Pool } = require('pg');
+const { WebSocketServer, WebSocket } = require('ws');
 
 const PORT = process.env.PORT || 3000;
 
@@ -107,6 +108,124 @@ async function initDB() {
       CREATE TABLE IF NOT EXISTS stripe_events (
         id TEXT PRIMARY KEY, processed_at BIGINT
       );
+    `);
+    // ── SOCIAL TABLES ────────────────────────────────────────
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS follows (
+        follower_id BIGINT,
+        following_id BIGINT,
+        created_at BIGINT,
+        PRIMARY KEY (follower_id, following_id)
+      );
+      CREATE TABLE IF NOT EXISTS feed_events (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT,
+        type TEXT,
+        payload JSONB,
+        created_at BIGINT
+      );
+      CREATE TABLE IF NOT EXISTS feed_reactions (
+        id BIGSERIAL PRIMARY KEY,
+        event_id BIGINT,
+        user_id BIGINT,
+        emoji TEXT,
+        created_at BIGINT,
+        UNIQUE (event_id, user_id, emoji)
+      );
+      CREATE TABLE IF NOT EXISTS feed_comments (
+        id BIGSERIAL PRIMARY KEY,
+        event_id BIGINT,
+        user_id BIGINT,
+        body TEXT,
+        created_at BIGINT
+      );
+    `);
+    // ── SCHOOL / CONFERENCE TABLES ───────────────────────────
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS schools (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        domain TEXT UNIQUE NOT NULL,
+        conference TEXT,
+        logo_url TEXT
+      );
+      CREATE TABLE IF NOT EXISTS school_memberships (
+        user_id BIGINT PRIMARY KEY,
+        school_id INT,
+        verified_at BIGINT
+      );
+      CREATE TABLE IF NOT EXISTS conference_challenges (
+        id SERIAL PRIMARY KEY,
+        conference TEXT NOT NULL,
+        title TEXT NOT NULL,
+        starts_at BIGINT,
+        ends_at BIGINT,
+        status TEXT DEFAULT 'upcoming'
+      );
+      CREATE TABLE IF NOT EXISTS challenge_scores (
+        challenge_id INT,
+        school_id INT,
+        total_score BIGINT DEFAULT 0,
+        participants INT DEFAULT 0,
+        updated_at BIGINT,
+        PRIMARY KEY (challenge_id, school_id)
+      );
+      CREATE TABLE IF NOT EXISTS badges (
+        id TEXT PRIMARY KEY,
+        name TEXT,
+        description TEXT,
+        icon TEXT,
+        type TEXT
+      );
+      CREATE TABLE IF NOT EXISTS user_badges (
+        user_id BIGINT,
+        badge_id TEXT,
+        awarded_at BIGINT,
+        PRIMARY KEY (user_id, badge_id)
+      );
+    `);
+    // ── STUDY PARTY TABLES ───────────────────────────────────
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS study_parties (
+        id TEXT PRIMARY KEY,
+        host_id BIGINT,
+        status TEXT DEFAULT 'lobby',
+        topic TEXT,
+        time_limit_sec INT,
+        question_ids JSONB,
+        current_question_index INT DEFAULT 0,
+        created_at BIGINT,
+        started_at BIGINT,
+        completed_at BIGINT
+      );
+      CREATE TABLE IF NOT EXISTS party_members (
+        party_id TEXT,
+        user_id BIGINT,
+        joined_at BIGINT,
+        status TEXT DEFAULT 'active',
+        PRIMARY KEY (party_id, user_id)
+      );
+      CREATE TABLE IF NOT EXISTS party_answers (
+        party_id TEXT,
+        user_id BIGINT,
+        question_id TEXT,
+        answer_text TEXT,
+        score INT,
+        grade_payload JSONB,
+        submitted_at BIGINT,
+        PRIMARY KEY (party_id, user_id, question_id)
+      );
+    `);
+    // ── INDEXES ──────────────────────────────────────────────
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id);
+      CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id);
+      CREATE INDEX IF NOT EXISTS idx_feed_events_user ON feed_events(user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_feed_comments_event ON feed_comments(event_id);
+      CREATE INDEX IF NOT EXISTS idx_feed_reactions_event ON feed_reactions(event_id);
+      CREATE INDEX IF NOT EXISTS idx_party_members_party ON party_members(party_id);
+      CREATE INDEX IF NOT EXISTS idx_party_answers_party ON party_answers(party_id, question_id);
+      CREATE INDEX IF NOT EXISTS idx_challenge_scores_challenge ON challenge_scores(challenge_id);
     `);
     // Backfill columns that may not exist on older DBs
     await client.query(`
@@ -564,6 +683,134 @@ async function generateInsights(userId) {
   return payload;
 }
 
+// ── SCHOOL DOMAIN LOOKUP ─────────────────────────────────────
+const SCHOOL_SEED = [
+  // Ivy League
+  { name: 'Harvard University', domain: 'harvard.edu', conference: 'Ivy League' },
+  { name: 'Yale University', domain: 'yale.edu', conference: 'Ivy League' },
+  { name: 'Princeton University', domain: 'princeton.edu', conference: 'Ivy League' },
+  { name: 'Columbia University', domain: 'columbia.edu', conference: 'Ivy League' },
+  { name: 'University of Pennsylvania', domain: 'upenn.edu', conference: 'Ivy League' },
+  { name: 'Brown University', domain: 'brown.edu', conference: 'Ivy League' },
+  { name: 'Dartmouth College', domain: 'dartmouth.edu', conference: 'Ivy League' },
+  { name: 'Cornell University', domain: 'cornell.edu', conference: 'Ivy League' },
+  // NESCAC
+  { name: 'Amherst College', domain: 'amherst.edu', conference: 'NESCAC' },
+  { name: 'Williams College', domain: 'williams.edu', conference: 'NESCAC' },
+  { name: 'Middlebury College', domain: 'middlebury.edu', conference: 'NESCAC' },
+  { name: 'Bowdoin College', domain: 'bowdoin.edu', conference: 'NESCAC' },
+  { name: 'Colby College', domain: 'colby.edu', conference: 'NESCAC' },
+  { name: 'Hamilton College', domain: 'hamilton.edu', conference: 'NESCAC' },
+  { name: 'Trinity College', domain: 'trincoll.edu', conference: 'NESCAC' },
+  { name: 'Wesleyan University', domain: 'wesleyan.edu', conference: 'NESCAC' },
+  { name: 'Tufts University', domain: 'tufts.edu', conference: 'NESCAC' },
+  { name: 'Bates College', domain: 'bates.edu', conference: 'NESCAC' },
+  { name: 'Connecticut College', domain: 'conncoll.edu', conference: 'NESCAC' },
+  // ACC
+  { name: 'Duke University', domain: 'duke.edu', conference: 'ACC' },
+  { name: 'University of North Carolina', domain: 'unc.edu', conference: 'ACC' },
+  { name: 'Georgetown University', domain: 'georgetown.edu', conference: 'ACC' },
+  { name: 'Boston College', domain: 'bc.edu', conference: 'ACC' },
+  { name: 'University of Virginia', domain: 'virginia.edu', conference: 'ACC' },
+  { name: 'Wake Forest University', domain: 'wfu.edu', conference: 'ACC' },
+  { name: 'Notre Dame', domain: 'nd.edu', conference: 'ACC' },
+  // Big Ten
+  { name: 'University of Michigan', domain: 'umich.edu', conference: 'Big Ten' },
+  { name: 'Northwestern University', domain: 'northwestern.edu', conference: 'Big Ten' },
+  { name: 'University of Chicago', domain: 'uchicago.edu', conference: 'Big Ten' },
+  { name: 'Penn State University', domain: 'psu.edu', conference: 'Big Ten' },
+  { name: 'Ohio State University', domain: 'osu.edu', conference: 'Big Ten' },
+  { name: 'University of Wisconsin', domain: 'wisc.edu', conference: 'Big Ten' },
+  { name: 'University of Minnesota', domain: 'umn.edu', conference: 'Big Ten' },
+  { name: 'Indiana University', domain: 'indiana.edu', conference: 'Big Ten' },
+  { name: 'Purdue University', domain: 'purdue.edu', conference: 'Big Ten' },
+  { name: 'University of Illinois', domain: 'illinois.edu', conference: 'Big Ten' },
+  // SEC
+  { name: 'Vanderbilt University', domain: 'vanderbilt.edu', conference: 'SEC' },
+  { name: 'University of Georgia', domain: 'uga.edu', conference: 'SEC' },
+  { name: 'University of Florida', domain: 'ufl.edu', conference: 'SEC' },
+  { name: 'University of Alabama', domain: 'ua.edu', conference: 'SEC' },
+  { name: 'University of Texas', domain: 'utexas.edu', conference: 'SEC' },
+  // Other top schools
+  { name: 'MIT', domain: 'mit.edu', conference: 'Independent' },
+  { name: 'Stanford University', domain: 'stanford.edu', conference: 'Pac-12' },
+  { name: 'University of California Berkeley', domain: 'berkeley.edu', conference: 'Pac-12' },
+  { name: 'UCLA', domain: 'ucla.edu', conference: 'Pac-12' },
+  { name: 'Carnegie Mellon University', domain: 'cmu.edu', conference: 'Independent' },
+  { name: 'NYU', domain: 'nyu.edu', conference: 'Independent' },
+  { name: 'Emory University', domain: 'emory.edu', conference: 'Independent' },
+  { name: 'Washington University in St. Louis', domain: 'wustl.edu', conference: 'Independent' },
+  { name: 'Rice University', domain: 'rice.edu', conference: 'Independent' },
+  { name: 'Tulane University', domain: 'tulane.edu', conference: 'Independent' },
+];
+
+async function seedSchools() {
+  for (const s of SCHOOL_SEED) {
+    await pool.query(
+      `INSERT INTO schools (name, domain, conference) VALUES ($1, $2, $3) ON CONFLICT (domain) DO NOTHING`,
+      [s.name, s.domain, s.conference]
+    );
+  }
+}
+
+async function detectSchoolFromEmail(email) {
+  const domain = email.split('@')[1];
+  if (!domain || !domain.endsWith('.edu')) return null;
+  const r = await pool.query('SELECT id, name, conference FROM schools WHERE domain=$1', [domain]);
+  return r.rows[0] || null;
+}
+
+async function linkUserToSchool(userId, schoolId) {
+  await pool.query(
+    `INSERT INTO school_memberships (user_id, school_id, verified_at) VALUES ($1, $2, $3)
+     ON CONFLICT (user_id) DO NOTHING`,
+    [userId, schoolId, nowSec()]
+  );
+}
+
+// ── FEED EVENT EMITTER ───────────────────────────────────────
+async function emitFeedEvent(userId, type, payload) {
+  await pool.query(
+    'INSERT INTO feed_events (user_id, type, payload, created_at) VALUES ($1, $2, $3, $4)',
+    [userId, type, JSON.stringify(payload), nowSec()]
+  );
+}
+
+// ── BADGE AWARD ──────────────────────────────────────────────
+async function awardBadge(userId, badgeId) {
+  await pool.query(
+    `INSERT INTO user_badges (user_id, badge_id, awarded_at) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+    [userId, badgeId, nowSec()]
+  );
+  const badgeR = await pool.query('SELECT * FROM badges WHERE id=$1', [badgeId]);
+  if (badgeR.rows[0]) {
+    await emitFeedEvent(userId, 'badge_earned', { badge: badgeR.rows[0] });
+  }
+}
+
+// ── PARTY CODE GENERATOR ─────────────────────────────────────
+function generatePartyCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+// ── WEBSOCKET PARTY STATE ────────────────────────────────────
+// partyClients: Map<partyId, Map<userId, WebSocket>>
+const partyClients = new Map();
+
+function broadcastToParty(partyId, message, excludeUserId = null) {
+  const clients = partyClients.get(partyId);
+  if (!clients) return;
+  const data = JSON.stringify(message);
+  for (const [uid, ws] of clients) {
+    if (excludeUserId && uid === excludeUserId) continue;
+    if (ws.readyState === WebSocket.OPEN) ws.send(data);
+  }
+}
+
+function getPartyMemberCount(partyId) {
+  return partyClients.get(partyId)?.size || 0;
+}
+
 // ── HTTP SERVER ─────────────────────────────────────────────
 const server = http.createServer(async (req, res) => {
   if (req.method==='OPTIONS') {
@@ -590,7 +837,14 @@ const server = http.createServer(async (req, res) => {
       const displayName = name||emailLower.split('@')[0];
       await pool.query('INSERT INTO users (id,email,password_hash,name,plan,onboarded,created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)',
         [id,emailLower,hashPwd(password),displayName,'free',0,nowSec()]);
-      return json(res,200,{token:signToken({userId:id,email:emailLower}),name:displayName,plan:'free',onboarded:false});
+      // Auto-detect school from .edu email
+      let schoolInfo = null;
+      const school = await detectSchoolFromEmail(emailLower);
+      if (school) {
+        await linkUserToSchool(id, school.id);
+        schoolInfo = { name: school.name, conference: school.conference };
+      }
+      return json(res,200,{token:signToken({userId:id,email:emailLower}),name:displayName,plan:'free',onboarded:false,school:schoolInfo});
     } catch(e){return json(res,500,{error:e.message});}
   }
 
@@ -1102,6 +1356,614 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ── SOCIAL: FOLLOW ───────────────────────────────────────
+  if (req.method==='POST' && url==='/api/social/follow') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {targetId} = await readBody(req);
+      if (!targetId || targetId == user.userId) return json(res,400,{error:'Invalid target'});
+      const exists = await pool.query('SELECT id FROM users WHERE id=$1', [targetId]);
+      if (!exists.rows[0]) return json(res,404,{error:'User not found'});
+      await pool.query(
+        'INSERT INTO follows (follower_id, following_id, created_at) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING',
+        [user.userId, targetId, nowSec()]
+      );
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  if (req.method==='POST' && url==='/api/social/unfollow') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {targetId} = await readBody(req);
+      await pool.query('DELETE FROM follows WHERE follower_id=$1 AND following_id=$2', [user.userId, targetId]);
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/social/profile?id=xxx — public profile (logged in only)
+  if (req.method==='GET' && url==='/api/social/profile') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const targetId = params.get('id') || user.userId;
+      const [userR, followerR, followingR, badgeR, schoolR, resultsR, activityR] = await Promise.all([
+        pool.query('SELECT id,name,plan,created_at FROM users WHERE id=$1', [targetId]),
+        pool.query('SELECT COUNT(*) FROM follows WHERE following_id=$1', [targetId]),
+        pool.query('SELECT COUNT(*) FROM follows WHERE follower_id=$1', [targetId]),
+        pool.query(`SELECT ub.badge_id, ub.awarded_at, b.name, b.icon, b.type
+                    FROM user_badges ub JOIN badges b ON b.id=ub.badge_id
+                    WHERE ub.user_id=$1 ORDER BY ub.awarded_at DESC`, [targetId]),
+        pool.query(`SELECT s.name, s.conference FROM school_memberships sm
+                    JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1`, [targetId]),
+        pool.query('SELECT topic,score,mastery_stage FROM question_results WHERE user_id=$1', [targetId]),
+        pool.query('SELECT date FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84', [targetId]),
+      ]);
+      if (!userR.rows[0]) return json(res,404,{error:'User not found'});
+      const u = userR.rows[0];
+      const all = resultsR.rows;
+      const overall = all.length > 0 ? Math.round(all.reduce((s,r)=>s+r.score,0)/all.length) : null;
+      const actDates = new Set(activityR.rows.map(a=>a.date));
+      let streak = 0;
+      for (let i=0;i<365;i++) {
+        const d=new Date(); d.setDate(d.getDate()-i);
+        const ds=d.toISOString().slice(0,10);
+        if (actDates.has(ds)) streak++; else if (i>0) break;
+      }
+      const isFollowing = await pool.query('SELECT 1 FROM follows WHERE follower_id=$1 AND following_id=$2', [user.userId, targetId]);
+      return json(res,200,{
+        id: u.id, name: u.name, plan: u.plan, memberSince: u.created_at,
+        followers: parseInt(followerR.rows[0].count),
+        following: parseInt(followingR.rows[0].count),
+        isFollowing: isFollowing.rows.length > 0,
+        badges: badgeR.rows,
+        school: schoolR.rows[0] || null,
+        stats: { overall, totalAnswered: all.length, streak },
+      });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/social/search?q=name
+  if (req.method==='GET' && url==='/api/social/search') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const q = (params.get('q')||'').trim();
+      if (!q || q.length < 2) return json(res,400,{error:'Query too short'});
+      const r = await pool.query(
+        `SELECT u.id, u.name, u.plan, s.name as school_name, s.conference
+         FROM users u
+         LEFT JOIN school_memberships sm ON sm.user_id=u.id
+         LEFT JOIN schools s ON s.id=sm.school_id
+         WHERE u.name ILIKE $1 AND u.id != $2 LIMIT 20`,
+        [`%${q}%`, user.userId]
+      );
+      const following = await pool.query('SELECT following_id FROM follows WHERE follower_id=$1', [user.userId]);
+      const followingSet = new Set(following.rows.map(r=>String(r.following_id)));
+      return json(res,200,{users: r.rows.map(u=>({...u, isFollowing: followingSet.has(String(u.id))}))});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/social/feed
+  if (req.method==='GET' && url==='/api/social/feed') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const limit = Math.min(parseInt(params.get('limit'))||30, 50);
+      const before = parseInt(params.get('before')) || null;
+      // Events from self + people you follow
+      const r = await pool.query(
+        `SELECT fe.id, fe.user_id, fe.type, fe.payload, fe.created_at,
+                u.name as user_name, u.plan as user_plan
+         FROM feed_events fe
+         JOIN users u ON u.id=fe.user_id
+         WHERE fe.user_id=$1
+            OR fe.user_id IN (SELECT following_id FROM follows WHERE follower_id=$1)
+         ${before ? 'AND fe.created_at < $3' : ''}
+         ORDER BY fe.created_at DESC LIMIT $2`,
+        before ? [user.userId, limit, before] : [user.userId, limit]
+      );
+      // Attach reaction + comment counts
+      const eventIds = r.rows.map(e=>e.id);
+      let reactionMap = {}, commentMap = {};
+      if (eventIds.length > 0) {
+        const [rxR, cmR] = await Promise.all([
+          pool.query(`SELECT event_id, emoji, COUNT(*) FROM feed_reactions WHERE event_id=ANY($1) GROUP BY event_id, emoji`, [eventIds]),
+          pool.query(`SELECT event_id, COUNT(*) FROM feed_comments WHERE event_id=ANY($1) GROUP BY event_id`, [eventIds]),
+        ]);
+        rxR.rows.forEach(r => {
+          if (!reactionMap[r.event_id]) reactionMap[r.event_id] = {};
+          reactionMap[r.event_id][r.emoji] = parseInt(r.count);
+        });
+        cmR.rows.forEach(r => { commentMap[r.event_id] = parseInt(r.count); });
+        // My reactions
+        const myRx = await pool.query(`SELECT event_id, emoji FROM feed_reactions WHERE user_id=$1 AND event_id=ANY($2)`, [user.userId, eventIds]);
+        myRx.rows.forEach(r => {
+          if (!reactionMap[r.event_id]) reactionMap[r.event_id] = {};
+          reactionMap[r.event_id]['_mine_'+r.emoji] = true;
+        });
+      }
+      const events = r.rows.map(e=>({
+        ...e,
+        reactions: reactionMap[e.id]||{},
+        commentCount: commentMap[e.id]||0,
+      }));
+      return json(res,200,{events});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/social/react
+  if (req.method==='POST' && url==='/api/social/react') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {eventId, emoji} = await readBody(req);
+      if (!eventId || !emoji) return json(res,400,{error:'eventId and emoji required'});
+      const allowed = ['🔥','👏','💪','🎯','😮'];
+      if (!allowed.includes(emoji)) return json(res,400,{error:'Invalid emoji'});
+      await pool.query(
+        'INSERT INTO feed_reactions (event_id, user_id, emoji, created_at) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING',
+        [eventId, user.userId, emoji, nowSec()]
+      );
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  if (req.method==='POST' && url==='/api/social/unreact') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {eventId, emoji} = await readBody(req);
+      await pool.query('DELETE FROM feed_reactions WHERE event_id=$1 AND user_id=$2 AND emoji=$3', [eventId, user.userId, emoji]);
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/social/comments?eventId=xxx
+  if (req.method==='GET' && url==='/api/social/comments') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const eventId = params.get('eventId');
+      if (!eventId) return json(res,400,{error:'eventId required'});
+      const r = await pool.query(
+        `SELECT fc.id, fc.body, fc.created_at, u.id as user_id, u.name as user_name
+         FROM feed_comments fc JOIN users u ON u.id=fc.user_id
+         WHERE fc.event_id=$1 ORDER BY fc.created_at ASC`,
+        [eventId]
+      );
+      return json(res,200,{comments: r.rows});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/social/comment
+  if (req.method==='POST' && url==='/api/social/comment') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {eventId, body} = await readBody(req);
+      if (!eventId || !body || !body.trim()) return json(res,400,{error:'eventId and body required'});
+      const trimmed = body.trim().slice(0, 500);
+      const r = await pool.query(
+        'INSERT INTO feed_comments (event_id, user_id, body, created_at) VALUES ($1,$2,$3,$4) RETURNING id',
+        [eventId, user.userId, trimmed, nowSec()]
+      );
+      return json(res,200,{ok:true, id: r.rows[0].id});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/social/followers?id=xxx  /  GET /api/social/following?id=xxx
+  if (req.method==='GET' && (url==='/api/social/followers' || url==='/api/social/following')) {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const targetId = params.get('id') || user.userId;
+      const isFollowers = url==='/api/social/followers';
+      const r = await pool.query(
+        isFollowers
+          ? `SELECT u.id, u.name, u.plan FROM follows f JOIN users u ON u.id=f.follower_id WHERE f.following_id=$1 ORDER BY f.created_at DESC`
+          : `SELECT u.id, u.name, u.plan FROM follows f JOIN users u ON u.id=f.following_id WHERE f.follower_id=$1 ORDER BY f.created_at DESC`,
+        [targetId]
+      );
+      const myFollowing = await pool.query('SELECT following_id FROM follows WHERE follower_id=$1', [user.userId]);
+      const mySet = new Set(myFollowing.rows.map(r=>String(r.following_id)));
+      return json(res,200,{users: r.rows.map(u=>({...u, isFollowing: mySet.has(String(u.id))}))});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // ── SCHOOL / CONFERENCE ──────────────────────────────────
+  // GET /api/school/me
+  if (req.method==='GET' && url==='/api/school/me') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const r = await pool.query(
+        `SELECT s.id, s.name, s.conference, s.logo_url FROM school_memberships sm
+         JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1`,
+        [user.userId]
+      );
+      return json(res,200,{school: r.rows[0]||null});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/school/leaderboard?conference=NESCAC
+  if (req.method==='GET' && url==='/api/school/leaderboard') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const conference = params.get('conference');
+      const r = await pool.query(
+        `SELECT s.id, s.name, s.conference,
+                COUNT(DISTINCT sm.user_id) as members,
+                COALESCE(AVG(qr.score),0)::INT as avg_score,
+                COUNT(qr.score) as total_answers
+         FROM schools s
+         LEFT JOIN school_memberships sm ON sm.school_id=s.id
+         LEFT JOIN question_results qr ON qr.user_id=sm.user_id
+         ${conference ? 'WHERE s.conference=$1' : ''}
+         GROUP BY s.id ORDER BY avg_score DESC LIMIT 50`,
+        conference ? [conference] : []
+      );
+      return json(res,200,{schools: r.rows});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/school/conferences
+  if (req.method==='GET' && url==='/api/school/conferences') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const r = await pool.query('SELECT DISTINCT conference FROM schools ORDER BY conference');
+      return json(res,200,{conferences: r.rows.map(r=>r.conference)});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/school/challenges
+  if (req.method==='GET' && url==='/api/school/challenges') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const schoolR = await pool.query(
+        `SELECT s.conference FROM school_memberships sm JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1`,
+        [user.userId]
+      );
+      const conference = schoolR.rows[0]?.conference;
+      if (!conference) return json(res,200,{challenges:[], enrolled: false});
+      const r = await pool.query(
+        `SELECT cc.*, cs.total_score, cs.participants,
+                ROW_NUMBER() OVER (PARTITION BY cc.id ORDER BY cs.total_score DESC) as rank
+         FROM conference_challenges cc
+         LEFT JOIN challenge_scores cs ON cs.challenge_id=cc.id
+         LEFT JOIN school_memberships sm2 ON sm2.school_id=cs.school_id AND sm2.user_id=$1
+         WHERE cc.conference=$2 ORDER BY cc.starts_at DESC`,
+        [user.userId, conference]
+      );
+      return json(res,200,{challenges: r.rows, conference, enrolled: true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/admin/challenge — create a conference challenge (admin only)
+  if (req.method==='POST' && url==='/api/admin/challenge') {
+    const adminKey=req.headers['x-admin-secret']||'';
+    if(!ADMIN_SECRET||adminKey!==ADMIN_SECRET) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {conference, title, starts_at, ends_at} = await readBody(req);
+      if (!conference||!title||!starts_at||!ends_at) return json(res,400,{error:'conference, title, starts_at, ends_at required'});
+      const r = await pool.query(
+        'INSERT INTO conference_challenges (conference,title,starts_at,ends_at,status) VALUES ($1,$2,$3,$4,$5) RETURNING id',
+        [conference, title, starts_at, ends_at, 'upcoming']
+      );
+      return json(res,200,{ok:true, id: r.rows[0].id});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/admin/badge — create a badge definition (admin only)
+  if (req.method==='POST' && url==='/api/admin/badge') {
+    const adminKey=req.headers['x-admin-secret']||'';
+    if(!ADMIN_SECRET||adminKey!==ADMIN_SECRET) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {id, name, description, icon, type} = await readBody(req);
+      if (!id||!name) return json(res,400,{error:'id and name required'});
+      await pool.query(
+        'INSERT INTO badges (id,name,description,icon,type) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (id) DO UPDATE SET name=$2,description=$3,icon=$4,type=$5',
+        [id, name, description||'', icon||'🏅', type||'general']
+      );
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // ── STUDY PARTIES ────────────────────────────────────────
+  // POST /api/party/create
+  if (req.method==='POST' && url==='/api/party/create') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {topic, timeLimitSec} = await readBody(req);
+      let code;
+      // Ensure unique code
+      for (let i=0; i<10; i++) {
+        code = generatePartyCode();
+        const exists = await pool.query('SELECT id FROM study_parties WHERE id=$1', [code]);
+        if (!exists.rows[0]) break;
+      }
+      const tl = (parseInt(timeLimitSec)||0) > 0 ? parseInt(timeLimitSec) : null;
+      await pool.query(
+        'INSERT INTO study_parties (id,host_id,status,topic,time_limit_sec,created_at) VALUES ($1,$2,$3,$4,$5,$6)',
+        [code, user.userId, 'lobby', topic||null, tl, nowSec()]
+      );
+      await pool.query(
+        'INSERT INTO party_members (party_id,user_id,joined_at,status) VALUES ($1,$2,$3,$4)',
+        [code, user.userId, nowSec(), 'active']
+      );
+      return json(res,200,{ok:true, code});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/party/join
+  if (req.method==='POST' && url==='/api/party/join') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {code} = await readBody(req);
+      if (!code) return json(res,400,{error:'code required'});
+      const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      if (party.status === 'complete') return json(res,400,{error:'This party has already ended'});
+      if (party.status === 'active') return json(res,400,{error:'Session already in progress'});
+      await pool.query(
+        'INSERT INTO party_members (party_id,user_id,joined_at,status) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING',
+        [code, user.userId, nowSec(), 'active']
+      );
+      const membersR = await pool.query(
+        `SELECT pm.user_id, u.name FROM party_members pm JOIN users u ON u.id=pm.user_id
+         WHERE pm.party_id=$1 AND pm.status='active'`, [code]
+      );
+      return json(res,200,{ok:true, party: {id:party.id, topic:party.topic, timeLimitSec:party.time_limit_sec, status:party.status, hostId:party.host_id}, members: membersR.rows});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/party/state?code=xxx
+  if (req.method==='GET' && url==='/api/party/state') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const code = params.get('code');
+      if (!code) return json(res,400,{error:'code required'});
+      const [partyR, membersR] = await Promise.all([
+        pool.query('SELECT * FROM study_parties WHERE id=$1', [code]),
+        pool.query(`SELECT pm.user_id, u.name, pm.status FROM party_members pm
+                    JOIN users u ON u.id=pm.user_id WHERE pm.party_id=$1`, [code]),
+      ]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      const currentQId = party.question_ids ? party.question_ids[party.current_question_index] : null;
+      const currentQ = currentQId ? QUESTIONS_BY_ID[currentQId] : null;
+      // Who has answered this question already
+      let answered = [];
+      if (currentQId) {
+        const ansR = await pool.query(
+          `SELECT user_id FROM party_answers WHERE party_id=$1 AND question_id=$2`,
+          [code, currentQId]
+        );
+        answered = ansR.rows.map(r=>r.user_id);
+      }
+      return json(res,200,{
+        party: {
+          id: party.id, hostId: party.host_id, status: party.status,
+          topic: party.topic, timeLimitSec: party.time_limit_sec,
+          currentQuestionIndex: party.current_question_index,
+          totalQuestions: party.question_ids ? party.question_ids.length : 0,
+        },
+        currentQuestion: currentQ ? {id:currentQId, question:currentQ.question, topic:currentQ.topic} : null,
+        members: membersR.rows,
+        answeredUserIds: answered,
+      });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/party/start — host only, picks questions and starts session
+  if (req.method==='POST' && url==='/api/party/start') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {code, questionCount} = await readBody(req);
+      if (!code) return json(res,400,{error:'code required'});
+      const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      if (party.host_id != user.userId) return json(res,403,{error:'Only the host can start'});
+      if (party.status !== 'lobby') return json(res,400,{error:'Party already started'});
+      const n = Math.min(parseInt(questionCount)||10, 30);
+      const topic = party.topic;
+      const eligibleIds = topic && topic !== 'All'
+        ? Object.keys(QUESTIONS_BY_ID).filter(id => QUESTIONS_BY_ID[id].topic === topic)
+        : Object.keys(QUESTIONS_BY_ID);
+      const questionIds = shuffle(eligibleIds).slice(0, n);
+      await pool.query(
+        `UPDATE study_parties SET status='active', question_ids=$1, current_question_index=0, started_at=$2 WHERE id=$3`,
+        [JSON.stringify(questionIds), nowSec(), code]
+      );
+      const firstQ = QUESTIONS_BY_ID[questionIds[0]];
+      broadcastToParty(code, {
+        type: 'party_started',
+        currentQuestionIndex: 0,
+        totalQuestions: questionIds.length,
+        question: { id: questionIds[0], question: firstQ?.question, topic: firstQ?.topic },
+      });
+      return json(res,200,{ok:true, totalQuestions: questionIds.length});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/party/answer — submit answer for current question
+  if (req.method==='POST' && url==='/api/party/answer') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {code, questionId, answerText} = await readBody(req);
+      if (!code||!questionId) return json(res,400,{error:'code and questionId required'});
+      const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      if (party.status !== 'active') return json(res,400,{error:'Party not active'});
+      // Verify this is the current question
+      const currentQId = party.question_ids[party.current_question_index];
+      if (currentQId !== questionId) return json(res,400,{error:'Not the current question'});
+      // Save answer (ungraded for now)
+      await pool.query(
+        `INSERT INTO party_answers (party_id,user_id,question_id,answer_text,submitted_at)
+         VALUES ($1,$2,$3,$4,$5) ON CONFLICT (party_id,user_id,question_id) DO UPDATE SET answer_text=$4, submitted_at=$5`,
+        [code, user.userId, questionId, answerText||'', nowSec()]
+      );
+      // Broadcast to party that this user answered (no answer text revealed)
+      broadcastToParty(code, { type: 'member_answered', userId: user.userId });
+      // Check if all active members have answered
+      const activeMembers = await pool.query(
+        `SELECT user_id FROM party_members WHERE party_id=$1 AND status='active'`, [code]
+      );
+      const answered = await pool.query(
+        `SELECT user_id FROM party_answers WHERE party_id=$1 AND question_id=$2`, [code, questionId]
+      );
+      const allAnswered = answered.rows.length >= activeMembers.rows.length;
+      if (allAnswered) {
+        // Grade all answers in parallel
+        const q = QUESTIONS_BY_ID[questionId];
+        const gradePromises = answered.rows.map(async ({user_id}) => {
+          const ansR = await pool.query(
+            'SELECT answer_text FROM party_answers WHERE party_id=$1 AND user_id=$2 AND question_id=$3',
+            [code, user_id, questionId]
+          );
+          const grade = await gradeMockAnswer(q, ansR.rows[0]?.answer_text||'');
+          await pool.query(
+            `UPDATE party_answers SET score=$1, grade_payload=$2 WHERE party_id=$3 AND user_id=$4 AND question_id=$5`,
+            [grade.score, JSON.stringify(grade), code, user_id, questionId]
+          );
+          return { userId: user_id, score: grade.score, verdict: grade.verdict, grade };
+        });
+        const results = await Promise.all(gradePromises);
+        // Get all answers to send side-by-side
+        const allAnswersR = await pool.query(
+          `SELECT pa.user_id, pa.answer_text, pa.score, pa.grade_payload, u.name
+           FROM party_answers pa JOIN users u ON u.id=pa.user_id
+           WHERE pa.party_id=$1 AND pa.question_id=$2`,
+          [code, questionId]
+        );
+        broadcastToParty(code, {
+          type: 'question_graded',
+          questionId,
+          question: { id: questionId, question: q?.question, model_answer: q?.model_answer, topic: q?.topic },
+          results: allAnswersR.rows.map(r=>({
+            userId: r.user_id, name: r.name, answerText: r.answer_text,
+            score: r.score, grade: r.grade_payload,
+          })),
+        });
+      }
+      return json(res,200,{ok:true, allAnswered});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/party/next — host advances to next question
+  if (req.method==='POST' && url==='/api/party/next') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {code} = await readBody(req);
+      if (!code) return json(res,400,{error:'code required'});
+      const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      if (party.host_id != user.userId) return json(res,403,{error:'Only the host can advance'});
+      if (party.status !== 'active') return json(res,400,{error:'Party not active'});
+      const nextIndex = party.current_question_index + 1;
+      if (nextIndex >= party.question_ids.length) {
+        // Session complete
+        await pool.query(`UPDATE study_parties SET status='complete', completed_at=$1 WHERE id=$2`, [nowSec(), code]);
+        // Compute final scores per member
+        const finalR = await pool.query(
+          `SELECT pa.user_id, u.name, AVG(pa.score)::INT as avg_score, COUNT(pa.question_id) as answered
+           FROM party_answers pa JOIN users u ON u.id=pa.user_id
+           WHERE pa.party_id=$1 GROUP BY pa.user_id, u.name ORDER BY avg_score DESC`,
+          [code]
+        );
+        broadcastToParty(code, { type: 'party_complete', finalScores: finalR.rows });
+        // Emit feed event for all participants
+        for (const member of finalR.rows) {
+          await emitFeedEvent(member.user_id, 'party_complete', {
+            partyId: code,
+            avgScore: member.avg_score,
+            participants: finalR.rows.length,
+          });
+        }
+        return json(res,200,{ok:true, complete:true});
+      }
+      await pool.query('UPDATE study_parties SET current_question_index=$1 WHERE id=$2', [nextIndex, code]);
+      const nextQId = party.question_ids[nextIndex];
+      const nextQ = QUESTIONS_BY_ID[nextQId];
+      broadcastToParty(code, {
+        type: 'next_question',
+        currentQuestionIndex: nextIndex,
+        totalQuestions: party.question_ids.length,
+        question: { id: nextQId, question: nextQ?.question, topic: nextQ?.topic },
+      });
+      return json(res,200,{ok:true, complete:false, nextIndex});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/party/skip — host skips a member (submits blank)
+  if (req.method==='POST' && url==='/api/party/skip') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {code, targetUserId} = await readBody(req);
+      if (!code||!targetUserId) return json(res,400,{error:'code and targetUserId required'});
+      const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      if (party.host_id != user.userId) return json(res,403,{error:'Only the host can skip members'});
+      const currentQId = party.question_ids[party.current_question_index];
+      await pool.query(
+        `INSERT INTO party_answers (party_id,user_id,question_id,answer_text,score,grade_payload,submitted_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (party_id,user_id,question_id) DO NOTHING`,
+        [code, targetUserId, currentQId, '', 0, JSON.stringify({score:0,verdict:'Skipped',strengths:'',gaps:'No answer submitted.',concept_gap:null}), nowSec()]
+      );
+      broadcastToParty(code, { type: 'member_answered', userId: targetUserId });
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/party/results?code=xxx — full results for completed party
+  if (req.method==='GET' && url==='/api/party/results') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const code = params.get('code');
+      if (!code) return json(res,400,{error:'code required'});
+      const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      const answersR = await pool.query(
+        `SELECT pa.user_id, pa.question_id, pa.answer_text, pa.score, pa.grade_payload, u.name
+         FROM party_answers pa JOIN users u ON u.id=pa.user_id WHERE pa.party_id=$1`,
+        [code]
+      );
+      // Group by question
+      const byQuestion = {};
+      for (const row of answersR.rows) {
+        if (!byQuestion[row.question_id]) {
+          const q = QUESTIONS_BY_ID[row.question_id];
+          byQuestion[row.question_id] = { question: q?.question, topic: q?.topic, modelAnswer: q?.model_answer, answers: [] };
+        }
+        byQuestion[row.question_id].answers.push({
+          userId: row.user_id, name: row.name,
+          answerText: row.answer_text, score: row.score, grade: row.grade_payload,
+        });
+      }
+      // Final leaderboard
+      const leaderboard = {};
+      for (const row of answersR.rows) {
+        if (!leaderboard[row.user_id]) leaderboard[row.user_id] = { userId:row.user_id, name:row.name, scores:[], total:0 };
+        if (row.score != null) leaderboard[row.user_id].scores.push(row.score);
+      }
+      const finalScores = Object.values(leaderboard).map(m=>({
+        ...m,
+        avgScore: m.scores.length > 0 ? Math.round(m.scores.reduce((a,b)=>a+b,0)/m.scores.length) : 0,
+      })).sort((a,b)=>b.avgScore-a.avgScore);
+      return json(res,200,{
+        partyId: code, topic: party.topic, completedAt: party.completed_at,
+        questions: party.question_ids || [],
+        byQuestion, finalScores,
+      });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
   // ── STATIC FILES ─────────────────────────────────────────
   let filePath=path.join(__dirname,req.url.split('?')[0]);
   if(req.url.split('?')[0]==='/') filePath=path.join(__dirname,'landing.html');
@@ -1114,11 +1976,46 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
-initDB().then(()=>{
+initDB().then(async ()=>{
+  await seedSchools();
   server.listen(PORT,()=>{
     console.log(`Server on port ${PORT}`);
     console.log(`Stripe: ${STRIPE_SECRET_KEY?'configured':'NOT configured'}`);
     console.log(`Admin secret: ${ADMIN_SECRET?'SET':'NOT SET'}`);
     console.log(`Anthropic key: ${process.env.ANTHROPIC_API_KEY?'SET':'NOT SET'}`);
+  });
+
+  // ── WEBSOCKET SERVER ──────────────────────────────────────
+  const wss = new WebSocketServer({ server });
+  wss.on('connection', (ws, req) => {
+    const params = new URLSearchParams(req.url.split('?')[1]||'');
+    const token = params.get('token');
+    const code = params.get('code');
+    if (!token || !code) { ws.close(1008, 'Missing token or code'); return; }
+    const user = verifyToken(token);
+    if (!user) { ws.close(1008, 'Invalid token'); return; }
+
+    // Verify membership then register
+    pool.query('SELECT 1 FROM party_members WHERE party_id=$1 AND user_id=$2', [code, user.userId])
+      .then(r => {
+        if (!r.rows[0]) { ws.close(1008, 'Not a member of this party'); return; }
+        if (!partyClients.has(code)) partyClients.set(code, new Map());
+        partyClients.get(code).set(user.userId, ws);
+
+        // Broadcast member joined
+        broadcastToParty(code, { type: 'member_online', userId: user.userId }, user.userId);
+        ws.send(JSON.stringify({ type: 'connected', userId: user.userId, partyId: code }));
+
+        ws.on('close', () => {
+          partyClients.get(code)?.delete(user.userId);
+          if (partyClients.get(code)?.size === 0) partyClients.delete(code);
+          broadcastToParty(code, { type: 'member_offline', userId: user.userId });
+        });
+
+        ws.on('error', () => {
+          partyClients.get(code)?.delete(user.userId);
+        });
+      })
+      .catch(() => ws.close(1011, 'Server error'));
   });
 }).catch(err=>{console.error('DB init failed:',err.message);process.exit(1);});
