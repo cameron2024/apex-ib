@@ -312,6 +312,25 @@
 
     updateSidebarPlanText(plan, gradedToday);
 
+    // Update sidebar name + initials from stored value
+    const _raw = localStorage.getItem('apex_user');
+    let _name = '';
+    try {
+      if (_raw && _raw !== 'undefined' && _raw !== 'null') {
+        const _p = JSON.parse(_raw);
+        _name = (typeof _p === 'object' && _p !== null) ? (_p.name || '') : (String(_p) || '');
+      }
+    } catch(e) {}
+    if (!_name || _name === 'undefined') _name = localStorage.getItem('apex_name') || '';
+    if (_name) {
+      const nmEl = document.getElementById('sidebarUserName');
+      if (nmEl) nmEl.textContent = _name;
+      const avEl = document.getElementById('sidebarAvatar');
+      if (avEl && !avEl.querySelector('img')) {
+        avEl.textContent = _name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      }
+    }
+
     // Upgrade button: show for free, hide for paid (idempotent)
     const upgradeBtn = document.getElementById('upgradeBtn');
     if (upgradeBtn) {
@@ -334,13 +353,27 @@
     const plan        = window._userPlan || 'free';
     const gt          = window._gradedToday || 0;
     const _rawUser    = localStorage.getItem('apex_user');
-    let name = '—', email = localStorage.getItem('apex_email') || '';
+    let name = '', email = localStorage.getItem('apex_email') || '';
     try {
-      const parsed = JSON.parse(_rawUser);
-      name  = (typeof parsed === 'object' && parsed !== null) ? (parsed.name || '—') : (parsed || '—');
-      if (!email && parsed?.email) email = parsed.email;
+      if (_rawUser && _rawUser !== 'undefined' && _rawUser !== 'null') {
+        const parsed = JSON.parse(_rawUser);
+        name = (typeof parsed === 'object' && parsed !== null) ? (parsed.name || '') : (String(parsed) || '');
+        if (!email && parsed?.email) email = parsed.email;
+      }
     } catch(e) {
-      name = _rawUser || '—';
+      // plain string stored (old format) — only use if it doesn't look like garbage
+      if (_rawUser && _rawUser !== 'undefined' && _rawUser !== 'null' && !_rawUser.startsWith('{')) {
+        name = _rawUser;
+      }
+    }
+    // Always fall back to apex_name
+    if (!name || name === 'undefined') name = localStorage.getItem('apex_name') || '—';
+    // Also update sidebar elements while we're here
+    const nmEl = document.getElementById('sidebarUserName');
+    if (nmEl && name && name !== '—') nmEl.textContent = name;
+    const avEl = document.getElementById('sidebarAvatar');
+    if (avEl && !avEl.querySelector('img') && name && name !== '—') {
+      avEl.textContent = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     }
     const memberSince = window._memberSince;
 
