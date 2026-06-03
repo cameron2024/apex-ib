@@ -1495,22 +1495,31 @@ const server = http.createServer(async (req, res) => {
     try {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
       const targetId = params.get('id') || user.userId;
-      const [userR, followerR, followingR, badgeR, schoolR, resultsR, activityR] = await Promise.all([
+      const [userR, followerR, followingR, badgeR, schoolR, resultsR, activityR, mockR] = await Promise.all([
         pool.query('SELECT id,name,plan,created_at FROM users WHERE id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE following_id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE follower_id=$1', [targetId]),
-        pool.query(`SELECT ub.badge_id, ub.awarded_at, b.name, b.icon, b.type
-                    FROM user_badges ub JOIN badges b ON b.id=ub.badge_id
-                    WHERE ub.user_id=$1 ORDER BY ub.awarded_at DESC`, [targetId]),
-        pool.query(`SELECT s.name, s.conference FROM school_memberships sm
-                    JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1`, [targetId]),
+        pool.query(`SELECT ub.badge_id, ub.awarded_at, b.name, b.icon, b.type FROM user_badges ub JOIN badges b ON b.id=ub.badge_id WHERE ub.user_id=$1 ORDER BY ub.awarded_at DESC`, [targetId]),
+        pool.query(`SELECT s.name, s.conference FROM school_memberships sm JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1`, [targetId]),
         pool.query('SELECT topic,score,mastery_stage FROM question_results WHERE user_id=$1', [targetId]),
         pool.query('SELECT date FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84', [targetId]),
+        pool.query('SELECT overall_score, started_at FROM mock_sessions WHERE user_id=$1 AND overall_score IS NOT NULL ORDER BY started_at DESC LIMIT 5', [targetId]),
       ]);
       if (!userR.rows[0]) return json(res,404,{error:'User not found'});
       const u = userR.rows[0];
       const all = resultsR.rows;
       const overall = all.length > 0 ? Math.round(all.reduce((s,r)=>s+r.score,0)/all.length) : null;
+      const byTopic = {};
+      all.forEach(r => {
+        if (!byTopic[r.topic]) byTopic[r.topic] = { scores:[], stages:{} };
+        byTopic[r.topic].scores.push(r.score);
+        byTopic[r.topic].stages[r.mastery_stage] = (byTopic[r.topic].stages[r.mastery_stage]||0)+1;
+      });
+      const topicBreakdown = Object.entries(byTopic).map(([topic, d]) => {
+        const avg = Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length);
+        const dominantStage = Object.entries(d.stages).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'new';
+        return { topic, avg, count: d.scores.length, stage: dominantStage };
+      }).sort((a,b) => b.avg - a.avg);
       const actDates = new Set(activityR.rows.map(a=>a.date));
       let streak = 0;
       for (let i=0;i<365;i++) {
@@ -1518,6 +1527,8 @@ const server = http.createServer(async (req, res) => {
         const ds=d.toISOString().slice(0,10);
         if (actDates.has(ds)) streak++; else if (i>0) break;
       }
+      const masteredCount = all.filter(r=>r.mastery_stage==='mastered').length;
+      const strugglingCount = all.filter(r=>r.mastery_stage==='struggling').length;
       const isFollowing = await pool.query('SELECT 1 FROM follows WHERE follower_id=$1 AND following_id=$2', [user.userId, targetId]);
       return json(res,200,{
         id: u.id, name: u.name, plan: u.plan, memberSince: u.created_at,
@@ -1526,7 +1537,10 @@ const server = http.createServer(async (req, res) => {
         isFollowing: isFollowing.rows.length > 0,
         badges: badgeR.rows,
         school: schoolR.rows[0] || null,
-        stats: { overall, totalAnswered: all.length, streak },
+        activityDates: [...actDates],
+        recentMocks: mockR.rows,
+        stats: { overall, totalAnswered: all.length, streak, masteredCount, strugglingCount },
+        topicBreakdown,
       });
     } catch(e){return json(res,500,{error:e.message});}
   }
