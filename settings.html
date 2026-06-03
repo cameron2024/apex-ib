@@ -510,11 +510,9 @@
         window._gradedToday = data.gradedToday || 0;
         window._memberSince = data.memberSince || null;
         initSidebarMenu(window._userPlan, window._gradedToday);
-        const avatarEl = document.getElementById('sidebarAvatar');
-        const nameEl   = document.getElementById('sidebarUserName');
-        if (nameEl) nameEl.textContent = name;
-        if (avatarEl) avatarEl.textContent = initials;
-      }).catch(() => {});
+      }).catch(() => {
+        initSidebarMenu('free', 0);
+      });
   }
 
   // ── SAVE PROFILE ──
@@ -532,9 +530,21 @@
       });
       const data = await r.json();
       if (!r.ok) { setStatus(status, 'error', data.error || 'Failed to save'); return; }
-      localStorage.setItem('apex_user', data.name);
+      // Keep apex_user as a JSON object, update name within it
+      try {
+        const existing = JSON.parse(localStorage.getItem('apex_user') || '{}');
+        const updated = typeof existing === 'object' && existing !== null ? {...existing, name: data.name} : {name: data.name};
+        localStorage.setItem('apex_user', JSON.stringify(updated));
+      } catch(e) {
+        localStorage.setItem('apex_user', JSON.stringify({name: data.name}));
+      }
+      localStorage.setItem('apex_name', data.name);
       document.getElementById('settingsAvatarName').textContent = data.name;
-      document.getElementById('sidebarUserName') && (document.getElementById('sidebarUserName').textContent = data.name);
+      const nameEl = document.getElementById('sidebarUserName');
+      if (nameEl) nameEl.textContent = data.name;
+      const initials = data.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const avatarEl = document.getElementById('sidebarAvatar');
+      if (avatarEl) avatarEl.textContent = initials;
       setStatus(status, 'success', '✓ Saved');
     } catch(e) {
       setStatus(status, 'error', 'Something went wrong');

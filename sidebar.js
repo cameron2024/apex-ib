@@ -143,9 +143,21 @@
     // Apply cached identity + plan IMMEDIATELY (before the API call resolves)
     // so the sidebar shows the right state on the very first paint.
     try {
-      const cachedName  = localStorage.getItem('apex_user');
       const cachedPlan  = localStorage.getItem('apex_plan');
       const cachedGrad  = parseInt(localStorage.getItem('apex_graded_today') || '0');
+      const cachedName  = getApexName();
+      if (cachedName) {
+        const nm = document.getElementById('sidebarUserName');
+        if (nm) nm.textContent = cachedName;
+        const av = document.getElementById('sidebarAvatar');
+        if (av && !av.querySelector('img')) {
+          const initials = cachedName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+          av.textContent = initials;
+        }
+      }
+      if (cachedPlan) initSidebarMenu(cachedPlan, cachedGrad);
+      else if (!localStorage.getItem('apex_token')) initSidebarMenu('guest', 0);
+    } catch(e) {}
       if (cachedName) {
         const nm = document.getElementById('sidebarUserName');
         if (nm) nm.textContent = cachedName;
