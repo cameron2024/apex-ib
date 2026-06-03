@@ -863,7 +863,7 @@ const server = http.createServer(async (req, res) => {
         await linkUserToSchool(id, school.id);
         schoolInfo = { name: school.name, conference: school.conference };
       }
-      return json(res,200,{token:signToken({userId:id,email:emailLower}),name:displayName,plan:'free',onboarded:false,school:schoolInfo});
+      return json(res,200,{token:signToken({userId:id,email:emailLower}),name:displayName,plan:'free',onboarded:false,school:schoolInfo,user:{id,name:displayName,email:emailLower,plan:'free'}});
     } catch(e){return json(res,500,{error:e.message});}
   }
 
@@ -874,7 +874,7 @@ const server = http.createServer(async (req, res) => {
       const r = await pool.query('SELECT * FROM users WHERE email=$1',[email.toLowerCase().trim()]);
       const user = r.rows[0];
       if (!user||!checkPwd(password,user.password_hash)) return json(res,401,{error:'Invalid email or password'});
-      return json(res,200,{token:signToken({userId:user.id,email:user.email}),name:user.name,plan:user.plan||'free',onboarded:!!user.onboarded});
+      return json(res,200,{token:signToken({userId:user.id,email:user.email}),name:user.name,plan:user.plan||'free',onboarded:!!user.onboarded,user:{id:user.id,name:user.name,email:user.email,plan:user.plan||'free'}});
     } catch(e){return json(res,500,{error:e.message});}
   }
 
@@ -1443,7 +1443,6 @@ const server = http.createServer(async (req, res) => {
   if (req.method==='POST' && url==='/api/account/delete') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
-      // Delete all user data across every table
       await pool.query('DELETE FROM party_answers WHERE user_id=$1', [user.userId]);
       await pool.query('DELETE FROM party_members WHERE user_id=$1', [user.userId]);
       await pool.query('DELETE FROM feed_comments WHERE user_id=$1', [user.userId]);
@@ -1454,12 +1453,15 @@ const server = http.createServer(async (req, res) => {
       await pool.query('DELETE FROM school_memberships WHERE user_id=$1', [user.userId]);
       await pool.query('DELETE FROM saved_questions WHERE user_id=$1', [user.userId]);
       await pool.query('DELETE FROM question_results WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM mock_sessions WHERE user_id=$1', [user.userId]);
       await pool.query('DELETE FROM sessions WHERE user_id=$1', [user.userId]);
       await pool.query('DELETE FROM activity WHERE user_id=$1', [user.userId]);
       await pool.query('DELETE FROM insights_cache WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM user_state WHERE user_id=$1', [user.userId]).catch(()=>{});
+      await pool.query('DELETE FROM stripe_events WHERE user_id=$1', [user.userId]).catch(()=>{});
       await pool.query('DELETE FROM users WHERE id=$1', [user.userId]);
       return json(res,200,{ok:true});
-    } catch(e){return json(res,500,{error:e.message});}
+    } catch(e){ console.error('Delete account error:', e.message); return json(res,500,{error:e.message}); }
   }
 
   // ── SOCIAL: FOLLOW ───────────────────────────────────────
