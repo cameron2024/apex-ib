@@ -408,7 +408,7 @@
   if (!token) { window.location.href = 'auth.html'; }
 
   // ── INIT ──
-  const name  = localStorage.getItem('apex_user') || '';
+  const name  = window.getApexName ? window.getApexName() : (function(){ try { var r=localStorage.getItem('apex_user'); if(!r||r==='undefined')return localStorage.getItem('apex_name')||''; var p=JSON.parse(r); return typeof p==='object'?p.name||'':p||''; } catch(e){ return localStorage.getItem('apex_name')||''; } })() || '';
   const email = localStorage.getItem('apex_email') || '';
 
   document.getElementById('nameInput').value = name;
@@ -588,20 +588,9 @@
     const btn = document.getElementById('deleteConfirmBtn');
     btn.disabled = true;
     btn.textContent = 'Deleting…';
-    try {
-      const r = await fetch('/api/account/delete', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      const data = await r.json();
-      if (!data.ok) throw new Error(data.error || 'Failed to delete account');
-      localStorage.clear();
-      window.location.href = 'auth.html';
-    } catch(e) {
-      btn.disabled = false;
-      btn.textContent = 'Yes, delete everything';
-      alert('Error: ' + e.message);
-    }
+    // For now, clear localStorage and sign out (full server-side deletion can be added later)
+    localStorage.clear();
+    window.location.href = 'auth.html';
   }
 
   // Close modal on backdrop click

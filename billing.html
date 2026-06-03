@@ -364,7 +364,7 @@
       window._gradedToday = gradedToday;
       window._memberSince = memberSince;
 
-      const name = localStorage.getItem('apex_user') || '';
+      const name = window.getApexName ? window.getApexName() : (function(){ try { var r=localStorage.getItem('apex_user'); if(!r||r==='undefined')return localStorage.getItem('apex_name')||''; var p=JSON.parse(r); return typeof p==='object'?p.name||'':p||''; } catch(e){ return localStorage.getItem('apex_name')||''; } })() || '';
       const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
       const avatarEl = document.getElementById('sidebarAvatar');
       const nameEl   = document.getElementById('sidebarUserName');

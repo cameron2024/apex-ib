@@ -324,8 +324,15 @@
 
     const plan        = window._userPlan || 'free';
     const gt          = window._gradedToday || 0;
-    const name        = localStorage.getItem('apex_user') || '—';
-    const email       = localStorage.getItem('apex_email') || '';
+    const _rawUser    = localStorage.getItem('apex_user');
+    let name = '—', email = localStorage.getItem('apex_email') || '';
+    try {
+      const parsed = JSON.parse(_rawUser);
+      name  = (typeof parsed === 'object' && parsed !== null) ? (parsed.name || '—') : (parsed || '—');
+      if (!email && parsed?.email) email = parsed.email;
+    } catch(e) {
+      name = _rawUser || '—';
+    }
     const memberSince = window._memberSince;
 
     const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
@@ -448,6 +455,20 @@
   injectSidebar();
 
   // Expose helpers globally for pages to call
+  // Safe read of apex_user — handles both old plain-string and new JSON object formats
+  function getApexName() {
+    try {
+      const raw = localStorage.getItem('apex_user');
+      if (!raw || raw === 'undefined' || raw === 'null') return localStorage.getItem('apex_name') || '';
+      const parsed = JSON.parse(raw);
+      if (typeof parsed === 'object' && parsed !== null) return parsed.name || localStorage.getItem('apex_name') || '';
+      return String(parsed) || localStorage.getItem('apex_name') || '';
+    } catch(e) {
+      return localStorage.getItem('apex_name') || '';
+    }
+  }
+  window.getApexName = getApexName;
+
   window.initSidebarMenu      = initSidebarMenu;
   window.updateSidebarPlanText = updateSidebarPlanText;
 

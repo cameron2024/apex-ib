@@ -561,7 +561,7 @@
 
   // ── AUTH ──────────────────────────────────────────────────
   const token = localStorage.getItem('apex_token');
-  const userName = localStorage.getItem('apex_user');
+  const userName = window.getApexName ? window.getApexName() : (function(){ try { var r=localStorage.getItem('apex_user'); if(!r||r==='undefined')return localStorage.getItem('apex_name')||''; var p=JSON.parse(r); return typeof p==='object'?p.name||'':p||''; } catch(e){ return localStorage.getItem('apex_name')||''; } })();
   if (userName) {
     const initials = userName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     document.getElementById('sidebarAvatar').textContent = initials;

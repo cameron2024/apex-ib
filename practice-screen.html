@@ -2526,7 +2526,7 @@ Generate 3 drill questions targeting this exact gap.`;
   function init() {
     // Set auth state FIRST before anything else runs
     const token = localStorage.getItem('apex_token');
-    const name = localStorage.getItem('apex_user');
+    const name = window.getApexName ? window.getApexName() : (function(){ try { var r=localStorage.getItem('apex_user'); if(!r||r==='undefined')return localStorage.getItem('apex_name')||''; var p=JSON.parse(r); return typeof p==='object'?p.name||'':p||''; } catch(e){ return localStorage.getItem('apex_name')||''; } })();
     if (token && name) {
       authToken = token;
       currentUser = name;

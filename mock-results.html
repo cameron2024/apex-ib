@@ -191,7 +191,7 @@
 
 <script>
   const token = localStorage.getItem('apex_token');
-  const name = localStorage.getItem('apex_user');
+  const name = window.getApexName ? window.getApexName() : (function(){ try { var r=localStorage.getItem('apex_user'); if(!r||r==='undefined')return localStorage.getItem('apex_name')||''; var p=JSON.parse(r); return typeof p==='object'?p.name||'':p||''; } catch(e){ return localStorage.getItem('apex_name')||''; } })();
   const sessionId = new URLSearchParams(window.location.search).get('id');
 
   if (!token) { window.location.href = 'auth.html?next=' + encodeURIComponent(window.location.pathname + window.location.search); }
