@@ -145,7 +145,16 @@
     try {
       const cachedPlan  = localStorage.getItem('apex_plan');
       const cachedGrad  = parseInt(localStorage.getItem('apex_graded_today') || '0');
-      const cachedName  = getApexName();
+      // Safe name parse — getApexName() not yet defined here so inline it
+      let cachedName = '';
+      try {
+        const _r = localStorage.getItem('apex_user');
+        if (_r && _r !== 'undefined' && _r !== 'null') {
+          const _p = JSON.parse(_r);
+          cachedName = (typeof _p === 'object' && _p !== null) ? (_p.name || '') : (String(_p) || '');
+        }
+        if (!cachedName) cachedName = localStorage.getItem('apex_name') || '';
+      } catch(e) { cachedName = localStorage.getItem('apex_name') || ''; }
       if (cachedName) {
         const nm = document.getElementById('sidebarUserName');
         if (nm) nm.textContent = cachedName;
