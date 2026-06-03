@@ -948,7 +948,7 @@ async function loadSuggested() {
       return;
     }
     // Search for classmates
-    const r = await fetch(`/api/social/search?q=.`, { headers: {'Authorization':'Bearer '+token}});
+    const r = await fetch(`/api/social/browse`, { headers: {'Authorization':'Bearer '+token}});
     const data = await r.json();
     const users = (data.users||[]).filter(u=>!u.isFollowing).slice(0,4);
     if (users.length === 0) {

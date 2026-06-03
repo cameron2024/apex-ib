@@ -1531,6 +1531,41 @@ const server = http.createServer(async (req, res) => {
     } catch(e){return json(res,500,{error:e.message});}
   }
 
+  // GET /api/social/browse?school=1  — all users (optionally filtered to same school)
+  if (req.method==='GET' && url==='/api/social/browse') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const schoolOnly = params.get('school') === '1';
+      let q, vals;
+      if (schoolOnly) {
+        // Users from same school
+        q = `SELECT u.id, u.name, u.plan, s.name as school_name, s.conference
+             FROM users u
+             JOIN school_memberships sm ON sm.user_id=u.id
+             JOIN schools s ON s.id=sm.school_id
+             WHERE s.id = (
+               SELECT school_id FROM school_memberships WHERE user_id=$1
+             ) AND u.id != $1
+             ORDER BY u.created_at DESC LIMIT 50`;
+        vals = [user.userId];
+      } else {
+        // All users except self
+        q = `SELECT u.id, u.name, u.plan, s.name as school_name, s.conference
+             FROM users u
+             LEFT JOIN school_memberships sm ON sm.user_id=u.id
+             LEFT JOIN schools s ON s.id=sm.school_id
+             WHERE u.id != $1
+             ORDER BY u.created_at DESC LIMIT 50`;
+        vals = [user.userId];
+      }
+      const r = await pool.query(q, vals);
+      const following = await pool.query('SELECT following_id FROM follows WHERE follower_id=$1', [user.userId]);
+      const followingSet = new Set(following.rows.map(r=>String(r.following_id)));
+      return json(res,200,{users: r.rows.map(u=>({...u, isFollowing: followingSet.has(String(u.id))}))});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
   // GET /api/social/search?q=name
   if (req.method==='GET' && url==='/api/social/search') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});

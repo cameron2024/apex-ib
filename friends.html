@@ -544,11 +544,11 @@ async function loadTab(tab) {
 }
 
 // ── SEARCH ──
+// ── SEARCH ──
 async function loadSearch(q) {
   const grid = document.getElementById('userGrid');
-  if (!q || q.trim().length < 1) {
-    // Show school classmates as default
-    loadSchoolTab();
+  if (!q || q.trim().length < 2) {
+    loadDiscover();
     return;
   }
   grid.innerHTML = skeletons(4);
@@ -556,6 +556,19 @@ async function loadSearch(q) {
     const r = await fetch(`/api/social/search?q=${encodeURIComponent(q)}`, { headers: {'Authorization':'Bearer '+token}});
     const data = await r.json();
     renderUserCards(data.users||[], 'No users found matching that name.');
+  } catch(e) {
+    grid.innerHTML = errorMsg();
+  }
+}
+
+// ── DISCOVER (default) ──
+async function loadDiscover() {
+  const grid = document.getElementById('userGrid');
+  grid.innerHTML = skeletons(4);
+  try {
+    const r = await fetch('/api/social/browse', { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    renderUserCards(data.users||[], 'No other users yet — invite some friends!');
   } catch(e) {
     grid.innerHTML = errorMsg();
   }
@@ -584,9 +597,9 @@ async function loadSchoolTab() {
     return;
   }
   try {
-    const r = await fetch(`/api/social/search?q=.`, { headers: {'Authorization':'Bearer '+token}});
+    const r = await fetch('/api/social/browse?school=1', { headers: {'Authorization':'Bearer '+token}});
     const data = await r.json();
-    renderUserCards(data.users||[], 'No classmates found yet.');
+    renderUserCards(data.users||[], 'No classmates from ' + mySchool.name + ' yet.');
   } catch(e) {
     grid.innerHTML = errorMsg();
   }
