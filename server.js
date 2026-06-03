@@ -1439,6 +1439,29 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // POST /api/account/delete
+  if (req.method==='POST' && url==='/api/account/delete') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      // Delete all user data across every table
+      await pool.query('DELETE FROM party_answers WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM party_members WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM feed_comments WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM feed_reactions WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM feed_events WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM follows WHERE follower_id=$1 OR following_id=$1', [user.userId]);
+      await pool.query('DELETE FROM user_badges WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM school_memberships WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM saved_questions WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM question_results WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM sessions WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM activity WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM insights_cache WHERE user_id=$1', [user.userId]);
+      await pool.query('DELETE FROM users WHERE id=$1', [user.userId]);
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
   // ── SOCIAL: FOLLOW ───────────────────────────────────────
   if (req.method==='POST' && url==='/api/social/follow') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});

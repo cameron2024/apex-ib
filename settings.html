@@ -588,9 +588,20 @@
     const btn = document.getElementById('deleteConfirmBtn');
     btn.disabled = true;
     btn.textContent = 'Deleting…';
-    // For now, clear localStorage and sign out (full server-side deletion can be added later)
-    localStorage.clear();
-    window.location.href = 'auth.html';
+    try {
+      const r = await fetch('/api/account/delete', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await r.json();
+      if (!data.ok) throw new Error(data.error || 'Failed to delete account');
+      localStorage.clear();
+      window.location.href = 'auth.html';
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = 'Yes, delete everything';
+      alert('Error: ' + e.message);
+    }
   }
 
   // Close modal on backdrop click
