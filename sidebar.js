@@ -167,18 +167,6 @@
       if (cachedPlan) initSidebarMenu(cachedPlan, cachedGrad);
       else if (!localStorage.getItem('apex_token')) initSidebarMenu('guest', 0);
     } catch(e) {}
-      if (cachedName) {
-        const nm = document.getElementById('sidebarUserName');
-        if (nm) nm.textContent = cachedName;
-        const av = document.getElementById('sidebarAvatar');
-        if (av && !av.querySelector('img')) {
-          const initials = cachedName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-          av.textContent = initials;
-        }
-      }
-      if (cachedPlan) initSidebarMenu(cachedPlan, cachedGrad);
-      else if (!localStorage.getItem('apex_token')) initSidebarMenu('guest', 0);
-    } catch(e) {}
   }
 
   // ── AVATAR HELPERS ────────────────────────────────────────
