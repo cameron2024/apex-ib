@@ -967,19 +967,25 @@ const server = http.createServer(async (req, res) => {
       await pool.query('DELETE FROM insights_cache WHERE user_id=$1', [user.userId]);
 
       // ── FEED EVENTS ──────────────────────────────────────
-      // 1. session_complete — emit on every 5th question answered today (batched to avoid spam)
-      if (questionsToday % 5 === 0) {
-        const todaySessionsR = await pool.query(
-          'SELECT score FROM sessions WHERE user_id=$1 AND created_at >= $2',
-          [user.userId, Math.floor(Date.now()/1000) - 86400]
-        );
-        const scores = todaySessionsR.rows.map(r => r.score);
-        const avgScore = scores.length > 0 ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-        await emitFeedEvent(user.userId, 'session_complete', {
-          questionsAnswered: questionsToday,
-          avgScore,
-          topic: topic || 'All',
-        });
+      // session_complete: upsert into the most recent event within 30 min, else create new
+      const thirtyMinAgo = Math.floor(Date.now()/1000) - 1800;
+      const recentEvent = await pool.query(
+        `SELECT id FROM feed_events WHERE user_id=$1 AND type='session_complete' AND created_at >= $2 ORDER BY created_at DESC LIMIT 1`,
+        [user.userId, thirtyMinAgo]
+      );
+      const todaySessionsR = await pool.query(
+        'SELECT score FROM sessions WHERE user_id=$1 AND created_at >= $2',
+        [user.userId, Math.floor(new Date().setHours(0,0,0,0)/1000)]
+      );
+      const scores = todaySessionsR.rows.map(r => r.score);
+      const avgScore = scores.length > 0 ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+      const sessionPayload = JSON.stringify({ questionsAnswered: questionsToday, avgScore, topic: topic || 'All' });
+      if (recentEvent.rows[0]) {
+        // Update the existing event so the feed shows fresh numbers without flooding
+        await pool.query('UPDATE feed_events SET payload=$1, created_at=$2 WHERE id=$3',
+          [sessionPayload, nowSec(), recentEvent.rows[0].id]);
+      } else {
+        await emitFeedEvent(user.userId, 'session_complete', { questionsAnswered: questionsToday, avgScore, topic: topic || 'All' });
       }
 
       // 2. streak milestone
@@ -1608,15 +1614,21 @@ const server = http.createServer(async (req, res) => {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
       const limit = Math.min(parseInt(params.get('limit'))||30, 50);
       const before = parseInt(params.get('before')) || null;
-      // Events from self + people you follow
+      const tab = params.get('tab') || 'following';
+      let whereClause;
+      if (tab === 'mine') {
+        whereClause = `fe.user_id=$1`;
+      } else if (tab === 'school') {
+        whereClause = `fe.user_id IN (SELECT sm2.user_id FROM school_memberships sm2 WHERE sm2.school_id = (SELECT school_id FROM school_memberships WHERE user_id=$1))`;
+      } else {
+        whereClause = `(fe.user_id=$1 OR fe.user_id IN (SELECT following_id FROM follows WHERE follower_id=$1))`;
+      }
       const r = await pool.query(
         `SELECT fe.id, fe.user_id, fe.type, fe.payload, fe.created_at,
                 u.name as user_name, u.plan as user_plan
          FROM feed_events fe
          JOIN users u ON u.id=fe.user_id
-         WHERE fe.user_id=$1
-            OR fe.user_id IN (SELECT following_id FROM follows WHERE follower_id=$1)
-         ${before ? 'AND fe.created_at < $3' : ''}
+         WHERE ${whereClause} ${before ? 'AND fe.created_at < $3' : ''}
          ORDER BY fe.created_at DESC LIMIT $2`,
         before ? [user.userId, limit, before] : [user.userId, limit]
       );
