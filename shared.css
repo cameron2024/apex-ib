@@ -60,13 +60,14 @@ body {
 }
 
 .logo-mark {
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   background: var(--text-primary);
-  border-radius: 8px;
+  border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  image-rendering: crisp-edges;
 }
-.logo-mark svg { width: 16px; height: 16px; }
+.logo-mark svg { width: 24px; height: 24px; }
 .logo-name {
   font-family: 'DM Serif Display', serif;
   font-size: 17px;
