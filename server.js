@@ -236,6 +236,7 @@ async function initDB() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS weak_topics TEXT;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded INT DEFAULT 0;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_data TEXT;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS attempt_count INT DEFAULT 1;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS consecutive_high INT DEFAULT 0;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS mastery_stage TEXT;
@@ -891,6 +892,38 @@ const server = http.createServer(async (req, res) => {
     } catch(e){return json(res,500,{error:e.message});}
   }
 
+  // POST /api/auth/save-avatar
+  if (req.method==='POST' && url==='/api/auth/save-avatar') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {avatarData} = await readBody(req);
+      if (!avatarData) return json(res,400,{error:'avatarData required'});
+      if (avatarData.length > 700000) return json(res,400,{error:'Image too large. Please use a smaller photo.'});
+      await pool.query('UPDATE users SET avatar_data=$1 WHERE id=$2', [avatarData, user.userId]);
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // DELETE /api/auth/remove-avatar
+  if (req.method==='DELETE' && url==='/api/auth/remove-avatar') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      await pool.query('UPDATE users SET avatar_data=NULL WHERE id=$1', [user.userId]);
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/auth/avatar?id=xxx
+  if (req.method==='GET' && url==='/api/auth/avatar') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const targetId = params.get('id') || user.userId;
+      const r = await pool.query('SELECT avatar_data FROM users WHERE id=$1', [targetId]);
+      return json(res,200,{avatarData: r.rows[0]?.avatar_data || null});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
   if (req.method==='POST' && url==='/api/auth/update-profile') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
@@ -1038,7 +1071,7 @@ const server = http.createServer(async (req, res) => {
         pool.query('SELECT last_topic,last_question_index FROM user_state WHERE user_id=$1',[user.userId]),
         pool.query('SELECT question_id,topic,score,status,created_at FROM sessions WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50',[user.userId]),
         pool.query('SELECT date,questions_answered FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84',[user.userId]),
-        pool.query('SELECT plan, created_at, interview_date, weak_topics, role, onboarded FROM users WHERE id=$1',[user.userId])
+        pool.query('SELECT plan, created_at, interview_date, weak_topics, role, onboarded, avatar_data FROM users WHERE id=$1',[user.userId])
       ]);
       const state = stateR.rows[0]||{last_topic:'All',last_question_index:0};
       const actDates = new Set(activityR.rows.map(a=>a.date));
@@ -1063,7 +1096,8 @@ const server = http.createServer(async (req, res) => {
         interviewDate: u.interview_date||null,
         weakTopics: u.weak_topics ? u.weak_topics.split(',').filter(Boolean) : [],
         role: u.role||'',
-        onboarded: !!u.onboarded
+        onboarded: !!u.onboarded,
+        avatarData: u.avatar_data||null,
       });
     } catch(e){return json(res,500,{error:e.message});}
   }
@@ -1174,6 +1208,19 @@ const server = http.createServer(async (req, res) => {
     try {
       const {sessionId, answers} = await readBody(req);
       if (!sessionId || !answers) return json(res,400,{error:'sessionId and answers required'});
+      // Plan check — free users: 1 mock per day
+      const planR = await pool.query('SELECT plan FROM users WHERE id=$1', [user.userId]);
+      const plan = planR.rows[0]?.plan || 'free';
+      if (plan === 'free') {
+        const todayStart = Math.floor(new Date().setHours(0,0,0,0)/1000);
+        const mockToday = await pool.query(
+          'SELECT COUNT(*) FROM mock_sessions WHERE user_id=$1 AND completed_at IS NOT NULL AND completed_at >= $2',
+          [user.userId, todayStart]
+        );
+        if (parseInt(mockToday.rows[0].count) >= 1) {
+          return json(res,402,{error:'limit_reached', message:'Free accounts include 1 mock interview per day. Upgrade for unlimited.'});
+        }
+      }
       // Verify ownership
       const r = await pool.query('SELECT question_ids, completed_at FROM mock_sessions WHERE id=$1 AND user_id=$2', [sessionId, user.userId]);
       if (r.rows.length === 0) return json(res,404,{error:'Session not found'});
@@ -1536,7 +1583,7 @@ const server = http.createServer(async (req, res) => {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
       const targetId = params.get('id') || user.userId;
       const [userR, followerR, followingR, badgeR, schoolR, resultsR, activityR, mockR] = await Promise.all([
-        pool.query('SELECT id,name,plan,created_at FROM users WHERE id=$1', [targetId]),
+        pool.query('SELECT id,name,plan,created_at,avatar_data FROM users WHERE id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE following_id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE follower_id=$1', [targetId]),
         pool.query(`SELECT ub.badge_id, ub.awarded_at, b.name, b.icon, b.type FROM user_badges ub JOIN badges b ON b.id=ub.badge_id WHERE ub.user_id=$1 ORDER BY ub.awarded_at DESC`, [targetId]),
@@ -1571,7 +1618,7 @@ const server = http.createServer(async (req, res) => {
       const strugglingCount = all.filter(r=>r.mastery_stage==='struggling').length;
       const isFollowing = await pool.query('SELECT 1 FROM follows WHERE follower_id=$1 AND following_id=$2', [user.userId, targetId]);
       return json(res,200,{
-        id: u.id, name: u.name, plan: u.plan, memberSince: u.created_at,
+        id: u.id, name: u.name, plan: u.plan, memberSince: u.created_at, avatarData: u.avatar_data || null,
         followers: parseInt(followerR.rows[0].count),
         following: parseInt(followingR.rows[0].count),
         isFollowing: isFollowing.rows.length > 0,
@@ -2019,37 +2066,53 @@ const server = http.createServer(async (req, res) => {
       );
       const allAnswered = answered.rows.length >= activeMembers.rows.length;
       if (allAnswered) {
-        // Grade all answers in parallel
+        // Grade all answers — requires host to be on a paid plan
+        const hostPlanR = await pool.query('SELECT plan FROM users WHERE id=(SELECT host_id FROM study_parties WHERE id=$1)', [code]);
+        const hostPlan = hostPlanR.rows[0]?.plan || 'free';
         const q = QUESTIONS_BY_ID[questionId];
-        const gradePromises = answered.rows.map(async ({user_id}) => {
-          const ansR = await pool.query(
-            'SELECT answer_text FROM party_answers WHERE party_id=$1 AND user_id=$2 AND question_id=$3',
-            [code, user_id, questionId]
+        if (hostPlan === 'free') {
+          // Show answers side-by-side without AI grading for free hosts
+          const allAnswersR = await pool.query(
+            `SELECT pa.user_id, pa.answer_text, u.name FROM party_answers pa JOIN users u ON u.id=pa.user_id
+             WHERE pa.party_id=$1 AND pa.question_id=$2`, [code, questionId]
           );
-          const grade = await gradeMockAnswer(q, ansR.rows[0]?.answer_text||'');
-          await pool.query(
-            `UPDATE party_answers SET score=$1, grade_payload=$2 WHERE party_id=$3 AND user_id=$4 AND question_id=$5`,
-            [grade.score, JSON.stringify(grade), code, user_id, questionId]
+          broadcastToParty(code, {
+            type: 'question_graded',
+            questionId,
+            question: { id: questionId, question: q?.question, model_answer: q?.model_answer, topic: q?.topic },
+            results: allAnswersR.rows.map(r=>({ userId: r.user_id, name: r.name, answerText: r.answer_text, score: null, grade: { verdict: 'Upgrade to Pro to unlock AI grading in study parties.', strengths:'', gaps:'' } })),
+            ungradedFree: true,
+          });
+        } else {
+          const gradePromises = answered.rows.map(async ({user_id}) => {
+            const ansR = await pool.query(
+              'SELECT answer_text FROM party_answers WHERE party_id=$1 AND user_id=$2 AND question_id=$3',
+              [code, user_id, questionId]
+            );
+            const grade = await gradeMockAnswer(q, ansR.rows[0]?.answer_text||'');
+            await pool.query(
+              `UPDATE party_answers SET score=$1, grade_payload=$2 WHERE party_id=$3 AND user_id=$4 AND question_id=$5`,
+              [grade.score, JSON.stringify(grade), code, user_id, questionId]
+            );
+            return { userId: user_id, score: grade.score, verdict: grade.verdict, grade };
+          });
+          const results = await Promise.all(gradePromises);
+          const allAnswersR = await pool.query(
+            `SELECT pa.user_id, pa.answer_text, pa.score, pa.grade_payload, u.name
+             FROM party_answers pa JOIN users u ON u.id=pa.user_id
+             WHERE pa.party_id=$1 AND pa.question_id=$2`,
+            [code, questionId]
           );
-          return { userId: user_id, score: grade.score, verdict: grade.verdict, grade };
-        });
-        const results = await Promise.all(gradePromises);
-        // Get all answers to send side-by-side
-        const allAnswersR = await pool.query(
-          `SELECT pa.user_id, pa.answer_text, pa.score, pa.grade_payload, u.name
-           FROM party_answers pa JOIN users u ON u.id=pa.user_id
-           WHERE pa.party_id=$1 AND pa.question_id=$2`,
-          [code, questionId]
-        );
-        broadcastToParty(code, {
-          type: 'question_graded',
-          questionId,
-          question: { id: questionId, question: q?.question, model_answer: q?.model_answer, topic: q?.topic },
-          results: allAnswersR.rows.map(r=>({
-            userId: r.user_id, name: r.name, answerText: r.answer_text,
-            score: r.score, grade: r.grade_payload,
-          })),
-        });
+          broadcastToParty(code, {
+            type: 'question_graded',
+            questionId,
+            question: { id: questionId, question: q?.question, model_answer: q?.model_answer, topic: q?.topic },
+            results: allAnswersR.rows.map(r=>({
+              userId: r.user_id, name: r.name, answerText: r.answer_text,
+              score: r.score, grade: r.grade_payload,
+            })),
+          });
+        }
       }
       return json(res,200,{ok:true, allAnswered});
     } catch(e){return json(res,500,{error:e.message});}
