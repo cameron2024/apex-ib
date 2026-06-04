@@ -686,6 +686,17 @@ async function generateInsights(userId) {
   return payload;
 }
 
+// ── CONFERENCE LOGO MAP ──────────────────────────────────────
+const CONFERENCE_LOGOS = {
+  'Ivy League':   'https://upload.wikimedia.org/wikipedia/en/thumb/0/07/Ivy_League_logo.svg/320px-Ivy_League_logo.svg.png',
+  'NESCAC':       'https://upload.wikimedia.org/wikipedia/en/thumb/5/58/NESCAC_logo.svg/320px-NESCAC_logo.svg.png',
+  'ACC':          'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Atlantic_Coast_Conference_logo.svg/320px-Atlantic_Coast_Conference_logo.svg.png',
+  'Big Ten':      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Big_Ten_Conference_logo.svg/320px-Big_Ten_Conference_logo.svg.png',
+  'SEC':          'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Southeastern_Conference_logo.svg/320px-Southeastern_Conference_logo.svg.png',
+  'Pac-12':       'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Pac-12_Conference_logo.svg/320px-Pac-12_Conference_logo.svg.png',
+  'Independent':  null,
+};
+
 // ── SCHOOL DOMAIN LOOKUP ─────────────────────────────────────
 const SCHOOL_SEED = [
   // Ivy League
@@ -749,9 +760,11 @@ const SCHOOL_SEED = [
 
 async function seedSchools() {
   for (const s of SCHOOL_SEED) {
+    const logoUrl = CONFERENCE_LOGOS[s.conference] || null;
     await pool.query(
-      `INSERT INTO schools (name, domain, conference) VALUES ($1, $2, $3) ON CONFLICT (domain) DO NOTHING`,
-      [s.name, s.domain, s.conference]
+      `INSERT INTO schools (name, domain, conference, logo_url) VALUES ($1, $2, $3, $4)
+       ON CONFLICT (domain) DO UPDATE SET name=$1, conference=$3, logo_url=$4`,
+      [s.name, s.domain, s.conference, logoUrl]
     );
   }
 }
@@ -1582,7 +1595,7 @@ const server = http.createServer(async (req, res) => {
         pool.query('SELECT COUNT(*) FROM follows WHERE following_id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE follower_id=$1', [targetId]),
         pool.query(`SELECT ub.badge_id, ub.awarded_at, b.name, b.icon, b.type FROM user_badges ub JOIN badges b ON b.id=ub.badge_id WHERE ub.user_id=$1 ORDER BY ub.awarded_at DESC`, [targetId]),
-        pool.query(`SELECT s.name, s.conference FROM school_memberships sm JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1`, [targetId]),
+        pool.query(`SELECT s.name, s.conference, s.logo_url FROM school_memberships sm JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1`, [targetId]),
         pool.query('SELECT topic,score,mastery_stage FROM question_results WHERE user_id=$1', [targetId]),
         pool.query('SELECT date FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84', [targetId]),
         pool.query('SELECT overall_score, started_at FROM mock_sessions WHERE user_id=$1 AND overall_score IS NOT NULL ORDER BY started_at DESC LIMIT 5', [targetId]),

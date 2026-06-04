@@ -559,11 +559,23 @@ function timeAgo(ts) {
 // ── POPULATE PROFILE CARD ──
 function renderProfileCard(profile, progress, school) {
   document.getElementById('profileAvatar').textContent = initials(profile.name);
+  // Load avatar
+  fetch('/api/auth/avatar', { headers: {'Authorization':'Bearer '+token}})
+    .then(r=>r.json()).then(data => {
+      if (data.avatarData) {
+        const el = document.getElementById('profileAvatar');
+        el.textContent = ''; el.style.position='relative';
+        const img = document.createElement('img');
+        img.src = data.avatarData;
+        img.style.cssText='position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;';
+        el.appendChild(img);
+      }
+    }).catch(()=>{});
   document.getElementById('profileName').textContent = profile.name;
 
   if (school) {
     document.getElementById('profileSchool').style.display = 'inline-flex';
-    document.getElementById('profileSchoolName').textContent = school.name + (school.conference ? ' · ' + school.conference : '');
+    const _logoHtml = school.logo_url ? `<img src="${school.logo_url}" alt="${school.conference}" style="width:16px;height:16px;object-fit:contain;" onerror="this.outerHTML='🎓'">` : '🎓'; document.getElementById('profileSchoolName').innerHTML = _logoHtml + ' ' + school.name + (school.conference ? ' · ' + school.conference : '');
   }
 
   const planMap = {

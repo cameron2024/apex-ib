@@ -170,8 +170,22 @@
   }
 
   // ── AVATAR HELPERS ────────────────────────────────────────
+  function getSidebarUserId() {
+    try {
+      const t = localStorage.getItem('apex_token');
+      if (!t) return null;
+      const p = JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+      return p.userId;
+    } catch(e) { return null; }
+  }
+
+  function getAvatarUrl() {
+    const uid = getSidebarUserId();
+    return uid ? localStorage.getItem('apex_avatar_' + uid) : null;
+  }
+
   function applyAvatarToSidebar() {
-    const url = localStorage.getItem('apex_avatar');
+    const url = getAvatarUrl();
     const el = document.getElementById('sidebarAvatar');
     if (!el) return;
     const existing = el.querySelector('img.sidebar-av-photo');
@@ -185,16 +199,26 @@
       } else {
         existing.src = url;
       }
-      el.style.backgroundImage = '';
       el.style.position = 'relative';
     } else {
       if (existing) existing.remove();
-      el.style.backgroundImage = '';
+      // Try fetching from server if not cached
+      const uid = getSidebarUserId();
+      const token = localStorage.getItem('apex_token');
+      if (uid && token) {
+        fetch('/api/auth/avatar', { headers: {'Authorization':'Bearer '+token}})
+          .then(r=>r.json()).then(data => {
+            if (data.avatarData) {
+              localStorage.setItem('apex_avatar_'+uid, data.avatarData);
+              applyAvatarToSidebar();
+            }
+          }).catch(()=>{});
+      }
     }
   }
 
   function applyAvatarToMenu() {
-    const url = localStorage.getItem('apex_avatar');
+    const url = getAvatarUrl();
     const menuAv = document.getElementById('menuHeaderAvatar');
     if (!menuAv) return;
     const existing = menuAv.querySelector('img.av-photo');
@@ -234,9 +258,23 @@
           const sy = (raw.height - min) / 2;
           ctx.drawImage(raw, sx, sy, min, min, 0, 0, SIZE, SIZE);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-          localStorage.setItem('apex_avatar', dataUrl);
-          applyAvatarToSidebar();
-          applyAvatarToMenu();
+          const uid = getSidebarUserId();
+          const token = localStorage.getItem('apex_token');
+          if (uid && token) {
+            fetch('/api/auth/save-avatar', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+              body: JSON.stringify({avatarData: dataUrl})
+            }).then(()=>{
+              localStorage.setItem('apex_avatar_'+uid, dataUrl);
+              applyAvatarToSidebar();
+              applyAvatarToMenu();
+            }).catch(()=>{
+              localStorage.setItem('apex_avatar_'+uid, dataUrl);
+              applyAvatarToSidebar();
+              applyAvatarToMenu();
+            });
+          }
         };
         raw.src = ev.target.result;
       };
@@ -470,8 +508,13 @@
 
   // ── AUTH HELPERS ──────────────────────────────────────────
   window.doLogout = function () {
+    const uid = getSidebarUserId();
+    if (uid) localStorage.removeItem('apex_avatar_' + uid);
     localStorage.removeItem('apex_token');
     localStorage.removeItem('apex_user');
+    localStorage.removeItem('apex_name');
+    localStorage.removeItem('apex_plan');
+    localStorage.removeItem('apex_graded_today');
     window.location.href = 'auth.html';
   };
 

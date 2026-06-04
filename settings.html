@@ -430,7 +430,7 @@
       const reader = new FileReader();
       reader.onload = function (ev) {
         const raw = new Image();
-        raw.onload = function () {
+        raw.onload = async function () {
           const canvas = document.createElement('canvas');
           const SIZE = 220;
           canvas.width = SIZE; canvas.height = SIZE;
@@ -440,23 +440,19 @@
           const sy = (raw.height - min) / 2;
           ctx.drawImage(raw, sx, sy, min, min, 0, 0, SIZE, SIZE);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-          localStorage.setItem('apex_avatar', dataUrl);
-          // Update sidebar avatar manually (sidebar internals are in an IIFE)
-          const sidebarAv = document.getElementById('sidebarAvatar');
-          if (sidebarAv) {
-            sidebarAv.style.position = 'relative';
-            let sidebarImg = sidebarAv.querySelector('img.sidebar-av-photo');
-            if (!sidebarImg) {
-              sidebarImg = document.createElement('img');
-              sidebarImg.className = 'sidebar-av-photo';
-              sidebarImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:1;';
-              sidebarAv.appendChild(sidebarImg);
-            }
-            sidebarImg.src = dataUrl;
-            sidebarAv.style.backgroundImage = '';
-          }
-          // Now refresh the settings page avatar — data is guaranteed to be in localStorage
-          refreshAvatar();
+          // Save to server
+          try {
+            const r = await fetch('/api/auth/save-avatar', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+              body: JSON.stringify({avatarData: dataUrl})
+            });
+            const data = await r.json();
+            if (!data.ok) { alert(data.error || 'Failed to save photo'); return; }
+            // Cache locally per-user so sidebar doesn't flicker
+            localStorage.setItem('apex_avatar_' + getUserId(), dataUrl);
+            updateAvatarUI(dataUrl);
+          } catch(e) { alert('Failed to save photo'); }
         };
         raw.src = ev.target.result;
       };
@@ -465,40 +461,67 @@
     input.click();
   };
 
-  function refreshAvatar() {
-    const url = localStorage.getItem('apex_avatar');
+  function getUserId() {
+    try {
+      const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+      return p.userId;
+    } catch(e) { return 'unknown'; }
+  }
+
+  function updateAvatarUI(dataUrl) {
+    // Settings page avatar
     const el = document.getElementById('settingsAvatar');
     const existing = el.querySelector('img');
     const initialsEl = document.getElementById('settingsAvatarInitials');
     const removeBtn = document.getElementById('removePhotoBtn');
-    if (url && !existing) {
+    if (dataUrl && !existing) {
       const img = document.createElement('img');
-      img.src = url;
+      img.src = dataUrl;
       el.insertBefore(img, el.firstChild);
-    } else if (url && existing) {
-      existing.src = url;
-    } else if (!url && existing) {
+    } else if (dataUrl && existing) {
+      existing.src = dataUrl;
+    } else if (!dataUrl && existing) {
       existing.remove();
     }
-    if (initialsEl) initialsEl.style.display = url ? 'none' : '';
-    if (removeBtn) removeBtn.style.display = url ? '' : 'none';
-  }
-
-  function removePhoto() {
-    localStorage.removeItem('apex_avatar');
-    const el = document.getElementById('settingsAvatar');
-    const img = el.querySelector('img');
-    if (img) img.remove();
-    const initialsEl = document.getElementById('settingsAvatarInitials');
-    if (initialsEl) initialsEl.style.display = '';
-    // Reset sidebar avatar too
+    if (initialsEl) initialsEl.style.display = dataUrl ? 'none' : '';
+    if (removeBtn) removeBtn.style.display = dataUrl ? '' : 'none';
+    // Sidebar avatar
     const sidebarAv = document.getElementById('sidebarAvatar');
     if (sidebarAv) {
-      const sidebarImg = sidebarAv.querySelector('img.sidebar-av-photo');
-      if (sidebarImg) sidebarImg.remove();
-      sidebarAv.style.backgroundImage = '';
+      let sidebarImg = sidebarAv.querySelector('img.sidebar-av-photo');
+      if (dataUrl) {
+        if (!sidebarImg) {
+          sidebarImg = document.createElement('img');
+          sidebarImg.className = 'sidebar-av-photo';
+          sidebarImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:1;';
+          sidebarAv.appendChild(sidebarImg);
+        }
+        sidebarImg.src = dataUrl;
+      } else if (sidebarImg) {
+        sidebarImg.remove();
+      }
     }
-    document.getElementById('removePhotoBtn').style.display = 'none';
+  }
+
+  function refreshAvatar() {
+    const cached = localStorage.getItem('apex_avatar_' + getUserId());
+    if (cached) { updateAvatarUI(cached); return; }
+    // Load from server
+    fetch('/api/auth/avatar', { headers: {'Authorization':'Bearer '+token}})
+      .then(r=>r.json()).then(data => {
+        if (data.avatarData) {
+          localStorage.setItem('apex_avatar_' + getUserId(), data.avatarData);
+          updateAvatarUI(data.avatarData);
+        }
+      }).catch(()=>{});
+  }
+
+  async function removePhoto() {
+    try {
+      await fetch('/api/auth/remove-avatar', { method:'DELETE', headers:{'Authorization':'Bearer '+token}});
+      localStorage.removeItem('apex_avatar_' + getUserId());
+      updateAvatarUI(null);
+    } catch(e) { alert('Failed to remove photo'); }
   }
   refreshAvatar();
 

@@ -970,7 +970,11 @@ async function loadSchoolWidget() {
     document.getElementById('schoolWidget').style.display = '';
     document.getElementById('schoolCard').innerHTML = `
       <div class="school-card">
-        <div class="school-logo">🎓</div>
+        <div class="school-logo">
+          ${school.logo_url
+            ? `<img src="${school.logo_url}" alt="${school.conference}" style="width:36px;height:36px;object-fit:contain;" onerror="this.parentNode.textContent='🎓'">`
+            : '🎓'}
+        </div>
         <div>
           <div class="school-name">${school.name}</div>
           <div class="school-conf">${school.conference}</div>
