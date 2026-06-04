@@ -578,6 +578,8 @@
     <div>
       <div class="feed-tabs">
         <button class="feed-tab active" onclick="switchTab('following')">Following</button>
+        <button class="feed-tab" onclick="switchTab('discover')">Discover</button>
+        <button class="feed-tab" onclick="switchTab('school')">My School</button>
         <button class="feed-tab" onclick="switchTab('school')">My School</button>
       </div>
 
@@ -743,12 +745,41 @@ async function loadFeed(reset = false) {
   if (loading) return;
   loading = true;
   const list = document.getElementById('feedList');
+
+  if (currentTab === 'discover') {
+    list.innerHTML = renderSkeleton();
+    try {
+      const r = await fetch('/api/social/browse', { headers: { 'Authorization': 'Bearer ' + token }});
+      const data = await r.json();
+      const users = data.users || [];
+      document.getElementById('loadMoreBtn').style.display = 'none';
+      if (users.length === 0) {
+        list.innerHTML = `<div class="feed-empty"><div class="feed-empty-icon">🔭</div><h3>No users yet</h3><p>Invite friends to join Apex.</p></div>`;
+      } else {
+        list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">` +
+          users.map(u => `
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;gap:12px;align-items:center;transition:border-color .15s;" onmouseenter="this.style.borderColor='var(--border-strong)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white;flex-shrink:0;">${initials(u.name)}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name}</div>
+              <div style="font-size:12px;color:var(--text-tertiary);">${u.school_name ? u.school_name : (u.followers + ' followers')}</div>
+            </div>
+            <button onclick="quickFollow(${u.id},this)" style="font-size:12px;font-weight:600;padding:5px 13px;border-radius:99px;border:1.5px solid ${u.isFollowing?'var(--border)':'var(--text-primary)'};background:none;cursor:pointer;color:${u.isFollowing?'var(--text-secondary)':'var(--text-primary)'};white-space:nowrap;font-family:DM Sans,sans-serif;transition:all .15s;" ${u.isFollowing?'data-following=1':''}>${u.isFollowing ? 'Following' : 'Follow'}</button>
+          </div>`).join('') + `</div>`;
+      }
+    } catch(e) {
+      list.innerHTML = '<div style="padding:20px;color:var(--text-secondary);">Failed to load.</div>';
+    }
+    loading = false;
+    return;
+  }
+
   if (reset) {
     lastCreatedAt = null;
     list.innerHTML = renderSkeleton();
   }
   try {
-    let url = `/api/social/feed?limit=15`;
+    let url = `/api/social/feed?limit=15&tab=${currentTab}`;
     if (lastCreatedAt) url += `&before=${lastCreatedAt}`;
     const r = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token }});
     const data = await r.json();
@@ -778,10 +809,32 @@ async function loadFeed(reset = false) {
 
 async function loadMore() { await loadFeed(false); }
 
+async function quickFollow(userId, btn) {
+  const isFollowing = btn.dataset.following === '1';
+  try {
+    await fetch(isFollowing ? '/api/social/unfollow' : '/api/social/follow', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({targetId: userId})
+    });
+    if (isFollowing) {
+      delete btn.dataset.following;
+      btn.textContent = 'Follow';
+      btn.style.borderColor = 'var(--text-primary)';
+      btn.style.color = 'var(--text-primary)';
+    } else {
+      btn.dataset.following = '1';
+      btn.textContent = 'Following';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'var(--text-secondary)';
+    }
+  } catch(e) {}
+}
+
 function switchTab(tab) {
   currentTab = tab;
-  document.querySelectorAll('.feed-tab').forEach((btn,i) => {
-    btn.classList.toggle('active', (i===0 && tab==='following') || (i===1 && tab==='school'));
+  document.querySelectorAll('.feed-tab').forEach(btn => {
+    const m = btn.getAttribute('onclick').match(/'([^']+)'/);
+    btn.classList.toggle('active', m && m[1] === tab);
   });
   loadFeed(true);
 }
