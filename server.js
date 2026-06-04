@@ -1423,6 +1423,40 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ── ADMIN ────────────────────────────────────────────────
+  if (req.method==='POST' && url==='/api/admin/delete-user') {
+    const adminKey=req.headers['x-admin-secret']||'';
+    if(!ADMIN_SECRET||adminKey!==ADMIN_SECRET) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {name} = await readBody(req);
+      if (!name) return json(res,400,{error:'name required'});
+      const userR = await pool.query('SELECT id,name,email FROM users WHERE name ILIKE $1', [name]);
+      if (userR.rows.length === 0) return json(res,404,{error:'No user found with that name'});
+      const deleted = [];
+      for (const u of userR.rows) {
+        const uid = u.id;
+        await pool.query('DELETE FROM party_answers WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM party_members WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM feed_comments WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM feed_reactions WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM feed_events WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM follows WHERE follower_id=$1 OR following_id=$1', [uid]);
+        await pool.query('DELETE FROM user_badges WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM school_memberships WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM saved_questions WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM question_results WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM mock_sessions WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM sessions WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM activity WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM insights_cache WHERE user_id=$1', [uid]);
+        await pool.query('DELETE FROM user_state WHERE user_id=$1', [uid]).catch(()=>{});
+        await pool.query('DELETE FROM stripe_events WHERE user_id=$1', [uid]).catch(()=>{});
+        await pool.query('DELETE FROM users WHERE id=$1', [uid]);
+        deleted.push({id: uid, name: u.name, email: u.email});
+      }
+      return json(res,200,{ok:true, deleted});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
   if (req.method==='POST' && url==='/api/admin/set-plan') {
     const adminKey=req.headers['x-admin-secret']||'';
     if(!ADMIN_SECRET||adminKey!==ADMIN_SECRET) return json(res,401,{error:'Unauthorized'});
