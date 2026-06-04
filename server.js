@@ -536,42 +536,44 @@ function buildMockQuestions(format, customConfig) {
 async function checkMockEligibility(userId) {
   const userR = await pool.query('SELECT plan FROM users WHERE id=$1', [userId]);
   const plan = userR.rows[0]?.plan || 'free';
+
+  // Recruiting Pass — unlimited
   if (plan === 'pass') return { ok: true, plan };
+
+  // Free — 1 mock lifetime
   if (plan === 'free') {
     const r = await pool.query('SELECT COUNT(*) FROM mock_sessions WHERE user_id=$1', [userId]);
     const used = parseInt(r.rows[0].count);
     if (used >= FREE_MOCK_LIMIT) {
-      return { ok: false, plan, reason: 'free_limit', message: 'Free accounts include 1 mock interview. Upgrade for more.' };
+      return { ok: false, plan, reason: 'free_limit', message: 'Free accounts include 1 lifetime mock interview. Upgrade to Pro for 1 mock every 24 hours.' };
     }
     return { ok: true, plan, remaining: FREE_MOCK_LIMIT - used };
   }
+
+  // Pro — 1 mock per 24h rolling window starting from when the last mock COMPLETED
   if (plan === 'monthly') {
-    // Pro: 1 mock per rolling 24h window (24hr after the most recent mock start)
     const r = await pool.query(
-      'SELECT started_at FROM mock_sessions WHERE user_id=$1 ORDER BY started_at DESC LIMIT 1',
+      'SELECT completed_at FROM mock_sessions WHERE user_id=$1 AND completed_at IS NOT NULL ORDER BY completed_at DESC LIMIT 1',
       [userId]
     );
-    const lastStart = r.rows[0] ? parseInt(r.rows[0].started_at) : 0;
+    const lastCompleted = r.rows[0] ? parseInt(r.rows[0].completed_at) : 0;
     const now = nowSec();
-    const cooldownUntil = lastStart + ONE_DAY;
-    if (lastStart && now < cooldownUntil) {
+    const cooldownUntil = lastCompleted + ONE_DAY;
+    if (lastCompleted && now < cooldownUntil) {
       const secsLeft = cooldownUntil - now;
       const hoursLeft = Math.floor(secsLeft / 3600);
       const minsLeft = Math.ceil((secsLeft % 3600) / 60);
-      const niceTime = hoursLeft > 0
-        ? `${hoursLeft}h ${minsLeft}m`
-        : `${minsLeft}m`;
+      const niceTime = hoursLeft > 0 ? `${hoursLeft}h ${minsLeft}m` : `${minsLeft}m`;
       return {
-        ok: false,
-        plan,
-        reason: 'daily_limit',
-        message: `Pro includes 1 mock interview per day. Next mock available in ${niceTime}.`,
+        ok: false, plan, reason: 'daily_limit',
+        message: `Next mock available in ${niceTime}.`,
         nextAvailableAt: cooldownUntil,
         secondsRemaining: secsLeft
       };
     }
     return { ok: true, plan };
   }
+
   return { ok: true, plan };
 }
 
@@ -1208,19 +1210,6 @@ const server = http.createServer(async (req, res) => {
     try {
       const {sessionId, answers} = await readBody(req);
       if (!sessionId || !answers) return json(res,400,{error:'sessionId and answers required'});
-      // Plan check — free users: 1 mock per day
-      const planR = await pool.query('SELECT plan FROM users WHERE id=$1', [user.userId]);
-      const plan = planR.rows[0]?.plan || 'free';
-      if (plan === 'free') {
-        const todayStart = Math.floor(new Date().setHours(0,0,0,0)/1000);
-        const mockToday = await pool.query(
-          'SELECT COUNT(*) FROM mock_sessions WHERE user_id=$1 AND completed_at IS NOT NULL AND completed_at >= $2',
-          [user.userId, todayStart]
-        );
-        if (parseInt(mockToday.rows[0].count) >= 1) {
-          return json(res,402,{error:'limit_reached', message:'Free accounts include 1 mock interview per day. Upgrade for unlimited.'});
-        }
-      }
       // Verify ownership
       const r = await pool.query('SELECT question_ids, completed_at FROM mock_sessions WHERE id=$1 AND user_id=$2', [sessionId, user.userId]);
       if (r.rows.length === 0) return json(res,404,{error:'Session not found'});
@@ -1377,7 +1366,13 @@ const server = http.createServer(async (req, res) => {
           const actR = await pool.query('SELECT questions_answered FROM activity WHERE user_id=$1 AND date=$2',[user.userId,today()]);
           const count = actR.rows[0] ? parseInt(actR.rows[0].questions_answered) : 0;
           if(count>=FREE_DAILY_LIMIT){
-            return json(res,402,{error:'limit_reached',message:`You've used all ${FREE_DAILY_LIMIT} free grades today. Upgrade to keep going.`,plan:'free',gradedToday:count});
+            return json(res,402,{
+              error:'limit_reached',
+              flashcard_mode: true,
+              message:`You've used all ${FREE_DAILY_LIMIT} free grades today. You can still study in flashcard mode — questions and model answers, no AI grading. Upgrade to Pro for unlimited graded answers.`,
+              plan:'free',
+              gradedToday:count
+            });
           }
         }
       } catch(e){return json(res,500,{error:e.message});}
@@ -1921,6 +1916,10 @@ const server = http.createServer(async (req, res) => {
   if (req.method==='POST' && url==='/api/party/create') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
+      const planR = await pool.query('SELECT plan FROM users WHERE id=$1', [user.userId]);
+      if ((planR.rows[0]?.plan || 'free') === 'free') {
+        return json(res,402,{error:'upgrade_required', message:'Study parties are available on Pro and Recruiting Pass. Upgrade to create and host sessions.'});
+      }
       const {topic, timeLimitSec} = await readBody(req);
       let code;
       // Ensure unique code
@@ -1946,6 +1945,10 @@ const server = http.createServer(async (req, res) => {
   if (req.method==='POST' && url==='/api/party/join') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
+      const planR = await pool.query('SELECT plan FROM users WHERE id=$1', [user.userId]);
+      if ((planR.rows[0]?.plan || 'free') === 'free') {
+        return json(res,402,{error:'upgrade_required', message:'Study parties are available on Pro and Recruiting Pass. Upgrade to join sessions.'});
+      }
       const {code} = await readBody(req);
       if (!code) return json(res,400,{error:'code required'});
       const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);

@@ -1609,7 +1609,12 @@ Return JSON only.`;
 
       if (response.status === 402) {
         overlay.classList.remove('visible');
-        showUpgradeModal('grade_limit');
+        const errData = await response.json().catch(()=>({}));
+        if (errData.flashcard_mode) {
+          enterFlashcardMode(errData.message);
+        } else {
+          showUpgradeModal('grade_limit');
+        }
         return;
       }
       if (!response.ok) throw new Error(`API ${response.status}: ${await response.text()}`);
@@ -2526,7 +2531,7 @@ Generate 3 drill questions targeting this exact gap.`;
   function init() {
     // Set auth state FIRST before anything else runs
     const token = localStorage.getItem('apex_token');
-    const name = window.getApexName ? window.getApexName() : (function(){ try { var r=localStorage.getItem('apex_user'); if(!r||r==='undefined')return localStorage.getItem('apex_name')||''; var p=JSON.parse(r); return typeof p==='object'?p.name||'':p||''; } catch(e){ return localStorage.getItem('apex_name')||''; } })();
+    const name = localStorage.getItem('apex_user');
     if (token && name) {
       authToken = token;
       currentUser = name;
@@ -2633,6 +2638,10 @@ Generate 3 drill questions targeting this exact gap.`;
         window._gradedToday = gradedToday;
         window._memberSince = data.memberSince || null;
         initSidebarMenu(userPlan, gradedToday);
+        // Auto-enter flashcard mode if free limit already exhausted
+        if (userPlan === 'free' && gradedToday >= 5) {
+          setTimeout(() => enterFlashcardMode(`You've used all 5 free grades today. You can still study in flashcard mode — questions and model answers, no AI grading. Upgrade to Pro for unlimited graded answers.`), 500);
+        }
         updatePlanUI();
       }
 
@@ -2852,6 +2861,74 @@ Generate 3 drill questions targeting this exact gap.`;
     if (upgradeBtn && userPlan !== 'free') upgradeBtn.style.display = 'none';
   }
 
+
+  // ── FLASHCARD MODE ───────────────────────────────────────
+  // Activated when free users exhaust their 5 daily grades.
+  // Shows question + model answer without AI grading.
+  let _flashcardMode = false;
+
+  function enterFlashcardMode(message) {
+    _flashcardMode = true;
+    // Show a banner at top of practice area
+    const existing = document.getElementById('flashcardBanner');
+    if (existing) return;
+    const banner = document.createElement('div');
+    banner.id = 'flashcardBanner';
+    banner.style.cssText = 'background:#FEF3C7;border:1px solid #FCD34D;border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;font-size:13.5px;';
+    banner.innerHTML = `
+      <span style="font-size:20px;">📖</span>
+      <div style="flex:1;">
+        <strong>Flashcard mode</strong> — ${message}
+      </div>
+      <button onclick="startCheckout('monthly')" style="padding:7px 16px;background:#1A1814;color:white;border:none;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;">Upgrade</button>
+    `;
+    const practiceArea = document.getElementById('practiceArea') || document.querySelector('.practice-content') || document.querySelector('.main');
+    if (practiceArea) practiceArea.insertBefore(banner, practiceArea.firstChild);
+    // Hide the submit button and show reveal button instead
+    swapToFlashcardControls();
+  }
+
+  function swapToFlashcardControls() {
+    const submitBtn = document.getElementById('submitBtn') || document.getElementById('btnSubmit');
+    if (submitBtn) submitBtn.style.display = 'none';
+    const existing = document.getElementById('flashcardRevealBtn');
+    if (existing) return;
+    const btn = document.createElement('button');
+    btn.id = 'flashcardRevealBtn';
+    btn.textContent = 'Reveal model answer';
+    btn.style.cssText = 'padding:11px 24px;background:var(--text-primary);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;transition:opacity .15s;';
+    btn.onmouseover = () => btn.style.opacity = '0.85';
+    btn.onmouseout = () => btn.style.opacity = '1';
+    btn.onclick = revealFlashcardAnswer;
+    if (submitBtn) submitBtn.parentNode.insertBefore(btn, submitBtn.nextSibling);
+  }
+
+  function revealFlashcardAnswer() {
+    const q = filteredQuestions[currentIndex];
+    if (!q) return;
+    // Show model answer in the feedback area without grading
+    showFlashcardAnswer(q.model_answer || 'No model answer available.');
+    // Auto-advance after a moment
+    document.getElementById('flashcardRevealBtn').textContent = 'Next question →';
+    document.getElementById('flashcardRevealBtn').onclick = () => {
+      advanceToNextQuestion();
+      document.getElementById('flashcardRevealBtn').textContent = 'Reveal model answer';
+      document.getElementById('flashcardRevealBtn').onclick = revealFlashcardAnswer;
+    };
+  }
+
+  function showFlashcardAnswer(modelAnswer) {
+    // Reuse feedback panel area if it exists, otherwise create inline
+    const feedbackEl = document.getElementById('feedbackPanel') || document.getElementById('gradeFeedback');
+    if (feedbackEl) {
+      feedbackEl.style.display = '';
+      feedbackEl.innerHTML = `
+        <div style="padding:20px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#166534;margin-bottom:8px;">Model Answer</div>
+          <div style="font-size:14px;line-height:1.65;color:#1A1814;">${modelAnswer}</div>
+        </div>`;
+    }
+  }
 
   function showUpgradeModal(reason) {
     const existing = document.getElementById('upgradeModal');
