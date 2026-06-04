@@ -577,9 +577,8 @@
   <div class="feed-layout fade-2">
     <div>
       <div class="feed-tabs">
-        <button class="feed-tab active" onclick="switchTab('following')">Following</button>
-        <button class="feed-tab" onclick="switchTab('discover')">Discover</button>
-        <button class="feed-tab" onclick="switchTab('school')">My School</button>
+        <button class="feed-tab active" onclick="switchTab('discover')">Discover</button>
+        <button class="feed-tab" onclick="switchTab('following')">Following</button>
         <button class="feed-tab" onclick="switchTab('school')">My School</button>
       </div>
 
@@ -613,7 +612,7 @@
 const token = localStorage.getItem('apex_token');
 if (!token) window.location.href = 'auth.html';
 
-let currentTab = 'following';
+let currentTab = 'discover';
 let lastCreatedAt = null;
 let loading = false;
 let myUserId = null;
