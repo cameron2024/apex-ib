@@ -791,7 +791,9 @@ function renderUserCards(users, emptyMsg) {
       <a href="#" class="user-card-avatar" onclick="openProfile(${u.id});return false;">${initials(u.name)}</a>
       <div class="user-card-body">
         <a href="#" class="user-card-name" onclick="openProfile(${u.id});return false;">${u.name}</a>
-        <div class="user-card-school">${u.school_name ? u.school_name + (u.conference ? ' · ' + u.conference : '') : 'Apex user'}</div>
+        <div class="user-card-school">
+          ${u.school_name ? u.school_name + (u.conference ? ' · ' + u.conference : '') + ' &nbsp;·&nbsp; ' : ''}${u.followers ?? 0} followers · ${u.following ?? 0} following
+        </div>
       </div>
       <div class="user-card-follow">
         <button class="follow-btn-lg ${u.isFollowing?'following':''}"
