@@ -9,271 +9,355 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <style>
-  .page-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 32px;
-    animation: fadeUp 0.35s ease both;
-  }
-  .page-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 28px;
-    letter-spacing: -0.4px;
-    line-height: 1.2;
-    margin-bottom: 4px;
-  }
-  .page-sub { font-size: 14px; color: var(--text-secondary); }
 
-  /* ── SETTINGS LAYOUT ── */
-  .settings-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-width: 640px;
-    margin: 0 auto;
-  }
+/* ── LAYOUT ── */
+.settings-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+  max-width: 860px;
+  margin: 0 auto;
+  align-items: start;
+}
 
-  .settings-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    animation: fadeUp 0.35s ease both;
-  }
-  .settings-card:nth-child(2) { animation-delay: 0.05s; }
-  .settings-card:nth-child(3) { animation-delay: 0.10s; }
+.page-header {
+  max-width: 860px;
+  margin: 0 auto 28px;
+  animation: fadeUp 0.35s ease both;
+}
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  letter-spacing: -0.4px;
+  margin-bottom: 4px;
+}
+.page-sub { font-size: 14px; color: var(--text-secondary); }
 
-  .card-header {
-    padding: 18px 24px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .card-header-icon {
-    width: 30px; height: 30px;
-    border-radius: 8px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .card-header-icon svg { width: 14px; height: 14px; opacity: 0.7; }
-  .card-header-text { flex: 1; }
-  .card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-  .card-desc  { font-size: 12.5px; color: var(--text-tertiary); margin-top: 1px; }
+/* ── SIDEBAR NAV ── */
+.settings-nav {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: sticky;
+  top: 40px;
+  animation: fadeUp 0.35s ease both;
+}
 
-  .card-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.12s;
+  border-left: 2px solid transparent;
+}
 
-  /* ── FORM FIELDS ── */
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field-row { display: flex; gap: 12px; }
-  .field-row .field { flex: 1; }
+.settings-nav-item:hover { background: var(--bg); color: var(--text-primary); }
 
-  label {
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--text-secondary);
-  }
+.settings-nav-item.active {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-weight: 600;
+  border-left-color: var(--text-primary);
+}
 
-  input[type="text"],
-  input[type="email"],
-  input[type="password"] {
-    width: 100%;
-    padding: 9px 12px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--text-primary);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  input:focus { border-color: var(--border-strong); background: white; }
-  input:disabled { opacity: 0.5; cursor: not-allowed; }
-  input.error { border-color: var(--accent-red); }
+.settings-nav-item svg {
+  width: 15px; height: 15px;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+.settings-nav-item.active svg { opacity: 1; }
 
-  .field-hint {
-    font-size: 12px;
-    color: var(--text-tertiary);
-  }
+.settings-nav-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
 
-  /* ── AVATAR SECTION ── */
-  .avatar-section {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px;
-    background: var(--bg);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-  }
-  .settings-avatar {
-    width: 52px; height: 52px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 600; color: white;
-    flex-shrink: 0;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-  }
-  .settings-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-  .avatar-info { flex: 1; }
-  .avatar-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
-  .avatar-hint { font-size: 12px; color: var(--text-tertiary); }
-  .btn-avatar-change {
-    padding: 7px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 12.5px;
-    font-family: inherit;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .btn-avatar-change:hover { border-color: var(--border-strong); color: var(--text-primary); }
-  .btn-avatar-remove {
-    padding: 7px 14px;
-    background: none;
-    border: 1px solid #FECACA;
-    border-radius: var(--radius-sm);
-    font-size: 12.5px;
-    font-family: inherit;
-    color: var(--accent-red);
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .btn-avatar-remove:hover { background: #FEF2F2; border-color: var(--accent-red); }
+.settings-nav-item.danger { color: var(--accent-red); }
+.settings-nav-item.danger svg { opacity: 0.7; }
+.settings-nav-item.danger:hover { background: #FEF2F2; }
+.settings-nav-item.danger.active { border-left-color: var(--accent-red); background: #FEF2F2; }
 
-  /* ── BUTTONS ── */
-  .card-footer {
-    padding: 14px 24px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    background: var(--bg);
-  }
+/* ── TAB PANELS ── */
+.settings-panel { display: none; animation: fadeUp 0.25s ease both; }
+.settings-panel.active { display: block; }
 
-  .btn-save {
-    padding: 8px 18px;
-    background: var(--text-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-family: inherit;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .btn-save:hover { opacity: 0.85; }
-  .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ── CARDS ── */
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
 
-  .save-status {
-    font-size: 12.5px;
-    color: var(--text-tertiary);
-    transition: all 0.2s;
-  }
-  .forgot-link {
-    font-size: 12.5px;
-    color: var(--accent-blue);
-    text-decoration: none;
-    margin-left: auto;
-    margin-right: 10px;
-  }
-  .forgot-link:hover { text-decoration: underline; }
-  .save-status.success { color: var(--accent-green); }
-  .save-status.error   { color: var(--accent-red); }
+.settings-card:last-child { margin-bottom: 0; }
 
-  /* ── DANGER ZONE ── */
-  .danger-card { border-color: #FEE2E2; }
-  .danger-card .card-header { border-color: #FEE2E2; }
-  .danger-card .card-header-icon { background: #FEF2F2; border-color: #FECACA; }
-  .danger-card .card-header-icon svg { color: var(--accent-red); opacity: 1; }
-  .danger-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-  }
-  .danger-item-text { flex: 1; }
-  .danger-item-label { font-size: 13.5px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
-  .danger-item-desc  { font-size: 12px; color: var(--text-tertiary); }
-  .btn-danger {
-    padding: 7px 14px;
-    background: none;
-    border: 1px solid #FECACA;
-    border-radius: var(--radius-sm);
-    font-size: 12.5px;
-    font-family: inherit;
-    color: var(--accent-red);
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .btn-danger:hover { background: #FEF2F2; border-color: var(--accent-red); }
+.card-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-header-icon {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.card-header-icon svg { width: 14px; height: 14px; opacity: 0.65; }
+.card-header-text { flex: 1; }
+.card-title { font-size: 13.5px; font-weight: 600; }
+.card-desc  { font-size: 12px; color: var(--text-tertiary); margin-top: 1px; }
 
-  /* ── DELETE CONFIRM MODAL ── */
-  .modal-backdrop {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.35);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.15s ease both;
-  }
-  .modal-backdrop.open { display: flex; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.card-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
 
-  .modal {
-    background: white;
-    border-radius: 14px;
-    padding: 28px 28px 24px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-    animation: modalPop 0.2s cubic-bezier(0.16,1,0.3,1) both;
-  }
-  @keyframes modalPop {
-    from { opacity: 0; transform: scale(0.96) translateY(8px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  .modal-icon { font-size: 28px; margin-bottom: 12px; }
-  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 8px; }
-  .modal-desc { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-  .btn-modal-cancel {
-    padding: 8px 16px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 13px; font-family: inherit;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .btn-modal-cancel:hover { border-color: var(--border-strong); }
-  .btn-modal-confirm {
-    padding: 8px 16px;
-    background: var(--accent-red);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 13px; font-family: inherit; font-weight: 500;
-    cursor: pointer; transition: opacity 0.15s;
-  }
-  .btn-modal-confirm:hover { opacity: 0.85; }
+.card-footer {
+  padding: 12px 22px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; background: var(--bg);
+}
+
+/* ── FORM ── */
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field-row { display: flex; gap: 12px; }
+.field-row .field { flex: 1; }
+
+label { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); }
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s;
+  position: relative;
+}
+input:focus { border-color: var(--border-strong); background: white; }
+input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.field-hint { font-size: 12px; color: var(--text-tertiary); }
+
+/* Password with toggle */
+.pwd-wrap { position: relative; }
+.pwd-wrap input { padding-right: 38px; }
+.pwd-eye {
+  position: absolute;
+  right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--text-tertiary); padding: 2px;
+  transition: color 0.15s; display: flex;
+}
+.pwd-eye:hover { color: var(--text-primary); }
+.pwd-eye svg { width: 15px; height: 15px; }
+
+/* ── AVATAR ── */
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.settings-avatar {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 600; color: white;
+  flex-shrink: 0; overflow: hidden; cursor: pointer; position: relative;
+  transition: opacity 0.15s;
+}
+.settings-avatar:hover { opacity: 0.85; }
+.settings-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.avatar-info { flex: 1; }
+.avatar-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.avatar-hint { font-size: 12px; color: var(--text-tertiary); }
+
+/* ── BUTTONS ── */
+.btn-save {
+  padding: 8px 18px;
+  background: var(--text-primary);
+  color: white; border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-family: inherit; font-weight: 500;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.btn-save:hover { opacity: 0.85; }
+.btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-outline {
+  padding: 7px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px; font-family: inherit;
+  color: var(--text-secondary); cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn-outline:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+.btn-danger-outline {
+  padding: 7px 14px;
+  background: none;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px; font-family: inherit;
+  color: var(--accent-red); cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn-danger-outline:hover { background: #FEF2F2; border-color: var(--accent-red); }
+
+.save-status { font-size: 12.5px; color: var(--text-tertiary); transition: all 0.2s; }
+.save-status.success { color: var(--accent-green); }
+.save-status.error   { color: var(--accent-red); }
+
+.forgot-link {
+  font-size: 12.5px; color: var(--accent-blue);
+  text-decoration: none; margin-left: auto; margin-right: 10px;
+}
+.forgot-link:hover { text-decoration: underline; }
+
+/* ── TOGGLE SWITCH ── */
+.toggle-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.toggle-info { flex: 1; }
+.toggle-label { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.toggle-desc  { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px; height: 24px;
+  flex-shrink: 0; margin-top: 2px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #ccc; border-radius: 99px; transition: .25s;
+}
+.toggle-thumb {
+  position: absolute;
+  height: 18px; width: 18px;
+  left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .25s;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--text-primary); }
+.toggle-switch input:checked + .toggle-track .toggle-thumb { transform: translateX(20px); }
+
+/* ── RADIO OPTIONS ── */
+.radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color .15s;
+}
+.radio-option:has(input:checked) { border-color: var(--text-primary); }
+.radio-option input { margin-top: 2px; flex-shrink: 0; }
+.radio-option-title { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
+.radio-option-desc  { font-size: 12.5px; color: var(--text-secondary); }
+
+/* ── DANGER CARD ── */
+.danger-card { border-color: #FEE2E2; }
+.danger-card .card-header { border-color: #FEE2E2; }
+.danger-card .card-header-icon { background: #FEF2F2; border-color: #FECACA; }
+.danger-item {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.danger-item-label { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
+.danger-item-desc  { font-size: 12px; color: var(--text-tertiary); }
+
+/* ── PLAN CARD ── */
+.plan-current {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.plan-badge-lg {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700; padding: 5px 13px;
+  border-radius: 99px;
+}
+.badge-free    { background: #EFEDE9; color: #78736C; border: 1px solid #C4C0B8; }
+.badge-monthly { background: #EFF6FF; color: #2563EB; }
+.badge-pass    { background: #FEF3C7; color: #D97706; }
+
+/* ── DELETE MODAL ── */
+.modal-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35); z-index: 100;
+  align-items: center; justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: white; border-radius: 14px;
+  padding: 28px; max-width: 400px; width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: modalPop 0.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes modalPop {
+  from { opacity:0; transform:scale(0.96) translateY(8px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.modal-icon { font-size: 28px; margin-bottom: 12px; }
+.modal-title { font-family:'DM Serif Display',serif; font-size:20px; margin-bottom:8px; }
+.modal-desc { font-size:13.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+.btn-modal-cancel {
+  padding:8px 16px; background:var(--bg); border:1px solid var(--border);
+  border-radius:var(--radius-sm); font-size:13px; font-family:inherit; cursor:pointer;
+}
+.btn-modal-confirm {
+  padding:8px 16px; background:var(--accent-red); color:white; border:none;
+  border-radius:var(--radius-sm); font-size:13px; font-family:inherit; font-weight:500; cursor:pointer;
+}
+.btn-modal-confirm:hover { opacity: 0.85; }
+
+@media (max-width: 680px) {
+  .settings-layout { grid-template-columns: 1fr; }
+  .settings-nav { position: static; display: flex; overflow-x: auto; }
+  .settings-nav-divider { display: none; }
+  .settings-nav-item { border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .settings-nav-item.active { border-bottom-color: var(--text-primary); border-left: none; }
+}
 </style>
 </head>
 
@@ -282,174 +366,287 @@
 
 <main class="main">
 
-  <div class="page-header">
-    <div>
-      <div class="page-title">Settings</div>
-      <div class="page-sub">Manage your account and preferences</div>
-    </div>
+  <div class="page-header fade-1">
+    <div class="page-title">Settings</div>
+    <div class="page-sub">Manage your account and preferences</div>
   </div>
 
-  <div class="settings-grid">
+  <div class="settings-layout">
 
-    <!-- PROFILE -->
-    <div class="settings-card">
-      <div class="card-header">
-        <div class="card-header-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </div>
-        <div class="card-header-text">
-          <div class="card-title">Profile</div>
-          <div class="card-desc">Your name and photo</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="avatar-section">
-          <div class="settings-avatar" id="settingsAvatar" onclick="window._triggerAvatarUpload()" title="Change photo">
-            <span id="settingsAvatarInitials">?</span>
-          </div>
-          <div class="avatar-info">
-            <div class="avatar-name" id="settingsAvatarName">—</div>
-            <div class="avatar-hint">Click photo to upload a new one</div>
-          </div>
-          <button class="btn-avatar-change" onclick="window._triggerAvatarUpload()">Change photo</button>
-          <button class="btn-avatar-remove" id="removePhotoBtn" onclick="removePhoto()" style="display:none;">Remove</button>
-        </div>
-        <div class="field">
-          <label for="nameInput">Display name</label>
-          <input type="text" id="nameInput" placeholder="Your name" maxlength="80">
-        </div>
-        <div class="field">
-          <label for="emailDisplay">Email address</label>
-          <input type="email" id="emailDisplay" disabled>
-          <span class="field-hint">Email cannot be changed. Contact support if needed.</span>
-        </div>
-      </div>
-      <div class="card-footer">
-        <span class="save-status" id="profileStatus"></span>
-        <button class="btn-save" id="profileSaveBtn" onclick="saveProfile()">Save changes</button>
-      </div>
-    </div>
+    <!-- ── SIDEBAR NAV ── -->
+    <nav class="settings-nav fade-1">
+      <button class="settings-nav-item active" onclick="switchTab('profile')" id="nav-profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </button>
+      <button class="settings-nav-item" onclick="switchTab('security')" id="nav-security">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Security
+      </button>
+      <button class="settings-nav-item" onclick="switchTab('privacy')" id="nav-privacy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Privacy
+      </button>
+      <button class="settings-nav-item" onclick="switchTab('billing')" id="nav-billing">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Billing
+      </button>
+      <div class="settings-nav-divider"></div>
+      <button class="settings-nav-item danger" onclick="switchTab('danger')" id="nav-danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Danger zone
+      </button>
+    </nav>
 
-    <!-- SECURITY -->
-    <div class="settings-card">
-      <div class="card-header">
-        <div class="card-header-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        </div>
-        <div class="card-header-text">
-          <div class="card-title">Security</div>
-          <div class="card-desc">Change your password</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="field">
-          <label for="currentPwd">Current password</label>
-          <input type="password" id="currentPwd" placeholder="Enter current password">
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="newPwd">New password</label>
-            <input type="password" id="newPwd" placeholder="At least 6 characters">
+    <!-- ── PANELS ── -->
+    <div class="fade-2">
+
+      <!-- PROFILE -->
+      <div class="settings-panel active" id="panel-profile">
+        <div class="settings-card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Profile photo</div>
+              <div class="card-desc">Shown to other users across the platform</div>
+            </div>
           </div>
-          <div class="field">
-            <label for="confirmPwd">Confirm new password</label>
-            <input type="password" id="confirmPwd" placeholder="Repeat new password">
+          <div class="card-body">
+            <div class="avatar-section">
+              <div class="settings-avatar" id="settingsAvatar" onclick="window._triggerAvatarUpload()" title="Change photo">
+                <span id="settingsAvatarInitials">?</span>
+              </div>
+              <div class="avatar-info">
+                <div class="avatar-name" id="settingsAvatarName">—</div>
+                <div class="avatar-hint">Click to upload · JPG or PNG · Max 500KB</div>
+              </div>
+              <button class="btn-outline" onclick="window._triggerAvatarUpload()">Change</button>
+              <button class="btn-danger-outline" id="removePhotoBtn" onclick="removePhoto()" style="display:none;">Remove</button>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card-footer">
-        <span class="save-status" id="pwdStatus"></span>
-        <a href="auth.html?mode=forgot" class="forgot-link">Forgot password?</a>
-        <button class="btn-save" id="pwdSaveBtn" onclick="savePassword()">Update password</button>
-      </div>
-    </div>
 
-    <!-- PRIVACY -->
-    <div class="settings-card">
-      <div class="card-header">
-        <div class="card-header-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="card-header-text">
-          <div class="card-title">Privacy</div>
-          <div class="card-desc">Control who can see your profile and activity</div>
-        </div>
-      </div>
-      <div class="card-body">
-
-        <!-- Private account toggle -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:18px;">
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:3px;">Private account</div>
-            <div style="font-size:13px;color:var(--text-secondary);line-height:1.5;max-width:400px;">When on, only your followers can see your full profile. Everyone else sees only your follower/following counts, streak, and answers count.</div>
+        <div class="settings-card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Display name</div>
+              <div class="card-desc">How you appear to other users</div>
+            </div>
           </div>
-          <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-top:2px;">
-            <input type="checkbox" id="privacyPrivateToggle" onchange="savePrivacy()" style="opacity:0;width:0;height:0;">
-            <span style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:99px;transition:.3s;" id="privateToggleTrack">
-              <span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;" id="privateToggleThumb"></span>
-            </span>
-          </label>
+          <div class="card-body">
+            <div class="field">
+              <label for="nameInput">Name</label>
+              <input type="text" id="nameInput" placeholder="Your name" maxlength="80">
+            </div>
+            <div class="field">
+              <label for="emailDisplay">Email address</label>
+              <input type="email" id="emailDisplay" disabled>
+              <span class="field-hint">Email cannot be changed. Contact support if needed.</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="save-status" id="profileStatus"></span>
+            <button class="btn-save" id="profileSaveBtn" onclick="saveProfile()">Save changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="settings-panel" id="panel-security">
+        <div class="settings-card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Change password</div>
+              <div class="card-desc">Use a strong password you don't use elsewhere</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <label>Current password</label>
+              <div class="pwd-wrap">
+                <input type="password" id="currentPwd" placeholder="Enter current password">
+                <button type="button" class="pwd-eye" onclick="togglePwd('currentPwd',this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>New password</label>
+                <div class="pwd-wrap">
+                  <input type="password" id="newPwd" placeholder="At least 6 characters">
+                  <button type="button" class="pwd-eye" onclick="togglePwd('newPwd',this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Confirm new password</label>
+                <div class="pwd-wrap">
+                  <input type="password" id="confirmPwd" placeholder="Repeat new password">
+                  <button type="button" class="pwd-eye" onclick="togglePwd('confirmPwd',this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="save-status" id="pwdStatus"></span>
+            <a href="auth.html?mode=forgot" class="forgot-link">Forgot password?</a>
+            <button class="btn-save" id="pwdSaveBtn" onclick="savePassword()">Update password</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRIVACY -->
+      <div class="settings-panel" id="panel-privacy">
+        <div class="settings-card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Account privacy</div>
+              <div class="card-desc">Control who can see your full profile</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Private account</div>
+                <div class="toggle-desc">When on, only your followers can see your performance, topics, and answers. Everyone else sees only your public stats.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="privacyPrivateToggle" onchange="savePrivacy()">
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+          </div>
         </div>
 
-        <!-- Visibility -->
-        <div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border);">
-          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Profile visibility</div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.5;">Who can see your full performance, topics, and answer history.</div>
-          <div style="display:flex;flex-direction:column;gap:10px;" id="visibilityOptions">
-            <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);transition:border-color .15s;">
-              <input type="radio" name="visibility" value="public" onchange="savePrivacy()" style="margin-top:2px;flex-shrink:0;">
+        <div class="settings-card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Profile visibility</div>
+              <div class="card-desc">Who can see your full performance data and answer history</div>
+            </div>
+          </div>
+          <div class="card-body" id="visibilityOptions" style="gap:10px;">
+            <label class="radio-option">
+              <input type="radio" name="visibility" value="public" onchange="savePrivacy()">
               <div>
-                <div style="font-size:13.5px;font-weight:600;">Everyone</div>
-                <div style="font-size:12.5px;color:var(--text-secondary);">Any logged-in Apex user can see your full profile.</div>
+                <div class="radio-option-title">Everyone</div>
+                <div class="radio-option-desc">Any logged-in Apex user can view your full profile.</div>
               </div>
             </label>
-            <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);transition:border-color .15s;">
-              <input type="radio" name="visibility" value="friends" onchange="savePrivacy()" style="margin-top:2px;flex-shrink:0;">
+            <label class="radio-option">
+              <input type="radio" name="visibility" value="friends" onchange="savePrivacy()">
               <div>
-                <div style="font-size:13.5px;font-weight:600;">Mutual followers only</div>
-                <div style="font-size:12.5px;color:var(--text-secondary);">Only people who follow you and you follow back can see your full profile.</div>
+                <div class="radio-option-title">Mutual followers only</div>
+                <div class="radio-option-desc">Only people you both follow and follow you back can see your full profile.</div>
               </div>
             </label>
-            <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);transition:border-color .15s;" id="schoolVisibilityOption">
-              <input type="radio" name="visibility" value="school" onchange="savePrivacy()" style="margin-top:2px;flex-shrink:0;">
+            <label class="radio-option">
+              <input type="radio" name="visibility" value="school" onchange="savePrivacy()">
               <div>
-                <div style="font-size:13.5px;font-weight:600;">My school only <span style="font-size:11px;font-weight:400;color:var(--text-tertiary);">.edu required</span></div>
-                <div style="font-size:12.5px;color:var(--text-secondary);">Only people with a verified .edu email from your school can see your full profile.</div>
+                <div class="radio-option-title">My school only <span style="font-size:11px;font-weight:400;color:var(--text-tertiary);">.edu required</span></div>
+                <div class="radio-option-desc">Only people with a verified .edu email from your school can see your full profile.</div>
               </div>
             </label>
           </div>
-        </div>
-
-        <div id="privacySaveStatus" style="font-size:13px;color:var(--accent-green);display:none;">✓ Privacy settings saved</div>
-      </div>
-    </div>
-
-    <!-- DANGER ZONE -->
-    <div class="settings-card danger-card">
-      <div class="card-header">
-        <div class="card-header-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <div class="card-header-text">
-          <div class="card-title">Danger zone</div>
-          <div class="card-desc">Irreversible actions</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="danger-item">
-          <div class="danger-item-text">
-            <div class="danger-item-label">Delete account</div>
-            <div class="danger-item-desc">Permanently remove your account and all practice history. This cannot be undone.</div>
+          <div class="card-footer">
+            <span id="privacySaveStatus" class="save-status"></span>
           </div>
-          <button class="btn-danger" onclick="openDeleteModal()">Delete account</button>
         </div>
       </div>
-    </div>
 
-  </div>
+      <!-- BILLING -->
+      <div class="settings-panel" id="panel-billing">
+        <div class="settings-card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Current plan</div>
+              <div class="card-desc">Your subscription and billing details</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="plan-current">
+              <div id="planBadge" class="plan-badge-lg badge-free">○ Free</div>
+              <div style="flex:1;">
+                <div id="planName" style="font-size:14px;font-weight:600;margin-bottom:2px;">Free plan</div>
+                <div id="planDesc" style="font-size:12.5px;color:var(--text-secondary);">5 graded answers/day · 1 mock interview lifetime</div>
+              </div>
+              <a href="pricing.html" class="btn-save" style="text-decoration:none;">Upgrade</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card" id="manageSubCard" style="display:none;">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Manage subscription</div>
+              <div class="card-desc">Cancel or update your billing details</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="danger-item">
+              <div>
+                <div class="danger-item-label">Cancel subscription</div>
+                <div class="danger-item-desc">Your plan stays active until the end of the billing period.</div>
+              </div>
+              <button class="btn-danger-outline" onclick="cancelSubscription()">Cancel plan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="settings-panel" id="panel-danger">
+        <div class="settings-card danger-card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Danger zone</div>
+              <div class="card-desc">Irreversible actions — proceed with care</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="danger-item">
+              <div>
+                <div class="danger-item-label">Delete account</div>
+                <div class="danger-item-desc">Permanently removes your account, all practice history, performance data, and social connections. Cannot be undone.</div>
+              </div>
+              <button class="btn-danger-outline" onclick="openDeleteModal()">Delete account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end panels -->
+  </div><!-- end layout -->
 </main>
 
-<!-- DELETE CONFIRM MODAL -->
+<!-- DELETE MODAL -->
 <div class="modal-backdrop" id="deleteModal">
   <div class="modal">
     <div class="modal-icon">⚠️</div>
@@ -464,299 +661,281 @@
 
 <script src="sidebar.js"></script>
 <script>
-  const token = localStorage.getItem('apex_token');
-  if (!token) { window.location.href = 'auth.html'; }
+const token = localStorage.getItem('apex_token');
+if (!token) window.location.href = 'auth.html';
 
-  // ── INIT ──
-  const name  = window.getApexName ? window.getApexName() : (function(){ try { var r=localStorage.getItem('apex_user'); if(!r||r==='undefined')return localStorage.getItem('apex_name')||''; var p=JSON.parse(r); return typeof p==='object'?p.name||'':p||''; } catch(e){ return localStorage.getItem('apex_name')||''; } })() || '';
-  const email = localStorage.getItem('apex_email') || '';
+// ── TAB SWITCHING ──
+function switchTab(tab) {
+  document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('nav-'+tab)?.classList.add('active');
+  document.getElementById('panel-'+tab)?.classList.add('active');
+  // Load billing info when switching to billing tab
+  if (tab === 'billing') loadBillingInfo();
+}
 
-  document.getElementById('nameInput').value = name;
-  document.getElementById('emailDisplay').value = email;
+// Check for ?tab= param
+const _tabParam = new URLSearchParams(location.search).get('tab');
+if (_tabParam) switchTab(_tabParam);
 
-  const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '?';
-  document.getElementById('settingsAvatarInitials').textContent = initials;
-  document.getElementById('settingsAvatarName').textContent = name || 'Your name';
+// ── INIT ──
+const name  = window.getApexName ? window.getApexName() : '';
+const email = localStorage.getItem('apex_email') || '';
 
-  // Override _triggerAvatarUpload so refreshAvatar fires AFTER the image
-  // is fully processed and saved — not on a blind setTimeout
-  window._triggerAvatarUpload = function () {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function (e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (ev) {
-        const raw = new Image();
-        raw.onload = async function () {
-          const canvas = document.createElement('canvas');
-          const SIZE = 220;
-          canvas.width = SIZE; canvas.height = SIZE;
-          const ctx = canvas.getContext('2d');
-          const min = Math.min(raw.width, raw.height);
-          const sx = (raw.width  - min) / 2;
-          const sy = (raw.height - min) / 2;
-          ctx.drawImage(raw, sx, sy, min, min, 0, 0, SIZE, SIZE);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-          // Save to server
-          try {
-            const r = await fetch('/api/auth/save-avatar', {
-              method: 'POST',
-              headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
-              body: JSON.stringify({avatarData: dataUrl})
-            });
-            const data = await r.json();
-            if (!data.ok) { alert(data.error || 'Failed to save photo'); return; }
-            // Cache locally per-user so sidebar doesn't flicker
-            localStorage.setItem('apex_avatar_' + getUserId(), dataUrl);
-            updateAvatarUI(dataUrl);
-          } catch(e) { alert('Failed to save photo'); }
-        };
-        raw.src = ev.target.result;
+document.getElementById('nameInput').value = name;
+document.getElementById('emailDisplay').value = email;
+
+const initials = (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?';
+document.getElementById('settingsAvatarInitials').textContent = initials;
+document.getElementById('settingsAvatarName').textContent = name || 'Your name';
+
+// ── PASSWORD TOGGLE ──
+function togglePwd(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  btn.innerHTML = isHidden
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+}
+
+// ── AVATAR ──
+function getUserId() {
+  try {
+    const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return p.userId;
+  } catch(e) { return 'unknown'; }
+}
+
+window._triggerAvatarUpload = function() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = function(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const raw = new Image();
+      raw.onload = async function() {
+        const canvas = document.createElement('canvas');
+        const SIZE = 220; canvas.width = SIZE; canvas.height = SIZE;
+        const ctx = canvas.getContext('2d');
+        const min = Math.min(raw.width, raw.height);
+        const sx = (raw.width-min)/2, sy = (raw.height-min)/2;
+        ctx.drawImage(raw, sx, sy, min, min, 0, 0, SIZE, SIZE);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        try {
+          const r = await fetch('/api/auth/save-avatar', {
+            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+            body: JSON.stringify({avatarData: dataUrl})
+          });
+          const data = await r.json();
+          if (!data.ok) { alert(data.error||'Failed to save photo'); return; }
+          localStorage.setItem('apex_avatar_'+getUserId(), dataUrl);
+          updateAvatarUI(dataUrl);
+        } catch(e) { alert('Failed to save photo'); }
       };
-      reader.readAsDataURL(file);
+      raw.src = ev.target.result;
     };
-    input.click();
+    reader.readAsDataURL(file);
   };
+  input.click();
+};
 
-  function getUserId() {
-    try {
-      const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-      return p.userId;
-    } catch(e) { return 'unknown'; }
+function updateAvatarUI(dataUrl) {
+  const el = document.getElementById('settingsAvatar');
+  const existing = el.querySelector('img');
+  const initialsEl = document.getElementById('settingsAvatarInitials');
+  if (dataUrl && !existing) {
+    const img = document.createElement('img'); img.src = dataUrl;
+    el.insertBefore(img, el.firstChild);
+  } else if (dataUrl && existing) { existing.src = dataUrl; }
+  else if (!dataUrl && existing) { existing.remove(); }
+  if (initialsEl) initialsEl.style.display = dataUrl ? 'none' : '';
+  document.getElementById('removePhotoBtn').style.display = dataUrl ? '' : 'none';
+  const sidebarAv = document.getElementById('sidebarAvatar');
+  if (sidebarAv) {
+    let sImg = sidebarAv.querySelector('img.sidebar-av-photo');
+    if (dataUrl) {
+      if (!sImg) { sImg = document.createElement('img'); sImg.className='sidebar-av-photo'; sImg.style.cssText='position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:1;'; sidebarAv.appendChild(sImg); }
+      sImg.src = dataUrl;
+    } else if (sImg) sImg.remove();
   }
+}
 
-  function updateAvatarUI(dataUrl) {
-    // Settings page avatar
-    const el = document.getElementById('settingsAvatar');
-    const existing = el.querySelector('img');
-    const initialsEl = document.getElementById('settingsAvatarInitials');
-    const removeBtn = document.getElementById('removePhotoBtn');
-    if (dataUrl && !existing) {
-      const img = document.createElement('img');
-      img.src = dataUrl;
-      el.insertBefore(img, el.firstChild);
-    } else if (dataUrl && existing) {
-      existing.src = dataUrl;
-    } else if (!dataUrl && existing) {
-      existing.remove();
+function refreshAvatar() {
+  const cached = localStorage.getItem('apex_avatar_'+getUserId());
+  if (cached) { updateAvatarUI(cached); return; }
+  fetch('/api/auth/avatar', { headers:{'Authorization':'Bearer '+token}})
+    .then(r=>r.json()).then(data => {
+      if (data.avatarData) { localStorage.setItem('apex_avatar_'+getUserId(), data.avatarData); updateAvatarUI(data.avatarData); }
+    }).catch(()=>{});
+}
+refreshAvatar();
+
+async function removePhoto() {
+  try {
+    await fetch('/api/auth/remove-avatar', { method:'DELETE', headers:{'Authorization':'Bearer '+token}});
+    localStorage.removeItem('apex_avatar_'+getUserId());
+    updateAvatarUI(null);
+  } catch(e) { alert('Failed to remove photo'); }
+}
+
+// ── PRIVACY ──
+async function loadPrivacySettings() {
+  try {
+    const r = await fetch('/api/auth/privacy', { headers:{'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    const toggle = document.getElementById('privacyPrivateToggle');
+    const track = toggle?.nextElementSibling;
+    if (toggle) {
+      toggle.checked = !!data.isPrivate;
+      if (track) track.querySelector('.toggle-thumb').style.transform = toggle.checked ? 'translateX(20px)' : '';
+      if (track) track.style.background = toggle.checked ? 'var(--text-primary)' : '#ccc';
     }
-    if (initialsEl) initialsEl.style.display = dataUrl ? 'none' : '';
-    if (removeBtn) removeBtn.style.display = dataUrl ? '' : 'none';
-    // Sidebar avatar
-    const sidebarAv = document.getElementById('sidebarAvatar');
-    if (sidebarAv) {
-      let sidebarImg = sidebarAv.querySelector('img.sidebar-av-photo');
-      if (dataUrl) {
-        if (!sidebarImg) {
-          sidebarImg = document.createElement('img');
-          sidebarImg.className = 'sidebar-av-photo';
-          sidebarImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:1;';
-          sidebarAv.appendChild(sidebarImg);
-        }
-        sidebarImg.src = dataUrl;
-      } else if (sidebarImg) {
-        sidebarImg.remove();
-      }
-    }
-  }
+    const vis = data.visibility || 'public';
+    document.querySelectorAll('input[name="visibility"]').forEach(r => { if (r.value === vis) r.checked = true; });
+  } catch(e) {}
+}
+loadPrivacySettings();
 
-  function refreshAvatar() {
-    const cached = localStorage.getItem('apex_avatar_' + getUserId());
-    if (cached) { updateAvatarUI(cached); return; }
-    // Load from server
-    fetch('/api/auth/avatar', { headers: {'Authorization':'Bearer '+token}})
-      .then(r=>r.json()).then(data => {
-        if (data.avatarData) {
-          localStorage.setItem('apex_avatar_' + getUserId(), data.avatarData);
-          updateAvatarUI(data.avatarData);
-        }
-      }).catch(()=>{});
+document.getElementById('privacyPrivateToggle')?.addEventListener('change', function() {
+  const track = this.nextElementSibling;
+  if (track) {
+    track.style.background = this.checked ? 'var(--text-primary)' : '#ccc';
+    track.querySelector('.toggle-thumb').style.transform = this.checked ? 'translateX(20px)' : '';
   }
+});
 
-  async function removePhoto() {
+let _privTimer = null;
+function savePrivacy() {
+  clearTimeout(_privTimer);
+  _privTimer = setTimeout(async () => {
+    const isPrivate = document.getElementById('privacyPrivateToggle')?.checked || false;
+    const vis = document.querySelector('input[name="visibility"]:checked')?.value || 'public';
     try {
-      await fetch('/api/auth/remove-avatar', { method:'DELETE', headers:{'Authorization':'Bearer '+token}});
-      localStorage.removeItem('apex_avatar_' + getUserId());
-      updateAvatarUI(null);
-    } catch(e) { alert('Failed to remove photo'); }
-  }
-  refreshAvatar();
-
-  // ── PRIVACY ──────────────────────────────────────────────
-  async function loadPrivacySettings() {
-    try {
-      const r = await fetch('/api/auth/privacy', { headers: {'Authorization':'Bearer '+token}});
-      const data = await r.json();
-      const toggle = document.getElementById('privacyPrivateToggle');
-      const track = document.getElementById('privateToggleTrack');
-      const thumb = document.getElementById('privateToggleThumb');
-      if (toggle) {
-        toggle.checked = !!data.isPrivate;
-        updateToggleUI(!!data.isPrivate, track, thumb);
-      }
-      const vis = data.visibility || 'public';
-      const radios = document.querySelectorAll('input[name="visibility"]');
-      radios.forEach(r => { if (r.value === vis) r.checked = true; });
-      highlightSelectedVisibility();
+      await fetch('/api/auth/privacy', {
+        method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body: JSON.stringify({isPrivate, visibility: vis})
+      });
+      const s = document.getElementById('privacySaveStatus');
+      if (s) { s.textContent='✓ Saved'; s.className='save-status success'; setTimeout(()=>{s.textContent='';s.className='save-status';}, 2500); }
     } catch(e) {}
-  }
+  }, 400);
+}
 
-  function updateToggleUI(checked, track, thumb) {
-    if (!track || !thumb) return;
-    track.style.background = checked ? 'var(--text-primary)' : '#ccc';
-    thumb.style.transform = checked ? 'translateX(20px)' : 'translateX(0)';
-  }
+// ── BILLING ──
+async function loadBillingInfo() {
+  try {
+    const r = await fetch('/api/progress/load', { headers:{'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    const plan = data.plan || 'free';
+    const planMap = {
+      free:    { badge:'badge-free',    icon:'○', name:'Free plan',       desc:'5 graded answers/day · 1 lifetime mock interview' },
+      monthly: { badge:'badge-monthly', icon:'★', name:'Pro — $19.99/mo', desc:'Unlimited graded answers · 1 mock/day · Study parties' },
+      pass:    { badge:'badge-pass',    icon:'◆', name:'Recruiting Pass', desc:'Everything in Pro · Unlimited mocks' },
+    };
+    const pm = planMap[plan] || planMap.free;
+    document.getElementById('planBadge').className = 'plan-badge-lg '+pm.badge;
+    document.getElementById('planBadge').textContent = pm.icon+' '+(plan==='free'?'Free':plan==='monthly'?'Pro':'Pass');
+    document.getElementById('planName').textContent = pm.name;
+    document.getElementById('planDesc').textContent = pm.desc;
+    if (plan !== 'free') document.getElementById('manageSubCard').style.display = '';
+  } catch(e) {}
+}
 
-  document.getElementById('privacyPrivateToggle')?.addEventListener('change', function() {
-    updateToggleUI(this.checked,
-      document.getElementById('privateToggleTrack'),
-      document.getElementById('privateToggleThumb'));
-    highlightSelectedVisibility();
-  });
+async function cancelSubscription() {
+  if (!confirm('Are you sure you want to cancel your subscription? You\'ll keep access until the end of your billing period.')) return;
+  try {
+    const r = await fetch('/api/stripe/cancel', { method:'POST', headers:{'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    if (data.ok) { alert('Subscription cancelled. Access continues until end of billing period.'); loadBillingInfo(); }
+    else alert(data.error || 'Failed to cancel');
+  } catch(e) { alert('Failed to cancel subscription'); }
+}
 
-  function highlightSelectedVisibility() {
-    document.querySelectorAll('#visibilityOptions label').forEach(label => {
-      const radio = label.querySelector('input[type="radio"]');
-      label.style.borderColor = radio?.checked ? 'var(--text-primary)' : 'var(--border)';
+// ── SAVE PROFILE ──
+async function saveProfile() {
+  const newName = document.getElementById('nameInput').value.trim();
+  const btn = document.getElementById('profileSaveBtn');
+  const status = document.getElementById('profileStatus');
+  if (!newName) { setStatus(status,'error','Name cannot be empty'); return; }
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/auth/update-profile', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({name: newName})
     });
-  }
-
-  document.querySelectorAll('input[name="visibility"]').forEach(r => {
-    r.addEventListener('change', highlightSelectedVisibility);
-  });
-
-  let privacySaveTimer = null;
-  async function savePrivacy() {
-    clearTimeout(privacySaveTimer);
-    privacySaveTimer = setTimeout(async () => {
-      const isPrivate = document.getElementById('privacyPrivateToggle')?.checked || false;
-      const visEl = document.querySelector('input[name="visibility"]:checked');
-      const visibility = visEl?.value || 'public';
-      try {
-        await fetch('/api/auth/privacy', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
-          body: JSON.stringify({isPrivate, visibility})
-        });
-        const status = document.getElementById('privacySaveStatus');
-        if (status) {
-          status.style.display = '';
-          setTimeout(() => { status.style.display = 'none'; }, 2500);
-        }
-      } catch(e) {}
-    }, 400);
-  }
-
-  loadPrivacySettings();
-
-  // Sidebar init
-  if (token) {
-    fetch('/api/progress/load', { headers: { 'Authorization': 'Bearer ' + token } })
-      .then(r => r.json()).then(data => {
-        window._userPlan = data.plan || 'free';
-        window._gradedToday = data.gradedToday || 0;
-        window._memberSince = data.memberSince || null;
-        initSidebarMenu(window._userPlan, window._gradedToday);
-      }).catch(() => {
-        initSidebarMenu('free', 0);
-      });
-  }
-
-  // ── SAVE PROFILE ──
-  async function saveProfile() {
-    const newName = document.getElementById('nameInput').value.trim();
-    const btn = document.getElementById('profileSaveBtn');
-    const status = document.getElementById('profileStatus');
-    if (!newName) { setStatus(status, 'error', 'Name cannot be empty'); return; }
-    btn.disabled = true;
+    const data = await r.json();
+    if (!r.ok) { setStatus(status,'error',data.error||'Failed'); return; }
     try {
-      const r = await fetch('/api/auth/update-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ name: newName })
-      });
-      const data = await r.json();
-      if (!r.ok) { setStatus(status, 'error', data.error || 'Failed to save'); return; }
-      // Keep apex_user as a JSON object, update name within it
-      try {
-        const existing = JSON.parse(localStorage.getItem('apex_user') || '{}');
-        const updated = typeof existing === 'object' && existing !== null ? {...existing, name: data.name} : {name: data.name};
-        localStorage.setItem('apex_user', JSON.stringify(updated));
-      } catch(e) {
-        localStorage.setItem('apex_user', JSON.stringify({name: data.name}));
-      }
-      localStorage.setItem('apex_name', data.name);
-      document.getElementById('settingsAvatarName').textContent = data.name;
-      const nameEl = document.getElementById('sidebarUserName');
-      if (nameEl) nameEl.textContent = data.name;
-      const initials = data.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      const avatarEl = document.getElementById('sidebarAvatar');
-      if (avatarEl) avatarEl.textContent = initials;
-      setStatus(status, 'success', '✓ Saved');
-    } catch(e) {
-      setStatus(status, 'error', 'Something went wrong');
-    } finally {
-      btn.disabled = false;
-    }
-  }
+      const ex = JSON.parse(localStorage.getItem('apex_user')||'{}');
+      localStorage.setItem('apex_user', JSON.stringify(typeof ex==='object'&&ex?{...ex,name:data.name}:{name:data.name}));
+    } catch(e) { localStorage.setItem('apex_user', JSON.stringify({name:data.name})); }
+    localStorage.setItem('apex_name', data.name);
+    document.getElementById('settingsAvatarName').textContent = data.name;
+    const nmEl = document.getElementById('sidebarUserName'); if (nmEl) nmEl.textContent = data.name;
+    const avEl = document.getElementById('sidebarAvatar');
+    if (avEl && !avEl.querySelector('img')) avEl.textContent = data.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    setStatus(status,'success','✓ Saved');
+  } catch(e) { setStatus(status,'error','Something went wrong'); }
+  finally { btn.disabled = false; }
+}
 
-  // ── SAVE PASSWORD ──
-  async function savePassword() {
-    const current = document.getElementById('currentPwd').value;
-    const newPwd  = document.getElementById('newPwd').value;
-    const confirm = document.getElementById('confirmPwd').value;
-    const btn     = document.getElementById('pwdSaveBtn');
-    const status  = document.getElementById('pwdStatus');
+// ── SAVE PASSWORD ──
+async function savePassword() {
+  const current = document.getElementById('currentPwd').value;
+  const newPwd  = document.getElementById('newPwd').value;
+  const confirm = document.getElementById('confirmPwd').value;
+  const btn = document.getElementById('pwdSaveBtn');
+  const status = document.getElementById('pwdStatus');
+  if (!current||!newPwd||!confirm) { setStatus(status,'error','All fields required'); return; }
+  if (newPwd !== confirm) { setStatus(status,'error','Passwords don\'t match'); return; }
+  if (newPwd.length < 6)  { setStatus(status,'error','Minimum 6 characters'); return; }
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/auth/change-password', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({currentPassword:current, newPassword:newPwd})
+    });
+    const data = await r.json();
+    if (!r.ok) { setStatus(status,'error',data.error||'Failed'); return; }
+    ['currentPwd','newPwd','confirmPwd'].forEach(id => document.getElementById(id).value = '');
+    setStatus(status,'success','✓ Password updated');
+  } catch(e) { setStatus(status,'error','Something went wrong'); }
+  finally { btn.disabled = false; }
+}
 
-    if (!current || !newPwd || !confirm) { setStatus(status, 'error', 'All fields required'); return; }
-    if (newPwd !== confirm) { setStatus(status, 'error', 'Passwords don\'t match'); return; }
-    if (newPwd.length < 6)  { setStatus(status, 'error', 'Minimum 6 characters'); return; }
-    btn.disabled = true;
-    try {
-      const r = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ currentPassword: current, newPassword: newPwd })
-      });
-      const data = await r.json();
-      if (!r.ok) { setStatus(status, 'error', data.error || 'Failed'); return; }
-      document.getElementById('currentPwd').value = '';
-      document.getElementById('newPwd').value = '';
-      document.getElementById('confirmPwd').value = '';
-      setStatus(status, 'success', '✓ Password updated');
-    } catch(e) {
-      setStatus(status, 'error', 'Something went wrong');
-    } finally {
-      btn.disabled = false;
-    }
-  }
+function setStatus(el, type, msg) {
+  el.textContent = msg; el.className = 'save-status '+type;
+  if (type === 'success') setTimeout(() => { el.textContent=''; el.className='save-status'; }, 3000);
+}
 
-  function setStatus(el, type, msg) {
-    el.textContent = msg;
-    el.className = 'save-status ' + type;
-    if (type === 'success') setTimeout(() => { el.textContent = ''; el.className = 'save-status'; }, 3000);
-  }
+// ── DELETE ──
+function openDeleteModal()  { document.getElementById('deleteModal').classList.add('open'); }
+function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); }
 
-  // ── DELETE MODAL ──
-  function openDeleteModal()  { document.getElementById('deleteModal').classList.add('open'); }
-  function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); }
-
-  async function confirmDelete() {
-    const btn = document.getElementById('deleteConfirmBtn');
-    btn.disabled = true;
-    btn.textContent = 'Deleting…';
-    // For now, clear localStorage and sign out (full server-side deletion can be added later)
+async function confirmDelete() {
+  const btn = document.getElementById('deleteConfirmBtn');
+  btn.disabled = true; btn.textContent = 'Deleting…';
+  try {
+    const r = await fetch('/api/account/delete', { method:'POST', headers:{'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error||'Failed');
     localStorage.clear();
     window.location.href = 'auth.html';
-  }
+  } catch(e) { btn.disabled=false; btn.textContent='Yes, delete everything'; alert('Error: '+e.message); }
+}
 
-  // Close modal on backdrop click
-  document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) closeDeleteModal();
-  });
+document.getElementById('deleteModal').addEventListener('click', e => { if (e.target===document.getElementById('deleteModal')) closeDeleteModal(); });
+
+// ── SIDEBAR ──
+if (token) {
+  fetch('/api/progress/load', { headers:{'Authorization':'Bearer '+token}})
+    .then(r=>r.json()).then(data => {
+      window._userPlan=data.plan||'free'; window._gradedToday=data.gradedToday||0; window._memberSince=data.memberSince||null;
+      initSidebarMenu(window._userPlan, window._gradedToday);
+    }).catch(()=>initSidebarMenu('free',0));
+}
 </script>
 </body>
 </html>
