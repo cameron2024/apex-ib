@@ -897,12 +897,13 @@ async function openProfile(userId) {
             <div class="pp-count-num">${u.stats?.streak ?? 0}</div>
             <div class="pp-count-label">Day Streak</div>
           </div>
-          <div class="pp-count">
+          <div class="pp-count clickable" onclick="toggleAnswerHistory(${userId})">
             <div class="pp-count-num">${u.stats?.totalAnswered ?? 0}</div>
-            <div class="pp-count-label">Answered</div>
+            <div class="pp-count-label">Answered ↕</div>
           </div>
         </div>
         <div id="panelFollowsList" style="margin-top:10px;display:none;"></div>
+        <div id="panelAnswerHistory" style="margin-top:10px;display:none;"></div>
         <div class="pp-actions">
           ${!isMe ? `
           <button class="pp-follow-btn ${u.isFollowing?'following':''}" id="ppFollowBtn" onclick="toggleFollowPanel(${userId}, this)">
@@ -999,6 +1000,145 @@ async function openProfile(userId) {
       }
     }
   } catch(e) {}
+}
+
+let _answerHistoryOpen = false;
+let _answerHistoryUserId = null;
+let _answerHistoryOffset = 0;
+const _answerHistoryLimit = 15;
+
+const TOPIC_LABELS_SHORT = { Accounting:'Accounting', Enterprise_Value:'Enterprise Value', Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO' };
+const STAGE_COLORS = { mastered:'#166534', strong:'#1D4ED8', learning:'#92400E', struggling:'#991B1B', new:'#6B6560' };
+const STAGE_BG    = { mastered:'#F0FDF4', strong:'#EFF6FF', learning:'#FEF3C7', struggling:'#FEE2E2', new:'#F3F4F6' };
+
+async function toggleAnswerHistory(userId) {
+  const container = document.getElementById('panelAnswerHistory');
+  if (!container) return;
+  // Close if same user already open
+  if (_answerHistoryOpen && _answerHistoryUserId === userId) {
+    container.style.display = 'none';
+    _answerHistoryOpen = false;
+    return;
+  }
+  // Close follows list if open
+  document.getElementById('panelFollowsList').style.display = 'none';
+  _panelFollowsOpen = null;
+  _answerHistoryUserId = userId;
+  _answerHistoryOffset = 0;
+  _answerHistoryOpen = true;
+  container.style.display = '';
+  await loadAnswerHistoryPage(userId, 0, container, true);
+}
+
+async function loadAnswerHistoryPage(userId, offset, container, reset) {
+  if (reset) container.innerHTML = '<div style="padding:12px;color:var(--text-tertiary);font-size:13px;">Loading…</div>';
+  try {
+    const r = await fetch(`/api/social/answers?id=${userId}&limit=${_answerHistoryLimit}&offset=${offset}`, {
+      headers: {'Authorization':'Bearer '+token}
+    });
+    const data = await r.json();
+    const answers = data.answers || [];
+    const total = data.total || 0;
+
+    if (answers.length === 0 && reset) {
+      container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:13px;">No answered questions yet.</div>`;
+      return;
+    }
+
+    const topicFilter = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+      ${['All','Accounting','Valuation','DCF','Mergers_MA','LBO','Enterprise_Value'].map(t=>`
+        <button onclick="filterAnswerHistory(${userId},'${t}')" data-topic="${t}"
+          style="font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--border);background:none;cursor:pointer;font-family:DM Sans,sans-serif;color:var(--text-secondary);transition:all .15s;"
+          onmouseenter="this.style.background='var(--bg)'" onmouseleave="this.style.background='none'">
+          ${t === 'All' ? 'All' : TOPIC_LABELS_SHORT[t]||t}
+        </button>`).join('')}
+    </div>`;
+
+    const rows = answers.map((a,i) => {
+      const scoreColor = a.score >= 80 ? 'var(--accent-green)' : a.score >= 60 ? 'var(--accent-amber)' : 'var(--accent-red)';
+      const stage = a.masteryStage || 'new';
+      return `
+      <div style="padding:12px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">${TOPIC_LABELS_SHORT[a.topic]||a.topic}</div>
+            <div style="font-size:13.5px;font-weight:500;line-height:1.45;color:var(--text-primary);">${a.question}</div>
+          </div>
+          <div style="flex-shrink:0;text-align:center;">
+            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:${scoreColor};line-height:1;">${a.score}<span style="font-size:11px;opacity:.6;">/100</span></div>
+            <div style="font-size:10px;color:var(--text-tertiary);">${a.attemptCount}× tried</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+          <span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:${STAGE_BG[stage]};color:${STAGE_COLORS[stage]};">${stage}</span>
+          <span style="font-size:11.5px;color:var(--text-tertiary);">${timeAgoShort(a.updatedAt)}</span>
+          ${a.modelAnswer ? `<button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none';this.textContent=this.textContent.includes('Show')?'Hide model answer':'Show model answer';" style="font-size:11.5px;color:var(--accent-blue);background:none;border:none;cursor:pointer;padding:0;font-family:DM Sans,sans-serif;">Show model answer</button>
+          <div style="display:none;margin-top:6px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:10px 12px;font-size:12.5px;line-height:1.55;color:var(--text-primary);">${a.modelAnswer}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    const pagination = total > _answerHistoryLimit ? `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;font-size:12.5px;color:var(--text-secondary);">
+        <span>${offset+1}–${Math.min(offset+answers.length, total)} of ${total}</span>
+        <div style="display:flex;gap:6px;">
+          ${offset > 0 ? `<button onclick="loadAnswerHistoryPage(${userId},${offset-_answerHistoryLimit},document.getElementById('panelAnswerHistory'),true)" style="padding:4px 12px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-size:12px;font-family:DM Sans,sans-serif;">← Prev</button>` : ''}
+          ${offset + answers.length < total ? `<button onclick="loadAnswerHistoryPage(${userId},${offset+_answerHistoryLimit},document.getElementById('panelAnswerHistory'),true)" style="padding:4px 12px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-size:12px;font-family:DM Sans,sans-serif;">Next →</button>` : ''}
+        </div>
+      </div>` : '';
+
+    container.innerHTML = `
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary);">Answer History (${total})</div>
+          <button onclick="document.getElementById('panelAnswerHistory').style.display='none';_answerHistoryOpen=false;" style="font-size:18px;color:var(--text-tertiary);background:none;border:none;cursor:pointer;line-height:1;">×</button>
+        </div>
+        ${reset ? topicFilter : ''}
+        ${rows}
+        ${pagination}
+      </div>`;
+  } catch(e) {
+    container.innerHTML = '<div style="padding:12px;color:var(--text-secondary);font-size:13px;">Failed to load.</div>';
+  }
+}
+
+async function filterAnswerHistory(userId, topic) {
+  _answerHistoryOffset = 0;
+  const container = document.getElementById('panelAnswerHistory');
+  if (!container) return;
+  const r = await fetch(`/api/social/answers?id=${userId}&topic=${topic}&limit=${_answerHistoryLimit}&offset=0`, {
+    headers: {'Authorization':'Bearer '+token}
+  });
+  const data = await r.json();
+  // Re-render just the rows + pagination
+  const answers = data.answers || [];
+  const total = data.total || 0;
+  // Update button styles
+  container.querySelectorAll('[data-topic]').forEach(btn => {
+    btn.style.background = btn.dataset.topic === topic ? 'var(--text-primary)' : 'none';
+    btn.style.color = btn.dataset.topic === topic ? 'white' : 'var(--text-secondary)';
+    btn.style.borderColor = btn.dataset.topic === topic ? 'var(--text-primary)' : 'var(--border)';
+  });
+  const scoreColor = s => s >= 80 ? 'var(--accent-green)' : s >= 60 ? 'var(--accent-amber)' : 'var(--accent-red)';
+  const stage = s => s || 'new';
+  const rowsEl = container.querySelector('.answer-rows');
+  if (rowsEl) rowsEl.innerHTML = answers.map(a => `
+    <div style="padding:12px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">${TOPIC_LABELS_SHORT[a.topic]||a.topic}</div>
+          <div style="font-size:13.5px;font-weight:500;line-height:1.45;">${a.question}</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:${scoreColor(a.score)};line-height:1;">${a.score}<span style="font-size:11px;opacity:.6;">/100</span></div>
+          <div style="font-size:10px;color:var(--text-tertiary);">${a.attemptCount}× tried</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+        <span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:${STAGE_BG[stage(a.masteryStage)]};color:${STAGE_COLORS[stage(a.masteryStage)]};">${stage(a.masteryStage)}</span>
+        <span style="font-size:11.5px;color:var(--text-tertiary);">${timeAgoShort(a.updatedAt)}</span>
+      </div>
+    </div>`).join('') + (total === 0 ? '<div style="padding:12px;color:var(--text-tertiary);font-size:13px;">No results.</div>' : '');
 }
 
 let _panelFollowsOpen = null;

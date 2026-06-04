@@ -1640,6 +1640,48 @@ const server = http.createServer(async (req, res) => {
     } catch(e){return json(res,500,{error:e.message});}
   }
 
+  // GET /api/social/answers?id=xxx&topic=xxx&limit=xxx&offset=xxx
+  if (req.method==='GET' && url==='/api/social/answers') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const targetId = params.get('id') || user.userId;
+      const topic = params.get('topic') || null;
+      const limit = Math.min(parseInt(params.get('limit'))||20, 50);
+      const offset = parseInt(params.get('offset'))||0;
+      const topicFilter = topic && topic !== 'All' ? 'AND qr.topic=$3' : '';
+      const vals = topic && topic !== 'All' ? [targetId, limit, topic, offset] : [targetId, limit, offset];
+      const r = await pool.query(
+        `SELECT qr.question_id, qr.topic, qr.score, qr.mastery_stage, qr.attempt_count, qr.updated_at,
+                (SELECT COUNT(*) FROM sessions s WHERE s.user_id=$1 AND s.question_id=qr.question_id) as times_seen
+         FROM question_results qr
+         WHERE qr.user_id=$1 ${topicFilter}
+         ORDER BY qr.updated_at DESC
+         LIMIT $2 OFFSET $${topic && topic !== 'All' ? 4 : 3}`,
+        vals
+      );
+      const total = await pool.query(
+        `SELECT COUNT(*) FROM question_results WHERE user_id=$1 ${topicFilter}`,
+        topic && topic !== 'All' ? [targetId, topic] : [targetId]
+      );
+      const rows = r.rows.map(row => {
+        const q = QUESTIONS_BY_ID[row.question_id];
+        return {
+          questionId: row.question_id,
+          question: q?.question || '(Question not found)',
+          modelAnswer: q?.model_answer || '',
+          topic: row.topic,
+          score: row.score,
+          masteryStage: row.mastery_stage,
+          attemptCount: parseInt(row.attempt_count),
+          timesSeen: parseInt(row.times_seen),
+          updatedAt: row.updated_at,
+        };
+      });
+      return json(res,200,{ answers: rows, total: parseInt(total.rows[0].count), limit, offset });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
   // GET /api/social/browse?school=1  — all users (optionally filtered to same school)
   if (req.method==='GET' && url==='/api/social/browse') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
