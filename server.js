@@ -237,6 +237,8 @@ async function initDB() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded INT DEFAULT 0;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_data TEXT;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS is_private INT DEFAULT 0;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS visibility TEXT DEFAULT 'public';
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS attempt_count INT DEFAULT 1;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS consecutive_high INT DEFAULT 0;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS mastery_stage TEXT;
@@ -903,6 +905,31 @@ const server = http.createServer(async (req, res) => {
       const r = await pool.query('SELECT password_hash FROM users WHERE id=$1',[user.userId]);
       if(!r.rows[0]||!checkPwd(currentPassword,r.rows[0].password_hash)) return json(res,401,{error:'Current password is incorrect'});
       await pool.query('UPDATE users SET password_hash=$1 WHERE id=$2',[hashPwd(newPassword),user.userId]);
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/auth/privacy — get own privacy settings
+  if (req.method==='GET' && url==='/api/auth/privacy') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const r = await pool.query('SELECT is_private, visibility FROM users WHERE id=$1', [user.userId]);
+      const u = r.rows[0] || {};
+      return json(res,200,{ isPrivate: !!u.is_private, visibility: u.visibility || 'public' });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/auth/privacy — save privacy settings
+  if (req.method==='POST' && url==='/api/auth/privacy') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {isPrivate, visibility} = await readBody(req);
+      const validVisibility = ['public','friends','school'];
+      const vis = validVisibility.includes(visibility) ? visibility : 'public';
+      await pool.query(
+        'UPDATE users SET is_private=$1, visibility=$2 WHERE id=$3',
+        [isPrivate ? 1 : 0, vis, user.userId]
+      );
       return json(res,200,{ok:true});
     } catch(e){return json(res,500,{error:e.message});}
   }
@@ -1591,7 +1618,7 @@ const server = http.createServer(async (req, res) => {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
       const targetId = params.get('id') || user.userId;
       const [userR, followerR, followingR, badgeR, schoolR, resultsR, activityR, mockR] = await Promise.all([
-        pool.query('SELECT id,name,plan,created_at,avatar_data FROM users WHERE id=$1', [targetId]),
+        pool.query('SELECT id,name,plan,created_at,avatar_data,is_private,visibility FROM users WHERE id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE following_id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE follower_id=$1', [targetId]),
         pool.query(`SELECT ub.badge_id, ub.awarded_at, b.name, b.icon, b.type FROM user_badges ub JOIN badges b ON b.id=ub.badge_id WHERE ub.user_id=$1 ORDER BY ub.awarded_at DESC`, [targetId]),
@@ -1624,18 +1651,63 @@ const server = http.createServer(async (req, res) => {
       }
       const masteredCount = all.filter(r=>r.mastery_stage==='mastered').length;
       const strugglingCount = all.filter(r=>r.mastery_stage==='struggling').length;
-      const isFollowing = await pool.query('SELECT 1 FROM follows WHERE follower_id=$1 AND following_id=$2', [user.userId, targetId]);
+      const isFollowingR = await pool.query('SELECT 1 FROM follows WHERE follower_id=$1 AND following_id=$2', [user.userId, targetId]);
+      const isFollowing = isFollowingR.rows.length > 0;
+      const isMutual = isFollowing && (await pool.query('SELECT 1 FROM follows WHERE follower_id=$1 AND following_id=$2', [targetId, user.userId])).rows.length > 0;
+      const isMe = String(user.userId) === String(targetId);
+
+      // Privacy check
+      const isPrivate = !!u.is_private;
+      const visibility = u.visibility || 'public';
+      const userSchoolR = !isMe ? await pool.query('SELECT school_id FROM school_memberships WHERE user_id=$1', [user.userId]) : null;
+      const viewerSchoolId = userSchoolR?.rows[0]?.school_id;
+      const targetSchoolId = schoolR.rows[0]?.id;
+
+      let canViewFull = isMe;
+      if (!canViewFull) {
+        if (visibility === 'public' && !isPrivate) canViewFull = true;
+        else if (visibility === 'friends') canViewFull = isMutual;
+        else if (visibility === 'school') canViewFull = viewerSchoolId && targetSchoolId && String(viewerSchoolId) === String(targetSchoolId);
+        else if (isPrivate) canViewFull = isFollowing;
+      }
+
+      // Recommended profiles (shown when account is private/locked)
+      let recommended = [];
+      if (!canViewFull && !isMe) {
+        const recR = await pool.query(
+          `SELECT u2.id, u2.name, u2.plan, s.name as school_name, s.conference,
+                  (SELECT COUNT(*) FROM follows WHERE following_id=u2.id) as followers
+           FROM users u2
+           LEFT JOIN school_memberships sm2 ON sm2.user_id=u2.id
+           LEFT JOIN schools s ON s.id=sm2.school_id
+           WHERE u2.id != $1 AND u2.id != $2 AND (u2.is_private IS NULL OR u2.is_private=0)
+           ORDER BY RANDOM() LIMIT 6`,
+          [targetId, user.userId]
+        );
+        recommended = recR.rows;
+      }
+
       return json(res,200,{
         id: u.id, name: u.name, plan: u.plan, memberSince: u.created_at, avatarData: u.avatar_data || null,
         followers: parseInt(followerR.rows[0].count),
         following: parseInt(followingR.rows[0].count),
-        isFollowing: isFollowing.rows.length > 0,
-        badges: badgeR.rows,
+        isFollowing,
+        isPrivate,
+        visibility,
+        canViewFull,
+        badges: canViewFull ? badgeR.rows : [],
         school: schoolR.rows[0] || null,
-        activityDates: [...actDates],
-        recentMocks: mockR.rows,
-        stats: { overall, totalAnswered: all.length, streak, masteredCount, strugglingCount },
-        topicBreakdown,
+        activityDates: canViewFull ? [...actDates] : [],
+        recentMocks: canViewFull ? mockR.rows : [],
+        stats: {
+          overall: canViewFull ? overall : null,
+          totalAnswered: all.length,
+          streak,
+          masteredCount: canViewFull ? masteredCount : null,
+          strugglingCount: canViewFull ? strugglingCount : null,
+        },
+        topicBreakdown: canViewFull ? topicBreakdown : [],
+        recommended,
       });
     } catch(e){return json(res,500,{error:e.message});}
   }
@@ -1646,6 +1718,15 @@ const server = http.createServer(async (req, res) => {
     try {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
       const targetId = params.get('id') || user.userId;
+      // Privacy check
+      if (String(targetId) !== String(user.userId)) {
+        const privR = await pool.query('SELECT is_private, visibility FROM users WHERE id=$1', [targetId]);
+        const pv = privR.rows[0] || {};
+        if (pv.is_private || pv.visibility !== 'public') {
+          const isFollowing = await pool.query('SELECT 1 FROM follows WHERE follower_id=$1 AND following_id=$2', [user.userId, targetId]);
+          if (isFollowing.rows.length === 0) return json(res,403,{error:'This account is private.'});
+        }
+      }
       const topic = params.get('topic') || null;
       const limit = Math.min(parseInt(params.get('limit'))||20, 50);
       const offset = parseInt(params.get('offset'))||0;

@@ -821,6 +821,11 @@ async function loadProfile() {
     document.getElementById('profileTabs').style.display = '';
     document.title = `${profileData.name} — Apex`;
 
+    if (!profileData.canViewFull && !isMe) {
+      renderLockedProfile();
+      return;
+    }
+
     // Load default tab
     tabLoaded['performance'] = true;
     renderPerformance();
@@ -845,6 +850,49 @@ async function toggleFollow() {
     const numEl = document.querySelector('.profile-stat-num');
     if (numEl) numEl.textContent = parseInt(numEl.textContent||0) + (btn.classList.contains('following') ? 1 : -1);
   } catch(e) {}
+}
+
+// ── LOCKED PROFILE ──
+function renderLockedProfile() {
+  // Hide tabs, replace content with locked state
+  document.getElementById('profileTabs').style.display = 'none';
+  document.getElementById('panel-performance').classList.add('active');
+
+  const u = profileData;
+  const visibility = u.visibility || 'public';
+  const lockReason = visibility === 'friends'
+    ? 'This account is only visible to mutual followers.'
+    : visibility === 'school'
+    ? 'This account is only visible to people from the same school.'
+    : 'This account is private.';
+
+  const recommended = u.recommended || [];
+
+  document.getElementById('perfContent').innerHTML = `
+    <!-- Locked state -->
+    <div style="text-align:center;padding:48px 20px 40px;border-top:1px solid var(--border);margin-top:0;">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;">🔒</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:8px;">This account is private</div>
+      <div style="font-size:14px;color:var(--text-secondary);max-width:320px;margin:0 auto 24px;line-height:1.6;">${lockReason} Follow this account to see their performance, topics, and answer history.</div>
+      ${!u.isFollowing ? `
+      <button onclick="toggleFollow()" style="padding:10px 28px;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'" id="followBtn">Follow</button>` : `
+      <button onclick="toggleFollow()" class="btn-follow following" id="followBtn" style="padding:10px 24px;background:none;color:var(--text-secondary);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;">Following</button>`}
+    </div>
+
+    ${recommended.length > 0 ? `
+    <div style="margin-top:8px;">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px;padding-top:8px;border-top:1px solid var(--border);">Suggested accounts</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;">
+        ${recommended.map(r => `
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;gap:11px;align-items:center;cursor:pointer;transition:border-color .15s;" onclick="window.location.href='profile.html?id=${r.id}'" onmouseenter="this.style.borderColor='var(--border-strong)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;">${initials(r.name)}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</div>
+              <div style="font-size:11.5px;color:var(--text-tertiary);">${r.school_name||''} · ${r.followers??0} followers</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}`;
 }
 
 // ── PERFORMANCE TAB ──

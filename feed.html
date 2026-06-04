@@ -758,8 +758,8 @@ async function loadFeed(reset = false) {
         list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">` +
           users.map(u => `
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;gap:12px;align-items:center;transition:border-color .15s;" onmouseenter="this.style.borderColor='var(--border-strong)'" onmouseleave="this.style.borderColor='var(--border)'">
-            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white;flex-shrink:0;">${initials(u.name)}</div>
-            <div style="flex:1;min-width:0;">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white;flex-shrink:0;cursor:pointer;" onclick="window.location.href='profile.html?id=${u.id}'">${initials(u.name)}</div>
+            <div style="flex:1;min-width:0;cursor:pointer;" onclick="window.location.href='profile.html?id=${u.id}'">
               <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name}</div>
               <div style="font-size:12px;color:var(--text-tertiary);">${u.school_name ? u.school_name : (u.followers + ' followers')}</div>
             </div>
@@ -925,9 +925,9 @@ async function toggleComments(eventId, btn) {
 function renderComments(container, eventId, comments) {
   container.innerHTML = comments.map(c=>`
     <div class="comment-item">
-      <div class="comment-avatar">${initials(c.user_name)}</div>
+      <div class="comment-avatar" style="cursor:pointer;" onclick="window.location.href='profile.html?id='+c.user_id">${initials(c.user_name)}</div>
       <div class="comment-content">
-        <span class="comment-author">${c.user_name}</span>
+        <a href="profile.html?id=${c.user_id}" style="text-decoration:none;color:inherit;" class="comment-author">${c.user_name}</a>
         <span class="comment-body">${c.body}</span>
         <div class="comment-time">${timeAgo(c.created_at)}</div>
       </div>
