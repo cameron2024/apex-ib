@@ -294,7 +294,10 @@
   display: flex; gap: 24px; margin-bottom: 18px;
 }
 
-.pp-count { text-align: center; }
+.pp-count { text-align: center; padding: 4px 6px; border-radius: 8px; transition: background 0.15s; }
+.pp-count.clickable { cursor: pointer; }
+.pp-count.clickable:hover { background: rgba(255,255,255,0.12); }
+.pp-count.clickable:hover .pp-count-label { opacity: 1; text-decoration: underline; text-underline-offset: 2px; }
 .pp-count-num {
   font-family: 'DM Serif Display', serif;
   font-size: 20px; line-height: 1;
@@ -302,9 +305,10 @@
 .pp-count-label {
   font-size: 10.5px; opacity: 0.6;
   text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px;
+  transition: opacity 0.15s;
 }
 
-.pp-actions { display: flex; gap: 8px; }
+.pp-actions { display: flex; gap: 8px; align-items: center; }
 
 .pp-follow-btn {
   padding: 8px 22px; border-radius: 99px;
@@ -319,10 +323,19 @@
 
 .pp-plan-chip {
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 600; padding: 3px 10px;
-  border-radius: 99px; border: 1px solid rgba(255,255,255,0.25);
-  color: rgba(255,255,255,0.8);
+  font-size: 11px; font-weight: 600; padding: 4px 11px;
+  border-radius: 99px; border: 1.5px solid rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.9);
+  cursor: pointer; transition: all 0.15s;
+  text-decoration: none;
 }
+.pp-plan-chip:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.7);
+  color: white;
+}
+.pp-plan-chip::after { content: ' →'; opacity: 0; transition: opacity 0.15s; font-size: 11px; }
+.pp-plan-chip:hover::after { opacity: 1; }
 
 /* Body */
 .pp-body { padding: 0; flex: 1; }
@@ -872,13 +885,13 @@ async function openProfile(userId) {
         <div class="pp-name">${u.name}</div>
         <div class="pp-school">${u.school ? `${u.school.logo_url ? `<img src="${u.school.logo_url}" alt="${u.school.conference}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.outerHTML='🎓'">` : '🎓 '}${u.school.name} · ${u.school.conference}` : 'Apex user'}</div>
         <div class="pp-counts">
-          <div class="pp-count" style="cursor:pointer;" onclick="togglePanelFollows(${userId},'followers',this)">
+          <div class="pp-count clickable" onclick="togglePanelFollows(${userId},'followers',this)">
             <div class="pp-count-num">${u.followers}</div>
-            <div class="pp-count-label">Followers</div>
+            <div class="pp-count-label">Followers ↕</div>
           </div>
-          <div class="pp-count" style="cursor:pointer;" onclick="togglePanelFollows(${userId},'following',this)">
+          <div class="pp-count clickable" onclick="togglePanelFollows(${userId},'following',this)">
             <div class="pp-count-num">${u.following}</div>
-            <div class="pp-count-label">Following</div>
+            <div class="pp-count-label">Following ↕</div>
           </div>
           <div class="pp-count">
             <div class="pp-count-num">${u.stats?.streak ?? 0}</div>
@@ -895,7 +908,7 @@ async function openProfile(userId) {
           <button class="pp-follow-btn ${u.isFollowing?'following':''}" id="ppFollowBtn" onclick="toggleFollowPanel(${userId}, this)">
             ${u.isFollowing ? 'Following' : '+ Follow'}
           </button>` : `<button class="pp-follow-btn" onclick="closeProfile();window.location.href='you.html'">View your profile</button>`}
-          <span class="pp-plan-chip" onclick="window.location.href='billing.html'" style="cursor:pointer;" title="View plans">${planIcons[u.plan]||'○'} ${planLabels[u.plan]||'Free'}</span>
+          <span class="pp-plan-chip" onclick="window.location.href='pricing.html'" title="See all plans">${planIcons[u.plan]||'○'} ${planLabels[u.plan]||'Free'}</span>
         </div>
       </div>
 
