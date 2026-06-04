@@ -755,7 +755,7 @@ async function loadFollowList(type) {
         <div class="follow-item-info">
           <div style="display:flex;align-items:center;gap:7px;">
             <a href="friends.html?id=${u.id}" class="follow-item-name">${u.name}</a>
-            ${u.plan !== 'free' ? `<span onclick="window.location.href='billing.html'" title="Click to see plans" style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;cursor:pointer;${u.plan==='pass'?'background:#FEF3C7;color:#D97706;':'background:#EFF6FF;color:#2563EB;'}">${u.plan==='pass'?'◆ Pass':'★ Pro'}</span>` : ''}
+            ${u.plan !== 'free' ? `<span onclick="window.location.href='pricing.html'" title="Click to see plans" style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;cursor:pointer;${u.plan==='pass'?'background:#FEF3C7;color:#D97706;':'background:#EFF6FF;color:#2563EB;'}">${u.plan==='pass'?'◆ Pass':'★ Pro'}</span>` : ''}
           </div>
           <div class="follow-item-school">
             ${u.school_name
