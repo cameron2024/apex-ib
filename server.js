@@ -1816,8 +1816,22 @@ const server = http.createServer(async (req, res) => {
       const isFollowers = url==='/api/social/followers';
       const r = await pool.query(
         isFollowers
-          ? `SELECT u.id, u.name, u.plan FROM follows f JOIN users u ON u.id=f.follower_id WHERE f.following_id=$1 ORDER BY f.created_at DESC`
-          : `SELECT u.id, u.name, u.plan FROM follows f JOIN users u ON u.id=f.following_id WHERE f.follower_id=$1 ORDER BY f.created_at DESC`,
+          ? `SELECT u.id, u.name, u.plan,
+               s.name as school_name, s.conference, s.logo_url,
+               (SELECT COUNT(*) FROM follows WHERE following_id=u.id) as followers,
+               (SELECT COUNT(*) FROM follows WHERE follower_id=u.id) as following
+             FROM follows f JOIN users u ON u.id=f.follower_id
+             LEFT JOIN school_memberships sm ON sm.user_id=u.id
+             LEFT JOIN schools s ON s.id=sm.school_id
+             WHERE f.following_id=$1 ORDER BY f.created_at DESC`
+          : `SELECT u.id, u.name, u.plan,
+               s.name as school_name, s.conference, s.logo_url,
+               (SELECT COUNT(*) FROM follows WHERE following_id=u.id) as followers,
+               (SELECT COUNT(*) FROM follows WHERE follower_id=u.id) as following
+             FROM follows f JOIN users u ON u.id=f.following_id
+             LEFT JOIN school_memberships sm ON sm.user_id=u.id
+             LEFT JOIN schools s ON s.id=sm.school_id
+             WHERE f.follower_id=$1 ORDER BY f.created_at DESC`,
         [targetId]
       );
       const myFollowing = await pool.query('SELECT following_id FROM follows WHERE follower_id=$1', [user.userId]);

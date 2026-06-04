@@ -753,14 +753,65 @@ async function loadFollowList(type) {
       <div class="follow-item" style="animation-delay:${i*0.04}s;">
         <a href="friends.html?id=${u.id}" class="follow-item-avatar">${initials(u.name)}</a>
         <div class="follow-item-info">
-          <a href="friends.html?id=${u.id}" class="follow-item-name">${u.name}</a>
-          <div class="follow-item-school">${u.school_name ? u.school_name + (u.conference?' · '+u.conference:'') : 'Apex user'}</div>
+          <div style="display:flex;align-items:center;gap:7px;">
+            <a href="friends.html?id=${u.id}" class="follow-item-name">${u.name}</a>
+            ${u.plan !== 'free' ? `<span onclick="window.location.href='billing.html'" title="Click to see plans" style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;cursor:pointer;${u.plan==='pass'?'background:#FEF3C7;color:#D97706;':'background:#EFF6FF;color:#2563EB;'}">${u.plan==='pass'?'◆ Pass':'★ Pro'}</span>` : ''}
+          </div>
+          <div class="follow-item-school">
+            ${u.school_name
+              ? (u.logo_url ? `<img src="${u.logo_url}" style="width:12px;height:12px;object-fit:contain;vertical-align:middle;margin-right:3px;" onerror="this.remove()">` : '') + u.school_name + ' · '
+              : ''}
+            <span style="color:var(--text-tertiary);">${u.followers ?? 0} followers · ${u.following ?? 0} following</span>
+          </div>
         </div>
-        ${type === 'following' ? `
-        <button class="follow-item-btn" onclick="unfollow(${u.id},this)">Unfollow</button>` : ''}
-      </div>`).join('')}</div>`;
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button onclick="toggleUserFollows(${u.id}, this)" style="font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--text-tertiary);font-family:DM Sans,sans-serif;transition:all .15s;" title="See their follows">↓</button>
+          ${type === 'following' ? `<button class="follow-item-btn" onclick="unfollow(${u.id},this)">Unfollow</button>` : ''}
+        </div>
+      </div>
+      <div id="subfollows-${u.id}" style="display:none;margin-left:50px;margin-bottom:4px;"></div>
+    `).join('')}</div>`;
   } catch(e) {
     content.innerHTML = `<div style="padding:20px;color:var(--text-secondary);font-size:13.5px;">Failed to load.</div>`;
+  }
+}
+
+async function toggleUserFollows(userId, btn) {
+  const container = document.getElementById('subfollows-'+userId);
+  if (!container) return;
+  if (container.style.display !== 'none') {
+    container.style.display = 'none';
+    btn.textContent = '↓';
+    return;
+  }
+  btn.textContent = '…';
+  container.style.display = '';
+  container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);padding:6px 0;">Loading…</div>';
+  try {
+    const [fwersR, fwingR] = await Promise.all([
+      fetch(`/api/social/followers?id=${userId}`, { headers: {'Authorization':'Bearer '+token}}),
+      fetch(`/api/social/following?id=${userId}`, { headers: {'Authorization':'Bearer '+token}}),
+    ]);
+    const fwers = (await fwersR.json()).users || [];
+    const fwing = (await fwingR.json()).users || [];
+    const renderMini = (list, label) => list.length === 0 ? '' : `
+      <div style="font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-tertiary);margin:8px 0 4px;">${label}</div>
+      ${list.slice(0,6).map(u=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
+          <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:white;flex-shrink:0;">${initials(u.name)}</div>
+          <a href="friends.html?id=${u.id}" style="font-size:12.5px;font-weight:500;color:var(--text-primary);text-decoration:none;flex:1;">${u.name}</a>
+          <span style="font-size:11px;color:var(--text-tertiary);">${u.followers ?? 0} followers</span>
+        </div>`).join('')}
+      ${list.length > 6 ? `<div style="font-size:11.5px;color:var(--accent-blue);margin-top:4px;cursor:pointer;" onclick="window.location.href='friends.html?id=${userId}'">See all ${list.length} →</div>` : ''}`;
+    container.innerHTML = `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px;">
+      ${renderMini(fwers, 'Followers')}
+      ${renderMini(fwing, 'Following')}
+      ${fwers.length===0&&fwing.length===0 ? '<div style="font-size:12px;color:var(--text-tertiary);">No social connections yet.</div>' : ''}
+    </div>`;
+    btn.textContent = '↑';
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-secondary);padding:6px 0;">Failed to load.</div>';
+    btn.textContent = '↓';
   }
 }
 

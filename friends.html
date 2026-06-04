@@ -872,11 +872,11 @@ async function openProfile(userId) {
         <div class="pp-name">${u.name}</div>
         <div class="pp-school">${u.school ? `${u.school.logo_url ? `<img src="${u.school.logo_url}" alt="${u.school.conference}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.outerHTML='🎓'">` : '🎓 '}${u.school.name} · ${u.school.conference}` : 'Apex user'}</div>
         <div class="pp-counts">
-          <div class="pp-count">
+          <div class="pp-count" style="cursor:pointer;" onclick="togglePanelFollows(${userId},'followers',this)">
             <div class="pp-count-num">${u.followers}</div>
             <div class="pp-count-label">Followers</div>
           </div>
-          <div class="pp-count">
+          <div class="pp-count" style="cursor:pointer;" onclick="togglePanelFollows(${userId},'following',this)">
             <div class="pp-count-num">${u.following}</div>
             <div class="pp-count-label">Following</div>
           </div>
@@ -889,12 +889,13 @@ async function openProfile(userId) {
             <div class="pp-count-label">Answered</div>
           </div>
         </div>
+        <div id="panelFollowsList" style="margin-top:10px;display:none;"></div>
         <div class="pp-actions">
           ${!isMe ? `
           <button class="pp-follow-btn ${u.isFollowing?'following':''}" id="ppFollowBtn" onclick="toggleFollowPanel(${userId}, this)">
             ${u.isFollowing ? 'Following' : '+ Follow'}
           </button>` : `<button class="pp-follow-btn" onclick="closeProfile();window.location.href='you.html'">View your profile</button>`}
-          <span class="pp-plan-chip">${planIcons[u.plan]||'○'} ${planLabels[u.plan]||'Free'}</span>
+          <span class="pp-plan-chip" onclick="window.location.href='billing.html'" style="cursor:pointer;" title="View plans">${planIcons[u.plan]||'○'} ${planLabels[u.plan]||'Free'}</span>
         </div>
       </div>
 
@@ -984,6 +985,59 @@ async function openProfile(userId) {
         el.appendChild(img);
       }
     }
+  } catch(e) {}
+}
+
+let _panelFollowsOpen = null;
+
+async function togglePanelFollows(userId, type, btn) {
+  const container = document.getElementById('panelFollowsList');
+  if (!container) return;
+  if (_panelFollowsOpen === type) {
+    container.style.display = 'none';
+    _panelFollowsOpen = null;
+    return;
+  }
+  _panelFollowsOpen = type;
+  container.style.display = '';
+  container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">Loading…</div>';
+  try {
+    const r = await fetch(`/api/social/${type}?id=${userId}`, { headers: {'Authorization':'Bearer '+token}});
+    const data = await r.json();
+    const users = data.users || [];
+    if (users.length === 0) {
+      container.innerHTML = `<div style="font-size:12.5px;color:var(--text-tertiary);padding:8px 0;">No ${type} yet.</div>`;
+      return;
+    }
+    container.innerHTML = `
+      <div style="background:var(--bg);border-radius:8px;border:1px solid var(--border);overflow:hidden;margin-bottom:8px;">
+        <div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-tertiary);">${type} (${users.length})</div>
+        ${users.map(u=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);transition:background .1s;" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background=''">
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;flex-shrink:0;cursor:pointer;" onclick="closeProfile();openProfile(${u.id})">${initials(u.name)}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;cursor:pointer;" onclick="closeProfile();openProfile(${u.id})">${u.name}</div>
+              <div style="font-size:11px;color:var(--text-tertiary);">${u.school_name||''} ${u.followers!=null?'· '+u.followers+' followers':''}</div>
+            </div>
+            <button onclick="quickFollowPanel(${u.id},this,${u.isFollowing})" style="font-size:11px;padding:4px 10px;border-radius:99px;border:1.5px solid ${u.isFollowing?'var(--border)':'var(--text-primary)'};background:none;cursor:pointer;color:${u.isFollowing?'var(--text-secondary)':'var(--text-primary)'};font-family:DM Sans,sans-serif;white-space:nowrap;">${u.isFollowing?'Following':'Follow'}</button>
+          </div>`).join('')}
+      </div>`;
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-secondary);">Failed to load.</div>';
+  }
+}
+
+async function quickFollowPanel(userId, btn, wasFollowing) {
+  try {
+    await fetch(wasFollowing ? '/api/social/unfollow' : '/api/social/follow', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({targetId: userId})
+    });
+    const nowFollowing = !wasFollowing;
+    btn.textContent = nowFollowing ? 'Following' : 'Follow';
+    btn.style.borderColor = nowFollowing ? 'var(--border)' : 'var(--text-primary)';
+    btn.style.color = nowFollowing ? 'var(--text-secondary)' : 'var(--text-primary)';
+    btn.onclick = () => quickFollowPanel(userId, btn, nowFollowing);
   } catch(e) {}
 }
 
