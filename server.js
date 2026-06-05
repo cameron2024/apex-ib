@@ -924,7 +924,7 @@ const server = http.createServer(async (req, res) => {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
       const {isPrivate, visibility} = await readBody(req);
-      const validVisibility = ['public','friends','school'];
+      const validVisibility = ['public','friends','school','school_and_friends'];
       const vis = validVisibility.includes(visibility) ? visibility : 'public';
       await pool.query(
         'UPDATE users SET is_private=$1, visibility=$2 WHERE id=$3',
@@ -1665,10 +1665,18 @@ const server = http.createServer(async (req, res) => {
 
       let canViewFull = isMe;
       if (!canViewFull) {
-        if (visibility === 'public' && !isPrivate) canViewFull = true;
-        else if (visibility === 'friends') canViewFull = isMutual;
-        else if (visibility === 'school') canViewFull = viewerSchoolId && targetSchoolId && String(viewerSchoolId) === String(targetSchoolId);
-        else if (isPrivate) canViewFull = isFollowing;
+        if (isPrivate) {
+          canViewFull = isFollowing;
+        } else if (visibility === 'public') {
+          canViewFull = true;
+        } else if (visibility === 'friends') {
+          canViewFull = isMutual;
+        } else if (visibility === 'school') {
+          canViewFull = viewerSchoolId && targetSchoolId && String(viewerSchoolId) === String(targetSchoolId);
+        } else if (visibility === 'school_and_friends') {
+          const sameSchool = viewerSchoolId && targetSchoolId && String(viewerSchoolId) === String(targetSchoolId);
+          canViewFull = sameSchool || isMutual;
+        }
       }
 
       // Recommended profiles (shown when account is private/locked)

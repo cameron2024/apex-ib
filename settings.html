@@ -274,20 +274,21 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
 .toggle-switch input:checked + .toggle-track .toggle-thumb { transform: translateX(20px); }
 
 /* ── RADIO OPTIONS ── */
-.radio-option {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  cursor: pointer;
-  padding: 12px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  transition: border-color .15s;
+.privacy-row { transition: background 0.15s; }
+.privacy-row:hover { background: var(--bg); }
+.privacy-row.disabled { opacity: 0.4; pointer-events: none; }
+.privacy-row-inner {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 18px 22px;
 }
-.radio-option:has(input:checked) { border-color: var(--text-primary); }
-.radio-option input { margin-top: 2px; flex-shrink: 0; }
-.radio-option-title { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
-.radio-option-desc  { font-size: 12.5px; color: var(--text-secondary); }
+.privacy-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.privacy-text { flex: 1; }
+.privacy-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.privacy-desc  { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 
 /* ── DANGER CARD ── */
 .danger-card { border-color: #FEE2E2; }
@@ -509,67 +510,104 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
 
       <!-- PRIVACY -->
       <div class="settings-panel" id="panel-privacy">
+
         <div class="settings-card">
           <div class="card-header">
             <div class="card-header-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <div class="card-header-text">
-              <div class="card-title">Account privacy</div>
+              <div class="card-title">Profile visibility</div>
               <div class="card-desc">Control who can see your full profile</div>
             </div>
           </div>
-          <div class="card-body">
-            <div class="toggle-row">
-              <div class="toggle-info">
-                <div class="toggle-label">Private account</div>
-                <div class="toggle-desc">When on, only your followers can see your performance, topics, and answers. Everyone else sees only your public stats.</div>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="privacyPrivateToggle" onchange="savePrivacy()">
-                <span class="toggle-track"><span class="toggle-thumb"></span></span>
-              </label>
-            </div>
-          </div>
-        </div>
+          <div class="card-body" style="gap:0;padding:0;">
 
-        <div class="settings-card">
-          <div class="card-header">
-            <div class="card-header-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <!-- What's always public -->
+            <div style="padding:16px 22px;background:var(--bg);border-bottom:1px solid var(--border);font-size:13px;color:var(--text-secondary);line-height:1.6;">
+              Regardless of your settings, everyone can always see your <strong style="color:var(--text-primary);">follower count, following count, day streak,</strong> and <strong style="color:var(--text-primary);">number of questions answered</strong>.
             </div>
-            <div class="card-header-text">
-              <div class="card-title">Profile visibility</div>
-              <div class="card-desc">Who can see your full performance data and answer history</div>
+
+            <!-- Private -->
+            <div class="privacy-row" id="row-private">
+              <div class="privacy-row-inner">
+                <div class="privacy-icon" style="background:#F3F4F6;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <div class="privacy-text">
+                  <div class="privacy-title">Private profile</div>
+                  <div class="privacy-desc">Only your followers can see anything beyond your public stats. Your performance, topics, answers, and badges are hidden from everyone else.</div>
+                </div>
+                <label class="toggle-switch" style="flex-shrink:0;">
+                  <input type="checkbox" id="tog-private" onchange="onPrivacyChange('private')">
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
             </div>
-          </div>
-          <div class="card-body" id="visibilityOptions" style="gap:10px;">
-            <label class="radio-option">
-              <input type="radio" name="visibility" value="public" onchange="savePrivacy()">
-              <div>
-                <div class="radio-option-title">Everyone</div>
-                <div class="radio-option-desc">Any logged-in Apex user can view your full profile.</div>
+
+            <div style="height:1px;background:var(--border);"></div>
+
+            <!-- School only -->
+            <div class="privacy-row" id="row-school">
+              <div class="privacy-row-inner">
+                <div class="privacy-icon" style="background:#EFF6FF;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" width="16" height="16"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                </div>
+                <div class="privacy-text">
+                  <div class="privacy-title">My school only <span style="font-size:11px;font-weight:400;color:var(--text-tertiary);">.edu required</span></div>
+                  <div class="privacy-desc">Full profile is visible only to people from your verified .edu institution. Can be combined with mutual followers.</div>
+                </div>
+                <label class="toggle-switch" style="flex-shrink:0;">
+                  <input type="checkbox" id="tog-school" onchange="onPrivacyChange('school')">
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
               </div>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="visibility" value="friends" onchange="savePrivacy()">
-              <div>
-                <div class="radio-option-title">Mutual followers only</div>
-                <div class="radio-option-desc">Only people you both follow and follow you back can see your full profile.</div>
+            </div>
+
+            <div style="height:1px;background:var(--border);"></div>
+
+            <!-- Mutual followers -->
+            <div class="privacy-row" id="row-friends">
+              <div class="privacy-row-inner">
+                <div class="privacy-icon" style="background:#F0FDF4;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                </div>
+                <div class="privacy-text">
+                  <div class="privacy-title">Mutual followers only</div>
+                  <div class="privacy-desc">Full profile visible only to people you follow back. Can be combined with school only — mutual followers from any school can see your profile.</div>
+                </div>
+                <label class="toggle-switch" style="flex-shrink:0;">
+                  <input type="checkbox" id="tog-friends" onchange="onPrivacyChange('friends')">
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
               </div>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="visibility" value="school" onchange="savePrivacy()">
-              <div>
-                <div class="radio-option-title">My school only <span style="font-size:11px;font-weight:400;color:var(--text-tertiary);">.edu required</span></div>
-                <div class="radio-option-desc">Only people with a verified .edu email from your school can see your full profile.</div>
+            </div>
+
+            <div style="height:1px;background:var(--border);"></div>
+
+            <!-- Public -->
+            <div class="privacy-row" id="row-public">
+              <div class="privacy-row-inner">
+                <div class="privacy-icon" style="background:#FEF3C7;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                </div>
+                <div class="privacy-text">
+                  <div class="privacy-title">Public profile</div>
+                  <div class="privacy-desc">Full profile visible to all logged-in Apex users — performance stats, topic breakdown, answer history, activity heatmap, and badges.</div>
+                </div>
+                <label class="toggle-switch" style="flex-shrink:0;">
+                  <input type="checkbox" id="tog-public" onchange="onPrivacyChange('public')">
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
               </div>
-            </label>
+            </div>
+
           </div>
           <div class="card-footer">
             <span id="privacySaveStatus" class="save-status"></span>
           </div>
         </div>
+
       </div>
 
       <!-- BILLING -->
@@ -781,44 +819,112 @@ async function removePhoto() {
 }
 
 // ── PRIVACY ──
+// State: private=true means locked to followers only
+//        school=true, friends=true can be combined
+//        public=true means open to all (clears others)
+let _privState = { private: false, school: false, friends: false, public: true };
+
+function setToggleUI(id, on) {
+  const input = document.getElementById('tog-'+id);
+  if (!input) return;
+  input.checked = on;
+  const track = input.nextElementSibling;
+  if (track) {
+    track.style.background = on ? 'var(--text-primary)' : '#ccc';
+    const thumb = track.querySelector('.toggle-thumb');
+    if (thumb) thumb.style.transform = on ? 'translateX(20px)' : '';
+  }
+}
+
+function applyPrivacyUI() {
+  ['private','school','friends','public'].forEach(k => setToggleUI(k, _privState[k]));
+}
+
+function onPrivacyChange(which) {
+  const val = document.getElementById('tog-'+which)?.checked;
+
+  if (which === 'private') {
+    if (val) {
+      // Private on → turn everything else off
+      _privState = { private: true, school: false, friends: false, public: false };
+    } else {
+      // Private off → default back to public
+      _privState = { private: false, school: false, friends: false, public: true };
+    }
+  } else if (which === 'school') {
+    if (val) {
+      // School on → private and public off, friends can stay
+      _privState.private = false;
+      _privState.public = false;
+      _privState.school = true;
+    } else {
+      _privState.school = false;
+      // If nothing left on, default to public
+      if (!_privState.friends) _privState.public = true;
+    }
+  } else if (which === 'friends') {
+    if (val) {
+      // Friends on → private and public off, school can stay
+      _privState.private = false;
+      _privState.public = false;
+      _privState.friends = true;
+    } else {
+      _privState.friends = false;
+      if (!_privState.school) _privState.public = true;
+    }
+  } else if (which === 'public') {
+    if (val) {
+      // Public on → everything else off
+      _privState = { private: false, school: false, friends: false, public: true };
+    } else {
+      // Public off → default to private
+      _privState = { private: true, school: false, friends: false, public: false };
+    }
+  }
+
+  applyPrivacyUI();
+  savePrivacy();
+}
+
+// Map state to server fields
+function privacyStateToServer() {
+  if (_privState.private) return { isPrivate: true, visibility: 'public' };
+  if (_privState.school && _privState.friends) return { isPrivate: false, visibility: 'school_and_friends' };
+  if (_privState.school)  return { isPrivate: false, visibility: 'school' };
+  if (_privState.friends) return { isPrivate: false, visibility: 'friends' };
+  return { isPrivate: false, visibility: 'public' };
+}
+
+function serverToPrivacyState(isPrivate, visibility) {
+  if (isPrivate) return { private: true, school: false, friends: false, public: false };
+  if (visibility === 'school_and_friends') return { private: false, school: true, friends: true, public: false };
+  if (visibility === 'school')   return { private: false, school: true,  friends: false, public: false };
+  if (visibility === 'friends')  return { private: false, school: false, friends: true,  public: false };
+  return { private: false, school: false, friends: false, public: true };
+}
+
 async function loadPrivacySettings() {
   try {
     const r = await fetch('/api/auth/privacy', { headers:{'Authorization':'Bearer '+token}});
     const data = await r.json();
-    const toggle = document.getElementById('privacyPrivateToggle');
-    const track = toggle?.nextElementSibling;
-    if (toggle) {
-      toggle.checked = !!data.isPrivate;
-      if (track) track.querySelector('.toggle-thumb').style.transform = toggle.checked ? 'translateX(20px)' : '';
-      if (track) track.style.background = toggle.checked ? 'var(--text-primary)' : '#ccc';
-    }
-    const vis = data.visibility || 'public';
-    document.querySelectorAll('input[name="visibility"]').forEach(r => { if (r.value === vis) r.checked = true; });
+    _privState = serverToPrivacyState(!!data.isPrivate, data.visibility||'public');
+    applyPrivacyUI();
   } catch(e) {}
 }
 loadPrivacySettings();
-
-document.getElementById('privacyPrivateToggle')?.addEventListener('change', function() {
-  const track = this.nextElementSibling;
-  if (track) {
-    track.style.background = this.checked ? 'var(--text-primary)' : '#ccc';
-    track.querySelector('.toggle-thumb').style.transform = this.checked ? 'translateX(20px)' : '';
-  }
-});
 
 let _privTimer = null;
 function savePrivacy() {
   clearTimeout(_privTimer);
   _privTimer = setTimeout(async () => {
-    const isPrivate = document.getElementById('privacyPrivateToggle')?.checked || false;
-    const vis = document.querySelector('input[name="visibility"]:checked')?.value || 'public';
     try {
+      const payload = privacyStateToServer();
       await fetch('/api/auth/privacy', {
         method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-        body: JSON.stringify({isPrivate, visibility: vis})
+        body: JSON.stringify(payload)
       });
       const s = document.getElementById('privacySaveStatus');
-      if (s) { s.textContent='✓ Saved'; s.className='save-status success'; setTimeout(()=>{s.textContent='';s.className='save-status';}, 2500); }
+      if (s) { s.textContent='✓ Saved'; s.className='save-status success'; setTimeout(()=>{s.textContent='';s.className='save-status';},2500); }
     } catch(e) {}
   }, 400);
 }
