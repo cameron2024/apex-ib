@@ -239,6 +239,8 @@ async function initDB() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_data TEXT;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS is_private INT DEFAULT 0;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS visibility TEXT DEFAULT 'public';
+      UPDATE users SET is_private=0 WHERE is_private IS NULL;
+      UPDATE users SET visibility='public' WHERE visibility IS NULL;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS attempt_count INT DEFAULT 1;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS consecutive_high INT DEFAULT 0;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS mastery_stage TEXT;
@@ -1659,13 +1661,17 @@ const server = http.createServer(async (req, res) => {
       // Privacy check
       const isPrivate = !!u.is_private;
       const visibility = u.visibility || 'public';
+      // NULL values from pre-privacy users = public
+      const effectivelyPublic = !u.is_private && (!u.visibility || u.visibility === 'public');
       const userSchoolR = !isMe ? await pool.query('SELECT school_id FROM school_memberships WHERE user_id=$1', [user.userId]) : null;
       const viewerSchoolId = userSchoolR?.rows[0]?.school_id;
       const targetSchoolId = schoolR.rows[0]?.id;
 
       let canViewFull = isMe;
       if (!canViewFull) {
-        if (isPrivate) {
+        if (effectivelyPublic || visibility === 'public') {
+          canViewFull = true;
+        } else if (isPrivate) {
           canViewFull = isFollowing;
         } else if (visibility === 'public') {
           canViewFull = true;
