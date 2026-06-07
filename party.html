@@ -314,7 +314,24 @@
 .setting-label { font-size: 13px; color: var(--text-secondary); }
 .setting-value { font-size: 13px; font-weight: 600; }
 
-.btn-primary {
+.topic-block {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--surface);
+  user-select: none;
+}
+.topic-block:hover { border-color: var(--border-strong); background: var(--bg); }
+.topic-block.selected {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+  color: white;
+}
+.topic-block-icon { font-size: 22px; margin-bottom: 6px; line-height: 1; }
+.topic-block-name { font-size: 12.5px; font-weight: 600; line-height: 1.3; }
   width: 100%;
   padding: 11px;
   background: var(--text-primary);
@@ -773,28 +790,43 @@
       <p>Configure your session. Share the code with friends once it's created.</p>
 
       <div class="form-group">
-        <label class="form-label">Topic <span>(optional)</span></label>
-        <select class="form-select" id="createTopic">
-          <option value="">All topics (mixed)</option>
-          <option value="Accounting">Accounting</option>
-          <option value="Enterprise_Value">Enterprise Value</option>
-          <option value="Valuation">Valuation</option>
-          <option value="DCF">Discounted Cash Flow</option>
-          <option value="Mergers_MA">Mergers & Acquisitions</option>
-          <option value="LBO">Leveraged Buyouts</option>
-        </select>
+        <label class="form-label">Topics <span>(select one or more, or leave all unselected for mixed)</span></label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;" id="topicBlocks">
+          <div class="topic-block" data-topic="Accounting" onclick="toggleTopicBlock(this)">
+            <div class="topic-block-icon">📊</div>
+            <div class="topic-block-name">Accounting</div>
+          </div>
+          <div class="topic-block" data-topic="Enterprise_Value" onclick="toggleTopicBlock(this)">
+            <div class="topic-block-icon">🏢</div>
+            <div class="topic-block-name">Enterprise Value</div>
+          </div>
+          <div class="topic-block" data-topic="Valuation" onclick="toggleTopicBlock(this)">
+            <div class="topic-block-icon">💎</div>
+            <div class="topic-block-name">Valuation</div>
+          </div>
+          <div class="topic-block" data-topic="DCF" onclick="toggleTopicBlock(this)">
+            <div class="topic-block-icon">📈</div>
+            <div class="topic-block-name">DCF</div>
+          </div>
+          <div class="topic-block" data-topic="Mergers_MA" onclick="toggleTopicBlock(this)">
+            <div class="topic-block-icon">🤝</div>
+            <div class="topic-block-name">M&A</div>
+          </div>
+          <div class="topic-block" data-topic="LBO" onclick="toggleTopicBlock(this)">
+            <div class="topic-block-icon">⚡</div>
+            <div class="topic-block-name">LBO</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-tertiary);margin-top:8px;" id="topicSelectionHint">No topics selected — mixed questions from all topics</div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Time limit per question <span>(optional)</span></label>
-        <select class="form-select" id="createTimeLimit">
-          <option value="">No limit — host advances manually</option>
-          <option value="60">1 minute</option>
-          <option value="120">2 minutes</option>
-          <option value="180">3 minutes</option>
-          <option value="300">5 minutes</option>
-          <option value="600">10 minutes</option>
-        </select>
+        <label class="form-label">Time limit per question <span>(optional — leave blank for no limit)</span></label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input class="form-input" type="number" id="createTimeLimitInput" placeholder="e.g. 90" min="10" max="900" style="width:120px;">
+          <span style="font-size:13.5px;color:var(--text-secondary);">seconds per question</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-tertiary);margin-top:6px;">Host advances manually if blank. Suggested: 60–180 seconds.</div>
       </div>
 
       <button class="btn-primary" onclick="createParty()" id="createBtn">Create Party</button>
@@ -1016,17 +1048,37 @@ function showView(id) {
   document.getElementById(id)?.classList.add('active');
 }
 
+// ── TOPIC BLOCKS ──
+function toggleTopicBlock(el) {
+  el.classList.toggle('selected');
+  const selected = document.querySelectorAll('#topicBlocks .topic-block.selected');
+  const hint = document.getElementById('topicSelectionHint');
+  if (selected.length === 0) {
+    hint.textContent = 'No topics selected — mixed questions from all topics';
+  } else {
+    const names = [...selected].map(b => b.querySelector('.topic-block-name').textContent);
+    hint.textContent = names.join(', ');
+  }
+}
+
+function getSelectedTopics() {
+  return [...document.querySelectorAll('#topicBlocks .topic-block.selected')].map(b => b.dataset.topic);
+}
+
 // ── CREATE PARTY ──
 async function createParty() {
   const btn = document.getElementById('createBtn');
   btn.disabled = true; btn.textContent = 'Creating…';
-  const topic = document.getElementById('createTopic').value;
-  const timeLimitSec = parseInt(document.getElementById('createTimeLimit').value)||0;
+  const topics = getSelectedTopics();
+  // Pass as comma-joined string; server picks randomly from these topics
+  const topic = topics.length === 1 ? topics[0] : topics.length > 1 ? topics.join(',') : null;
+  const timeLimitRaw = parseInt(document.getElementById('createTimeLimitInput').value) || 0;
+  const timeLimitSec = timeLimitRaw >= 10 ? timeLimitRaw : null;
   try {
     const r = await fetch('/api/party/create', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body: JSON.stringify({topic: topic||null, timeLimitSec: timeLimitSec||null})
+      body: JSON.stringify({topic, timeLimitSec})
     });
     const data = await r.json();
     if (r.status === 402) {
@@ -1080,7 +1132,11 @@ async function joinParty() {
     allMembers = data.members||[];
     // Enter lobby
     document.getElementById('lobbyCodeBadge').textContent = partyCode;
-    document.getElementById('lobbyTopic').textContent = data.party.topic ? data.party.topic.replace('_',' ') : 'Mixed';
+    const topicRaw = data.party.topic;
+    const topicDisplay = topicRaw
+      ? topicRaw.split(',').map(t => t.trim().replace(/_/g,' ')).join(', ')
+      : 'Mixed';
+    document.getElementById('lobbyTopic').textContent = topicDisplay;
     document.getElementById('lobbyTimeLimit').textContent = timeLimitSec ? (timeLimitSec/60 + ' min') : 'No limit';
     if (isHost) document.getElementById('hostStartSection').style.display = '';
     renderLobbyMembers(allMembers);

@@ -2308,9 +2308,14 @@ const server = http.createServer(async (req, res) => {
       if (party.status !== 'lobby') return json(res,400,{error:'Party already started'});
       const n = Math.min(parseInt(questionCount)||10, 30);
       const topic = party.topic;
-      const eligibleIds = topic && topic !== 'All'
-        ? Object.keys(QUESTIONS_BY_ID).filter(id => QUESTIONS_BY_ID[id].topic === topic)
-        : Object.keys(QUESTIONS_BY_ID);
+      let eligibleIds;
+      if (topic && topic !== 'All') {
+        // Support comma-joined multi-topic e.g. "Accounting,DCF,LBO"
+        const topics = topic.split(',').map(t => t.trim()).filter(Boolean);
+        eligibleIds = Object.keys(QUESTIONS_BY_ID).filter(id => topics.includes(QUESTIONS_BY_ID[id].topic));
+      } else {
+        eligibleIds = Object.keys(QUESTIONS_BY_ID);
+      }
       const questionIds = shuffle(eligibleIds).slice(0, n);
       await pool.query(
         `UPDATE study_parties SET status='active', question_ids=$1, current_question_index=0, started_at=$2 WHERE id=$3`,
