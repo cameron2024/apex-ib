@@ -2136,16 +2136,102 @@ Return JSON only.`;
     const bgMap = { basic:'#F3F4F6;color:#374151', intermediate:'#EFF6FF;color:#1D4ED8', hard:'#FEF3C7;color:#92400E' };
     const bd = prog.byDiff || {};
     const nextLevel = level === 'basic' ? 'intermediate' : level === 'intermediate' ? 'hard' : null;
-    let progressHtml = '';
-    if (nextLevel && bd[level]) {
-      const needed = level === 'basic' ? 70 : 75;
-      const ratio = bd[level].seenRatio || 0;
-      const avg = bd[level].avgScore;
-      const pct = avg != null ? Math.round(Math.min(100,(avg/needed)*60+ratio*40)) : Math.round(ratio*100);
-      progressHtml = `<span style="font-size:11px;color:var(--text-tertiary);margin-left:8px;">${pct}% to ${labelMap[nextLevel]}</span>`;
-    }
-    el.style.display = '';
-    el.innerHTML = `<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;background:${bgMap[level]||bgMap.basic}">${labelMap[level]||'Fundamentals'}</span>${progressHtml}`;
+    const needed = level === 'basic' ? 70 : 75;
+    const ratio = bd[level]?.seenRatio || 0;
+    const avg = bd[level]?.avgScore;
+    const pct = nextLevel ? (avg != null ? Math.round(Math.min(100,(avg/needed)*60+ratio*40)) : Math.round(ratio*100)) : 100;
+    const seen = bd[level]?.seen || 0;
+    const total = bd[level]?.total || 0;
+
+    // Tooltip content
+    const levelDescMap = {
+      basic:        'Core concepts every banker must know — financial statements, valuation basics, and accounting fundamentals.',
+      intermediate: 'Deeper technical questions on DCF, LBO mechanics, and more nuanced accounting topics.',
+      hard:         'Advanced deal-level questions: complex M&A structures, edge cases, and senior associate-level topics.',
+    };
+    const unlockDescMap = {
+      intermediate: `Unlock by scoring ≥ 70 avg on Fundamentals or seeing ≥ 60% of them.`,
+      hard:         `Unlock by scoring ≥ 75 avg on Technical or seeing ≥ 60% of them.`,
+    };
+    const nextUnlockDesc = nextLevel ? unlockDescMap[nextLevel] : '';
+    const avgDisplay = avg != null ? `${avg}/100` : '—';
+    const seenDisplay = `${seen} / ${total} seen`;
+
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.gap = '6px';
+    el.style.position = 'relative';
+
+    el.innerHTML = `
+      <div id="diffBadgeWrap" style="display:flex;align-items:center;gap:6px;cursor:default;"
+           onmouseenter="document.getElementById('diffTooltip').style.opacity='1';document.getElementById('diffTooltip').style.pointerEvents='all';"
+           onmouseleave="document.getElementById('diffTooltip').style.opacity='0';document.getElementById('diffTooltip').style.pointerEvents='none';">
+        <span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;background:${bgMap[level]||bgMap.basic}">
+          ${labelMap[level]||'Fundamentals'}
+        </span>
+        ${nextLevel ? `<span style="font-size:11px;color:var(--text-tertiary);">${pct}% to ${labelMap[nextLevel]}</span>` : `<span style="font-size:11px;color:var(--accent-green);">✓ Max level</span>`}
+      </div>
+
+      <div id="diffTooltip" style="
+        position:absolute; top:calc(100% + 10px); left:0;
+        width:280px; background:white;
+        border:1px solid var(--border); border-radius:12px;
+        box-shadow:0 12px 32px rgba(0,0,0,0.12);
+        padding:16px; z-index:200;
+        opacity:0; pointer-events:none;
+        transition:opacity 0.15s ease;
+        font-family:'DM Sans',sans-serif;
+      "
+      onmouseenter="this.style.opacity='1';this.style.pointerEvents='all';"
+      onmouseleave="this.style.opacity='0';this.style.pointerEvents='none';">
+
+        <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:10px;">Difficulty Progression</div>
+
+        <!-- Current level -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
+            <span style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:${bgMap[level]||bgMap.basic}">${labelMap[level]}</span>
+            <span style="font-size:11px;color:var(--accent-green);font-weight:600;">Current</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.5;">${levelDescMap[level]}</div>
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <div style="font-size:11.5px;color:var(--text-secondary);">📖 <strong>${seenDisplay}</strong></div>
+            <div style="font-size:11.5px;color:var(--text-secondary);">⭐ <strong>Avg ${avgDisplay}</strong></div>
+          </div>
+        </div>
+
+        ${nextLevel ? `
+        <!-- Progress to next -->
+        <div style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:4px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);">Next: ${labelMap[nextLevel]}</div>
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary);">${pct}%</div>
+          </div>
+          <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:8px;">
+            <div style="height:100%;width:${pct}%;background:var(--text-primary);border-radius:99px;transition:width .6s ease;"></div>
+          </div>
+          <div style="font-size:11.5px;color:var(--text-tertiary);line-height:1.5;">${nextUnlockDesc}</div>
+        </div>` : `
+        <div style="background:#F0FDF4;border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:13px;font-weight:600;color:#166534;">🏆 You've reached the highest level</div>
+          <div style="font-size:12px;color:#166534;margin-top:3px;opacity:.8;">Keep practicing to stay sharp.</div>
+        </div>`}
+
+        <!-- All three tiers overview -->
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">All levels</div>
+          ${['basic','intermediate','hard'].map(d => {
+            const dbd = bd[d] || {};
+            const isUnlocked = (prog.unlocked||['basic']).includes(d);
+            const isCurrent = d === level;
+            return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
+              <div style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:${isUnlocked?(bgMap[d]||bgMap.basic):'#F3F4F6;color:#9CA3AF'};opacity:${isUnlocked?1:0.5};">${labelMap[d]||d}</div>
+              ${isCurrent ? '<span style="font-size:10px;color:var(--accent-green);font-weight:600;">● current</span>' : isUnlocked ? '<span style="font-size:10px;color:var(--text-tertiary);">✓ unlocked</span>' : '<span style="font-size:10px;color:var(--text-tertiary);">🔒 locked</span>'}
+              <span style="margin-left:auto;font-size:11px;color:var(--text-tertiary);">${dbd.seen||0}/${dbd.total||0}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
   }
 
   function getFilteredQuestions(topic) {
