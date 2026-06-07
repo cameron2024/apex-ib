@@ -929,6 +929,7 @@
     <div class="breadcrumb">
       Practice <span class="breadcrumb-sep">›</span> <span id="breadcrumbTopic"></span>
     </div>
+    <div id="difficultyProgressBadge" style="display:none;display:flex;align-items:center;gap:6px;"></div>
     <div class="topic-pill" id="topicPillWrap">
       <span class="topic-dot"></span>
       <span id="topbarTopicPill"></span>
@@ -1609,12 +1610,7 @@ Return JSON only.`;
 
       if (response.status === 402) {
         overlay.classList.remove('visible');
-        const errData = await response.json().catch(()=>({}));
-        if (errData.flashcard_mode) {
-          enterFlashcardMode(errData.message);
-        } else {
-          showUpgradeModal('grade_limit');
-        }
+        showUpgradeModal('grade_limit');
         return;
       }
       if (!response.ok) throw new Error(`API ${response.status}: ${await response.text()}`);
@@ -2086,23 +2082,80 @@ Return JSON only.`;
 
   // Smart ordering: missed → partial → unattempted → mastered
   function smartOrder(questions) {
+    const DIFF_ORDER = { basic: 0, intermediate: 1, hard: 2 };
     const rank = q => {
       const s = sessionResults[q.id];
       if (s === 'missed')  return 0;
       if (s === 'partial') return 1;
       if (!s)              return 2;
-      return 3; // mastered — review at end
+      return 3;
     };
     const tiers = [[], [], [], []];
     questions.forEach(q => tiers[rank(q)].push(q));
-    tiers.forEach(t => t.sort(() => Math.random() - 0.5));
+    tiers.forEach(tier => {
+      tier.sort((a, b) => {
+        const da = DIFF_ORDER[a.difficulty] ?? 1;
+        const db = DIFF_ORDER[b.difficulty] ?? 1;
+        if (da !== db) return da - db;
+        return Math.random() - 0.5;
+      });
+    });
     return [...tiers[0], ...tiers[1], ...tiers[2], ...tiers[3]];
   }
 
+  let difficultyProgress = {};
+
+  async function loadDifficultyProgress() {
+    if (!authToken) return;
+    try {
+      const r = await fetch('/api/progress/difficulty', { headers: {'Authorization':'Bearer '+authToken}});
+      const data = await r.json();
+      difficultyProgress = data.topics || {};
+      updateDifficultyBadge(currentTopic);
+    } catch(e) {}
+  }
+
+  function getUnlockedDifficulties(topic) {
+    if (!authToken) return ['basic','intermediate','hard'];
+    if (topic === 'All') {
+      const all = new Set(['basic']);
+      Object.values(difficultyProgress).forEach(tp => (tp.unlocked||[]).forEach(d => all.add(d)));
+      return [...all];
+    }
+    return difficultyProgress[topic]?.unlocked || ['basic'];
+  }
+
+  function updateDifficultyBadge(topic) {
+    const el = document.getElementById('difficultyProgressBadge');
+    if (!el) return;
+    if (!authToken || topic === 'All') { el.style.display = 'none'; return; }
+    const prog = difficultyProgress[topic];
+    if (!prog) { el.style.display = 'none'; return; }
+    const level = prog.currentLevel || 'basic';
+    const labelMap = { basic:'Fundamentals', intermediate:'Technical', hard:'Advanced' };
+    const bgMap = { basic:'#F3F4F6;color:#374151', intermediate:'#EFF6FF;color:#1D4ED8', hard:'#FEF3C7;color:#92400E' };
+    const bd = prog.byDiff || {};
+    const nextLevel = level === 'basic' ? 'intermediate' : level === 'intermediate' ? 'hard' : null;
+    let progressHtml = '';
+    if (nextLevel && bd[level]) {
+      const needed = level === 'basic' ? 70 : 75;
+      const ratio = bd[level].seenRatio || 0;
+      const avg = bd[level].avgScore;
+      const pct = avg != null ? Math.round(Math.min(100,(avg/needed)*60+ratio*40)) : Math.round(ratio*100);
+      progressHtml = `<span style="font-size:11px;color:var(--text-tertiary);margin-left:8px;">${pct}% to ${labelMap[nextLevel]}</span>`;
+    }
+    el.style.display = '';
+    el.innerHTML = `<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;background:${bgMap[level]||bgMap.basic}">${labelMap[level]||'Fundamentals'}</span>${progressHtml}`;
+  }
+
   function getFilteredQuestions(topic) {
-    const base = topic === 'All' ? [...QUESTION_BANK] : QUESTION_BANK.filter(q => q.topic === topic);
+    let base = topic === 'All' ? [...QUESTION_BANK] : QUESTION_BANK.filter(q => q.topic === topic);
+    const unlocked = getUnlockedDifficulties(topic);
+    const seen = new Set(Object.keys(window._seenQuestionIds || {}));
+    base = base.filter(q => unlocked.includes(q.difficulty) || seen.has(q.id));
     return smartOrder(base);
   }
+
 
   async function selectTopic(topic) {
     if (!QUESTION_BANK.length) return; // not loaded yet
@@ -2141,6 +2194,7 @@ Return JSON only.`;
     const label = TOPIC_LABELS[topic] || topic;
     document.getElementById('breadcrumbTopic').textContent = label;
     document.getElementById('topbarTopicPill').textContent = label;
+    updateDifficultyBadge(topic);
     // Apply per-topic color to the header pill
     const PILL_TOPIC_CLASS = {
       'Accounting':      'accounting',
@@ -2438,6 +2492,8 @@ Generate 3 drill questions targeting this exact gap.`;
     else if (score >= 75) status = 'partial';
     else status = 'missed';
     sessionResults[q.id] = status;
+    if (!window._seenQuestionIds) window._seenQuestionIds = {};
+    window._seenQuestionIds[q.id] = true;
     updateProgressUI();
     // Persist to server
     saveResultToServer(q.id, q.topic, status, score);
@@ -2638,20 +2694,22 @@ Generate 3 drill questions targeting this exact gap.`;
         window._gradedToday = gradedToday;
         window._memberSince = data.memberSince || null;
         initSidebarMenu(userPlan, gradedToday);
-        // Auto-enter flashcard mode if free limit already exhausted
-        if (userPlan === 'free' && gradedToday >= 5) {
-          setTimeout(() => enterFlashcardMode(`You've used all 5 free grades today. You can still study in flashcard mode — questions and model answers, no AI grading. Upgrade to Pro for unlimited graded answers.`), 500);
-        }
         updatePlanUI();
       }
 
       // Restore all historical results into sessionResults
       if (data.results && data.results.length > 0) {
+        window._seenQuestionIds = {};
         data.results.forEach(r => {
           sessionResults[r.question_id] = r.status;
+          window._seenQuestionIds[r.question_id] = true;
         });
-        // Re-render with progress now loaded — re-run selectTopic to apply smart ordering
+        // Load difficulty progress then re-render with correct unlock state
+        await loadDifficultyProgress();
         selectTopic(startTopic);
+      } else {
+        window._seenQuestionIds = {};
+        await loadDifficultyProgress();
       }
     } catch(e) {
       console.log('Progress load error:', e.message);
@@ -2861,74 +2919,6 @@ Generate 3 drill questions targeting this exact gap.`;
     if (upgradeBtn && userPlan !== 'free') upgradeBtn.style.display = 'none';
   }
 
-
-  // ── FLASHCARD MODE ───────────────────────────────────────
-  // Activated when free users exhaust their 5 daily grades.
-  // Shows question + model answer without AI grading.
-  let _flashcardMode = false;
-
-  function enterFlashcardMode(message) {
-    _flashcardMode = true;
-    // Show a banner at top of practice area
-    const existing = document.getElementById('flashcardBanner');
-    if (existing) return;
-    const banner = document.createElement('div');
-    banner.id = 'flashcardBanner';
-    banner.style.cssText = 'background:#FEF3C7;border:1px solid #FCD34D;border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;font-size:13.5px;';
-    banner.innerHTML = `
-      <span style="font-size:20px;">📖</span>
-      <div style="flex:1;">
-        <strong>Flashcard mode</strong> — ${message}
-      </div>
-      <button onclick="startCheckout('monthly')" style="padding:7px 16px;background:#1A1814;color:white;border:none;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;">Upgrade</button>
-    `;
-    const practiceArea = document.getElementById('practiceArea') || document.querySelector('.practice-content') || document.querySelector('.main');
-    if (practiceArea) practiceArea.insertBefore(banner, practiceArea.firstChild);
-    // Hide the submit button and show reveal button instead
-    swapToFlashcardControls();
-  }
-
-  function swapToFlashcardControls() {
-    const submitBtn = document.getElementById('submitBtn') || document.getElementById('btnSubmit');
-    if (submitBtn) submitBtn.style.display = 'none';
-    const existing = document.getElementById('flashcardRevealBtn');
-    if (existing) return;
-    const btn = document.createElement('button');
-    btn.id = 'flashcardRevealBtn';
-    btn.textContent = 'Reveal model answer';
-    btn.style.cssText = 'padding:11px 24px;background:var(--text-primary);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;transition:opacity .15s;';
-    btn.onmouseover = () => btn.style.opacity = '0.85';
-    btn.onmouseout = () => btn.style.opacity = '1';
-    btn.onclick = revealFlashcardAnswer;
-    if (submitBtn) submitBtn.parentNode.insertBefore(btn, submitBtn.nextSibling);
-  }
-
-  function revealFlashcardAnswer() {
-    const q = filteredQuestions[currentIndex];
-    if (!q) return;
-    // Show model answer in the feedback area without grading
-    showFlashcardAnswer(q.model_answer || 'No model answer available.');
-    // Auto-advance after a moment
-    document.getElementById('flashcardRevealBtn').textContent = 'Next question →';
-    document.getElementById('flashcardRevealBtn').onclick = () => {
-      advanceToNextQuestion();
-      document.getElementById('flashcardRevealBtn').textContent = 'Reveal model answer';
-      document.getElementById('flashcardRevealBtn').onclick = revealFlashcardAnswer;
-    };
-  }
-
-  function showFlashcardAnswer(modelAnswer) {
-    // Reuse feedback panel area if it exists, otherwise create inline
-    const feedbackEl = document.getElementById('feedbackPanel') || document.getElementById('gradeFeedback');
-    if (feedbackEl) {
-      feedbackEl.style.display = '';
-      feedbackEl.innerHTML = `
-        <div style="padding:20px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#166534;margin-bottom:8px;">Model Answer</div>
-          <div style="font-size:14px;line-height:1.65;color:#1A1814;">${modelAnswer}</div>
-        </div>`;
-    }
-  }
 
   function showUpgradeModal(reason) {
     const existing = document.getElementById('upgradeModal');

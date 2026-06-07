@@ -406,13 +406,73 @@ async function buildPracticeSet(userId, n, topic, mode) {
     ? allIds.filter(id => QUESTIONS_BY_ID[id].topic === topic)
     : allIds;
 
+  // ── PER-TOPIC DIFFICULTY UNLOCK ──────────────────────────
+  // For each topic, compute which difficulty levels are unlocked
+  // based on how many basics have been seen and avg score on them.
+  function getUnlockedDifficulties(topicFilter) {
+    const topicQuestions = allIds.filter(id => {
+      const q = QUESTIONS_BY_ID[id];
+      return !topicFilter || topicFilter === 'All' || q.topic === topicFilter;
+    });
+    const basics = topicQuestions.filter(id => QUESTIONS_BY_ID[id].difficulty === 'basic');
+    const intermediates = topicQuestions.filter(id => QUESTIONS_BY_ID[id].difficulty === 'intermediate');
+
+    const seenBasics = basics.filter(id => seenMap[id]);
+    const seenIntermediates = intermediates.filter(id => seenMap[id]);
+
+    const basicScores = seenBasics.map(id => seenMap[id].score).filter(s => s != null);
+    const basicAvg = basicScores.length > 0 ? basicScores.reduce((a,b)=>a+b,0)/basicScores.length : 0;
+    const basicSeenRatio = basics.length > 0 ? seenBasics.length / basics.length : 0;
+
+    const intermScores = seenIntermediates.map(id => seenMap[id].score).filter(s => s != null);
+    const intermAvg = intermScores.length > 0 ? intermScores.reduce((a,b)=>a+b,0)/intermScores.length : 0;
+    const intermSeenRatio = intermediates.length > 0 ? seenIntermediates.length / intermediates.length : 0;
+
+    const unlocked = new Set(['basic']);
+    // Unlock intermediate: avg ≥ 70 on basics OR seen ≥ 60% of basics
+    if (seenBasics.length > 0 && (basicAvg >= 70 || basicSeenRatio >= 0.6)) {
+      unlocked.add('intermediate');
+    }
+    // Unlock hard: avg ≥ 75 on intermediate OR seen ≥ 60% of intermediates
+    if (unlocked.has('intermediate') && seenIntermediates.length > 0 && (intermAvg >= 75 || intermSeenRatio >= 0.6)) {
+      unlocked.add('hard');
+    }
+    return unlocked;
+  }
+
+  // Build per-topic unlock map for 'All' mode
+  const topicUnlockMap = {};
+  const allTopics = [...new Set(allIds.map(id => QUESTIONS_BY_ID[id].topic))];
+  if (!topic || topic === 'All') {
+    allTopics.forEach(t => { topicUnlockMap[t] = getUnlockedDifficulties(t); });
+  } else {
+    topicUnlockMap[topic] = getUnlockedDifficulties(topic);
+  }
+
+  function isDifficultyUnlocked(qId) {
+    const q = QUESTIONS_BY_ID[qId];
+    const unlocked = topicUnlockMap[q.topic];
+    return unlocked ? unlocked.has(q.difficulty) : true;
+  }
+
+  // Order unseen questions: basic first, then intermediate, then hard
+  const DIFF_ORDER = { basic: 0, intermediate: 1, hard: 2 };
+  function sortByDifficulty(ids) {
+    return [...ids].sort((a, b) => {
+      const da = DIFF_ORDER[QUESTIONS_BY_ID[a].difficulty] ?? 1;
+      const db = DIFF_ORDER[QUESTIONS_BY_ID[b].difficulty] ?? 1;
+      return da - db;
+    });
+  }
+
   const dueReviews = [];
   const unseen = [];
   const allOthers = [];
   for (const id of eligibleIds) {
     const hist = seenMap[id];
     if (!hist) {
-      unseen.push(id);
+      // Only include unseen questions at unlocked difficulty levels
+      if (isDifficultyUnlocked(id)) unseen.push(id);
     } else if (hist.next_due && hist.next_due <= now) {
       dueReviews.push({ id, due: hist.next_due, stage: hist.mastery_stage, last_score: hist.score });
     } else {
@@ -420,6 +480,19 @@ async function buildPracticeSet(userId, n, topic, mode) {
     }
   }
   dueReviews.sort((a,b) => a.due - b.due);
+
+  // Sort unseen: basic first, then intermediate, then hard within each difficulty shuffle
+  const unseenByDiff = { basic: [], intermediate: [], hard: [] };
+  unseen.forEach(id => {
+    const d = QUESTIONS_BY_ID[id].difficulty || 'basic';
+    (unseenByDiff[d] = unseenByDiff[d] || []).push(id);
+  });
+  // Shuffle within each tier, then concat in order
+  const unseenOrdered = [
+    ...shuffle(unseenByDiff.basic || []),
+    ...shuffle(unseenByDiff.intermediate || []),
+    ...shuffle(unseenByDiff.hard || []),
+  ];
 
   // Compute weak topics for new-question weighting
   const topicScores = {};
@@ -464,13 +537,14 @@ async function buildPracticeSet(userId, n, topic, mode) {
       result.push({ id: r.id, reason, stage: r.stage });
     }
 
-    const unseenWeak = unseen.filter(id => weakTopics.includes(QUESTIONS_BY_ID[id].topic));
-    const unseenOther = unseen.filter(id => !weakTopics.includes(QUESTIONS_BY_ID[id].topic));
+    const unseenWeak = unseenOrdered.filter(id => weakTopics.includes(QUESTIONS_BY_ID[id].topic));
+    const unseenOther = unseenOrdered.filter(id => !weakTopics.includes(QUESTIONS_BY_ID[id].topic));
     const pickFromWeak = Math.min(Math.floor(newCount * 0.7), unseenWeak.length);
     const pickFromOther = newCount - pickFromWeak;
+    // Take from front (already sorted basic→intermediate→hard, shuffled within tier)
     const newPicks = [
-      ...shuffle(unseenWeak).slice(0, pickFromWeak),
-      ...shuffle(unseenOther).slice(0, pickFromOther)
+      ...unseenWeak.slice(0, pickFromWeak),
+      ...unseenOther.slice(0, pickFromOther)
     ];
     for (const id of newPicks) {
       const reasonLabel = weakTopics.includes(QUESTIONS_BY_ID[id].topic) ? 'New — weak area' : 'New';
@@ -482,9 +556,12 @@ async function buildPracticeSet(userId, n, topic, mode) {
       for (const id of wildcards) result.push({ id, reason: 'Mixed review', stage: null });
     }
 
-    // Backfill if we're still short
+    // Backfill if we're still short — use difficulty order then wildcards
     const used = new Set(result.map(r => r.id));
-    const backfillPool = shuffle([...unseen, ...allOthers].filter(id => !used.has(id)));
+    const backfillPool = [
+      ...unseenOrdered.filter(id => !used.has(id)),
+      ...shuffle(allOthers.filter(id => !used.has(id)))
+    ];
     while (result.length < n && backfillPool.length > 0) {
       const id = backfillPool.pop();
       result.push({ id, reason: 'New', stage: null });
@@ -1723,6 +1800,53 @@ const server = http.createServer(async (req, res) => {
         topicBreakdown: canViewFull ? topicBreakdown : [],
         recommended,
       });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/progress/difficulty — per-topic difficulty unlock status
+  if (req.method==='GET' && url==='/api/progress/difficulty') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const histR = await pool.query(
+        'SELECT question_id, score, mastery_stage FROM question_results WHERE user_id=$1',
+        [user.userId]
+      );
+      const seenMap = {};
+      histR.rows.forEach(r => { seenMap[r.question_id] = r; });
+
+      const allIds = Object.keys(QUESTIONS_BY_ID);
+      const allTopics = [...new Set(allIds.map(id => QUESTIONS_BY_ID[id].topic))];
+      const DIFF_ORDER = ['basic','intermediate','hard'];
+
+      const result = {};
+      allTopics.forEach(t => {
+        const topicQs = allIds.filter(id => QUESTIONS_BY_ID[id].topic === t);
+        const byDiff = {};
+        DIFF_ORDER.forEach(d => {
+          const ids = topicQs.filter(id => QUESTIONS_BY_ID[id].difficulty === d);
+          const seen = ids.filter(id => seenMap[id]);
+          const scores = seen.map(id => seenMap[id].score).filter(s=>s!=null);
+          byDiff[d] = {
+            total: ids.length,
+            seen: seen.length,
+            avgScore: scores.length > 0 ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : null,
+            seenRatio: ids.length > 0 ? seen.length/ids.length : 0,
+          };
+        });
+
+        // Compute unlocked levels
+        const unlocked = ['basic'];
+        if (byDiff.basic.seen > 0 && (byDiff.basic.avgScore >= 70 || byDiff.basic.seenRatio >= 0.6)) {
+          unlocked.push('intermediate');
+        }
+        if (unlocked.includes('intermediate') && byDiff.intermediate.seen > 0 &&
+            (byDiff.intermediate.avgScore >= 75 || byDiff.intermediate.seenRatio >= 0.6)) {
+          unlocked.push('hard');
+        }
+
+        result[t] = { byDiff, unlocked, currentLevel: unlocked[unlocked.length-1] };
+      });
+      return json(res,200,{ topics: result });
     } catch(e){return json(res,500,{error:e.message});}
   }
 
