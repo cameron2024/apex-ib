@@ -386,9 +386,6 @@
   margin-top: 8px;
 }
 
-.btn-primary:hover { opacity: 0.85; }
-.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
 .btn-secondary {
   width: 100%;
   padding: 10px;
@@ -1073,7 +1070,9 @@ if (!token) {
     });
   })();
 }
-if (!token) { void 0; } else {
+// All code below only runs when token exists (guest wall above handles the no-token case)
+// Guest wall above handles unauthenticated users
+
 
 // ── STATE ──
 let partyCode = null;
@@ -1132,7 +1131,8 @@ function getSelectedTopics() {
 // ── CREATE PARTY ──
 async function createParty() {
   const btn = document.getElementById('createBtn');
-  btn.disabled = true; btn.textContent = 'Creating…';
+  const btnOrigHTML = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = 'Creating…';
   const topics = getSelectedTopics();
   // Pass as comma-joined string; server picks randomly from these topics
   const topic = topics.length === 1 ? topics[0] : topics.length > 1 ? topics.join(',') : null;
@@ -1146,7 +1146,7 @@ async function createParty() {
     });
     const data = await r.json();
     if (r.status === 402) {
-      btn.disabled = false; btn.textContent = 'Create Party';
+      btn.disabled = false; btn.innerHTML = btnOrigHTML;
       showPartyUpgradeWall(data.message);
       return;
     }
@@ -1160,7 +1160,7 @@ async function createParty() {
   } catch(e) {
     alert('Error: ' + e.message);
   }
-  btn.disabled = false; btn.textContent = 'Create Party';
+  btn.disabled = false; btn.innerHTML = btnOrigHTML;
 }
 
 function copyCode() {
@@ -1572,7 +1572,8 @@ async function init() {
 }
 
 init();
-}
+
 </script>
+
 </body>
 </html>
