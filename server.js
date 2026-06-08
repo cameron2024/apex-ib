@@ -1547,7 +1547,7 @@ const server = http.createServer(async (req, res) => {
       if(!customerId) return json(res,400,{error:'No billing account found. Please contact support.'});
       const session = await stripeRequest('POST','/v1/billing_portal/sessions',{
         customer: customerId,
-        return_url: APP_URL+'/billing.html'
+        return_url: APP_URL+'/settings.html?tab=billing'
       });
       if(session.error) return json(res,400,{error:session.error.message});
       return json(res,200,{url:session.url});
