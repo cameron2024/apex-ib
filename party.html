@@ -526,8 +526,12 @@
   gap: 12px;
 }
 
-.submit-answer-btn {
-  padding: 10px 24px;
+/* ── SUBMIT ANSWER BUTTON ── */
+.party-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 28px;
   background: var(--text-primary);
   color: white;
   border: none;
@@ -536,11 +540,104 @@
   font-weight: 600;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  letter-spacing: 0.01em;
+}
+.party-submit-btn:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.party-submit-btn:active { transform: translateY(0); }
+.party-submit-btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Keep old class alias for any dynamic JS still using it */
+.submit-answer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 28px;
+  background: var(--text-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.submit-answer-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.submit-answer-btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── HOST CONTROLS ── */
+.host-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  flex-wrap: wrap;
 }
 
-.submit-answer-btn:hover { opacity: 0.85; }
-.submit-answer-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.host-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 22px;
+  background: var(--text-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  white-space: nowrap;
+}
+.host-btn-primary:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+.host-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.host-skip-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.host-skip-select {
+  flex: 1;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.host-skip-select:focus { outline: none; border-color: var(--border-strong); }
+
+.host-btn-ghost {
+  padding: 8px 14px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.host-btn-ghost:hover { border-color: var(--border-strong); color: var(--text-primary); background: var(--bg); }
+
+/* ── MODEL / ANSWER TOGGLES ── */
 
 .submitted-msg {
   font-size: 13.5px;
@@ -605,15 +702,22 @@
   font-weight: 600;
 }
 
+/* ── MODEL / ANSWER TOGGLES ── */
 .model-answer-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
+  font-weight: 500;
   color: var(--accent-blue);
   cursor: pointer;
   border: none;
   background: none;
   font-family: 'DM Sans', sans-serif;
-  padding: 0;
+  padding: 4px 0;
+  transition: opacity 0.15s;
 }
+.model-answer-toggle:hover { opacity: 0.7; }
 
 .model-answer-block {
   padding: 14px 20px;
@@ -671,16 +775,20 @@
 }
 
 .answer-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
+  font-weight: 500;
   color: var(--text-tertiary);
   cursor: pointer;
   border: none;
   background: none;
   font-family: 'DM Sans', sans-serif;
-  padding: 0;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  padding: 4px 0;
+  transition: color 0.15s;
 }
+.answer-toggle-btn:hover { color: var(--text-primary); }
 
 .answer-text-block {
   margin-top: 8px;
@@ -1035,7 +1143,10 @@
       <div class="answer-area" id="answerArea">
         <textarea class="answer-textarea" id="answerTextarea" placeholder="Type your answer here…"></textarea>
         <div class="answer-submit-row">
-          <button class="submit-answer-btn" id="submitAnswerBtn" onclick="submitAnswer()">Submit Answer</button>
+          <button class="party-submit-btn" id="submitAnswerBtn" onclick="submitAnswer()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="9 18 15 12 9 6"/><polyline points="9 18 15 12 9 6" transform="translate(6,0)"/></svg>
+            Submit Answer
+          </button>
           <div class="submitted-msg" id="submittedMsg">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
             Submitted — waiting for others
@@ -1053,16 +1164,17 @@
       <div id="questionResults" style="display:none;"></div>
 
       <!-- Host controls -->
-      <div id="hostBar" style="display:none;margin-top:16px;display:none;">
-        <div class="host-controls" style="border-radius:var(--radius);border:1px solid var(--border);">
-          <button class="submit-answer-btn" onclick="advanceQuestion()" id="advanceBtn" style="flex:1;">
-            Next Question →
+      <div id="hostBar" style="display:none;margin-top:16px;">
+        <div class="host-controls">
+          <button class="host-btn-primary" onclick="advanceQuestion()" id="advanceBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            Next Question
           </button>
-          <div style="flex:1;">
-            <select class="form-select" id="skipMemberSelect" style="font-size:12.5px;padding:8px 10px;margin-bottom:6px;">
-              <option value="">Skip a member's answer…</option>
+          <div class="host-skip-wrap">
+            <select class="host-skip-select" id="skipMemberSelect">
+              <option value="">Force submit for…</option>
             </select>
-            <button class="btn-secondary" onclick="skipMember()" style="font-size:12px;padding:6px;margin-top:0;">Force submit blank</button>
+            <button class="host-btn-ghost" onclick="skipMember()">Submit blank</button>
           </div>
         </div>
       </div>
@@ -1075,7 +1187,10 @@
       <h1>Session Complete 🎉</h1>
       <p>Here's how everyone did. Review each question below.</p>
       <div class="leaderboard" id="finalLeaderboard"></div>
-      <a href="feed.html" style="display:inline-block;margin-top:12px;" class="btn-primary" style="text-decoration:none;">Back to Feed</a>
+      <a href="feed.html" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;margin-top:16px;">
+        Back to Feed
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
     </div>
   </div>
 
