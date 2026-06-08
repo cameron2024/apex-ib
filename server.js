@@ -336,6 +336,9 @@ function stripeRequest(method, path, body) {
 // ── CLAUDE API HELPER (server-side prompt construction) ─────
 function callClaude(systemPrompt, userPrompt, maxTokens) {
   return new Promise((resolve, reject) => {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return reject(new Error('ANTHROPIC_API_KEY is not set on the server.'));
+    }
     const payload = { model: 'claude-sonnet-4-6', max_tokens: maxTokens || 800, messages: [{ role: 'user', content: userPrompt }] };
     if (systemPrompt) payload.system = systemPrompt;
     const data = JSON.stringify(payload);
@@ -345,7 +348,7 @@ function callClaude(systemPrompt, userPrompt, maxTokens) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY || '',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
         'Content-Length': Buffer.byteLength(data)
       }
@@ -356,11 +359,14 @@ function callClaude(systemPrompt, userPrompt, maxTokens) {
         try {
           const parsed = JSON.parse(raw);
           if (parsed.error) return reject(new Error(parsed.error.message || 'Anthropic API error'));
-          resolve(parsed.content?.[0]?.text || '');
-        } catch(e) { reject(e); }
+          if (apiRes.statusCode !== 200) return reject(new Error(`Anthropic API error (${apiRes.statusCode}): ${raw.slice(0,200)}`));
+          const text = parsed.content?.[0]?.text || '';
+          if (!text) return reject(new Error('Empty response from grading service — please try again.'));
+          resolve(text);
+        } catch(e) { reject(new Error('Could not parse grading response — please try again.')); }
       });
     });
-    apiReq.on('error', reject);
+    apiReq.on('error', err => reject(new Error('Network error reaching grading service: ' + err.message)));
     apiReq.write(data);
     apiReq.end();
   });
@@ -672,11 +678,11 @@ Scoring rubric: 90-100 = interview-ready answer with all key concepts. 70-89 = c
     const text = await callClaude(systemPrompt, userPrompt, 600);
     const parsed = parseJsonFromText(text);
     if (!parsed || typeof parsed.score !== 'number') {
-      return { score: 0, verdict: 'Grading error', strengths: '', gaps: '', concept_gap: null };
+      return { score: 0, verdict: 'Grading error — malformed response.', strengths: '', gaps: 'Please try again.', concept_gap: null };
     }
     return parsed;
   } catch(e) {
-    return { score: 0, verdict: 'Grading error: ' + e.message, strengths: '', gaps: '', concept_gap: null };
+    return { score: 0, verdict: 'Grading unavailable — ' + e.message, strengths: '', gaps: 'Please try again in a moment.', concept_gap: null };
   }
 }
 
