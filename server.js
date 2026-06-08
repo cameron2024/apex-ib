@@ -2581,6 +2581,19 @@ const server = http.createServer(async (req, res) => {
     } catch(e){return json(res,500,{error:e.message});}
   }
 
+  // ── FAVICON ──────────────────────────────────────────────
+  if (url === '/favicon.svg' || url === '/favicon.ico') {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#1A1814"/>
+  <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" fill="white" fill-opacity=".12"/>
+  <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M16 9L22 20H10L16 9Z" fill="white" fill-opacity=".9"/>
+  <circle cx="16" cy="17" r="1.5" fill="#1A1814"/>
+</svg>`;
+    res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=86400' });
+    return res.end(svg);
+  }
+
   // ── STATIC FILES ─────────────────────────────────────────
   let filePath=path.join(__dirname,req.url.split('?')[0]);
   if(req.url.split('?')[0]==='/') filePath=path.join(__dirname,'landing.html');
