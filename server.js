@@ -374,9 +374,22 @@ function callClaude(systemPrompt, userPrompt, maxTokens) {
 
 function parseJsonFromText(text) {
   if (!text) return null;
-  // Strip markdown code fences if Claude wrapped the JSON
-  const cleaned = text.replace(/```json\s*|\s*```/g, '').trim();
-  try { return JSON.parse(cleaned); } catch(e) { return null; }
+  let cleaned = text.replace(/```json\s*|\s*```/g, '').trim();
+  // Try clean parse first
+  try { return JSON.parse(cleaned); } catch(e) {
+    // If truncated (unterminated string/object), try to salvage
+    if (e.message && (e.message.includes('Unterminated') || e.message.includes('Unexpected end'))) {
+      try {
+        // Strip trailing incomplete key-value pair then close open braces
+        let salvaged = cleaned.replace(/,\s*"[^"]*$/, '').replace(/,\s*$/, '');
+        const opens = (salvaged.match(/{/g)||[]).length;
+        const closes = (salvaged.match(/}/g)||[]).length;
+        if (opens > closes) salvaged += '}'.repeat(opens - closes);
+        return JSON.parse(salvaged);
+      } catch(_) { return null; }
+    }
+    return null;
+  }
 }
 
 // ── SPACED REPETITION ───────────────────────────────────────
@@ -675,7 +688,7 @@ async function gradeMockAnswer(question, userAnswer) {
 Scoring rubric: 90-100 = interview-ready answer with all key concepts. 70-89 = correct direction, minor gaps. 50-69 = partial credit, missing key pieces. Below 50 = significantly wrong or confused.`;
   const userPrompt = `Question: ${question.question}\n\nModel answer: ${question.model_answer}\n\nCandidate's answer: "${userAnswer}"\n\nReturn JSON only.`;
   try {
-    const text = await callClaude(systemPrompt, userPrompt, 600);
+    const text = await callClaude(systemPrompt, userPrompt, 1024);
     const parsed = parseJsonFromText(text);
     if (!parsed || typeof parsed.score !== 'number') {
       return { score: 0, verdict: 'Grading error — malformed response.', strengths: '', gaps: 'Please try again.', concept_gap: null };
@@ -734,7 +747,7 @@ async function generateInsights(userId) {
 
   let insights;
   try {
-    const text = await callClaude(null, insightsPrompt, 500);
+    const text = await callClaude(null, insightsPrompt, 1024);
     insights = parseJsonFromText(text);
     if (!insights) insights = { diagnosis: '', weak_pattern: '', next_action: '' };
   } catch(e) {

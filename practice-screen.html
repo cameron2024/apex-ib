@@ -1602,7 +1602,7 @@ Return JSON only.`;
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
-          max_tokens: 1200,
+          max_tokens: 2048,
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }]
         })
@@ -1651,14 +1651,32 @@ Return JSON only.`;
       // Final full render
       try {
         if (!fullText.trim()) throw new Error('empty_response');
-        const result = JSON.parse(fullText.replace(/```json|```/g, '').trim());
+        let cleaned = fullText.replace(/```json|```/g, '').trim();
+        // If JSON is truncated (unterminated), try to salvage by closing open structures
+        if (!cleaned.endsWith('}')) {
+          // Count open braces to detect truncation
+          const opens = (cleaned.match(/{/g)||[]).length;
+          const closes = (cleaned.match(/}/g)||[]).length;
+          if (opens > closes) {
+            // Try closing the object(s) — salvage what we have
+            cleaned = cleaned.replace(/,\s*"[^"]*$/, '').replace(/,\s*$/, '');
+            cleaned += '}'.repeat(opens - closes);
+          }
+        }
+        const result = JSON.parse(cleaned);
+        if (typeof result.score !== 'number') throw new Error('missing_score');
         renderFeedback(result);
       } catch(e) {
         console.error('Parse error:', e, fullText);
-        const msg = e.message === 'empty_response'
-          ? 'No response received from the grading service. Please try again.'
-          : 'The grading response was malformed. Please try again.';
-        showApiError(msg);
+        if (e.message === 'empty_response') {
+          showApiError('No response from the grading service — please try again.');
+        } else if (e.message === 'missing_score') {
+          showApiError('Grading response was incomplete — please try again.');
+        } else if (e.message && e.message.includes('Unterminated')) {
+          showApiError('Your answer may be too long — try to be more concise and resubmit.');
+        } else {
+          showApiError('Grading response was malformed — please try again.');
+        }
       }
 
     } catch (err) {
