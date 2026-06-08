@@ -52,27 +52,6 @@
   
 
   /* TOP BAR */
-  /* Difficulty tooltip */
-  .diff-tooltip {
-    position: absolute;
-    top: calc(100% + 6px); left: 0;
-    width: 290px;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-    padding: 16px;
-    z-index: 200;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s ease;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .diff-tooltip.tt-visible {
-    opacity: 1;
-    pointer-events: all;
-  }
-
   .topbar {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -950,7 +929,6 @@
     <div class="breadcrumb">
       Practice <span class="breadcrumb-sep">›</span> <span id="breadcrumbTopic"></span>
     </div>
-    <div id="difficultyProgressBadge" style="display:none;display:flex;align-items:center;gap:6px;"></div>
     <div class="topic-pill" id="topicPillWrap">
       <span class="topic-dot"></span>
       <span id="topbarTopicPill"></span>
@@ -1656,21 +1634,30 @@ Return JSON only.`;
           if (!data || data === '[DONE]') continue;
           try {
             const event = JSON.parse(data);
+            if (event.type === 'error') {
+              throw new Error(event.message || 'Grading error from server');
+            }
             if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
               fullText += event.delta.text;
               tryStreamRender(fullText);
             }
-          } catch(e) {}
+          } catch(e) {
+            if (e.message && e.message !== 'Unexpected token') throw e;
+          }
         }
       }
 
       // Final full render
       try {
+        if (!fullText.trim()) throw new Error('empty_response');
         const result = JSON.parse(fullText.replace(/```json|```/g, '').trim());
         renderFeedback(result);
       } catch(e) {
         console.error('Parse error:', e, fullText);
-        showApiError('Could not parse response — please try again.');
+        const msg = e.message === 'empty_response'
+          ? 'No response received from the grading service. Please try again.'
+          : 'The grading response was malformed. Please try again.';
+        showApiError(msg);
       }
 
     } catch (err) {
@@ -1778,7 +1765,7 @@ Return JSON only.`;
       document.getElementById('submitRow').after(errEl);
     }
     errEl.style.display = 'block';
-    errEl.innerHTML = `<strong>⚠️ Grading failed.</strong> Make sure the server is running with your API key.<br><span style="font-size:11px;color:#B91C1C;">Error: ${msg}</span>`;
+    errEl.innerHTML = `<strong>⚠️ Grading unavailable.</strong> Something went wrong on our end — please try again in a moment.<br><span style="font-size:11px;color:#B91C1C;">Error: ${msg}</span>`;
   }
 
   // ─── RENDER FEEDBACK ─────────────────────────────────────
@@ -2103,172 +2090,23 @@ Return JSON only.`;
 
   // Smart ordering: missed → partial → unattempted → mastered
   function smartOrder(questions) {
-    const DIFF_ORDER = { basic: 0, intermediate: 1, hard: 2 };
     const rank = q => {
       const s = sessionResults[q.id];
       if (s === 'missed')  return 0;
       if (s === 'partial') return 1;
       if (!s)              return 2;
-      return 3;
+      return 3; // mastered — review at end
     };
     const tiers = [[], [], [], []];
     questions.forEach(q => tiers[rank(q)].push(q));
-    tiers.forEach(tier => {
-      tier.sort((a, b) => {
-        const da = DIFF_ORDER[a.difficulty] ?? 1;
-        const db = DIFF_ORDER[b.difficulty] ?? 1;
-        if (da !== db) return da - db;
-        return Math.random() - 0.5;
-      });
-    });
+    tiers.forEach(t => t.sort(() => Math.random() - 0.5));
     return [...tiers[0], ...tiers[1], ...tiers[2], ...tiers[3]];
   }
 
-  let difficultyProgress = {};
-
-  async function loadDifficultyProgress() {
-    if (!authToken) return;
-    try {
-      const r = await fetch('/api/progress/difficulty', { headers: {'Authorization':'Bearer '+authToken}});
-      const data = await r.json();
-      difficultyProgress = data.topics || {};
-      updateDifficultyBadge(currentTopic);
-    } catch(e) {}
-  }
-
-  function getUnlockedDifficulties(topic) {
-    if (!authToken) return ['basic','intermediate','hard'];
-    if (topic === 'All') {
-      const all = new Set(['basic']);
-      Object.values(difficultyProgress).forEach(tp => (tp.unlocked||[]).forEach(d => all.add(d)));
-      return [...all];
-    }
-    return difficultyProgress[topic]?.unlocked || ['basic'];
-  }
-
-  function updateDifficultyBadge(topic) {
-    const el = document.getElementById('difficultyProgressBadge');
-    if (!el) return;
-    if (!authToken) { el.style.display = 'none'; return; }
-    if (topic === 'All') {
-      // For All: show the lowest unlocked level across topics (the user's weakest)
-      const levels = Object.values(difficultyProgress).map(p => p.currentLevel || 'basic');
-      const lowestLevel = levels.includes('basic') ? 'basic' : levels.includes('intermediate') ? 'intermediate' : 'hard';
-      const topicsAtBasic = levels.filter(l => l === 'basic').length;
-      const total = levels.length;
-      if (total === 0) { el.style.display = 'none'; return; }
-      const bgMap = { basic:'#F3F4F6;color:#374151', intermediate:'#EFF6FF;color:#1D4ED8', hard:'#FEF3C7;color:#92400E' };
-      const labelMap = { basic:'Fundamentals', intermediate:'Technical', hard:'Advanced' };
-      el.style.display = 'flex'; el.style.alignItems = 'center'; el.style.gap = '6px'; el.style.position = 'relative';
-      el.innerHTML = `<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;background:${bgMap[lowestLevel]}">${labelMap[lowestLevel]}</span><span style="font-size:11px;color:var(--text-tertiary);">${total - topicsAtBasic}/${total} topics advanced</span>`;
-      return;
-    }
-    const prog = difficultyProgress[topic];
-    if (!prog) { el.style.display = 'none'; return; }
-    const level = prog.currentLevel || 'basic';
-    const labelMap = { basic:'Fundamentals', intermediate:'Technical', hard:'Advanced' };
-    const bgMap = { basic:'#F3F4F6;color:#374151', intermediate:'#EFF6FF;color:#1D4ED8', hard:'#FEF3C7;color:#92400E' };
-    const bd = prog.byDiff || {};
-    const nextLevel = level === 'basic' ? 'intermediate' : level === 'intermediate' ? 'hard' : null;
-    const needed = level === 'basic' ? 70 : 75;
-    const ratio = bd[level]?.seenRatio || 0;
-    const avg = bd[level]?.avgScore;
-    const pct = nextLevel ? (avg != null ? Math.round(Math.min(100,(avg/needed)*60+ratio*40)) : Math.round(ratio*100)) : 100;
-    const seen = bd[level]?.seen || 0;
-    const total = bd[level]?.total || 0;
-
-    // Tooltip content
-    const levelDescMap = {
-      basic:        'Core concepts every banker must know — financial statements, valuation basics, and accounting fundamentals.',
-      intermediate: 'Deeper technical questions on DCF, LBO mechanics, and more nuanced accounting topics.',
-      hard:         'Advanced deal-level questions: complex M&A structures, edge cases, and senior associate-level topics.',
-    };
-    const unlockDescMap = {
-      intermediate: `Unlock by scoring ≥ 70 avg on Fundamentals or seeing ≥ 60% of them.`,
-      hard:         `Unlock by scoring ≥ 75 avg on Technical or seeing ≥ 60% of them.`,
-    };
-    const nextUnlockDesc = nextLevel ? unlockDescMap[nextLevel] : '';
-    const avgDisplay = avg != null ? `${avg}/100` : '—';
-    const seenDisplay = `${seen} / ${total} seen`;
-
-    el.style.display = 'flex';
-    el.style.alignItems = 'center';
-    el.style.gap = '6px';
-    el.style.position = 'relative';
-
-    el.innerHTML = `
-      <div id="diffBadgeWrap" style="display:flex;align-items:center;gap:6px;cursor:default;position:relative;"
-           onmouseenter="document.getElementById('diffTooltip').classList.add('tt-visible')"
-           onmouseleave="setTimeout(()=>{ if(!document.getElementById('diffTooltip').matches(':hover')) document.getElementById('diffTooltip').classList.remove('tt-visible'); },80)">
-        <span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;background:${bgMap[level]||bgMap.basic}">
-          ${labelMap[level]||'Fundamentals'}
-        </span>
-        ${nextLevel ? `<span style="font-size:11px;color:var(--text-tertiary);">${pct}% to ${labelMap[nextLevel]}</span>` : `<span style="font-size:11px;color:var(--accent-green);">✓ Max level</span>`}
-        <!-- Invisible bridge from badge to tooltip so hover doesn't break -->
-        <div style="position:absolute;top:100%;left:0;width:100%;height:14px;"></div>
-      </div>
-
-      <div id="diffTooltip" class="diff-tooltip"
-           onmouseenter="this.classList.add('tt-visible')"
-           onmouseleave="this.classList.remove('tt-visible')">
-
-        <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:10px;">Difficulty Progression</div>
-
-        <!-- Current level -->
-        <div style="margin-bottom:12px;">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
-            <span style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:${bgMap[level]||bgMap.basic}">${labelMap[level]}</span>
-            <span style="font-size:11px;color:var(--accent-green);font-weight:600;">Current</span>
-          </div>
-          <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.5;">${levelDescMap[level]}</div>
-          <div style="display:flex;gap:12px;margin-top:8px;">
-            <div style="font-size:11.5px;color:var(--text-secondary);">📖 <strong>${seenDisplay}</strong></div>
-            <div style="font-size:11.5px;color:var(--text-secondary);">⭐ <strong>Avg ${avgDisplay}</strong></div>
-          </div>
-        </div>
-
-        ${nextLevel ? `
-        <!-- Progress to next -->
-        <div style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:4px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);">Next: ${labelMap[nextLevel]}</div>
-            <div style="font-size:12px;font-weight:700;color:var(--text-primary);">${pct}%</div>
-          </div>
-          <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:8px;">
-            <div style="height:100%;width:${pct}%;background:var(--text-primary);border-radius:99px;transition:width .6s ease;"></div>
-          </div>
-          <div style="font-size:11.5px;color:var(--text-tertiary);line-height:1.5;">${nextUnlockDesc}</div>
-        </div>` : `
-        <div style="background:#F0FDF4;border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:13px;font-weight:600;color:#166534;">🏆 You've reached the highest level</div>
-          <div style="font-size:12px;color:#166534;margin-top:3px;opacity:.8;">Keep practicing to stay sharp.</div>
-        </div>`}
-
-        <!-- All three tiers overview -->
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">All levels</div>
-          ${['basic','intermediate','hard'].map(d => {
-            const dbd = bd[d] || {};
-            const isUnlocked = (prog.unlocked||['basic']).includes(d);
-            const isCurrent = d === level;
-            return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
-              <div style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:${isUnlocked?(bgMap[d]||bgMap.basic):'#F3F4F6;color:#9CA3AF'};opacity:${isUnlocked?1:0.5};">${labelMap[d]||d}</div>
-              ${isCurrent ? '<span style="font-size:10px;color:var(--accent-green);font-weight:600;">● current</span>' : isUnlocked ? '<span style="font-size:10px;color:var(--text-tertiary);">✓ unlocked</span>' : '<span style="font-size:10px;color:var(--text-tertiary);">🔒 locked</span>'}
-              <span style="margin-left:auto;font-size:11px;color:var(--text-tertiary);">${dbd.seen||0}/${dbd.total||0}</span>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
-  }
-
   function getFilteredQuestions(topic) {
-    let base = topic === 'All' ? [...QUESTION_BANK] : QUESTION_BANK.filter(q => q.topic === topic);
-    const unlocked = getUnlockedDifficulties(topic);
-    const seen = new Set(Object.keys(window._seenQuestionIds || {}));
-    base = base.filter(q => unlocked.includes(q.difficulty) || seen.has(q.id));
+    const base = topic === 'All' ? [...QUESTION_BANK] : QUESTION_BANK.filter(q => q.topic === topic);
     return smartOrder(base);
   }
-
 
   async function selectTopic(topic) {
     if (!QUESTION_BANK.length) return; // not loaded yet
@@ -2307,7 +2145,6 @@ Return JSON only.`;
     const label = TOPIC_LABELS[topic] || topic;
     document.getElementById('breadcrumbTopic').textContent = label;
     document.getElementById('topbarTopicPill').textContent = label;
-    updateDifficultyBadge(topic);
     // Apply per-topic color to the header pill
     const PILL_TOPIC_CLASS = {
       'Accounting':      'accounting',
@@ -2605,8 +2442,6 @@ Generate 3 drill questions targeting this exact gap.`;
     else if (score >= 75) status = 'partial';
     else status = 'missed';
     sessionResults[q.id] = status;
-    if (!window._seenQuestionIds) window._seenQuestionIds = {};
-    window._seenQuestionIds[q.id] = true;
     updateProgressUI();
     // Persist to server
     saveResultToServer(q.id, q.topic, status, score);
@@ -2812,21 +2647,11 @@ Generate 3 drill questions targeting this exact gap.`;
 
       // Restore all historical results into sessionResults
       if (data.results && data.results.length > 0) {
-        window._seenQuestionIds = {};
         data.results.forEach(r => {
           sessionResults[r.question_id] = r.status;
-          window._seenQuestionIds[r.question_id] = true;
-          if (r.score != null) {
-            window._questionResults = window._questionResults || {};
-            window._questionResults[r.question_id] = { score: r.score, status: r.status };
-          }
         });
-        // Load difficulty progress then re-render with correct unlock state
-        await loadDifficultyProgress();
+        // Re-render with progress now loaded — re-run selectTopic to apply smart ordering
         selectTopic(startTopic);
-      } else {
-        window._seenQuestionIds = {};
-        await loadDifficultyProgress();
       }
     } catch(e) {
       console.log('Progress load error:', e.message);
@@ -3098,8 +2923,8 @@ Generate 3 drill questions targeting this exact gap.`;
   .ql-modal {
     background: white;
     border-radius: 16px;
-    width: 90%; max-width: 720px;
-    max-height: 86vh;
+    width: 90%; max-width: 680px;
+    max-height: 82vh;
     display: flex; flex-direction: column;
     box-shadow: 0 24px 64px rgba(0,0,0,.18);
     overflow: hidden;
@@ -3115,62 +2940,24 @@ Generate 3 drill questions targeting this exact gap.`;
     padding: 18px 22px 14px;
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0; gap: 14px;
+    flex-shrink: 0;
+    gap: 14px;
   }
   .ql-title { font-family: 'DM Serif Display', serif; font-size: 18px; letter-spacing: -.3px; }
   .ql-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 1px; }
   .ql-close { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--text-tertiary); line-height: 1; padding: 4px 8px; }
-
-  /* Toolbar: search + controls */
-  .ql-toolbar {
-    padding: 10px 22px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
+  .ql-search-wrap { padding: 12px 22px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .ql-search {
-    flex: 1; min-width: 160px;
-    padding: 7px 10px 7px 32px;
+    width: 100%;
+    padding: 8px 12px;
     border: 1px solid var(--border);
     border-radius: 7px;
     font-size: 13px;
     font-family: inherit;
     background: var(--bg);
-    position: relative;
   }
   .ql-search:focus { outline: none; border-color: var(--text-primary); background: white; }
-  .ql-search-wrap { position: relative; flex: 1; min-width: 160px; }
-  .ql-search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; opacity: .4; pointer-events: none; }
-
-  /* Filter + sort pills */
-  .ql-filter-group { display: flex; gap: 5px; flex-wrap: wrap; }
-  .ql-filter-btn {
-    font-size: 11.5px; font-weight: 600;
-    padding: 4px 11px; border-radius: 99px;
-    border: 1.5px solid var(--border);
-    background: none; cursor: pointer;
-    font-family: inherit; color: var(--text-secondary);
-    transition: all .12s; white-space: nowrap;
-  }
-  .ql-filter-btn:hover { border-color: var(--border-strong); color: var(--text-primary); }
-  .ql-filter-btn.active { background: var(--text-primary); border-color: var(--text-primary); color: white; }
-  .ql-filter-btn.diff-basic.active    { background: #374151; border-color: #374151; }
-  .ql-filter-btn.diff-intermediate.active { background: #1D4ED8; border-color: #1D4ED8; }
-  .ql-filter-btn.diff-hard.active     { background: #92400E; border-color: #92400E; }
-
-  .ql-sort-select {
-    font-size: 12px; font-family: inherit;
-    padding: 5px 10px; border: 1px solid var(--border);
-    border-radius: 7px; background: var(--bg);
-    cursor: pointer; color: var(--text-secondary);
-  }
-  .ql-sort-select:focus { outline: none; }
-
   .ql-list { flex: 1; overflow-y: auto; padding: 4px 0; }
-
   .ql-row {
     display: flex; align-items: center; gap: 12px;
     padding: 11px 22px;
@@ -3180,45 +2967,23 @@ Generate 3 drill questions targeting this exact gap.`;
   }
   .ql-row:hover { background: var(--bg); border-left-color: var(--text-primary); }
   .ql-row.current { background: #FEF3C7; border-left-color: #B45309; }
-  .ql-row.locked { opacity: 0.45; cursor: not-allowed; }
-  .ql-row.locked:hover { background: none; border-left-color: transparent; }
-  .ql-row-num { font-size: 11px; font-weight: 600; color: var(--text-tertiary); min-width: 28px; font-variant-numeric: tabular-nums; }
+  .ql-row-num { font-size: 11px; font-weight: 600; color: var(--text-tertiary); min-width: 30px; font-variant-numeric: tabular-nums; }
   .ql-row-text { flex: 1; font-size: 13.5px; line-height: 1.45; color: var(--text-primary); }
   .ql-row-text .ql-topic-mini { font-size: 10.5px; color: var(--text-tertiary); margin-top: 2px; font-weight: 500; letter-spacing: .02em; text-transform: uppercase; }
-  .ql-row-meta { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
-
-  .ql-diff-pill {
-    font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px;
-  }
-  .ql-diff-basic        { background: #F3F4F6; color: #374151; }
-  .ql-diff-intermediate { background: #EFF6FF; color: #1D4ED8; }
-  .ql-diff-hard         { background: #FEF3C7; color: #92400E; }
-  .ql-diff-locked       { background: #F3F4F6; color: #9CA3AF; }
-
-  .ql-score-badge {
-    font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 99px;
-    min-width: 36px; text-align: center;
-  }
-  .ql-score-high { background: #F0FDF4; color: #166534; }
-  .ql-score-mid  { background: #FEF3C7; color: #92400E; }
-  .ql-score-low  { background: #FEE2E2; color: #991B1B; }
-
   .ql-status {
-    width: 9px; height: 9px; border-radius: 50%;
-    flex-shrink: 0; background: var(--border);
+    width: 10px; height: 10px; border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--border);
   }
   .ql-status.mastered { background: #16A34A; }
-  .ql-status.partial  { background: #D97706; }
-  .ql-status.missed   { background: #DC2626; }
-
+  .ql-status.partial { background: #D97706; }
+  .ql-status.missed { background: #DC2626; }
   .ql-empty { padding: 40px 22px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
-
   .ql-legend {
     display: flex; gap: 14px; padding: 10px 22px;
     border-top: 1px solid var(--border);
     font-size: 11px; color: var(--text-tertiary);
     flex-shrink: 0; background: var(--bg);
-    flex-wrap: wrap;
   }
   .ql-legend-item { display: flex; align-items: center; gap: 5px; }
   #btnBrowseQuestions:hover { border-color: var(--text-primary); color: var(--text-primary); }
@@ -3233,24 +2998,8 @@ Generate 3 drill questions targeting this exact gap.`;
       </div>
       <button class="ql-close" onclick="closeQuestionList()">&times;</button>
     </div>
-    <div class="ql-toolbar">
-      <div class="ql-search-wrap">
-        <svg class="ql-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="ql-search" id="qlSearch" type="text" placeholder="Search questions…" oninput="renderQuestionList()">
-      </div>
-      <div class="ql-filter-group" id="qlDiffFilters">
-        <button class="ql-filter-btn diff-basic active" data-diff="basic" onclick="toggleDiffFilter('basic',this)">Fundamentals</button>
-        <button class="ql-filter-btn diff-intermediate active" data-diff="intermediate" onclick="toggleDiffFilter('intermediate',this)">Technical</button>
-        <button class="ql-filter-btn diff-hard active" data-diff="hard" onclick="toggleDiffFilter('hard',this)">Advanced</button>
-      </div>
-      <select class="ql-sort-select" id="qlSort" onchange="renderQuestionList()">
-        <option value="default">Order: Default</option>
-        <option value="score-high">Score: High → Low</option>
-        <option value="score-low">Score: Low → High</option>
-        <option value="difficulty-easy">Difficulty: Easy first</option>
-        <option value="difficulty-hard">Difficulty: Hard first</option>
-        <option value="alpha">A → Z</option>
-      </select>
+    <div class="ql-search-wrap">
+      <input class="ql-search" id="qlSearch" type="text" placeholder="Search question text…" oninput="filterQuestionList()">
     </div>
     <div class="ql-list" id="qlList"></div>
     <div class="ql-legend">
@@ -3258,51 +3007,24 @@ Generate 3 drill questions targeting this exact gap.`;
       <div class="ql-legend-item"><span class="ql-status partial"></span> Partial</div>
       <div class="ql-legend-item"><span class="ql-status missed"></span> Missed</div>
       <div class="ql-legend-item"><span class="ql-status"></span> Not attempted</div>
-      <div class="ql-legend-item" style="margin-left:auto;"><span class="ql-diff-pill ql-diff-locked">🔒</span> Locked</div>
     </div>
   </div>
 </div>
 
 <script>
   const QL_TOPIC_LABELS = { Accounting:'Accounting', Enterprise_Value:'Enterprise Value', Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO' };
-  const DIFF_ORDER_MAP = { basic: 0, intermediate: 1, hard: 2 };
-  const DIFF_LABEL_MAP = { basic:'Fundamentals', intermediate:'Technical', hard:'Advanced' };
-  const DIFF_CLASS_MAP = { basic:'ql-diff-basic', intermediate:'ql-diff-intermediate', hard:'ql-diff-hard' };
-
-  // Active difficulty filters (all on by default)
-  let qlDiffActive = new Set(['basic','intermediate','hard']);
-
-  function toggleDiffFilter(diff, btn) {
-    if (qlDiffActive.has(diff)) {
-      if (qlDiffActive.size === 1) return; // keep at least one active
-      qlDiffActive.delete(diff);
-      btn.classList.remove('active');
-    } else {
-      qlDiffActive.add(diff);
-      btn.classList.add('active');
-    }
-    renderQuestionList();
-  }
 
   function openQuestionList() {
-    // Expand to ALL questions from the bank (not just filtered), for browse
-    const pool = currentTopic === 'All'
-      ? [...QUESTION_BANK]
-      : QUESTION_BANK.filter(q => q.topic === currentTopic);
-
+    if (!filteredQuestions || filteredQuestions.length === 0) return;
     const title = currentTopic === 'All' ? 'All questions' : (QL_TOPIC_LABELS[currentTopic] || currentTopic) + ' — all questions';
     document.getElementById('qlTitle').textContent = title;
+    document.getElementById('qlSub').textContent = filteredQuestions.length + ' questions · click any to jump';
     document.getElementById('qlSearch').value = '';
-
-    // Reset filters to all active
-    qlDiffActive = new Set(['basic','intermediate','hard']);
-    document.querySelectorAll('.ql-filter-btn[data-diff]').forEach(btn => btn.classList.add('active'));
-    document.getElementById('qlSort').value = 'default';
-
-    renderQuestionList();
+    renderQuestionList('');
     document.getElementById('qlOverlay').classList.add('visible');
     setTimeout(() => {
       document.getElementById('qlSearch').focus();
+      // Scroll the current question into view
       const cur = document.querySelector('.ql-row.current');
       if (cur) cur.scrollIntoView({ block: 'center', behavior: 'instant' });
     }, 250);
@@ -3325,106 +3047,41 @@ Generate 3 drill questions targeting this exact gap.`;
     return '';
   }
 
-  function scoreForQuestion(qid) {
-    const r = (window._questionResults||{})[qid];
-    return r ? r.score : null;
-  }
-
-  function renderQuestionList() {
+  function renderQuestionList(filterText) {
     const list = document.getElementById('qlList');
-    const ft = (document.getElementById('qlSearch').value || '').trim().toLowerCase();
-    const sortVal = document.getElementById('qlSort').value;
-    const unlocked = getUnlockedDifficulties(currentTopic);
-    const unlockedSet = new Set(unlocked);
-
-    // Pool: all questions for this topic
-    let pool = currentTopic === 'All'
-      ? [...QUESTION_BANK]
-      : QUESTION_BANK.filter(q => q.topic === currentTopic);
-
-    // Apply difficulty filter
-    pool = pool.filter(q => qlDiffActive.has(q.difficulty || 'basic'));
-
-    // Apply search
-    if (ft) pool = pool.filter(q => (q.question||'').toLowerCase().includes(ft) || (q.concept||'').toLowerCase().includes(ft));
-
-    // Apply sort
-    if (sortVal === 'score-high') {
-      pool.sort((a,b) => (scoreForQuestion(b.id)||0) - (scoreForQuestion(a.id)||0));
-    } else if (sortVal === 'score-low') {
-      pool.sort((a,b) => {
-        const sa = scoreForQuestion(a.id), sb = scoreForQuestion(b.id);
-        if (sa == null && sb == null) return 0;
-        if (sa == null) return 1; if (sb == null) return -1;
-        return sa - sb;
-      });
-    } else if (sortVal === 'difficulty-easy') {
-      pool.sort((a,b) => (DIFF_ORDER_MAP[a.difficulty]||0) - (DIFF_ORDER_MAP[b.difficulty]||0));
-    } else if (sortVal === 'difficulty-hard') {
-      pool.sort((a,b) => (DIFF_ORDER_MAP[b.difficulty]||0) - (DIFF_ORDER_MAP[a.difficulty]||0));
-    } else if (sortVal === 'alpha') {
-      pool.sort((a,b) => (a.question||'').localeCompare(b.question||''));
-    }
-    // default: preserve bank order (which is already difficulty-progressive)
-
-    document.getElementById('qlSub').textContent = pool.length + ' question' + (pool.length!==1?'s':'') + ' · click to jump';
-
-    if (pool.length === 0) {
-      list.innerHTML = '<div class="ql-empty">No questions match your filters.</div>';
+    const ft = (filterText || '').trim().toLowerCase();
+    const matches = filteredQuestions
+      .map((q, idx) => ({ q, idx }))
+      .filter(({q}) => !ft || (q.question || '').toLowerCase().includes(ft));
+    if (matches.length === 0) {
+      list.innerHTML = '<div class="ql-empty">No questions match that search.</div>';
       return;
     }
-
-    list.innerHTML = pool.map((q, i) => {
-      const isLocked = !unlockedSet.has(q.difficulty || 'basic') && !statusForQuestion(q.id);
-      const isCurrent = filteredQuestions[currentIndex]?.id === q.id;
+    list.innerHTML = matches.map(({q, idx}) => {
+      const isCurrent = idx === currentIndex;
       const status = statusForQuestion(q.id);
-      const score = scoreForQuestion(q.id);
-      const diffClass = isLocked ? 'ql-diff-locked' : (DIFF_CLASS_MAP[q.difficulty]||'ql-diff-basic');
-      const diffLabel = isLocked ? '🔒 Locked' : (DIFF_LABEL_MAP[q.difficulty]||'Fundamentals');
       const topicLabel = QL_TOPIC_LABELS[q.topic] || q.topic;
-
-      const scoreHtml = score != null
-        ? `<span class="ql-score-badge ${score>=80?'ql-score-high':score>=60?'ql-score-mid':'ql-score-low'}">${score}</span>`
-        : '';
-
-      const clickHandler = isLocked
-        ? `onclick="event.stopPropagation();"`
-        : `onclick="jumpToQuestion('${q.id}')"`;
-
-      return `<div class="ql-row ${isCurrent?'current':''} ${isLocked?'locked':''}" ${clickHandler}>
-        <div class="ql-row-num">${i+1}</div>
-        <div class="ql-status ${status}"></div>
-        <div class="ql-row-text">
-          ${escQL(q.question)}
-          <div style="display:flex;gap:6px;margin-top:4px;align-items:center;">
-            <span class="ql-diff-pill ${diffClass}">${diffLabel}</span>
-            ${currentTopic === 'All' ? `<span style="font-size:10.5px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em;">${topicLabel}</span>` : ''}
-            ${q.concept ? `<span style="font-size:10.5px;color:var(--text-tertiary);">${escQL(q.concept)}</span>` : ''}
-          </div>
-        </div>
-        <div class="ql-row-meta">${scoreHtml}</div>
-      </div>`;
+      return '<div class="ql-row ' + (isCurrent ? 'current' : '') + '" onclick="jumpToQuestion(' + idx + ')">' +
+        '<div class="ql-row-num">' + (idx + 1) + '</div>' +
+        '<div class="ql-status ' + status + '"></div>' +
+        '<div class="ql-row-text">' + escQL(q.question) +
+          (currentTopic === 'All' ? '<div class="ql-topic-mini">' + topicLabel + '</div>' : '') +
+        '</div>' +
+        '</div>';
     }).join('');
   }
 
-  function jumpToQuestion(qid) {
-    // Find the question in filteredQuestions; if not there, add it temporarily
-    let idx = filteredQuestions.findIndex(q => q.id === qid);
-    if (idx < 0) {
-      // Question exists in bank but may be locked/filtered out — still allow jump from browse
-      const q = QUESTION_BANK.find(q => q.id === qid);
-      if (!q) return;
-      filteredQuestions.push(q);
-      idx = filteredQuestions.length - 1;
-    }
+  function filterQuestionList() {
+    renderQuestionList(document.getElementById('qlSearch').value);
+  }
+
+  function jumpToQuestion(idx) {
+    if (idx < 0 || idx >= filteredQuestions.length) return;
     currentIndex = idx;
     closeQuestionList();
     loadQuestionAt(idx);
     updateProgressUI();
   }
-
-  // Populate _questionResults from server data for score display in browse
-  window._questionResults = window._questionResults || {};
 </script>
 
 </body>

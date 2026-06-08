@@ -1500,11 +1500,30 @@ const server = http.createServer(async (req, res) => {
     req.on('data',c=>{ size+=c.length; if(size>65536){req.destroy();return;} body+=c; });
     req.on('end',()=>{
       let parsed; try{parsed=JSON.parse(body);}catch(e){return json(res,400,{error:'Invalid body'});}
+      if (!process.env.ANTHROPIC_API_KEY) {
+        res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache','Access-Control-Allow-Origin':'*','Connection':'keep-alive'});
+        res.write(`data: ${JSON.stringify({type:'error',message:'ANTHROPIC_API_KEY is not set on the server.'})}\n\n`);
+        return res.end();
+      }
       parsed.stream=true;
       res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache','Access-Control-Allow-Origin':'*','Connection':'keep-alive'});
       const apiReq=https.request({hostname:'api.anthropic.com',path:'/v1/messages',method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':process.env.ANTHROPIC_API_KEY||'','anthropic-version':'2023-06-01'}},
-        apiRes=>{ apiRes.on('data',c=>res.write(c)); apiRes.on('end',()=>res.end()); });
+        headers:{'Content-Type':'application/json','x-api-key':process.env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01'}},
+        apiRes=>{
+          if (apiRes.statusCode !== 200) {
+            let errRaw='';
+            apiRes.on('data',c=>errRaw+=c);
+            apiRes.on('end',()=>{
+              let errMsg='Anthropic API error (status '+apiRes.statusCode+')';
+              try { const e=JSON.parse(errRaw); errMsg=e.error?.message||errMsg; } catch(_){}
+              res.write(`data: ${JSON.stringify({type:'error',message:errMsg})}\n\n`);
+              res.end();
+            });
+            return;
+          }
+          apiRes.on('data',c=>res.write(c));
+          apiRes.on('end',()=>res.end());
+        });
       apiReq.on('error',err=>{res.write(`data: ${JSON.stringify({type:'error',message:err.message})}\n\n`);res.end();});
       apiReq.write(JSON.stringify(parsed)); apiReq.end();
     }); return;
