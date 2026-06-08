@@ -702,10 +702,11 @@
             <button class="chip" type="button" onclick="toggleTopic(this, 'Mergers_MA')">M&amp;A</button>
             <button class="chip" type="button" onclick="toggleTopic(this, 'LBO')">LBO</button>
           </div>
-          <p class="onb-hint" style="margin-bottom:0;">Or skip if you're not sure yet — Apex will figure it out from your first few sessions.</p>
+          <p class="onb-hint" style="margin-bottom:0;">Or skip — Apex will figure it out from your first few sessions.</p>
           <div class="onb-actions">
             <button class="btn-secondary" type="button" onclick="onbPrev()">Back</button>
-            <button class="btn-submit" type="button" onclick="finishOnboarding(false)" id="step3Finish" style="margin-left:auto;width:auto;padding-left:24px;padding-right:24px;" disabled>
+            <button class="btn-skip" type="button" onclick="finishOnboarding(true)">Skip</button>
+            <button class="btn-submit" type="button" onclick="finishOnboarding(false)" id="step3Finish" style="margin-left:auto;width:auto;padding-left:24px;padding-right:24px;">
               Finish
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
@@ -874,7 +875,7 @@
   }
 
   function pickRole(el, value) {
-    document.querySelectorAll('[data-step="3"] .choice').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('[data-step="2"] .choice').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
     onbData.role = value;
     document.getElementById('step2Next').disabled = false;
