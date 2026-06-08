@@ -391,8 +391,7 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
       <button class="settings-nav-item" onclick="switchTab('billing')" id="nav-billing">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Billing
-      </button>
-      <div class="settings-nav-divider"></div>
+      </button>      <div class="settings-nav-divider"></div>
       <button class="settings-nav-item danger" onclick="switchTab('danger')" id="nav-danger">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         Danger zone
@@ -627,9 +626,9 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
               <div id="planBadge" class="plan-badge-lg badge-free">○ Free</div>
               <div style="flex:1;">
                 <div id="planName" style="font-size:14px;font-weight:600;margin-bottom:2px;">Free plan</div>
-                <div id="planDesc" style="font-size:12.5px;color:var(--text-secondary);">5 graded answers/day · 1 mock interview lifetime</div>
+                <div id="planDesc" style="font-size:12.5px;color:var(--text-secondary);">5 graded answers/day · 1 lifetime mock · 1 party join/day</div>
               </div>
-              <a href="pricing.html" class="btn-save" style="text-decoration:none;">Upgrade</a>
+              <a href="pricing.html" class="btn-save" style="text-decoration:none;white-space:nowrap;">View all plans</a>
             </div>
           </div>
         </div>
@@ -936,9 +935,9 @@ async function loadBillingInfo() {
     const data = await r.json();
     const plan = data.plan || 'free';
     const planMap = {
-      free:    { badge:'badge-free',    icon:'○', name:'Free plan',       desc:'5 graded answers/day · 1 lifetime mock interview' },
-      monthly: { badge:'badge-monthly', icon:'★', name:'Pro — $19.99/mo', desc:'Unlimited graded answers · 1 mock/day · Study parties' },
-      pass:    { badge:'badge-pass',    icon:'◆', name:'Recruiting Pass', desc:'Everything in Pro · Unlimited mocks' },
+      free:    { badge:'badge-free',    icon:'○', name:'Free plan',       desc:'5 graded answers/day · 1 lifetime mock · Join 1 party/day' },
+      monthly: { badge:'badge-monthly', icon:'★', name:'Pro — $19.99/mo', desc:'Unlimited graded answers · 1 mock/24h · Host 1 party/24h · Unlimited joins' },
+      pass:    { badge:'badge-pass',    icon:'◆', name:'Recruiting Pass', desc:'Everything in Pro · Unlimited mocks · Unlimited party hosting' },
     };
     const pm = planMap[plan] || planMap.free;
     document.getElementById('planBadge').className = 'plan-badge-lg '+pm.badge;

@@ -2205,26 +2205,32 @@ const server = http.createServer(async (req, res) => {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
       const planR = await pool.query('SELECT plan FROM users WHERE id=$1', [user.userId]);
-      if ((planR.rows[0]?.plan || 'free') === 'free') {
-        return json(res,402,{error:'upgrade_required', message:'Study parties are available on Pro and Recruiting Pass. Upgrade to create and host sessions.'});
+      const plan = planR.rows[0]?.plan || 'free';
+      if (plan === 'free') {
+        return json(res,402,{error:'upgrade_required', message:'Hosting a study party requires Pro or Recruiting Pass. Free users can join parties — upgrade to host your own.'});
+      }
+      if (plan === 'monthly') {
+        const since = nowSec() - ONE_DAY;
+        const recentHost = await pool.query(
+          `SELECT COUNT(*) FROM study_parties WHERE host_id=$1 AND started_at IS NOT NULL AND started_at >= $2`,
+          [user.userId, since]
+        );
+        if (parseInt(recentHost.rows[0].count) >= 1) {
+          return json(res,402,{error:'host_limit', message:'Pro includes 1 hosted study party per 24 hours. Upgrade to Recruiting Pass for unlimited hosting.'});
+        }
       }
       const {topic, timeLimitSec} = await readBody(req);
       let code;
-      // Ensure unique code
       for (let i=0; i<10; i++) {
         code = generatePartyCode();
         const exists = await pool.query('SELECT id FROM study_parties WHERE id=$1', [code]);
         if (!exists.rows[0]) break;
       }
       const tl = (parseInt(timeLimitSec)||0) > 0 ? parseInt(timeLimitSec) : null;
-      await pool.query(
-        'INSERT INTO study_parties (id,host_id,status,topic,time_limit_sec,created_at) VALUES ($1,$2,$3,$4,$5,$6)',
-        [code, user.userId, 'lobby', topic||null, tl, nowSec()]
-      );
-      await pool.query(
-        'INSERT INTO party_members (party_id,user_id,joined_at,status) VALUES ($1,$2,$3,$4)',
-        [code, user.userId, nowSec(), 'active']
-      );
+      await pool.query('INSERT INTO study_parties (id,host_id,status,topic,time_limit_sec,created_at) VALUES ($1,$2,$3,$4,$5,$6)',
+        [code, user.userId, 'lobby', topic||null, tl, nowSec()]);
+      await pool.query('INSERT INTO party_members (party_id,user_id,joined_at,status) VALUES ($1,$2,$3,$4)',
+        [code, user.userId, nowSec(), 'active']);
       return json(res,200,{ok:true, code});
     } catch(e){return json(res,500,{error:e.message});}
   }
@@ -2234,8 +2240,17 @@ const server = http.createServer(async (req, res) => {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
       const planR = await pool.query('SELECT plan FROM users WHERE id=$1', [user.userId]);
-      if ((planR.rows[0]?.plan || 'free') === 'free') {
-        return json(res,402,{error:'upgrade_required', message:'Study parties are available on Pro and Recruiting Pass. Upgrade to join sessions.'});
+      const plan = planR.rows[0]?.plan || 'free';
+      if (plan === 'free') {
+        const since = nowSec() - ONE_DAY;
+        const recentJoins = await pool.query(
+          `SELECT COUNT(*) FROM party_members pm JOIN study_parties sp ON sp.id=pm.party_id
+           WHERE pm.user_id=$1 AND sp.started_at IS NOT NULL AND sp.started_at >= $2`,
+          [user.userId, since]
+        );
+        if (parseInt(recentJoins.rows[0].count) >= 1) {
+          return json(res,402,{error:'join_limit', message:'Free accounts include 1 study party session per 24 hours. Upgrade to Pro for unlimited sessions.'});
+        }
       }
       const {code} = await readBody(req);
       if (!code) return json(res,400,{error:'code required'});
@@ -2244,14 +2259,10 @@ const server = http.createServer(async (req, res) => {
       const party = partyR.rows[0];
       if (party.status === 'complete') return json(res,400,{error:'This party has already ended'});
       if (party.status === 'active') return json(res,400,{error:'Session already in progress'});
-      await pool.query(
-        'INSERT INTO party_members (party_id,user_id,joined_at,status) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING',
-        [code, user.userId, nowSec(), 'active']
-      );
+      await pool.query('INSERT INTO party_members (party_id,user_id,joined_at,status) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING',
+        [code, user.userId, nowSec(), 'active']);
       const membersR = await pool.query(
-        `SELECT pm.user_id, u.name FROM party_members pm JOIN users u ON u.id=pm.user_id
-         WHERE pm.party_id=$1 AND pm.status='active'`, [code]
-      );
+        `SELECT pm.user_id, u.name FROM party_members pm JOIN users u ON u.id=pm.user_id WHERE pm.party_id=$1 AND pm.status='active'`, [code]);
       return json(res,200,{ok:true, party: {id:party.id, topic:party.topic, timeLimitSec:party.time_limit_sec, status:party.status, hostId:party.host_id}, members: membersR.rows});
     } catch(e){return json(res,500,{error:e.message});}
   }
