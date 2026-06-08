@@ -449,12 +449,12 @@
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
            Upgrade plan
          </a>
-         <a class="menu-item" href="billing.html">
+         <a class="menu-item" href="settings.html?tab=billing">
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
            Manage subscription
          </a>`
       : `<div class="menu-divider"></div>
-         <a class="menu-item" href="billing.html">
+         <a class="menu-item" href="settings.html?tab=billing">
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
            Manage subscription
          </a>`;
