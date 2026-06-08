@@ -1064,7 +1064,16 @@
 <script src="sidebar.js"></script>
 <script>
 const token = localStorage.getItem('apex_token');
-if (!token) window.location.href = 'auth.html';
+if (!token) {
+  (function showGuestWall() {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.body.innerHTML = '';
+      document.body.style.cssText = 'margin:0;font-family:DM Sans,sans-serif;background:#F7F6F3;min-height:100vh;display:flex;align-items:center;justify-content:center;';
+      document.body.innerHTML = `<div style="max-width:440px;width:90%;text-align:center;padding:48px 40px;background:white;border-radius:16px;border:1px solid #E8E5DF;box-shadow:0 8px 32px rgba(0,0,0,.06);"><div style="width:52px;height:52px;background:#1A1814;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><svg viewBox="0 0 32 32" fill="none" width="24" height="24"><path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" fill="white" fill-opacity=".12"/><path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 9L22 20H10L16 9Z" fill="white" fill-opacity=".9"/><circle cx="16" cy="17" r="1.5" fill="#1A1814"/></svg></div><div style="font-family:DM Serif Display,serif;font-size:24px;letter-spacing:-.3px;margin-bottom:10px;">Study Parties requires an account</div><p style="font-size:14px;color:#6B6560;line-height:1.65;margin-bottom:28px;">Practice synchronously with friends, compare answers side by side, and see how you stack up — all in real time.</p><a href="auth.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:#1A1814;color:white;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;font-family:DM Sans,sans-serif;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Create a free account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></a><div style="margin-top:14px;"><a href="auth.html" style="font-size:13px;color:#2563EB;text-decoration:none;">Already have an account? Sign in</a></div><div style="margin-top:24px;padding-top:20px;border-top:1px solid #E8E5DF;"><a href="practice-screen.html" style="font-size:12.5px;color:#9E9890;text-decoration:none;">← Back to practice</a></div></div>`;
+    });
+  })();
+}
+if (!token) { void 0; } else {
 
 // ── STATE ──
 let partyCode = null;
@@ -1563,6 +1572,7 @@ async function init() {
 }
 
 init();
+}
 </script>
 </body>
 </html>
