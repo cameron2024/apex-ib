@@ -403,6 +403,26 @@
 
 .btn-secondary:hover { border-color: var(--border-strong); color: var(--text-primary); }
 
+.btn-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: auto;
+  padding: 7px 16px;
+  background: none;
+  color: var(--text-tertiary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: color 0.15s;
+  margin: 8px auto 0;
+}
+.btn-cancel:hover { color: var(--accent-red); }
+
 /* ── SESSION ── */
 .session-header {
   display: flex;
@@ -911,7 +931,10 @@
       </div>
 
       <button class="btn-primary" onclick="startSession()" id="startBtn">Start Session</button>
-      <button class="btn-secondary" onclick="showView('view-landing')">Cancel</button>
+      <button class="btn-cancel" onclick="showView('view-landing')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="15 18 9 12 15 6"/></svg>
+        Cancel
+      </button>
     </div>
   </div>
 
