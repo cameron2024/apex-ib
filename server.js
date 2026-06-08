@@ -339,7 +339,7 @@ function callClaude(systemPrompt, userPrompt, maxTokens) {
     if (!process.env.ANTHROPIC_API_KEY) {
       return reject(new Error('ANTHROPIC_API_KEY is not set on the server.'));
     }
-    const payload = { model: 'claude-sonnet-4-6', max_tokens: maxTokens || 800, messages: [{ role: 'user', content: userPrompt }] };
+    const payload = { model: 'claude-haiku-4-5-20251001', max_tokens: maxTokens || 800, messages: [{ role: 'user', content: userPrompt }] };
     if (systemPrompt) payload.system = systemPrompt;
     const data = JSON.stringify(payload);
     const apiReq = https.request({
@@ -374,22 +374,28 @@ function callClaude(systemPrompt, userPrompt, maxTokens) {
 
 function parseJsonFromText(text) {
   if (!text) return null;
-  let cleaned = text.replace(/```json\s*|\s*```/g, '').trim();
-  // Try clean parse first
-  try { return JSON.parse(cleaned); } catch(e) {
-    // If truncated (unterminated string/object), try to salvage
-    if (e.message && (e.message.includes('Unterminated') || e.message.includes('Unexpected end'))) {
-      try {
-        // Strip trailing incomplete key-value pair then close open braces
-        let salvaged = cleaned.replace(/,\s*"[^"]*$/, '').replace(/,\s*$/, '');
-        const opens = (salvaged.match(/{/g)||[]).length;
-        const closes = (salvaged.match(/}/g)||[]).length;
-        if (opens > closes) salvaged += '}'.repeat(opens - closes);
-        return JSON.parse(salvaged);
-      } catch(_) { return null; }
+  // Find the outermost { } block regardless of surrounding text or markdown
+  const start = text.indexOf('{');
+  if (start === -1) return null;
+  let depth = 0, inStr = false, esc = false;
+  for (let i = start; i < text.length; i++) {
+    const c = text[i];
+    if (esc) { esc = false; continue; }
+    if (c === '\\' && inStr) { esc = true; continue; }
+    if (c === '"') { inStr = !inStr; continue; }
+    if (!inStr) {
+      if (c === '{') depth++;
+      else if (c === '}') { depth--; if (depth === 0) { try { return JSON.parse(text.slice(start, i+1)); } catch(_) { return null; } } }
     }
-    return null;
   }
+  // Truncated — try to salvage
+  if (depth > 0) {
+    try {
+      let s = text.slice(start).replace(/,\s*"[^"]*$/, '').replace(/,\s*$/, '');
+      return JSON.parse(s + '}'.repeat(depth));
+    } catch(_) { return null; }
+  }
+  return null;
 }
 
 // ── SPACED REPETITION ───────────────────────────────────────
@@ -682,7 +688,7 @@ async function gradeMockAnswer(question, userAnswer) {
   if (!userAnswer || !userAnswer.trim()) {
     return { score: 0, verdict: 'Skipped', strengths: '', gaps: 'No answer was given.', concept_gap: null };
   }
-  const systemPrompt = `You are an investment banking interview coach grading a candidate's answer to a technical question. Be honest and specific. Respond ONLY with valid JSON in this exact shape, no markdown:
+  const systemPrompt = `You are an investment banking interview coach grading a candidate's answer to a technical question. Be honest and specific. Your response MUST start with { and end with }. Output raw JSON only — no markdown, no explanation, no text before or after the JSON object:
 {"score": <integer 0-100>, "verdict": "<one sentence>", "strengths": "<2-3 sentences on what worked>", "gaps": "<2-3 sentences on what is missing or wrong>", "concept_gap": "<short label for the single biggest gap, or null>"}
 
 Scoring rubric: 90-100 = interview-ready answer with all key concepts. 70-89 = correct direction, minor gaps. 50-69 = partial credit, missing key pieces. Below 50 = significantly wrong or confused.`;

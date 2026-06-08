@@ -1568,7 +1568,7 @@ JSON rules:
 - "concept_gap": ONLY if score < 75 — the single most important concept to drill, stated specifically. Null if score >= 75.
 - "harder_followon": ONLY if score >= 90 — one harder follow-on question. Null if score < 90.
 
-Respond ONLY with valid JSON, no markdown fences:
+Your response MUST start with { and end with }. Output raw JSON only — no markdown, no explanation, no text before or after:
 {
   "scores": {
     "overall": 82,
@@ -1587,7 +1587,7 @@ Respond ONLY with valid JSON, no markdown fences:
 
 Candidate's answer: "${userAnswer}"
 
-Return JSON only.`;
+Your response must be raw JSON only — no other text.`;
 
     try {
       // Front-end cap check before hitting server
@@ -1601,7 +1601,7 @@ Return JSON only.`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
+          model: 'claude-haiku-4-5-20251001',
           max_tokens: 2048,
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }]
@@ -1648,37 +1648,48 @@ Return JSON only.`;
         }
       }
 
-      // Final full render
+      // Final full render — extract JSON robustly regardless of surrounding text or markdown
       try {
         if (!fullText.trim()) throw new Error('empty_response');
-        let cleaned = fullText.replace(/```json|```/g, '').trim();
-        // If JSON is truncated (unterminated), try to salvage by closing open structures
-        if (!cleaned.endsWith('}')) {
-          // Count open braces to detect truncation
-          const opens = (cleaned.match(/{/g)||[]).length;
-          const closes = (cleaned.match(/}/g)||[]).length;
-          if (opens > closes) {
-            // Try closing the object(s) — salvage what we have
-            cleaned = cleaned.replace(/,\s*"[^"]*$/, '').replace(/,\s*$/, '');
-            cleaned += '}'.repeat(opens - closes);
+
+        // Walk the string to find the outermost { } block
+        function extractJSON(str) {
+          const start = str.indexOf('{');
+          if (start === -1) return null;
+          let depth = 0, inStr = false, esc = false;
+          for (let i = start; i < str.length; i++) {
+            const c = str[i];
+            if (esc) { esc = false; continue; }
+            if (c === '\\' && inStr) { esc = true; continue; }
+            if (c === '"') { inStr = !inStr; continue; }
+            if (!inStr) {
+              if (c === '{') depth++;
+              else if (c === '}') { depth--; if (depth === 0) return str.slice(start, i+1); }
+            }
           }
+          // Truncated — close open braces
+          if (depth > 0) {
+            let s = str.slice(start).replace(/,\s*"[^"]*$/, '').replace(/,\s*$/, '');
+            return s + '}'.repeat(depth);
+          }
+          return null;
         }
-        const result = JSON.parse(cleaned);
-        if (typeof result.score !== 'number') throw new Error('missing_score');
+
+        const jsonStr = extractJSON(fullText);
+        if (!jsonStr) throw new Error('empty_response');
+        const result = JSON.parse(jsonStr);
+        if (typeof result.score !== 'number' && typeof result.scores?.overall !== 'number') throw new Error('missing_score');
         renderFeedback(result);
       } catch(e) {
-        console.error('Parse error:', e, fullText);
+        console.error('Parse error:', e.message, fullText.slice(0, 200));
         if (e.message === 'empty_response') {
           showApiError('No response from the grading service — please try again.');
         } else if (e.message === 'missing_score') {
           showApiError('Grading response was incomplete — please try again.');
-        } else if (e.message && e.message.includes('Unterminated')) {
-          showApiError('Your answer may be too long — try to be more concise and resubmit.');
         } else {
           showApiError('Grading response was malformed — please try again.');
         }
       }
-
     } catch (err) {
       overlay.classList.remove('visible');
       console.error('Grading error:', err);
