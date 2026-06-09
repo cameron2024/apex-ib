@@ -79,10 +79,12 @@
 }
 
 .type-card-icon {
-  font-size: 22px;
-  margin-bottom: 7px;
-  line-height: 1;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 9px;
 }
+.type-card-icon svg { width: 24px; height: 24px; }
+.type-card.selected .type-card-icon svg { stroke: white; }
 
 .type-card-label {
   font-size: 12.5px;
@@ -269,32 +271,32 @@
   <!-- TYPE SELECTOR -->
   <div class="type-grid" id="typeGrid">
     <div class="type-card selected" data-type="bug" onclick="selectType(this)">
-      <div class="type-card-icon">🐛</div>
+      <div class="type-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><rect width="8" height="14" x="8" y="6" rx="4"/><path d="m19 7-3 2"/><path d="m5 7 3 2"/><path d="m19 19-3-2"/><path d="m5 19 3-2"/><path d="M20 13h-4"/><path d="M4 13h4"/><path d="m10 4 1 2"/><path d="m14 4-1 2"/></svg></div>
       <div class="type-card-label">Bug</div>
       <div class="type-card-desc">Something broken or not working</div>
     </div>
     <div class="type-card" data-type="wrong-answer" onclick="selectType(this)">
-      <div class="type-card-icon">❓</div>
+      <div class="type-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M10 10.3c.2-.4.5-.8.9-1a2.1 2.1 0 0 1 2.6.4c.3.4.5.8.5 1.3 0 1.3-2 2-2 2"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
       <div class="type-card-label">Wrong answer</div>
       <div class="type-card-desc">Grading error or bad model answer</div>
     </div>
     <div class="type-card" data-type="feature" onclick="selectType(this)">
-      <div class="type-card-icon">💡</div>
+      <div class="type-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></div>
       <div class="type-card-label">Feature idea</div>
       <div class="type-card-desc">Something you'd like to see</div>
     </div>
     <div class="type-card" data-type="ui" onclick="selectType(this)">
-      <div class="type-card-icon">🎨</div>
+      <div class="type-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
       <div class="type-card-label">UI / design</div>
       <div class="type-card-desc">Looks off or hard to use</div>
     </div>
     <div class="type-card" data-type="grading" onclick="selectType(this)">
-      <div class="type-card-icon">⚡</div>
+      <div class="type-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div>
       <div class="type-card-label">Grading issue</div>
       <div class="type-card-desc">Score seems wrong or unfair</div>
     </div>
     <div class="type-card" data-type="other" onclick="selectType(this)">
-      <div class="type-card-icon">💬</div>
+      <div class="type-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M14 9c0 .55-.45 1-1 1H8"/><path d="M20 9V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v16l4-4h10a2 2 0 0 0 2-2v-3"/><circle cx="18" cy="18" r="3"/><path d="M15.5 15.5 18 18"/></svg></div>
       <div class="type-card-label">Other</div>
       <div class="type-card-desc">Anything else on your mind</div>
     </div>
@@ -307,9 +309,9 @@
       <div class="field" id="fieldSeverity" style="">
         <label>How bad is it?</label>
         <div class="severity-row">
-          <button class="severity-pill" onclick="selectSeverity('low', this)">🟢 Minor</button>
-          <button class="severity-pill sel-medium" onclick="selectSeverity('medium', this)">🟡 Annoying</button>
-          <button class="severity-pill" onclick="selectSeverity('high', this)">🔴 Blocking</button>
+          <button class="severity-pill" onclick="selectSeverity('low', this)">Minor</button>
+          <button class="severity-pill sel-medium" onclick="selectSeverity('medium', this)">Annoying</button>
+          <button class="severity-pill" onclick="selectSeverity('high', this)">Blocking</button>
         </div>
       </div>
 
