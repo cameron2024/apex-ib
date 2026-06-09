@@ -331,8 +331,7 @@
         <span class="field-hint">Helps us find it faster in the question bank.</span>
       </div>
 
-      <div class="field">
-        <label for="reportPage">Where did this happen?</label>
+      <div class="field" id="fieldPage">
         <select id="reportPage">
           <option value="">Select a page…</option>
           <option value="practice">Practice screen</option>
@@ -387,14 +386,25 @@ function selectType(el) {
   el.classList.add('selected');
   selectedType = el.dataset.type;
 
-  // Show question field for wrong-answer and grading types
+  const isFeature = selectedType === 'feature';
+  const isOther   = selectedType === 'other';
+
+  // Show question field only for wrong-answer and grading
   const showQ = ['wrong-answer','grading'].includes(selectedType);
   document.getElementById('fieldQuestion').style.display = showQ ? '' : 'none';
 
-  // Hide severity for feature requests
-  document.getElementById('fieldSeverity').style.display = selectedType === 'feature' ? 'none' : '';
+  // Hide severity for feature and other
+  document.getElementById('fieldSeverity').style.display = (isFeature || isOther) ? 'none' : '';
 
-  // Update placeholder
+  // Hide "where did this happen" for feature and other
+  document.getElementById('fieldPage').style.display = (isFeature || isOther) ? 'none' : '';
+
+  // Title placeholder
+  document.getElementById('reportTitle').placeholder = isFeature
+    ? 'One line summary of idea'
+    : 'One line summary of the issue';
+
+  // Description placeholder
   const placeholders = {
     bug: 'What happened? What did you expect to happen? Steps to reproduce?',
     'wrong-answer': 'What was the question? What was wrong with the grading or model answer?',
