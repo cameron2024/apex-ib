@@ -710,7 +710,7 @@
       </div>
     </div>
     <div class="card-cta-row">
-      <button class="btn-cta btn-free" onclick="window.location.href='auth.html?mode=register'">
+      <button class="btn-cta btn-free" onclick="launchFreeWash('auth.html?mode=register')">
         Start for free
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -817,7 +817,7 @@
       </div>
     </div>
     <div class="card-cta-row">
-      <button class="btn-cta btn-pro-monthly" onclick="launchWhirlpool('monthly', 'auth.html?mode=register&plan=monthly')">
+      <button class="btn-cta btn-pro-monthly" onclick="launchWhirlpool('monthly', 'auth.html?mode=register&plan=monthly')" onmouseenter="showVignette('monthly')" onmouseleave="hideVignette()">
         Get the Pro Plan
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -896,7 +896,7 @@
       </div>
     </div>
     <div class="card-cta-row">
-      <button class="btn-cta btn-pass" onclick="launchWhirlpool('pass', 'auth.html?mode=register&plan=pass')">
+      <button class="btn-cta btn-pass" onclick="launchWhirlpool('pass', 'auth.html?mode=register&plan=pass')" onmouseenter="showVignette('pass')" onmouseleave="hideVignette()">
         Get the Recruiting Pass
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -1119,6 +1119,20 @@
 </script>
 
 
+
+<!-- ── VIGNETTE OVERLAY ── -->
+<div id="vignetteOverlay" style="display:none;position:fixed;inset:0;z-index:100;pointer-events:none;transition:opacity .35s ease;opacity:0;">
+  <canvas id="vignetteCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+</div>
+
+<!-- ── FREE WASH OVERLAY ── -->
+<div id="freeWashOverlay" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;">
+  <canvas id="freeWashCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+  <div style="position:relative;z-index:1;text-align:center;pointer-events:none;">
+    <div id="freeWashText" style="font-family:'DM Serif Display',serif;font-size:22px;color:white;letter-spacing:-.3px;text-shadow:0 2px 20px rgba(0,0,0,.5);opacity:0;transition:opacity .4s ease .3s;">Starting your free account…</div>
+  </div>
+</div>
+
 <!-- ── WHIRLPOOL OVERLAY ── -->
 <div id="whirlpoolOverlay" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:transparent;">
   <canvas id="whirlpoolCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
@@ -1265,6 +1279,158 @@ function launchWhirlpool(plan, dest) {
   // Show label text
   setTimeout(() => { label.style.opacity = '1'; }, 300);
 }
+
+// ── VIGNETTE ON HOVER ──────────────────────────────────────
+let _vigRaf = null;
+let _vigTarget = 0;
+let _vigCurrent = 0;
+let _vigPlan = null;
+
+function showVignette(plan) {
+  _vigPlan = plan;
+  _vigTarget = 1;
+  const overlay = document.getElementById('vignetteOverlay');
+  overlay.style.display = 'block';
+  drawVignette();
+  requestAnimationFrame(animateVignette);
+}
+
+function hideVignette() {
+  _vigTarget = 0;
+}
+
+function animateVignette() {
+  _vigCurrent += (_vigTarget - _vigCurrent) * 0.1;
+  const overlay = document.getElementById('vignetteOverlay');
+  overlay.style.opacity = _vigCurrent;
+  drawVignette();
+  if (_vigCurrent > 0.002) {
+    requestAnimationFrame(animateVignette);
+  } else {
+    _vigCurrent = 0;
+    overlay.style.display = 'none';
+  }
+}
+
+function drawVignette() {
+  const canvas = document.getElementById('vignetteCanvas');
+  const W = canvas.width  = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  const isPro = _vigPlan === 'monthly';
+  const c1 = isPro ? 'rgba(37,99,235,' : 'rgba(217,119,6,';
+  const c2 = isPro ? 'rgba(30,58,138,' : 'rgba(146,64,14,';
+
+  // Left vignette
+  const gL = ctx.createLinearGradient(0, 0, W * 0.38, 0);
+  gL.addColorStop(0, c2 + '0.55)');
+  gL.addColorStop(0.5, c1 + '0.2)');
+  gL.addColorStop(1, 'transparent');
+  ctx.fillStyle = gL;
+  ctx.fillRect(0, 0, W * 0.38, H);
+
+  // Right vignette
+  const gR = ctx.createLinearGradient(W, 0, W * 0.62, 0);
+  gR.addColorStop(0, c2 + '0.55)');
+  gR.addColorStop(0.5, c1 + '0.2)');
+  gR.addColorStop(1, 'transparent');
+  ctx.fillStyle = gR;
+  ctx.fillRect(W * 0.62, 0, W * 0.38, H);
+
+  // Subtle top + bottom edges
+  const gT = ctx.createLinearGradient(0, 0, 0, H * 0.22);
+  gT.addColorStop(0, c1 + '0.18)');
+  gT.addColorStop(1, 'transparent');
+  ctx.fillStyle = gT;
+  ctx.fillRect(0, 0, W, H * 0.22);
+
+  const gB = ctx.createLinearGradient(0, H, 0, H * 0.78);
+  gB.addColorStop(0, c1 + '0.18)');
+  gB.addColorStop(1, 'transparent');
+  ctx.fillStyle = gB;
+  ctx.fillRect(0, H * 0.78, W, H * 0.22);
+}
+
+// ── FREE WASH ANIMATION ────────────────────────────────────
+const FINANCE_SYMBOLS = [
+  '$', '€', '£', '¥', '%', '∑', '∂', 'π', '∫', '±', '×', '÷',
+  'IRR', 'NPV', 'EBITDA', 'DCF', 'P/E', 'EV', 'ROI', 'WACC',
+  'β', 'α', 'Δ', '√', '≈', '∞', 'LBO', 'M&A', 'IPO',
+  '10x', '2.5x', '8%', '15%', '3.2x',
+];
+
+function launchFreeWash(dest) {
+  const overlay = document.getElementById('freeWashOverlay');
+  const canvas  = document.getElementById('freeWashCanvas');
+  const label   = document.getElementById('freeWashText');
+  overlay.style.display = 'flex';
+
+  const W = canvas.width  = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+
+  const DURATION = 1800;
+  const start = performance.now();
+
+  // Spawn symbols
+  const symbols = Array.from({length: 60}, () => ({
+    text: FINANCE_SYMBOLS[Math.floor(Math.random() * FINANCE_SYMBOLS.length)],
+    x: Math.random() * W,
+    y: Math.random() * H,
+    size: 14 + Math.random() * 28,
+    alpha: 0.06 + Math.random() * 0.18,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: -0.3 - Math.random() * 0.5,
+    rotation: (Math.random() - 0.5) * 0.4,
+    angle: (Math.random() - 0.5) * 1.2,
+  }));
+
+  function easeInOut(t) { return t < 0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+
+  function drawFrame(now) {
+    const elapsed = now - start;
+    const t = Math.min(elapsed / DURATION, 1);
+    const te = easeInOut(t);
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Wash background — grey, fades in
+    ctx.fillStyle = `rgba(20,20,20,${te * 0.96})`;
+    ctx.fillRect(0, 0, W, H);
+
+    // Symbols — drift upward and fade
+    symbols.forEach(s => {
+      s.x += s.vx;
+      s.y += s.vy;
+      s.angle += s.rotation * 0.01;
+
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.angle);
+      ctx.font = `600 ${s.size}px "DM Sans", sans-serif`;
+      ctx.fillStyle = `rgba(160,160,160,${s.alpha * te})`;
+      ctx.fillText(s.text, 0, 0);
+      ctx.restore();
+
+      // Wrap
+      if (s.y < -60) s.y = H + 20;
+      if (s.x < -60) s.x = W + 20;
+      if (s.x > W + 60) s.x = -20;
+    });
+
+    if (t < 1) {
+      requestAnimationFrame(drawFrame);
+    } else {
+      window.location.href = dest;
+    }
+  }
+
+  requestAnimationFrame(drawFrame);
+  setTimeout(() => { label.style.opacity = '1'; }, 350);
+}
+
 </script>
 </body>
 </html>
