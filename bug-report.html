@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report an Issue — Apex</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+
+.report-page {
+  max-width: 620px;
+  margin: 0 auto;
+  animation: fadeUp 0.35s ease both;
+}
+
+.page-eyebrow {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.page-eyebrow svg { width: 13px; height: 13px; opacity: .6; }
+
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 30px;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.page-sub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+/* Type selector */
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.type-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  background: var(--surface);
+  user-select: none;
+}
+
+.type-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.type-card.selected {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.type-card-icon {
+  font-size: 22px;
+  margin-bottom: 7px;
+  line-height: 1;
+}
+
+.type-card-label {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.type-card-desc {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.type-card.selected .type-card-desc { color: rgba(255,255,255,0.65); }
+
+/* Form */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.form-card-body { padding: 24px 26px; display: flex; flex-direction: column; gap: 18px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+.field-hint { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  box-sizing: border-box;
+}
+
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--border-strong);
+  background: white;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.55;
+}
+
+.field textarea::placeholder { color: var(--text-tertiary); }
+
+/* Severity pills */
+.severity-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.severity-pill {
+  padding: 5px 14px;
+  border-radius: 99px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.severity-pill:hover { border-color: var(--border-strong); color: var(--text-primary); }
+.severity-pill.sel-low    { background: #F0FDF4; color: #166534; border-color: #BBF7D0; }
+.severity-pill.sel-medium { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+.severity-pill.sel-high   { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+
+/* Footer */
+.form-card-footer {
+  padding: 14px 26px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+  gap: 12px;
+}
+
+.submit-status { font-size: 13px; color: var(--text-tertiary); flex: 1; }
+.submit-status.success { color: var(--accent-green); font-weight: 500; }
+.submit-status.error   { color: var(--accent-red); }
+
+.btn-submit-report {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 22px;
+  background: var(--text-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  white-space: nowrap;
+}
+.btn-submit-report:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.btn-submit-report:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Success state */
+.success-card {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px 40px;
+  text-align: center;
+  animation: fadeUp 0.3s ease both;
+}
+.success-card.visible { display: block; }
+.success-icon {
+  width: 52px; height: 52px;
+  background: #F0FDF4;
+  border: 1.5px solid #BBF7D0;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+  font-size: 22px;
+}
+.success-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+.success-sub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 360px;
+  margin: 0 auto 24px;
+}
+.btn-back-practice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.btn-back-practice:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+@media (max-width: 540px) {
+  .type-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body data-page="bug-report">
+<div id="sidebar-mount"></div>
+
+<main class="main">
+<div class="report-page">
+
+  <div class="page-eyebrow">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Feedback
+  </div>
+  <div class="page-title">Report an issue</div>
+  <div class="page-sub">Found a bug, have a feature idea, or spotted a wrong answer? We read every report and usually fix things within a day or two.</div>
+
+  <!-- TYPE SELECTOR -->
+  <div class="type-grid" id="typeGrid">
+    <div class="type-card selected" data-type="bug" onclick="selectType(this)">
+      <div class="type-card-icon">🐛</div>
+      <div class="type-card-label">Bug</div>
+      <div class="type-card-desc">Something broken or not working</div>
+    </div>
+    <div class="type-card" data-type="wrong-answer" onclick="selectType(this)">
+      <div class="type-card-icon">❓</div>
+      <div class="type-card-label">Wrong answer</div>
+      <div class="type-card-desc">Grading error or bad model answer</div>
+    </div>
+    <div class="type-card" data-type="feature" onclick="selectType(this)">
+      <div class="type-card-icon">💡</div>
+      <div class="type-card-label">Feature idea</div>
+      <div class="type-card-desc">Something you'd like to see</div>
+    </div>
+    <div class="type-card" data-type="ui" onclick="selectType(this)">
+      <div class="type-card-icon">🎨</div>
+      <div class="type-card-label">UI / design</div>
+      <div class="type-card-desc">Looks off or hard to use</div>
+    </div>
+    <div class="type-card" data-type="grading" onclick="selectType(this)">
+      <div class="type-card-icon">⚡</div>
+      <div class="type-card-label">Grading issue</div>
+      <div class="type-card-desc">Score seems wrong or unfair</div>
+    </div>
+    <div class="type-card" data-type="other" onclick="selectType(this)">
+      <div class="type-card-icon">💬</div>
+      <div class="type-card-label">Other</div>
+      <div class="type-card-desc">Anything else on your mind</div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card" id="formCard">
+    <div class="form-card-body">
+
+      <div class="field" id="fieldSeverity" style="">
+        <label>How bad is it?</label>
+        <div class="severity-row">
+          <button class="severity-pill" onclick="selectSeverity('low', this)">🟢 Minor</button>
+          <button class="severity-pill sel-medium" onclick="selectSeverity('medium', this)">🟡 Annoying</button>
+          <button class="severity-pill" onclick="selectSeverity('high', this)">🔴 Blocking</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="reportTitle">Title <span style="color:var(--accent-red);">*</span></label>
+        <input type="text" id="reportTitle" placeholder="One line summary of the issue" maxlength="120">
+      </div>
+
+      <div class="field">
+        <label for="reportDesc">Description <span style="color:var(--accent-red);">*</span></label>
+        <textarea id="reportDesc" placeholder="What happened? What did you expect to happen? Any steps to reproduce?"></textarea>
+      </div>
+
+      <div class="field" id="fieldQuestion" style="display:none;">
+        <label for="reportQuestion">Question text (optional)</label>
+        <input type="text" id="reportQuestion" placeholder="Paste the question that had the issue">
+        <span class="field-hint">Helps us find it faster in the question bank.</span>
+      </div>
+
+      <div class="field">
+        <label for="reportPage">Where did this happen?</label>
+        <select id="reportPage">
+          <option value="">Select a page…</option>
+          <option value="practice">Practice screen</option>
+          <option value="mock">Mock interview</option>
+          <option value="study-party">Study party</option>
+          <option value="feed">Feed / social</option>
+          <option value="profile">Profile page</option>
+          <option value="settings">Settings</option>
+          <option value="auth">Sign in / register</option>
+          <option value="other">Other / not sure</option>
+        </select>
+      </div>
+
+    </div>
+    <div class="form-card-footer">
+      <div class="submit-status" id="submitStatus"></div>
+      <button class="btn-submit-report" id="submitBtn" onclick="submitReport()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send report
+      </button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-card" id="successCard">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Got it — thanks.</div>
+    <div class="success-sub">Your report was submitted. We'll look into it and fix things as fast as we can. No reply needed but we may reach out if we have questions.</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <a href="practice-screen.html" class="btn-back-practice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to practice
+      </a>
+      <button onclick="resetForm()" class="btn-back-practice" style="border-color:var(--text-primary);color:var(--text-primary);">
+        Submit another
+      </button>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<script src="sidebar.js"></script>
+<script>
+const token = localStorage.getItem('apex_token');
+
+let selectedType = 'bug';
+let selectedSeverity = 'medium';
+
+function selectType(el) {
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType = el.dataset.type;
+
+  // Show question field for wrong-answer and grading types
+  const showQ = ['wrong-answer','grading'].includes(selectedType);
+  document.getElementById('fieldQuestion').style.display = showQ ? '' : 'none';
+
+  // Hide severity for feature requests
+  document.getElementById('fieldSeverity').style.display = selectedType === 'feature' ? 'none' : '';
+
+  // Update placeholder
+  const placeholders = {
+    bug: 'What happened? What did you expect to happen? Steps to reproduce?',
+    'wrong-answer': 'What was the question? What was wrong with the grading or model answer?',
+    feature: 'Describe the feature you\'d like. What problem would it solve?',
+    ui: 'What looks off or feels hard to use? Which page?',
+    grading: 'What was your answer? Why did the score seem wrong?',
+    other: 'Tell us whatever\'s on your mind.',
+  };
+  document.getElementById('reportDesc').placeholder = placeholders[selectedType] || placeholders.other;
+}
+
+function selectSeverity(level, btn) {
+  selectedSeverity = level;
+  document.querySelectorAll('.severity-pill').forEach(p => {
+    p.className = 'severity-pill';
+  });
+  btn.classList.add(`sel-${level}`);
+}
+
+async function submitReport() {
+  const title = document.getElementById('reportTitle').value.trim();
+  const desc  = document.getElementById('reportDesc').value.trim();
+  const status = document.getElementById('submitStatus');
+  const btn = document.getElementById('submitBtn');
+
+  if (!title) { setStatus(status, 'error', 'Please add a title.'); return; }
+  if (!desc)  { setStatus(status, 'error', 'Please describe the issue.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = 'Sending…';
+  setStatus(status, '', '');
+
+  const payload = {
+    type: selectedType,
+    severity: selectedSeverity,
+    title,
+    description: desc,
+    question: document.getElementById('reportQuestion').value.trim() || null,
+    page: document.getElementById('reportPage').value || null,
+    userAgent: navigator.userAgent,
+    url: window.location.href,
+  };
+
+  try {
+    const r = await fetch('/api/report', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (r.ok) {
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('typeGrid').style.display = 'none';
+      document.querySelector('.page-sub').style.display = 'none';
+      document.getElementById('successCard').classList.add('visible');
+    } else {
+      const data = await r.json().catch(() => ({}));
+      setStatus(status, 'error', data.error || 'Failed to send — please try again.');
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send report';
+    }
+  } catch(e) {
+    setStatus(status, 'error', 'Network error — please try again.');
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send report';
+  }
+}
+
+function resetForm() {
+  document.getElementById('formCard').style.display = '';
+  document.getElementById('typeGrid').style.display = '';
+  document.querySelector('.page-sub').style.display = '';
+  document.getElementById('successCard').classList.remove('visible');
+  document.getElementById('reportTitle').value = '';
+  document.getElementById('reportDesc').value = '';
+  document.getElementById('reportQuestion').value = '';
+  document.getElementById('reportPage').value = '';
+  document.getElementById('submitStatus').textContent = '';
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send report';
+  // Reset to bug
+  selectType(document.querySelector('[data-type="bug"]'));
+  selectSeverity('medium', document.querySelectorAll('.severity-pill')[1]);
+}
+
+function setStatus(el, type, msg) {
+  el.textContent = msg;
+  el.className = 'submit-status' + (type ? ' ' + type : '');
+}
+
+// Sidebar init
+if (token) {
+  fetch('/api/progress/load', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(r => r.json())
+    .then(data => {
+      window._userPlan = data.plan || 'free';
+      window._gradedToday = data.gradedToday || 0;
+      window._memberSince = data.memberSince || null;
+      if (window.initSidebarMenu) initSidebarMenu(window._userPlan, window._gradedToday);
+    }).catch(() => { if (window.initSidebarMenu) initSidebarMenu('free', 0); });
+}
+</script>
+</body>
+</html>

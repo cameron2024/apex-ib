@@ -142,6 +142,14 @@ async function initDB() {
     `);
     // ── SCHOOL / CONFERENCE TABLES ───────────────────────────
     await client.query(`
+      CREATE TABLE IF NOT EXISTS bug_reports (
+        id SERIAL PRIMARY KEY,
+        user_id BIGINT,
+        type TEXT, severity TEXT,
+        title TEXT, description TEXT,
+        question TEXT, page TEXT, user_agent TEXT,
+        created_at BIGINT
+      );
       CREATE TABLE IF NOT EXISTS schools (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -2578,6 +2586,36 @@ const server = http.createServer(async (req, res) => {
         questions: party.question_ids || [],
         byQuestion, finalScores,
       });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/admin/reports
+  if (req.method==='GET' && url.startsWith('/api/admin/reports')) {
+    if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) return json(res,401,{error:'Unauthorized'});
+    try {
+      const r = await pool.query(
+        `SELECT br.*, u.email, u.name FROM bug_reports br
+         LEFT JOIN users u ON u.id=br.user_id
+         ORDER BY br.created_at DESC LIMIT 100`
+      );
+      return json(res,200,{reports: r.rows});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/report — bug / feedback submission
+  if (req.method==='POST' && url==='/api/report') {
+    try {
+      const user = getUser(req);
+      const body = await readBody(req);
+      let data; try { data = JSON.parse(body); } catch(e) { return json(res,400,{error:'Invalid body'}); }
+      const { type, severity, title, description, question, page, userAgent } = data;
+      if (!title || !description) return json(res,400,{error:'title and description required'});
+      await pool.query(
+        `INSERT INTO bug_reports (user_id, type, severity, title, description, question, page, user_agent, created_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [user?.userId||null, type||'other', severity||'medium', title.slice(0,200), description.slice(0,2000), (question||'').slice(0,500)||null, page||null, (userAgent||'').slice(0,300), nowSec()]
+      );
+      return json(res,200,{ok:true});
     } catch(e){return json(res,500,{error:e.message});}
   }
 
