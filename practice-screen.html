@@ -438,28 +438,29 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 16px;
+    margin-top: 20px;
   }
 
   .btn-primary {
     background: var(--text-primary);
     color: white;
     border: none;
-    padding: 8px 18px;
+    padding: 11px 24px;
     border-radius: var(--radius-sm);
-    font-size: 13px;
+    font-size: 14px;
     font-family: 'DM Sans', sans-serif;
     font-weight: 600;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    transition: all 0.15s;
+    gap: 7px;
+    transition: opacity 0.15s, transform 0.1s;
     white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   }
-
-  .btn-primary:hover { background: #333; }
-  .btn-primary svg { width: 13px; height: 13px; }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary svg { width: 14px; height: 14px; }
 
   .btn-skip {
     background: none;
@@ -468,10 +469,12 @@
     font-family: 'DM Sans', sans-serif;
     color: var(--text-tertiary);
     cursor: pointer;
-    padding: 10px 12px;
+    padding: 8px 10px;
     transition: color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
-
   .btn-skip:hover { color: var(--text-secondary); }
 
   /* FEEDBACK STYLE TOGGLE - removed */
@@ -669,14 +672,24 @@
   }
 
   /* NEXT QUESTION — hero */
-  .next-section {
-    padding: 14px 24px 16px;
+  /* ── FEEDBACK ACTION BAR ── */
+  .feedback-actions {
+    padding: 14px 24px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 8px;
     background: var(--surface);
+  }
+
+  .next-section {
+    padding: 10px 24px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+    flex-wrap: wrap;
   }
 
   .next-label {
@@ -1169,7 +1182,23 @@
         </div>
       </div>
 
-      <!-- NEXT QUESTION — hero section -->
+      <!-- ACTION BAR — sits right below scores, above feedback body -->
+      <div class="feedback-actions" id="feedbackActions" style="display:none;">
+        <button class="btn-primary" id="btnLoadNext" onclick="confirmNextQuestion()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+          <span id="btnLoadNextLabel">Next question</span>
+        </button>
+        <button class="btn-ghost" onclick="retryQuestion()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+          Retry
+        </button>
+        <button class="btn-mark-mastered" id="btnMarkMastered" onclick="markMastered()" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Mark as Mastered
+        </button>
+      </div>
+
+      <!-- NEXT QUESTION PREVIEW — slim info strip -->
       <div class="next-section" id="nextSection">
         <div class="next-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -1181,19 +1210,7 @@
           <div class="next-q-reason" id="nextQReason"></div>
         </div>
         <div id="drillQueuePreview" style="display:none;"></div>
-        <div class="next-actions">
-          <button class="btn-primary" id="btnLoadNext" onclick="confirmNextQuestion()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-            <span id="btnLoadNextLabel">Load this question</span>
-          </button>
-          <button class="btn-ghost" onclick="retryQuestion()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
-            Retry this question
-          </button>
-          <button class="btn-mark-mastered" id="btnMarkMastered" onclick="markMastered()" style="display:none">
-            ★ Mark as Mastered
-          </button>
-        </div>
+        <div class="next-actions" style="display:none;"></div>
       </div>
 
       <!-- FEEDBACK BODY -->
@@ -1703,6 +1720,7 @@ Your response must be raw JSON only — no other text.`;
   function showFeedbackLoading() {
     const panel = document.getElementById('feedbackPanel');
     panel.classList.add('visible');
+    document.getElementById('feedbackActions').style.display = 'none';
     document.getElementById('verdictScore').textContent = '…';
     document.getElementById('verdictLabel').textContent = 'Grading';
     document.getElementById('verdictBadge').className = 'verdict-badge';
@@ -1717,7 +1735,6 @@ Your response must be raw JSON only — no other text.`;
     document.getElementById('nextQText').textContent = 'Analyzing your answer…';
     document.getElementById('nextQReason').textContent = '';
     document.getElementById('drillQueuePreview').style.display = 'none';
-    // Reset next-section visibility for fresh render
     document.getElementById('nextQPreview').style.display = '';
     document.getElementById('nextSection').style.cssText = '';
     const nextLabelReset = document.querySelector('#nextSection .next-label');
@@ -1991,8 +2008,9 @@ Your response must be raw JSON only — no other text.`;
       if (skipEl2) skipEl2.style.display = 'none';
     }
 
-    // Show panel
+    // Show panel and action bar
     document.getElementById('feedbackPanel').classList.add('visible');
+    document.getElementById('feedbackActions').style.display = 'flex';
     document.getElementById('feedbackPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     // Track session result
