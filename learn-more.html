@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Learn More — Apex</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -102,7 +102,6 @@
     background: var(--bg);
     border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
     flex-shrink: 0;
   }
   .section-title { font-size: 14px; font-weight: 600; }
@@ -324,7 +323,7 @@
     <!-- HOW IT WORKS -->
     <div class="section-card">
       <div class="section-header">
-        <div class="section-icon">⚡</div>
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div>
         <div>
           <div class="section-title">How it works</div>
           <div class="section-sub">Three steps from question to feedback</div>
@@ -369,7 +368,7 @@
     <!-- TOPICS -->
     <div class="section-card">
       <div class="section-header">
-        <div class="section-icon">📚</div>
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect width="8" height="18" x="3" y="3" rx="1"/><path d="M7 3v18"/><path d="M20.4 18.9c.2.5-.1 1.1-.6 1.3l-1.9.7c-.5.2-1.1-.1-1.3-.6L11 6c-.2-.5.1-1.1.6-1.3l1.9-.7c.5-.2 1.1.1 1.3.6Z"/></svg></div>
         <div>
           <div class="section-title">Question categories</div>
           <div class="section-sub">565 questions across 6 core IB topics</div>
@@ -426,7 +425,7 @@
     <!-- FAQ -->
     <div class="section-card">
       <div class="section-header">
-        <div class="section-icon">💬</div>
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
         <div>
           <div class="section-title">FAQ</div>
           <div class="section-sub">Common questions</div>
@@ -497,7 +496,7 @@
 <script src="sidebar.js"></script>
 <script>
   const token = localStorage.getItem('apex_token');
-  const name  = window.getApexName ? window.getApexName() : (function(){ try { var r=localStorage.getItem('apex_user'); if(!r||r==='undefined')return localStorage.getItem('apex_name')||''; var p=JSON.parse(r); return typeof p==='object'?p.name||'':p||''; } catch(e){ return localStorage.getItem('apex_name')||''; } })() || '';
+  const name  = localStorage.getItem('apex_user') || '';
 
   if (token) {
     fetch('/api/progress/load', { headers: { 'Authorization': 'Bearer ' + token } })
