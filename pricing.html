@@ -817,7 +817,7 @@
       </div>
     </div>
     <div class="card-cta-row">
-      <button class="btn-cta btn-pro-monthly" onclick="window.location.href='auth.html?mode=register&plan=monthly'">
+      <button class="btn-cta btn-pro-monthly" onclick="launchWhirlpool('monthly', 'auth.html?mode=register&plan=monthly')">
         Get the Pro Plan
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -896,7 +896,7 @@
       </div>
     </div>
     <div class="card-cta-row">
-      <button class="btn-cta btn-pass" onclick="window.location.href='auth.html?mode=register&plan=pass'">
+      <button class="btn-cta btn-pass" onclick="launchWhirlpool('pass', 'auth.html?mode=register&plan=pass')">
         Get the Recruiting Pass
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -1118,5 +1118,153 @@
   }
 </script>
 
+
+<!-- ── WHIRLPOOL OVERLAY ── -->
+<div id="whirlpoolOverlay" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:transparent;">
+  <canvas id="whirlpoolCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+  <div id="whirlpoolLabel" style="position:relative;z-index:1;text-align:center;pointer-events:none;">
+    <div id="whirlpoolText" style="font-family:'DM Serif Display',serif;font-size:22px;color:white;letter-spacing:-.3px;text-shadow:0 2px 20px rgba(0,0,0,.4);margin-top:12px;opacity:0;transition:opacity .4s ease .3s;">Taking you to checkout…</div>
+  </div>
+</div>
+
+<script>
+function launchWhirlpool(plan, dest) {
+  const overlay = document.getElementById('whirlpoolOverlay');
+  const canvas  = document.getElementById('whirlpoolCanvas');
+  const label   = document.getElementById('whirlpoolText');
+  overlay.style.display = 'flex';
+
+  // Colors
+  const isPro  = plan === 'monthly';
+  const color1 = isPro ? '#2563EB' : '#D97706';
+  const color2 = isPro ? '#60A5FA' : '#FDE68A';
+  const color3 = isPro ? '#1E3A8A' : '#92400E';
+  const bgBase = isPro ? '#0f1b40' : '#1c0e00';
+
+  const W = canvas.width  = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  const cx = W / 2, cy = H / 2;
+  const ctx = canvas.getContext('2d');
+
+  const PARTICLE_COUNT = 220;
+  const DURATION = 1600; // ms before redirect
+  const start = performance.now();
+
+  // Particles: each has an initial angle, radius, speed, size, color
+  const particles = Array.from({length: PARTICLE_COUNT}, (_, i) => {
+    const frac = i / PARTICLE_COUNT;
+    return {
+      angle:  frac * Math.PI * 2 * 5,   // spread over 5 full turns
+      radius: 80 + Math.random() * (Math.max(W,H) * 0.7),
+      speed:  2 + Math.random() * 3,
+      size:   2 + Math.random() * 5,
+      alpha:  0.4 + Math.random() * 0.6,
+      color:  [color1, color2, color3][Math.floor(Math.random() * 3)],
+      trail:  [],
+    };
+  });
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function easeInCubic(t) { return t * t * t; }
+  function easeOutQuad(t)  { return 1 - (1-t)*(1-t); }
+
+  function draw(now) {
+    const elapsed = now - start;
+    const tRaw = Math.min(elapsed / DURATION, 1);
+    const tIn  = easeInCubic(tRaw);   // accelerate inward
+    const tFade = easeOutQuad(Math.min(elapsed / 400, 1)); // bg fade in
+
+    // Background
+    ctx.fillStyle = bgBase;
+    ctx.globalAlpha = tFade * 0.92;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
+
+    // Radial glow at center
+    const glowRadius = lerp(0, 220, tIn);
+    if (glowRadius > 0) {
+      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+      grd.addColorStop(0, color2 + 'cc');
+      grd.addColorStop(0.4, color1 + '66');
+      grd.addColorStop(1, 'transparent');
+      ctx.globalAlpha = tIn * 0.7;
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    // Spin particles inward
+    const spinBoost = 1 + tIn * 6;  // spins faster as time progresses
+    const shrink    = 1 - tIn * 0.92;  // radius collapses to center
+
+    particles.forEach(p => {
+      p.angle += (p.speed * 0.025) * spinBoost;
+      const r = p.radius * shrink;
+      const x = cx + Math.cos(p.angle) * r;
+      const y = cy + Math.sin(p.angle) * r;
+
+      // Trail
+      p.trail.push({x, y});
+      if (p.trail.length > 10) p.trail.shift();
+
+      // Draw trail
+      if (p.trail.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(p.trail[0].x, p.trail[0].y);
+        for (let t = 1; t < p.trail.length; t++) {
+          ctx.lineTo(p.trail[t].x, p.trail[t].y);
+        }
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = p.size * 0.6;
+        ctx.globalAlpha = p.alpha * tFade * (1 - tRaw * 0.3);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      // Dot
+      ctx.beginPath();
+      ctx.arc(x, y, p.size * (1 - tIn * 0.5), 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha * tFade;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    // Spiral lines
+    const lineCount = 4;
+    for (let l = 0; l < lineCount; l++) {
+      const angleOffset = (l / lineCount) * Math.PI * 2 + tIn * Math.PI * 8;
+      ctx.beginPath();
+      for (let s = 0; s < 120; s++) {
+        const frac = s / 120;
+        const r2 = Math.max(W,H) * 0.6 * (1 - frac) * shrink;
+        const a2 = angleOffset + frac * Math.PI * 5;
+        const sx = cx + Math.cos(a2) * r2;
+        const sy = cy + Math.sin(a2) * r2;
+        if (s === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+      }
+      ctx.strokeStyle = l % 2 === 0 ? color1 : color2;
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.25 * tFade * (1 - tRaw * 0.4);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    if (tRaw < 1) {
+      requestAnimationFrame(draw);
+    } else {
+      window.location.href = dest;
+    }
+  }
+
+  requestAnimationFrame(draw);
+
+  // Show label text
+  setTimeout(() => { label.style.opacity = '1'; }, 300);
+}
+</script>
 </body>
 </html>
