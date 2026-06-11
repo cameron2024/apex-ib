@@ -1155,8 +1155,8 @@ function getPricingDest(targetPlan) {
   }
   // Already logged in
   if (targetPlan === 'free') return 'dashboard.html';
-  if (currentPlan === targetPlan) return 'billing.html'; // already on this plan
-  return `billing.html?upgrade=${targetPlan}`; // upgrade flow
+  if (currentPlan === targetPlan) return 'settings.html?tab=billing';
+  return `settings.html?tab=billing&upgrade=${targetPlan}`;
 }
 
 function launchWhirlpoolSmart(plan) {

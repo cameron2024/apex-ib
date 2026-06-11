@@ -321,6 +321,57 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
 .badge-monthly { background: #EFF6FF; color: #2563EB; }
 .badge-pass    { background: #FEF3C7; color: #D97706; }
 
+/* ── BILLING UPGRADE OPTIONS ── */
+.upgrade-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 540px) { .upgrade-options { grid-template-columns: 1fr; } }
+.upgrade-option {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.upgrade-option:hover { border-color: var(--border-strong); }
+.upgrade-option.highlighted { border-color: #2563EB; background: #F8FBFF; }
+.upgrade-option.highlighted-pass { border-color: #D97706; background: #FFFBF2; }
+.upgrade-option-header { display: flex; align-items: center; justify-content: space-between; }
+.upgrade-option-name { font-size: 13.5px; font-weight: 600; }
+.upgrade-option-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 99px; color: white;
+}
+.upgrade-option-badge.pro  { background: #2563EB; }
+.upgrade-option-badge.pass { background: #D97706; }
+.upgrade-option-price { font-size: 20px; font-weight: 700; letter-spacing: -.5px; }
+.upgrade-option-price span { font-size: 12px; font-weight: 400; color: var(--text-tertiary); }
+.upgrade-option-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.upgrade-features { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+.upgrade-feature {
+  display: flex; align-items: flex-start; gap: 7px;
+  font-size: 12px; color: var(--text-secondary); line-height: 1.45;
+}
+.upgrade-feature svg { flex-shrink: 0; margin-top: 1px; opacity: 0.7; }
+.upgrade-cta {
+  width: 100%; padding: 10px;
+  border: none; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+  margin-top: 4px;
+}
+.upgrade-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+.upgrade-cta.pro  { background: #2563EB; color: white; }
+.upgrade-cta.pass { background: #D97706; color: white; }
+.billing-portal-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.billing-portal-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
 /* ── DELETE MODAL ── */
 .modal-backdrop {
   display: none; position: fixed; inset: 0;
@@ -611,6 +662,8 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
 
       <!-- BILLING -->
       <div class="settings-panel" id="panel-billing">
+
+        <!-- Current plan -->
         <div class="settings-card">
           <div class="card-header">
             <div class="card-header-icon">
@@ -628,22 +681,73 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
                 <div id="planName" style="font-size:14px;font-weight:600;margin-bottom:2px;">Free plan</div>
                 <div id="planDesc" style="font-size:12.5px;color:var(--text-secondary);">5 graded answers/day · 1 lifetime mock · 1 party join/day</div>
               </div>
-              <a href="pricing.html" class="btn-save" style="text-decoration:none;white-space:nowrap;">View all plans</a>
             </div>
           </div>
         </div>
 
-        <div class="settings-card" id="manageSubCard" style="display:none;">
+        <!-- Upgrade options (hidden for pass users) -->
+        <div class="settings-card" id="upgradeCard">
           <div class="card-header">
             <div class="card-header-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             </div>
             <div class="card-header-text">
-              <div class="card-title">Manage subscription</div>
-              <div class="card-desc">Cancel or update your billing details</div>
+              <div class="card-title" id="upgradeCardTitle">Upgrade your plan</div>
+              <div class="card-desc" id="upgradeCardDesc">Unlock unlimited grading, voice mode, and more</div>
             </div>
           </div>
           <div class="card-body">
+            <div class="upgrade-options">
+              <!-- Pro Monthly -->
+              <div class="upgrade-option highlighted" id="upgradeOptMonthly">
+                <div class="upgrade-option-header">
+                  <span class="upgrade-option-name">Pro</span>
+                  <span class="upgrade-option-badge pro">Monthly</span>
+                </div>
+                <div class="upgrade-option-price">$19.99<span> / mo</span></div>
+                <div class="upgrade-features">
+                  <div class="upgrade-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>Unlimited AI-graded answers</div>
+                  <div class="upgrade-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>1 mock interview / day</div>
+                  <div class="upgrade-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>Voice mode for realistic prep</div>
+                  <div class="upgrade-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>Host study parties</div>
+                </div>
+                <button class="upgrade-cta pro" onclick="startCheckout('monthly')">Upgrade to Pro</button>
+              </div>
+              <!-- Recruiting Pass -->
+              <div class="upgrade-option highlighted-pass" id="upgradeOptPass">
+                <div class="upgrade-option-header">
+                  <span class="upgrade-option-name">Recruiting Pass</span>
+                  <span class="upgrade-option-badge pass">One-time</span>
+                </div>
+                <div class="upgrade-option-price">$39.99<span> / mo</span></div>
+                <div class="upgrade-features">
+                  <div class="upgrade-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</div>
+                  <div class="upgrade-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>Unlimited mock interviews</div>
+                  <div class="upgrade-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>Full recruiting cycle access</div>
+                  <div class="upgrade-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>Priority content updates</div>
+                </div>
+                <button class="upgrade-cta pass" onclick="startCheckout('pass')">Get Recruiting Pass</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manage subscription (paid users only) -->
+        <div class="settings-card" id="manageSubCard" style="display:none;">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="card-header-text">
+              <div class="card-title">Manage subscription</div>
+              <div class="card-desc">Update payment method or cancel your plan</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="billing-portal-row">
+              <span class="billing-portal-text">Manage your payment details and subscription through the Stripe billing portal.</span>
+              <button class="btn-save" onclick="openPortal()" id="portalBtn">Open billing portal</button>
+            </div>
             <div class="danger-item">
               <div>
                 <div class="danger-item-label">Cancel subscription</div>
@@ -653,6 +757,7 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- DANGER ZONE -->
@@ -941,11 +1046,57 @@ async function loadBillingInfo() {
     };
     const pm = planMap[plan] || planMap.free;
     document.getElementById('planBadge').className = 'plan-badge-lg '+pm.badge;
-    document.getElementById('planBadge').textContent = pm.icon+' '+(plan==='free'?'Free':plan==='monthly'?'Pro':'Pass');
+    document.getElementById('planBadge').textContent = pm.icon+' '+(plan==='free'?'Free':plan==='monthly'?'Pro':'Recruiting Pass');
     document.getElementById('planName').textContent = pm.name;
     document.getElementById('planDesc').textContent = pm.desc;
+
+    // Upgrade card: hide for pass users; for monthly users hide the Pro option
+    const upgradeCard = document.getElementById('upgradeCard');
+    if (plan === 'pass') {
+      upgradeCard.style.display = 'none';
+    } else {
+      upgradeCard.style.display = '';
+      if (plan === 'monthly') {
+        document.getElementById('upgradeOptMonthly').style.display = 'none';
+        document.getElementById('upgradeCardTitle').textContent = 'Upgrade to Recruiting Pass';
+        document.getElementById('upgradeCardDesc').textContent = 'Unlock unlimited mocks and lifetime access';
+      }
+    }
     if (plan !== 'free') document.getElementById('manageSubCard').style.display = '';
+
+    // Auto-trigger checkout if redirected from pricing page
+    const upgradePlan = new URLSearchParams(location.search).get('upgrade');
+    if (upgradePlan === 'monthly' || upgradePlan === 'pass') {
+      setTimeout(() => startCheckout(upgradePlan), 400);
+    }
   } catch(e) {}
+}
+
+async function startCheckout(plan) {
+  try {
+    const r = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan })
+    });
+    const data = await r.json();
+    if (data.url) window.location.href = data.url;
+    else alert(data.error || 'Could not start checkout. Please try again.');
+  } catch(e) { alert('Something went wrong. Please try again.'); }
+}
+
+async function openPortal() {
+  const btn = document.getElementById('portalBtn');
+  if (btn) { btn.textContent = 'Opening…'; btn.disabled = true; }
+  try {
+    const r = await fetch('/api/stripe/portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+    });
+    const data = await r.json();
+    if (data.url) window.location.href = data.url;
+    else { alert(data.error || 'Could not open billing portal.'); if (btn) { btn.textContent = 'Open billing portal'; btn.disabled = false; } }
+  } catch(e) { alert('Something went wrong.'); if (btn) { btn.textContent = 'Open billing portal'; btn.disabled = false; } }
 }
 
 async function cancelSubscription() {
