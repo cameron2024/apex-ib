@@ -407,8 +407,26 @@
   width: 11px; height: 11px; border-radius: 2px;
   background: var(--border);
 }
-.pp-day.active { background: #1A1814; }
+.pp-day.active { background: #1A1814; cursor: pointer; }
 .pp-day.today { outline: 2px solid var(--accent-blue); outline-offset: 1px; }
+
+/* Activity tooltip */
+.activity-tooltip {
+  position: fixed;
+  background: var(--text-primary);
+  color: white;
+  padding: 7px 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+  opacity: 0;
+  transition: opacity .15s;
+}
+.activity-tooltip.visible { opacity: 1; }
 
 /* Mock scores */
 .pp-mock-row {

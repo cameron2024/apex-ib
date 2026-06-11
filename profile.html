@@ -103,28 +103,8 @@
 }
 .profile-plan-badge:hover { opacity: 0.8; }
 .badge-free    { background: #EFEDE9; color: #78736C; border: 1px solid #C4C0B8; }
-.badge-monthly {
-  background: linear-gradient(135deg, #1e3a8a, #3b82f6, #6366f1, #1e40af, #1e3a8a);
-  background-size: 300% 300%;
-  animation: badgeMonthlyShift 6s ease infinite;
-  color: white;
-}
-.badge-pass {
-  background: linear-gradient(135deg, #78350f, #d97706, #fbbf24, #b45309, #92400e, #d97706);
-  background-size: 400% 400%;
-  animation: badgePassShimmer 5s ease infinite;
-  color: white;
-}
-@keyframes badgeMonthlyShift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-@keyframes badgePassShimmer {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+.badge-monthly { background: #EFF6FF; color: #2563EB; }
+.badge-pass    { background: #FEF3C7; color: #D97706; }
 
 .profile-school-line {
   display: flex;
@@ -389,7 +369,26 @@
 }
 .activity-day.active { background: var(--text-primary); }
 .activity-day.active-today { outline: 2.5px solid var(--accent-blue); outline-offset: 1px; }
-.activity-day:hover { opacity: 0.7; }
+.activity-day:hover { opacity: 0.7; cursor: default; }
+.activity-day.active:hover { opacity: 1; cursor: pointer; }
+
+/* Activity tooltip */
+.activity-tooltip {
+  position: fixed;
+  background: var(--text-primary);
+  color: white;
+  padding: 7px 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+  opacity: 0;
+  transition: opacity .15s;
+}
+.activity-tooltip.visible { opacity: 1; }
 
 /* ── ANSWERS TAB ── */
 .answers-filters {
@@ -785,7 +784,7 @@ async function loadProfile() {
     if (!profileData.id) { window.location.href = 'friends.html'; return; }
 
     const isMe = profileData.id == myUserId;
-    const planMap = { free:{cls:'badge-free',label:'Free'}, monthly:{cls:'badge-monthly',label:'Pro'}, pass:{cls:'badge-pass',label:'Recruiting Pass'} };
+    const planMap = { free:{cls:'badge-free',label:'○ Free'}, monthly:{cls:'badge-monthly',label:'★ Pro'}, pass:{cls:'badge-pass',label:'◆ Recruiting Pass'} };
     const pm = planMap[profileData.plan] || planMap.free;
 
     const header = document.getElementById('profileHeader');
@@ -980,12 +979,13 @@ function renderPerformance() {
           ${(u.activityDates||[]).length} active days
         </span>
       </div>
-      <div class="activity-grid">${buildActivityGrid(u.activityDates||[])}</div>
+      <div class="activity-grid">${buildActivityGrid(u.activityDates||[], u.activityMap||{})}</div>
     </div>`;
 }
 
-function buildActivityGrid(dates) {
+function buildActivityGrid(dates, activityMap) {
   const dateSet = new Set(dates);
+  const map = activityMap || {};
   const today = new Date().toISOString().slice(0,10);
   let html = '';
   for (let i = 83; i >= 0; i--) {
@@ -993,7 +993,9 @@ function buildActivityGrid(dates) {
     const ds = d.toISOString().slice(0,10);
     const active = dateSet.has(ds);
     const isToday = ds === today;
-    html += `<div class="activity-day ${active?'active':''} ${isToday?'active-today':''}" title="${ds}"></div>`;
+    const count = map[ds] || 0;
+    const label = d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    html += `<div class="activity-day ${active?'active':''} ${isToday?'active-today':''}" data-date="${label}" data-count="${count}"></div>`;
   }
   return html;
 }
@@ -1163,6 +1165,32 @@ async function init() {
 
 init();
 }
+</script>
+
+<!-- ACTIVITY TOOLTIP -->
+<div id="activityTooltip" class="activity-tooltip"></div>
+<script>
+(function() {
+  const tip = document.getElementById('activityTooltip');
+  document.addEventListener('mouseover', function(e) {
+    const day = e.target.closest('.activity-day');
+    if (!day || !day.dataset.date) return;
+    const count = parseInt(day.dataset.count) || 0;
+    const date = day.dataset.date;
+    tip.textContent = count > 0
+      ? `${date} · ${count} question${count !== 1 ? 's' : ''} answered`
+      : `${date} · No activity`;
+    tip.classList.add('visible');
+  });
+  document.addEventListener('mouseout', function(e) {
+    if (!e.target.closest('.activity-day')) return;
+    tip.classList.remove('visible');
+  });
+  document.addEventListener('mousemove', function(e) {
+    tip.style.left = (e.clientX + 12) + 'px';
+    tip.style.top  = (e.clientY - 32) + 'px';
+  });
+})();
 </script>
 </body>
 </html>

@@ -15,13 +15,9 @@
   <a class="sidebar-logo" href="dashboard.html">
     <div class="logo-mark">
       <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Outer hexagon -->
-        <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" fill="white" fill-opacity="0.12"/>
-        <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
-        <!-- Inner triangle / apex mark -->
-        <path d="M16 9L22 20H10L16 9Z" fill="white" fill-opacity="0.9"/>
-        <!-- Center dot -->
-        <circle cx="16" cy="17" r="1.5" fill="#1A1814"/>
+        <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" fill="#2d2b27"/>
+        <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" stroke="white" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M16 9L23 21H9L16 9Z" fill="#d4d0c8"/>
       </svg>
     </div>
     <span class="logo-name">Apex</span>

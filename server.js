@@ -1576,7 +1576,7 @@ const server = http.createServer(async (req, res) => {
         'payment_method_types[0]':'card',
         'line_items[0][price]':priceId,
         'line_items[0][quantity]':'1',
-        'mode': plan==='pass' ? 'subscription' : 'subscription',
+        'mode': plan==='pass' ? 'payment' : 'subscription',
         'success_url':`${APP_URL}/dashboard.html?upgraded=1`,
         'cancel_url':`${APP_URL}/pricing.html`,
         'metadata[user_id]':String(user.userId),
@@ -1596,29 +1596,13 @@ const server = http.createServer(async (req, res) => {
     try {
       const r = await pool.query('SELECT stripe_customer_id FROM users WHERE id=$1',[user.userId]);
       const customerId = r.rows[0]?.stripe_customer_id;
-      if(!customerId) return json(res,400,{error:'no_stripe_customer'});
+      if(!customerId) return json(res,400,{error:'No billing account found. Please contact support.'});
       const session = await stripeRequest('POST','/v1/billing_portal/sessions',{
         customer: customerId,
         return_url: APP_URL+'/settings.html?tab=billing'
       });
       if(session.error) return json(res,400,{error:session.error.message});
       return json(res,200,{url:session.url});
-    } catch(e){return json(res,500,{error:e.message});}
-  }
-
-  if (req.method==='POST' && url==='/api/stripe/cancel') {
-    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
-    if(!STRIPE_SECRET_KEY) return json(res,503,{error:'Stripe not configured'});
-    try {
-      const r = await pool.query('SELECT stripe_subscription_id FROM users WHERE id=$1',[user.userId]);
-      const subId = r.rows[0]?.stripe_subscription_id;
-      if(!subId) return json(res,400,{error:'No active subscription found.'});
-      // Cancel at period end so user keeps access until billing cycle ends
-      const result = await stripeRequest('POST',`/v1/subscriptions/${subId}`,{
-        'cancel_at_period_end':'true'
-      });
-      if(result.error) return json(res,400,{error:result.error.message});
-      return json(res,200,{ok:true});
     } catch(e){return json(res,500,{error:e.message});}
   }
 
@@ -1646,29 +1630,6 @@ const server = http.createServer(async (req, res) => {
       if(event.type==='customer.subscription.deleted'){
         await pool.query('UPDATE users SET plan=$1,stripe_subscription_id=NULL WHERE stripe_subscription_id=$2',['free',obj.id]);
         console.log(`Subscription ${obj.id} cancelled — downgraded to free`);
-      }
-      if(event.type==='customer.subscription.updated'){
-        // Handle plan changes made via billing portal (e.g. pro → pass)
-        const priceId = obj.items?.data?.[0]?.price?.id;
-        const status   = obj.status; // active, past_due, canceled, etc.
-        if(priceId && status === 'active'){
-          let newPlan = null;
-          if(priceId === STRIPE_MONTHLY_PRICE_ID) newPlan = 'monthly';
-          else if(priceId === STRIPE_PASS_PRICE_ID) newPlan = 'pass';
-          if(newPlan){
-            await pool.query('UPDATE users SET plan=$1 WHERE stripe_subscription_id=$2',[newPlan,obj.id]);
-            console.log(`Subscription ${obj.id} updated to ${newPlan}`);
-          }
-        }
-        if(status === 'canceled'){
-          await pool.query('UPDATE users SET plan=$1,stripe_subscription_id=NULL WHERE stripe_subscription_id=$2',['free',obj.id]);
-          console.log(`Subscription ${obj.id} status=canceled — downgraded to free`);
-        }
-      }
-      if(event.type==='invoice.payment_failed'){
-        // Log for now; optionally email user
-        const subId = obj.subscription;
-        console.log(`Payment failed for subscription ${subId}`);
       }
       return json(res,200,{ok:true});
     } catch(e){console.error('Webhook error:',e.message);return json(res,400,{error:e.message});}
@@ -1794,7 +1755,7 @@ const server = http.createServer(async (req, res) => {
         pool.query(`SELECT ub.badge_id, ub.awarded_at, b.name, b.icon, b.type FROM user_badges ub JOIN badges b ON b.id=ub.badge_id WHERE ub.user_id=$1 ORDER BY ub.awarded_at DESC`, [targetId]),
         pool.query(`SELECT s.name, s.conference, s.logo_url FROM school_memberships sm JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1`, [targetId]),
         pool.query('SELECT topic,score,mastery_stage FROM question_results WHERE user_id=$1', [targetId]),
-        pool.query('SELECT date FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84', [targetId]),
+        pool.query('SELECT date, questions_answered FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84', [targetId]),
         pool.query('SELECT overall_score, started_at FROM mock_sessions WHERE user_id=$1 AND overall_score IS NOT NULL ORDER BY started_at DESC LIMIT 5', [targetId]),
       ]);
       if (!userR.rows[0]) return json(res,404,{error:'User not found'});
@@ -1813,6 +1774,7 @@ const server = http.createServer(async (req, res) => {
         return { topic, avg, count: d.scores.length, stage: dominantStage };
       }).sort((a,b) => b.avg - a.avg);
       const actDates = new Set(activityR.rows.map(a=>a.date));
+      const activityMap = Object.fromEntries(activityR.rows.map(a=>[a.date, a.questions_answered||0]));
       let streak = 0;
       for (let i=0;i<365;i++) {
         const d=new Date(); d.setDate(d.getDate()-i);
@@ -1880,6 +1842,7 @@ const server = http.createServer(async (req, res) => {
         badges: canViewFull ? badgeR.rows : [],
         school: schoolR.rows[0] || null,
         activityDates: canViewFull ? [...actDates] : [],
+        activityMap: canViewFull ? activityMap : {},
         recentMocks: canViewFull ? mockR.rows : [],
         stats: {
           overall: canViewFull ? overall : null,
