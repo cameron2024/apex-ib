@@ -460,12 +460,12 @@
 
     const planActionRow = plan === 'free'
       ? `<div class="menu-divider"></div>
-         <a class="menu-item" href="pricing.html" style="color:#2563EB;font-weight:500;">
+         <a class="menu-item menu-item-upgrade-pro" href="pricing.html" style="font-weight:600;background:linear-gradient(135deg,#1e3a8a,#3b82f6,#6366f1,#1e40af,#1e3a8a);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:badgeMonthlyShift 6s ease infinite;">
            Upgrade to Pro
          </a>`
       : plan === 'monthly'
       ? `<div class="menu-divider"></div>
-         <a class="menu-item" href="pricing.html" style="color:#D97706;font-weight:500;">
+         <a class="menu-item menu-item-upgrade-pass" href="pricing.html" style="font-weight:600;background:linear-gradient(135deg,#78350f,#d97706,#fbbf24,#b45309,#92400e,#d97706);background-size:400% 400%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:badgePassShimmer 5s ease infinite;">
            Get Recruiting Pass
          </a>
          <a class="menu-item" href="settings.html?tab=billing">
