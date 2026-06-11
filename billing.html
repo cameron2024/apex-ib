@@ -497,7 +497,35 @@
     }
   }
 
-  loadBilling();
+  // ── STRIPE CHECKOUT ──
+  window.startCheckout = async function(plan) {
+    try {
+      const r = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ plan })
+      });
+      const data = await r.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Could not start checkout. Please try again.');
+      }
+    } catch(e) {
+      alert('Something went wrong. Please try again.');
+    }
+  };
+
+  // If pricing page sent us here with ?upgrade=plan, auto-trigger checkout
+  async function loadBillingThenCheckout() {
+    await loadBilling();
+    const upgradePlan = new URLSearchParams(location.search).get('upgrade');
+    if (upgradePlan === 'monthly' || upgradePlan === 'pass') {
+      setTimeout(() => window.startCheckout(upgradePlan), 400);
+    }
+  }
+
+  loadBillingThenCheckout();
 </script>
 </body>
 </html>

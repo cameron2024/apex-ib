@@ -710,7 +710,7 @@
       </div>
     </div>
     <div class="card-cta-row">
-      <button class="btn-cta btn-free" onclick="launchFreeWash('auth.html?mode=register')">
+      <button class="btn-cta btn-free" onclick="launchFreeWashSmart()">
         Start for free
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -817,7 +817,7 @@
       </div>
     </div>
     <div class="card-cta-row">
-      <button class="btn-cta btn-pro-monthly" onclick="launchWhirlpool('monthly', 'auth.html?mode=register&plan=monthly')" onmouseenter="showVignette('monthly')" onmouseleave="hideVignette()">
+      <button class="btn-cta btn-pro-monthly" onclick="launchWhirlpoolSmart('monthly')" onmouseenter="showVignette('monthly')" onmouseleave="hideVignette()">
         Get the Pro Plan
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -896,7 +896,7 @@
       </div>
     </div>
     <div class="card-cta-row">
-      <button class="btn-cta btn-pass" onclick="launchWhirlpool('pass', 'auth.html?mode=register&plan=pass')" onmouseenter="showVignette('pass')" onmouseleave="hideVignette()">
+      <button class="btn-cta btn-pass" onclick="launchWhirlpoolSmart('pass')" onmouseenter="showVignette('pass')" onmouseleave="hideVignette()">
         Get the Recruiting Pass
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -1142,6 +1142,30 @@
 </div>
 
 <script>
+// ── AUTH-AWARE DESTINATIONS ───────────────────────────────
+// Resolve the correct destination based on login state + current plan
+function getPricingDest(targetPlan) {
+  const token = localStorage.getItem('apex_token');
+  const currentPlan = localStorage.getItem('apex_plan') || 'free';
+  if (!token) {
+    // Guest — send to register with plan param
+    return targetPlan === 'free'
+      ? 'auth.html?mode=register'
+      : `auth.html?mode=register&plan=${targetPlan}`;
+  }
+  // Already logged in
+  if (targetPlan === 'free') return 'dashboard.html';
+  if (currentPlan === targetPlan) return 'billing.html'; // already on this plan
+  return `billing.html?upgrade=${targetPlan}`; // upgrade flow
+}
+
+function launchWhirlpoolSmart(plan) {
+  launchWhirlpool(plan, getPricingDest(plan));
+}
+function launchFreeWashSmart() {
+  launchFreeWash(getPricingDest('free'));
+}
+
 function launchWhirlpool(plan, dest) {
   const overlay = document.getElementById('whirlpoolOverlay');
   const canvas  = document.getElementById('whirlpoolCanvas');
