@@ -330,16 +330,6 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
   animation: badgePassShimmer 5s ease infinite;
   color: white;
 }
-@keyframes badgeMonthlyShift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-@keyframes badgePassShimmer {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
 a.plan-badge-lg { transition: opacity .15s, transform .15s; }
 a.plan-badge-lg:hover { opacity: .75; transform: translateY(-1px); }
 
@@ -1064,18 +1054,19 @@ async function loadBillingInfo() {
     const data = await r.json();
     const plan = data.plan || 'free';
     const planMap = {
-      free:    { badge:'badge-free',    icon:'○', name:'Free plan',       desc:'5 graded answers/day · 1 lifetime mock · Join 1 party/day' },
-      monthly: { badge:'badge-monthly', icon:'', name:'Pro — $19.99/mo', desc:'Unlimited graded answers · 1 mock/24h · Host 1 party/24h · Unlimited joins' },
-      pass:    { badge:'badge-pass',    icon:'', name:'Recruiting Pass', desc:'Everything in Pro · Unlimited mocks · Unlimited party hosting' },
+      free:    { badge:'badge-free',    name:'Free plan',       desc:'5 graded answers/day · 1 lifetime mock · Join 1 party/day' },
+      monthly: { badge:'badge-monthly', name:'Pro — $19.99/mo', desc:'Unlimited graded answers · 1 mock/24h · Host 1 party/24h · Unlimited joins' },
+      pass:    { badge:'badge-pass',    name:'Recruiting Pass', desc:'Everything in Pro · Unlimited mocks · Unlimited party hosting' },
     };
     const pm = planMap[plan] || planMap.free;
-    badgeEl.className = 'plan-badge-lg '+pm.badge;
-    const planLabel = plan==='free'?'Free':plan==='monthly'?'Pro':'Recruiting Pass';
-    badgeEl.textContent = (pm.icon ? pm.icon+' ' : '') + planLabel;
-    if (plan === 'free' || plan === 'monthly' || plan === 'pass') {
-      const label = plan === 'free' ? 'Free' : plan === 'monthly' ? 'Pro' : 'Recruiting Pass';
-      badgeEl.outerHTML = `<a id="planBadge" href="pricing.html" class="plan-badge-lg ${pm.badge}" style="text-decoration:none;cursor:pointer;" title="View plans">${label}</a>`;
+    const planLabel = plan==='free' ? 'Free' : plan==='monthly' ? 'Pro' : 'Recruiting Pass';
+
+    // Swap badge to a link for all plans
+    const badgeEl = document.getElementById('planBadge');
+    if (badgeEl) {
+      badgeEl.outerHTML = `<a id="planBadge" href="pricing.html" class="plan-badge-lg ${pm.badge}" style="text-decoration:none;cursor:pointer;" title="View plans">${planLabel}</a>`;
     }
+
     document.getElementById('planName').textContent = pm.name;
     document.getElementById('planDesc').textContent = pm.desc;
 

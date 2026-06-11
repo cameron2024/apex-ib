@@ -293,9 +293,21 @@
     const el = document.getElementById('sidebarPlan');
     if (!el) return;
     if (plan === 'pass') {
-      el.textContent = 'Recruiting Pass'; el.style.color = '#D97706';
+      el.textContent = 'Recruiting Pass';
+      el.style.background = 'linear-gradient(135deg, #78350f, #d97706, #fbbf24, #b45309, #92400e, #d97706)';
+      el.style.backgroundSize = '300% 300%';
+      el.style.webkitBackgroundClip = 'text';
+      el.style.webkitTextFillColor = 'transparent';
+      el.style.backgroundClip = 'text';
+      el.style.animation = 'badgePassShimmer 5s ease infinite';
     } else if (plan === 'monthly') {
-      el.textContent = 'Pro plan'; el.style.color = '#2563EB';
+      el.textContent = 'Pro plan';
+      el.style.background = 'linear-gradient(135deg, #1e3a8a, #3b82f6, #6366f1, #1e40af, #1e3a8a)';
+      el.style.backgroundSize = '300% 300%';
+      el.style.webkitBackgroundClip = 'text';
+      el.style.webkitTextFillColor = 'transparent';
+      el.style.backgroundClip = 'text';
+      el.style.animation = 'badgeMonthlyShift 6s ease infinite';
     } else if (plan === 'guest') {
       const r = Math.max(0, 5 - (gradedToday || 0));
       el.textContent = 'Free · ' + r + ' grade' + (r !== 1 ? 's' : '') + ' left today';
