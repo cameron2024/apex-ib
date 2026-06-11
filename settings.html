@@ -748,6 +748,9 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
               <span class="billing-portal-text">Manage your payment details and subscription through the Stripe billing portal.</span>
               <button class="btn-save" onclick="openPortal()" id="portalBtn">Open billing portal</button>
             </div>
+            <div id="portalNoCustomerNote" style="display:none;font-size:12.5px;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;line-height:1.55;">
+              Your account was activated manually and doesn't have a Stripe billing record yet. Payment management isn't available — contact support if you need to update billing details.
+            </div>
             <div class="danger-item">
               <div>
                 <div class="danger-item-label">Cancel subscription</div>
@@ -1099,9 +1102,22 @@ async function openPortal() {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
     });
     const data = await r.json();
-    if (data.url) window.location.href = data.url;
-    else { alert(data.error || 'Could not open billing portal.'); if (btn) { btn.textContent = 'Open billing portal'; btn.disabled = false; } }
-  } catch(e) { alert('Something went wrong.'); if (btn) { btn.textContent = 'Open billing portal'; btn.disabled = false; } }
+    if (data.url) {
+      window.location.href = data.url;
+    } else if (data.error === 'no_stripe_customer') {
+      if (btn) { btn.textContent = 'Open billing portal'; btn.disabled = false; }
+      // Account was manually upgraded — no Stripe record exists yet.
+      // Show a note instead of an error.
+      const note = document.getElementById('portalNoCustomerNote');
+      if (note) note.style.display = '';
+    } else {
+      alert(data.error || 'Could not open billing portal.');
+      if (btn) { btn.textContent = 'Open billing portal'; btn.disabled = false; }
+    }
+  } catch(e) {
+    alert('Something went wrong.');
+    if (btn) { btn.textContent = 'Open billing portal'; btn.disabled = false; }
+  }
 }
 
 async function cancelSubscription() {

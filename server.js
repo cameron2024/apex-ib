@@ -1596,7 +1596,7 @@ const server = http.createServer(async (req, res) => {
     try {
       const r = await pool.query('SELECT stripe_customer_id FROM users WHERE id=$1',[user.userId]);
       const customerId = r.rows[0]?.stripe_customer_id;
-      if(!customerId) return json(res,400,{error:'No billing account found. Please contact support.'});
+      if(!customerId) return json(res,400,{error:'no_stripe_customer'});
       const session = await stripeRequest('POST','/v1/billing_portal/sessions',{
         customer: customerId,
         return_url: APP_URL+'/settings.html?tab=billing'
