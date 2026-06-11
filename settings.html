@@ -739,7 +739,6 @@ a.plan-badge-lg:hover { opacity: .75; transform: translateY(-1px); }
               <div class="upgrade-option highlighted-pass" id="upgradeOptPass">
                 <div class="upgrade-option-header">
                   <span class="upgrade-option-name">Recruiting Pass</span>
-                  <span class="upgrade-option-badge pass">One-time</span>
                 </div>
                 <div class="upgrade-option-price">$39.99<span> / mo</span></div>
                 <div class="upgrade-features">
@@ -1066,16 +1065,16 @@ async function loadBillingInfo() {
     const plan = data.plan || 'free';
     const planMap = {
       free:    { badge:'badge-free',    icon:'○', name:'Free plan',       desc:'5 graded answers/day · 1 lifetime mock · Join 1 party/day' },
-      monthly: { badge:'badge-monthly', icon:'★', name:'Pro — $19.99/mo', desc:'Unlimited graded answers · 1 mock/24h · Host 1 party/24h · Unlimited joins' },
-      pass:    { badge:'badge-pass',    icon:'◆', name:'Recruiting Pass', desc:'Everything in Pro · Unlimited mocks · Unlimited party hosting' },
+      monthly: { badge:'badge-monthly', icon:'', name:'Pro — $19.99/mo', desc:'Unlimited graded answers · 1 mock/24h · Host 1 party/24h · Unlimited joins' },
+      pass:    { badge:'badge-pass',    icon:'', name:'Recruiting Pass', desc:'Everything in Pro · Unlimited mocks · Unlimited party hosting' },
     };
     const pm = planMap[plan] || planMap.free;
-    const badgeEl = document.getElementById('planBadge');
     badgeEl.className = 'plan-badge-lg '+pm.badge;
-    badgeEl.textContent = pm.icon+' '+(plan==='free'?'Free':plan==='monthly'?'Pro':'Recruiting Pass');
+    const planLabel = plan==='free'?'Free':plan==='monthly'?'Pro':'Recruiting Pass';
+    badgeEl.textContent = (pm.icon ? pm.icon+' ' : '') + planLabel;
     if (plan === 'free' || plan === 'monthly' || plan === 'pass') {
       const label = plan === 'free' ? 'Free' : plan === 'monthly' ? 'Pro' : 'Recruiting Pass';
-      badgeEl.outerHTML = `<a id="planBadge" href="pricing.html" class="plan-badge-lg ${pm.badge}" style="text-decoration:none;cursor:pointer;" title="View plans">${pm.icon} ${label}</a>`;
+      badgeEl.outerHTML = `<a id="planBadge" href="pricing.html" class="plan-badge-lg ${pm.badge}" style="text-decoration:none;cursor:pointer;" title="View plans">${label}</a>`;
     }
     document.getElementById('planName').textContent = pm.name;
     document.getElementById('planDesc').textContent = pm.desc;
