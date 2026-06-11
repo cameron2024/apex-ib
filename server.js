@@ -1606,6 +1606,22 @@ const server = http.createServer(async (req, res) => {
     } catch(e){return json(res,500,{error:e.message});}
   }
 
+  if (req.method==='POST' && url==='/api/stripe/cancel') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    if(!STRIPE_SECRET_KEY) return json(res,503,{error:'Stripe not configured'});
+    try {
+      const r = await pool.query('SELECT stripe_subscription_id FROM users WHERE id=$1',[user.userId]);
+      const subId = r.rows[0]?.stripe_subscription_id;
+      if(!subId) return json(res,400,{error:'No active subscription found.'});
+      // Cancel at period end so user keeps access until billing cycle ends
+      const result = await stripeRequest('POST',`/v1/subscriptions/${subId}`,{
+        'cancel_at_period_end':'true'
+      });
+      if(result.error) return json(res,400,{error:result.error.message});
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
   if (req.method==='POST' && url==='/api/stripe/webhook') {
     if(!STRIPE_WEBHOOK_SECRET) return json(res,503,{error:'Webhook not configured'});
     try {
@@ -1630,6 +1646,29 @@ const server = http.createServer(async (req, res) => {
       if(event.type==='customer.subscription.deleted'){
         await pool.query('UPDATE users SET plan=$1,stripe_subscription_id=NULL WHERE stripe_subscription_id=$2',['free',obj.id]);
         console.log(`Subscription ${obj.id} cancelled — downgraded to free`);
+      }
+      if(event.type==='customer.subscription.updated'){
+        // Handle plan changes made via billing portal (e.g. pro → pass)
+        const priceId = obj.items?.data?.[0]?.price?.id;
+        const status   = obj.status; // active, past_due, canceled, etc.
+        if(priceId && status === 'active'){
+          let newPlan = null;
+          if(priceId === STRIPE_MONTHLY_PRICE_ID) newPlan = 'monthly';
+          else if(priceId === STRIPE_PASS_PRICE_ID) newPlan = 'pass';
+          if(newPlan){
+            await pool.query('UPDATE users SET plan=$1 WHERE stripe_subscription_id=$2',[newPlan,obj.id]);
+            console.log(`Subscription ${obj.id} updated to ${newPlan}`);
+          }
+        }
+        if(status === 'canceled'){
+          await pool.query('UPDATE users SET plan=$1,stripe_subscription_id=NULL WHERE stripe_subscription_id=$2',['free',obj.id]);
+          console.log(`Subscription ${obj.id} status=canceled — downgraded to free`);
+        }
+      }
+      if(event.type==='invoice.payment_failed'){
+        // Log for now; optionally email user
+        const subId = obj.subscription;
+        console.log(`Payment failed for subscription ${subId}`);
       }
       return json(res,200,{ok:true});
     } catch(e){console.error('Webhook error:',e.message);return json(res,400,{error:e.message});}

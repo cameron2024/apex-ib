@@ -1721,7 +1721,27 @@
   });
 
   init();
-  // ── HEATMAP ──────────────────────────────────────────────
+
+  // ── UPGRADE SUCCESS BANNER ───────────────────────────────
+  if (new URLSearchParams(location.search).get('upgraded') === '1') {
+    history.replaceState(null,'','/dashboard.html');
+    const banner = document.createElement('div');
+    banner.style.cssText = `
+      position:fixed;top:20px;left:50%;transform:translateX(-50%);
+      background:#16A34A;color:white;padding:12px 22px;border-radius:10px;
+      font-size:14px;font-weight:600;z-index:9999;
+      box-shadow:0 4px 20px rgba(22,163,74,.35);
+      animation:fadeUp .35s ease both;
+      display:flex;align-items:center;gap:9px;
+    `;
+    banner.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> You're all set — welcome to your new plan!`;
+    document.body.appendChild(banner);
+    setTimeout(() => {
+      banner.style.transition = 'opacity .4s ease, transform .4s ease';
+      banner.style.opacity = '0'; banner.style.transform = 'translateX(-50%) translateY(-8px)';
+      setTimeout(() => banner.remove(), 400);
+    }, 4000);
+  }
   function openHeatmap() {
     buildHeatmap(window._activityData || [], window._streakCount || 0);
     document.getElementById('heatmapOverlay').classList.add('visible');
