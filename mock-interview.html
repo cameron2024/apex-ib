@@ -468,6 +468,8 @@
         <p style="font-size:14px;color:var(--text-secondary);max-width:380px;line-height:1.65;">A free account includes 1 mock interview — your first end-to-end session is on us.</p>
         <a href="auth.html?mode=register&next=mock-interview.html" style="padding:10px 22px;background:var(--text-primary);color:white;border-radius:8px;font-size:13.5px;font-weight:600;text-decoration:none;">Create free account</a>
       </div>`;
+    if (typeof initSidebarMenu === "function") initSidebarMenu("guest", 0);
+    throw new Error("guest");
   }
 
   if (name && token) {
@@ -574,6 +576,22 @@
 
   // ── START SESSION ──
   async function startMock() {
+    if (!chosenFormat) return;
+
+    // Free users get a confirmation modal before consuming their one lifetime mock
+    if ((window._userPlan || 'free') === 'free') {
+      const modal = document.getElementById('freeMockModal');
+      modal.style.display = 'flex';
+      document.getElementById('freeMockConfirmBtn').onclick = () => {
+        modal.style.display = 'none';
+        doStartMock();
+      };
+      return;
+    }
+    doStartMock();
+  }
+
+  async function doStartMock() {
     if (!chosenFormat) return;
     const btn = document.getElementById('btnStartMock');
     btn.disabled = true; btn.textContent = 'Starting…';
@@ -876,6 +894,20 @@
     loadPriorSessions();
   }
 </script>
+
+<!-- FREE MOCK CONFIRMATION MODAL -->
+<div id="freeMockModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:fadeUp .2s ease both;">
+    <div style="font-size:32px;margin-bottom:14px;">🎤</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:10px;">Use your one lifetime mock?</div>
+    <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.65;margin-bottom:24px;">Free accounts get <strong>one mock interview for life</strong>. Once you start, this counts — even if you close the tab or navigate away mid-session.<br><br>Upgrade to Pro or Recruiting Pass for unlimited mocks.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="document.getElementById('freeMockModal').style.display='none'" style="padding:9px 18px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;cursor:pointer;">Back out</button>
+      <a href="pricing.html" style="padding:9px 18px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;cursor:pointer;text-decoration:none;color:var(--text-primary);display:inline-flex;align-items:center;">Upgrade instead</a>
+      <button id="freeMockConfirmBtn" style="padding:9px 18px;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">Proceed</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
