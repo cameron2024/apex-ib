@@ -1146,24 +1146,129 @@
 // Resolve the correct destination based on login state + current plan
 function getPricingDest(targetPlan) {
   const token = localStorage.getItem('apex_token');
-  const currentPlan = localStorage.getItem('apex_plan') || 'free';
   if (!token) {
-    // Guest — send to register with plan param
     return targetPlan === 'free'
       ? 'auth.html?mode=register'
       : `auth.html?mode=register&plan=${targetPlan}`;
   }
-  // Already logged in
   if (targetPlan === 'free') return 'dashboard.html';
-  if (currentPlan === targetPlan) return 'settings.html?tab=billing';
-  return `settings.html?tab=billing&upgrade=${targetPlan}`;
+  return null; // logged-in + paid plan → use Stripe directly
 }
 
-function launchWhirlpoolSmart(plan) {
-  launchWhirlpool(plan, getPricingDest(plan));
+async function launchWhirlpoolSmart(plan) {
+  const dest = getPricingDest(plan);
+  if (dest) {
+    launchWhirlpool(plan, dest);
+    return;
+  }
+  // Logged-in user — hit Stripe checkout, show animation while waiting
+  const token = localStorage.getItem('apex_token');
+  // Show whirlpool immediately while we fetch
+  const overlay = document.getElementById('whirlpoolOverlay');
+  const label   = document.getElementById('whirlpoolText');
+  overlay.style.display = 'flex';
+  setTimeout(() => { label.style.opacity = '1'; }, 300);
+  // Start canvas animation (non-redirecting)
+  startWhirlpoolLoop(plan);
+  try {
+    const r = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan })
+    });
+    const data = await r.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      overlay.style.display = 'none';
+      label.style.opacity = '0';
+      alert(data.error || 'Could not start checkout. Please try again.');
+    }
+  } catch(e) {
+    overlay.style.display = 'none';
+    label.style.opacity = '0';
+    alert('Something went wrong. Please try again.');
+  }
 }
+
 function launchFreeWashSmart() {
   launchFreeWash(getPricingDest('free'));
+}
+
+// Runs the whirlpool canvas indefinitely (no redirect) — used for async Stripe checkout
+function startWhirlpoolLoop(plan) {
+  const canvas = document.getElementById('whirlpoolCanvas');
+  const isPro  = plan === 'monthly';
+  const color1 = isPro ? '#2563EB' : '#D97706';
+  const color2 = isPro ? '#60A5FA' : '#FDE68A';
+  const color3 = isPro ? '#1E3A8A' : '#92400E';
+  const bgBase = isPro ? '#0f1b40' : '#1c0e00';
+
+  const W = canvas.width  = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  const cx = W / 2, cy = H / 2;
+  const ctx = canvas.getContext('2d');
+  const start = performance.now();
+
+  const particles = Array.from({length: 220}, (_, i) => {
+    const frac = i / 220;
+    return {
+      angle: frac * Math.PI * 2 * 5,
+      radius: 80 + Math.random() * (Math.max(W,H) * 0.7),
+      speed: 2 + Math.random() * 3,
+      size: 2 + Math.random() * 5,
+      alpha: 0.4 + Math.random() * 0.6,
+      color: [color1, color2, color3][Math.floor(Math.random() * 3)],
+      trail: [],
+    };
+  });
+
+  function draw(now) {
+    if (document.getElementById('whirlpoolOverlay').style.display === 'none') return;
+    const elapsed = Math.min(now - start, 1600);
+    const tRaw  = elapsed / 1600;
+    const tIn   = tRaw * tRaw * tRaw;
+    const tFade = 1 - Math.pow(1 - Math.min(elapsed / 400, 1), 2);
+    const spinBoost = 1 + tIn * 6;
+    const shrink    = Math.max(1 - tIn * 0.92, 0.08); // floor so it doesn't collapse to 0
+
+    ctx.fillStyle = bgBase;
+    ctx.globalAlpha = tFade * 0.92;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
+
+    const glowRadius = tIn * 220;
+    if (glowRadius > 0) {
+      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+      grd.addColorStop(0, color2 + 'cc');
+      grd.addColorStop(0.4, color1 + '66');
+      grd.addColorStop(1, 'transparent');
+      ctx.globalAlpha = tIn * 0.7;
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    particles.forEach(p => {
+      p.angle += (p.speed * 0.025) * spinBoost;
+      const r = p.radius * shrink;
+      const x = cx + Math.cos(p.angle) * r;
+      const y = cy + Math.sin(p.angle) * r;
+      p.trail.push({x, y});
+      if (p.trail.length > 10) p.trail.shift();
+      if (p.trail.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(p.trail[0].x, p.trail[0].y);
+        for (let t = 1; t < p.trail.length; t++) ctx.lineTo(p.trail[t].x, p.trail[t].y);
+        ctx.strokeStyle = p.color; ctx.lineWidth = p.size * 0.6;
+        ctx.globalAlpha = p.alpha * tFade; ctx.stroke(); ctx.globalAlpha = 1;
+      }
+      ctx.beginPath(); ctx.arc(x, y, p.size * (1 - tIn * 0.5), 0, Math.PI * 2);
+      ctx.fillStyle = p.color; ctx.globalAlpha = p.alpha * tFade; ctx.fill(); ctx.globalAlpha = 1;
+    });
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
 }
 
 function launchWhirlpool(plan, dest) {

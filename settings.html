@@ -1045,8 +1045,12 @@ async function loadBillingInfo() {
       pass:    { badge:'badge-pass',    icon:'◆', name:'Recruiting Pass', desc:'Everything in Pro · Unlimited mocks · Unlimited party hosting' },
     };
     const pm = planMap[plan] || planMap.free;
-    document.getElementById('planBadge').className = 'plan-badge-lg '+pm.badge;
-    document.getElementById('planBadge').textContent = pm.icon+' '+(plan==='free'?'Free':plan==='monthly'?'Pro':'Recruiting Pass');
+    const badgeEl = document.getElementById('planBadge');
+    badgeEl.className = 'plan-badge-lg '+pm.badge;
+    badgeEl.textContent = pm.icon+' '+(plan==='free'?'Free':plan==='monthly'?'Pro':'Recruiting Pass');
+    if (plan === 'free') {
+      badgeEl.outerHTML = `<a id="planBadge" href="pricing.html" class="plan-badge-lg ${pm.badge}" style="text-decoration:none;cursor:pointer;" title="View plans">${pm.icon} Free</a>`;
+    }
     document.getElementById('planName').textContent = pm.name;
     document.getElementById('planDesc').textContent = pm.desc;
 
