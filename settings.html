@@ -318,8 +318,28 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
   border-radius: 99px;
 }
 .badge-free    { background: #EFEDE9; color: #78736C; border: 1px solid #C4C0B8; }
-.badge-monthly { background: #EFF6FF; color: #2563EB; }
-.badge-pass    { background: #FEF3C7; color: #D97706; }
+.badge-monthly {
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6, #6366f1, #1e40af, #1e3a8a);
+  background-size: 300% 300%;
+  animation: badgeMonthlyShift 6s ease infinite;
+  color: white;
+}
+.badge-pass {
+  background: linear-gradient(135deg, #78350f, #d97706, #fbbf24, #b45309, #92400e, #d97706);
+  background-size: 400% 400%;
+  animation: badgePassShimmer 5s ease infinite;
+  color: white;
+}
+@keyframes badgeMonthlyShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes badgePassShimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 a.plan-badge-lg { transition: opacity .15s, transform .15s; }
 a.plan-badge-lg:hover { opacity: .75; transform: translateY(-1px); }
 
