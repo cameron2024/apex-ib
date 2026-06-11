@@ -1200,12 +1200,17 @@ async function launchWhirlpoolSmart(plan) {
     launchWhirlpool(plan, dest);
     return;
   }
-  // Logged-in user — hit Stripe checkout, show animation while waiting
+
+  // Logged-in user — fire animation immediately, fetch Stripe in parallel
   const overlay = document.getElementById('whirlpoolOverlay');
   const label   = document.getElementById('whirlpoolText');
   overlay.style.display = 'flex';
   setTimeout(() => { label.style.opacity = '1'; }, 300);
   startWhirlpoolLoop(plan);
+
+  const animStart = Date.now();
+  const MIN_ANIM_MS = 1200; // always show at least 1.2s of animation
+
   try {
     const r = await fetch('/api/stripe/checkout', {
       method: 'POST',
@@ -1214,7 +1219,10 @@ async function launchWhirlpoolSmart(plan) {
     });
     const data = await r.json();
     if (data.url) {
-      window.location.href = data.url;
+      // Ensure animation plays for at least MIN_ANIM_MS before redirect
+      const elapsed = Date.now() - animStart;
+      const wait = Math.max(0, MIN_ANIM_MS - elapsed);
+      setTimeout(() => { window.location.href = data.url; }, wait);
     } else {
       overlay.style.display = 'none';
       label.style.opacity = '0';
@@ -1469,6 +1477,15 @@ window.addEventListener('pageshow', function(e) {
   const fLabel = document.getElementById('freeWashText');
   if (fLabel) fLabel.style.opacity = '0';
   _vigCurrent = 0; _vigTarget = 0;
+
+  // Sync real plan from API so localStorage isn't stale
+  const token = localStorage.getItem('apex_token');
+  if (token) {
+    fetch('/api/progress/load', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json())
+      .then(d => { if (d.plan) localStorage.setItem('apex_plan', d.plan); })
+      .catch(() => {});
+  }
 });
 
 // ── VIGNETTE ON HOVER ──────────────────────────────────────
