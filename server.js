@@ -1576,7 +1576,7 @@ const server = http.createServer(async (req, res) => {
         'payment_method_types[0]':'card',
         'line_items[0][price]':priceId,
         'line_items[0][quantity]':'1',
-        'mode': plan==='pass' ? 'payment' : 'subscription',
+        'mode': plan==='pass' ? 'subscription' : 'subscription',
         'success_url':`${APP_URL}/dashboard.html?upgraded=1`,
         'cancel_url':`${APP_URL}/pricing.html`,
         'metadata[user_id]':String(user.userId),
