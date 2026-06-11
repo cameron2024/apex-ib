@@ -15,9 +15,13 @@
   <a class="sidebar-logo" href="dashboard.html">
     <div class="logo-mark">
       <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" fill="#2d2b27"/>
-        <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" stroke="white" stroke-width="2.2" stroke-linejoin="round"/>
-        <path d="M16 9L23 21H9L16 9Z" fill="#d4d0c8"/>
+        <!-- Outer hexagon -->
+        <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" fill="white" fill-opacity="0.12"/>
+        <path d="M16 3L28 9.5V22.5L16 29L4 22.5V9.5L16 3Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Inner triangle / apex mark -->
+        <path d="M16 9L22 20H10L16 9Z" fill="white" fill-opacity="0.9"/>
+        <!-- Center dot -->
+        <circle cx="16" cy="17" r="1.5" fill="#1A1814"/>
       </svg>
     </div>
     <span class="logo-name">Apex</span>
@@ -291,7 +295,7 @@
     if (plan === 'pass') {
       el.textContent = 'Recruiting Pass'; el.style.color = '#D97706';
     } else if (plan === 'monthly') {
-      el.textContent = 'Monthly plan'; el.style.color = '#2563EB';
+      el.textContent = 'Pro plan'; el.style.color = '#2563EB';
     } else if (plan === 'guest') {
       const r = Math.max(0, 5 - (gradedToday || 0));
       el.textContent = 'Free · ' + r + ' grade' + (r !== 1 ? 's' : '') + ' left today';
@@ -419,8 +423,8 @@
     const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
 
     let bc = 'badge-free', bt = '○ Free plan';
-    if (plan === 'monthly') { bc = 'badge-monthly'; bt = '★ Monthly'; }
-    if (plan === 'pass')    { bc = 'badge-pass';    bt = '◆ Recruiting Pass'; }
+    if (plan === 'monthly') { bc = 'badge-monthly'; bt = 'Pro'; }
+    if (plan === 'pass')    { bc = 'badge-pass';    bt = 'Recruiting Pass'; }
 
     const memberLine = memberSince
       ? `<div class="menu-member-since">Member since ${new Date(memberSince * 1000).toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>`
