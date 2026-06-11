@@ -518,10 +518,10 @@
     letter-spacing: 0.01em;
   }
   .verdict-badge svg { width: 13px; height: 13px; flex-shrink: 0; }
-  .verdict-badge.mastered  { color: #15803D; background: #F0FDF4; }
-  .verdict-badge.strong    { color: #1D4ED8; background: #EFF6FF; }
-  .verdict-badge.needs-work { color: #B45309; background: #FFFBEB; }
-  .verdict-badge.miss      { color: #B91C1C; background: #FEF2F2; }
+  .verdict-badge.mastered  { color: #2E6B47; background: #F1F6F2; border: 1px solid #DDE9E0; }
+  .verdict-badge.strong    { color: #2C4C8C; background: #F1F4FA; border: 1px solid #DCE3F0; }
+  .verdict-badge.needs-work { color: #8A6420; background: #FAF6EE; border: 1px solid #ECE2CE; }
+  .verdict-badge.miss      { color: #9B3024; background: #FAF1F0; border: 1px solid #EFDDDA; }
 
   .verdict-label-sub { font-size: 12.5px; color: var(--text-tertiary); padding-left: 2px; }
 
@@ -607,10 +607,25 @@
     border: 1px solid transparent;
     font-family: 'DM Sans', sans-serif;
   }
-  .feedback-point.point-correct  { background: #FAFFFE; border-color: #DCFCE7; }
-  .feedback-point.point-missed   { background: #FFFAFA; border-color: #FEE2E2; }
-  .feedback-point.point-critical { background: #FFF7F7; border-color: #FECACA; }
+  .feedback-point.point-correct  { background: #F7FAF8; border-color: #E6EFE9; }
+  .feedback-point.point-missed   { background: #FBF8F7; border-color: #EFE7E5; }
+  .feedback-point.point-critical { background: #FCF8F7; border-color: #F0E3E1; }
   .feedback-point.point-empty    { background: transparent; border-color: transparent; color: var(--text-tertiary); font-style: italic; }
+
+  /* Elegant inline severity tags */
+  .fb-tag {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 1px 7px;
+    border-radius: 4px;
+    margin-right: 8px;
+    vertical-align: 1px;
+    line-height: 1.5;
+  }
+  .fb-tag-critical { background: #F3E3E1; color: #9B3024; }
+  .fb-tag-minor    { background: #EDE7DA; color: #6B5733; }
 
   .point-dot {
     width: 6px; height: 6px;
@@ -1909,8 +1924,15 @@ Your response must be raw JSON only — no other text.`;
     const _mc = document.getElementById('missedCount'); if (_mc) _mc.textContent = '';
     document.getElementById('feedbackMissed').innerHTML = missed.length
       ? missed.map(p => {
-          const isCritical = p.toLowerCase().startsWith('critical');
-          return `<div class="feedback-point ${isCritical ? 'point-critical' : 'point-missed'}"><span class="point-dot ${isCritical ? 'red' : 'amber'}"></span><span>${p}</span></div>`;
+          const lower = p.toLowerCase();
+          const isCritical = lower.startsWith('critical');
+          const isMinor = lower.startsWith('minor');
+          // Strip the leading "Critical:" / "Minor:" prefix from the text
+          let text = p.replace(/^\s*(critical|minor)\s*[:\-–]\s*/i, '');
+          let tag = '';
+          if (isCritical) tag = '<span class="fb-tag fb-tag-critical">Critical</span>';
+          else if (isMinor) tag = '<span class="fb-tag fb-tag-minor">Minor</span>';
+          return `<div class="feedback-point ${isCritical ? 'point-critical' : 'point-missed'}"><span class="point-dot ${isCritical ? 'red' : 'amber'}"></span><span>${tag}${text}</span></div>`;
         }).join('')
       : `<div class="feedback-point point-correct"><span class="point-dot green"></span><span>No significant gaps — excellent answer.</span></div>`;
 
