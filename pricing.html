@@ -1144,6 +1144,36 @@
 <script>
 // ── AUTH-AWARE DESTINATIONS ───────────────────────────────
 // Resolve the correct destination based on login state + current plan
+// ── STYLED TOAST ─────────────────────────────────────────
+function showPricingToast(msg) {
+  const existing = document.getElementById('pricingToast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'pricingToast';
+  toast.style.cssText = `
+    position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);
+    background:#1A1814;color:white;padding:13px 22px;border-radius:10px;
+    font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+    z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.28);
+    display:flex;align-items:center;gap:10px;white-space:nowrap;
+    opacity:0;transition:opacity .25s ease,transform .25s ease;
+  `;
+  toast.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" width="16" height="16" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    ${msg}
+  `;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(12px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
 function getPricingDest(targetPlan) {
   const token = localStorage.getItem('apex_token');
   if (!token) {
@@ -1159,9 +1189,8 @@ async function launchWhirlpoolSmart(plan) {
   const token = localStorage.getItem('apex_token');
   const currentPlan = localStorage.getItem('apex_plan') || 'free';
 
-  // Pass users can't upgrade further
   if (token && currentPlan === 'pass') {
-    alert('You already have the Recruiting Pass — the highest tier. No further upgrades are available.');
+    showPricingToast('You already have the Recruiting Pass — the highest tier.');
     return;
   }
 
@@ -1171,13 +1200,10 @@ async function launchWhirlpoolSmart(plan) {
     return;
   }
   // Logged-in user — hit Stripe checkout, show animation while waiting
-  const token = localStorage.getItem('apex_token');
-  // Show whirlpool immediately while we fetch
   const overlay = document.getElementById('whirlpoolOverlay');
   const label   = document.getElementById('whirlpoolText');
   overlay.style.display = 'flex';
   setTimeout(() => { label.style.opacity = '1'; }, 300);
-  // Start canvas animation (non-redirecting)
   startWhirlpoolLoop(plan);
   try {
     const r = await fetch('/api/stripe/checkout', {
@@ -1191,23 +1217,30 @@ async function launchWhirlpoolSmart(plan) {
     } else {
       overlay.style.display = 'none';
       label.style.opacity = '0';
-      alert(data.error || 'Could not start checkout. Please try again.');
+      showPricingToast(data.error || 'Could not start checkout. Please try again.');
     }
   } catch(e) {
     overlay.style.display = 'none';
     label.style.opacity = '0';
-    alert('Something went wrong. Please try again.');
+    showPricingToast('Something went wrong. Please try again.');
   }
 }
 
 function launchFreeWashSmart() {
   const token = localStorage.getItem('apex_token');
   const currentPlan = localStorage.getItem('apex_plan') || 'free';
+
   if (token && currentPlan === 'pass') {
-    alert('You already have the Recruiting Pass — the highest tier. No further upgrades are available.');
+    showPricingToast('You already have the Recruiting Pass — the highest tier.');
     return;
   }
-  launchFreeWash(getPricingDest('free'));
+  // Any logged-in user (free, monthly) → dashboard
+  if (token) {
+    launchFreeWash('dashboard.html');
+    return;
+  }
+  // Guest → register
+  launchFreeWash('auth.html?mode=register');
 }
 
 // Runs the whirlpool canvas indefinitely (no redirect) — used for async Stripe checkout
