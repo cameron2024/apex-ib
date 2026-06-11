@@ -1156,6 +1156,15 @@ function getPricingDest(targetPlan) {
 }
 
 async function launchWhirlpoolSmart(plan) {
+  const token = localStorage.getItem('apex_token');
+  const currentPlan = localStorage.getItem('apex_plan') || 'free';
+
+  // Pass users can't upgrade further
+  if (token && currentPlan === 'pass') {
+    alert('You already have the Recruiting Pass — the highest tier. No further upgrades are available.');
+    return;
+  }
+
   const dest = getPricingDest(plan);
   if (dest) {
     launchWhirlpool(plan, dest);
@@ -1192,6 +1201,12 @@ async function launchWhirlpoolSmart(plan) {
 }
 
 function launchFreeWashSmart() {
+  const token = localStorage.getItem('apex_token');
+  const currentPlan = localStorage.getItem('apex_plan') || 'free';
+  if (token && currentPlan === 'pass') {
+    alert('You already have the Recruiting Pass — the highest tier. No further upgrades are available.');
+    return;
+  }
   launchFreeWash(getPricingDest('free'));
 }
 
