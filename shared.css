@@ -125,14 +125,22 @@ body {
 .upgrade-btn {
   display: flex; align-items: center; gap: 7px;
   width: 100%; padding: 8px 10px; margin-bottom: 6px;
-  background: var(--accent-blue); color: white;
+  color: white;
   border-radius: var(--radius-sm);
   font-size: 12px; font-weight: 600; letter-spacing: .01em;
   text-decoration: none; cursor: pointer;
-  transition: background .15s, transform .1s;
+  transition: opacity .15s, transform .1s;
   box-sizing: border-box;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6, #6366f1, #1e40af, #1e3a8a);
+  background-size: 300% 300%;
+  animation: badgeMonthlyShift 6s ease infinite;
 }
-.upgrade-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+.upgrade-btn.pass-btn {
+  background: linear-gradient(135deg, #78350f, #d97706, #fbbf24, #b45309, #92400e, #d97706);
+  background-size: 400% 400%;
+  animation: badgePassShimmer 5s ease infinite;
+}
+.upgrade-btn:hover { opacity: .88; transform: translateY(-1px); }
 .upgrade-btn svg { flex-shrink: 0; }
 
 /* ── USER CARD ───────────────────────────────────────────── */

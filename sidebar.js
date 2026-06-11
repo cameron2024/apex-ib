@@ -99,7 +99,6 @@
 
   <div class="sidebar-bottom">
     <a href="pricing.html" class="upgrade-btn" id="upgradeBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       Upgrade to Pro
     </a>
     <div class="user-card" id="userCard">
@@ -386,10 +385,20 @@
       }
     }
 
-    // Upgrade button: show for free, hide for paid (idempotent)
+    // Upgrade button: show for free + monthly, hide for pass
     const upgradeBtn = document.getElementById('upgradeBtn');
     if (upgradeBtn) {
-      upgradeBtn.style.display = (plan === 'free') ? '' : 'none';
+      if (plan === 'pass') {
+        upgradeBtn.style.display = 'none';
+      } else if (plan === 'monthly') {
+        upgradeBtn.style.display = '';
+        upgradeBtn.className = 'upgrade-btn pass-btn';
+        upgradeBtn.textContent = 'Get Recruiting Pass';
+      } else {
+        upgradeBtn.style.display = '';
+        upgradeBtn.className = 'upgrade-btn';
+        upgradeBtn.textContent = 'Upgrade to Pro';
+      }
     }
 
     // Re-apply avatar photo last — pages may have set textContent = initials
@@ -452,14 +461,12 @@
     const planActionRow = plan === 'free'
       ? `<div class="menu-divider"></div>
          <a class="menu-item" href="pricing.html" style="color:#2563EB;font-weight:500;">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
            Upgrade to Pro
          </a>`
       : plan === 'monthly'
       ? `<div class="menu-divider"></div>
          <a class="menu-item" href="pricing.html" style="color:#D97706;font-weight:500;">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-           Upgrade plan
+           Get Recruiting Pass
          </a>
          <a class="menu-item" href="settings.html?tab=billing">
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
