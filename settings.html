@@ -1051,8 +1051,8 @@ async function loadBillingInfo() {
     const badgeEl = document.getElementById('planBadge');
     badgeEl.className = 'plan-badge-lg '+pm.badge;
     badgeEl.textContent = pm.icon+' '+(plan==='free'?'Free':plan==='monthly'?'Pro':'Recruiting Pass');
-    if (plan === 'free' || plan === 'monthly') {
-      const label = plan === 'free' ? 'Free' : 'Pro';
+    if (plan === 'free' || plan === 'monthly' || plan === 'pass') {
+      const label = plan === 'free' ? 'Free' : plan === 'monthly' ? 'Pro' : 'Recruiting Pass';
       badgeEl.outerHTML = `<a id="planBadge" href="pricing.html" class="plan-badge-lg ${pm.badge}" style="text-decoration:none;cursor:pointer;" title="View plans">${pm.icon} ${label}</a>`;
     }
     document.getElementById('planName').textContent = pm.name;
