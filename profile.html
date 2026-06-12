@@ -375,16 +375,16 @@
 /* Activity tooltip */
 .activity-tooltip {
   position: fixed;
-  background: var(--text-primary);
+  background: #1A1814;
   color: white;
-  padding: 7px 11px;
-  border-radius: 7px;
+  padding: 10px 13px;
+  border-radius: 9px;
   font-size: 12px;
   font-family: 'DM Sans', sans-serif;
   pointer-events: none;
   z-index: 999;
-  white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+  min-width: 160px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.28);
   opacity: 0;
   transition: opacity .15s;
 }
@@ -979,13 +979,14 @@ function renderPerformance() {
           ${(u.activityDates||[]).length} active days
         </span>
       </div>
-      <div class="activity-grid">${buildActivityGrid(u.activityDates||[], u.activityMap||{})}</div>
+      <div class="activity-grid">${buildActivityGrid(u.activityDates||[], u.activityMap||{}, u.dailyStats||{})}</div>
     </div>`;
 }
 
-function buildActivityGrid(dates, activityMap) {
+function buildActivityGrid(dates, activityMap, dailyStats) {
   const dateSet = new Set(dates);
   const map = activityMap || {};
+  const stats = dailyStats || {};
   const today = new Date().toISOString().slice(0,10);
   let html = '';
   for (let i = 83; i >= 0; i--) {
@@ -994,8 +995,12 @@ function buildActivityGrid(dates, activityMap) {
     const active = dateSet.has(ds);
     const isToday = ds === today;
     const count = map[ds] || 0;
-    const label = d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
-    html += `<div class="activity-day ${active?'active':''} ${isToday?'active-today':''}" data-date="${label}" data-count="${count}"></div>`;
+    const label = d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+    const s = stats[ds] || {};
+    const dataStats = s.avgScore != null
+      ? `data-avg="${s.avgScore}" data-best="${s.bestScore}" data-topic="${s.topTopic||''}" data-topic-count="${s.topTopicCount||0}"`
+      : '';
+    html += `<div class="activity-day ${active?'active':''} ${isToday?'active-today':''}" data-date="${label}" data-count="${count}" ${dataStats}></div>`;
   }
   return html;
 }
@@ -1177,9 +1182,24 @@ init();
     if (!day || !day.dataset.date) return;
     const count = parseInt(day.dataset.count) || 0;
     const date = day.dataset.date;
-    tip.textContent = count > 0
-      ? `${date} · ${count} question${count !== 1 ? 's' : ''} answered`
-      : `${date} · No activity`;
+    if (count === 0) {
+      tip.innerHTML = `<div style="font-weight:600;margin-bottom:4px;">${date}</div><div style="opacity:.65;">No activity</div>`;
+    } else {
+      const avg  = day.dataset.avg  ? parseInt(day.dataset.avg)  : null;
+      const best = day.dataset.best ? parseInt(day.dataset.best) : null;
+      const topic = day.dataset.topic || '';
+      const topicCount = parseInt(day.dataset.topicCount) || 0;
+      const topicLabel = (typeof TOPIC_LABELS !== 'undefined' && TOPIC_LABELS[topic]) || topic.replace('_',' ');
+      const scoreColor = (s) => s >= 80 ? '#4ade80' : s >= 60 ? '#fbbf24' : '#f87171';
+      tip.innerHTML = `
+        <div style="font-weight:600;margin-bottom:6px;">${date}</div>
+        <div style="display:flex;flex-direction:column;gap:3px;font-size:11.5px;">
+          <div style="display:flex;justify-content:space-between;gap:16px;"><span style="opacity:.7;">Questions</span><span style="font-weight:600;">${count}</span></div>
+          ${avg  != null ? `<div style="display:flex;justify-content:space-between;gap:16px;"><span style="opacity:.7;">Avg score</span><span style="font-weight:600;color:${scoreColor(avg)}">${avg}/100</span></div>` : ''}
+          ${best != null ? `<div style="display:flex;justify-content:space-between;gap:16px;"><span style="opacity:.7;">Best</span><span style="font-weight:600;color:${scoreColor(best)}">${best}/100</span></div>` : ''}
+          ${topicLabel ? `<div style="display:flex;justify-content:space-between;gap:16px;"><span style="opacity:.7;">Most</span><span style="font-weight:600;">${topicLabel}${topicCount>1?' ('+topicCount+')':''}</span></div>` : ''}
+        </div>`;
+    }
     tip.classList.add('visible');
   });
   document.addEventListener('mouseout', function(e) {
@@ -1187,8 +1207,8 @@ init();
     tip.classList.remove('visible');
   });
   document.addEventListener('mousemove', function(e) {
-    tip.style.left = (e.clientX + 12) + 'px';
-    tip.style.top  = (e.clientY - 32) + 'px';
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top  = (e.clientY - 44) + 'px';
   });
 })();
 </script>

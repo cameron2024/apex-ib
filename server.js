@@ -1748,7 +1748,7 @@ const server = http.createServer(async (req, res) => {
     try {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
       const targetId = params.get('id') || user.userId;
-      const [userR, followerR, followingR, badgeR, schoolR, resultsR, activityR, mockR] = await Promise.all([
+      const [userR, followerR, followingR, badgeR, schoolR, resultsR, activityR, mockR, dailyStatsR] = await Promise.all([
         pool.query('SELECT id,name,plan,created_at,avatar_data,is_private,visibility FROM users WHERE id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE following_id=$1', [targetId]),
         pool.query('SELECT COUNT(*) FROM follows WHERE follower_id=$1', [targetId]),
@@ -1757,6 +1757,16 @@ const server = http.createServer(async (req, res) => {
         pool.query('SELECT topic,score,mastery_stage FROM question_results WHERE user_id=$1', [targetId]),
         pool.query('SELECT date, questions_answered FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84', [targetId]),
         pool.query('SELECT overall_score, started_at FROM mock_sessions WHERE user_id=$1 AND overall_score IS NOT NULL ORDER BY started_at DESC LIMIT 5', [targetId]),
+        pool.query(`SELECT
+          TO_CHAR(updated_at::timestamp, 'YYYY-MM-DD') as date,
+          ROUND(AVG(score))::INT as avg_score,
+          MAX(score) as best_score,
+          topic,
+          COUNT(*) as topic_count
+        FROM question_results
+        WHERE user_id=$1 AND score IS NOT NULL
+        GROUP BY TO_CHAR(updated_at::timestamp, 'YYYY-MM-DD'), topic
+        ORDER BY date DESC, topic_count DESC`, [targetId]),
       ]);
       if (!userR.rows[0]) return json(res,404,{error:'User not found'});
       const u = userR.rows[0];
@@ -1775,6 +1785,14 @@ const server = http.createServer(async (req, res) => {
       }).sort((a,b) => b.avg - a.avg);
       const actDates = new Set(activityR.rows.map(a=>a.date));
       const activityMap = Object.fromEntries(activityR.rows.map(a=>[a.date, a.questions_answered||0]));
+      // Build per-day rich stats from dailyStatsR
+      const dailyStats = {};
+      for (const row of dailyStatsR.rows) {
+        if (!dailyStats[row.date]) {
+          dailyStats[row.date] = { avgScore: row.avg_score, bestScore: row.best_score, topTopic: row.topic, topTopicCount: parseInt(row.topic_count) };
+        }
+        // first row per date is top topic (ORDER BY topic_count DESC)
+      }
       let streak = 0;
       for (let i=0;i<365;i++) {
         const d=new Date(); d.setDate(d.getDate()-i);
@@ -1843,6 +1861,7 @@ const server = http.createServer(async (req, res) => {
         school: schoolR.rows[0] || null,
         activityDates: canViewFull ? [...actDates] : [],
         activityMap: canViewFull ? activityMap : {},
+        dailyStats: canViewFull ? dailyStats : {},
         recentMocks: canViewFull ? mockR.rows : [],
         stats: {
           overall: canViewFull ? overall : null,
