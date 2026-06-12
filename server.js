@@ -1758,14 +1758,14 @@ const server = http.createServer(async (req, res) => {
         pool.query('SELECT date, questions_answered FROM activity WHERE user_id=$1 ORDER BY date DESC LIMIT 84', [targetId]),
         pool.query('SELECT overall_score, started_at FROM mock_sessions WHERE user_id=$1 AND overall_score IS NOT NULL ORDER BY started_at DESC LIMIT 5', [targetId]),
         pool.query(`SELECT
-          TO_CHAR(updated_at::timestamp, 'YYYY-MM-DD') as date,
+          TO_CHAR(to_timestamp(updated_at), 'YYYY-MM-DD') as date,
           ROUND(AVG(score))::INT as avg_score,
           MAX(score) as best_score,
           topic,
           COUNT(*) as topic_count
         FROM question_results
-        WHERE user_id=$1 AND score IS NOT NULL
-        GROUP BY TO_CHAR(updated_at::timestamp, 'YYYY-MM-DD'), topic
+        WHERE user_id=$1 AND score IS NOT NULL AND updated_at IS NOT NULL
+        GROUP BY TO_CHAR(to_timestamp(updated_at), 'YYYY-MM-DD'), topic
         ORDER BY date DESC, topic_count DESC`, [targetId]),
       ]);
       if (!userR.rows[0]) return json(res,404,{error:'User not found'});
