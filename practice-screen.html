@@ -1561,6 +1561,12 @@
   }
 
   function switchMode(mode) {
+    if (scratchVisible) {
+      document.getElementById('scratchPanel').style.display = 'none';
+      scratchVisible = false;
+      const btn = document.getElementById('scratchToggleBtn');
+      btn.style.background = 'white'; btn.style.color = 'var(--text-secondary)'; btn.style.borderColor = 'var(--border)';
+    }
     const plan = window._userPlan || 'free';
     // Free and guest users can't use voice mode
     if (mode === 'voice' && (plan === 'free' || plan === 'guest')) {
