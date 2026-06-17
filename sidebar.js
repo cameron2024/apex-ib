@@ -488,7 +488,7 @@
         <div class="menu-header-text">
           <div class="menu-user-name">${name}</div>
           ${email ? `<div class="menu-user-email">${email}</div>` : ''}
-          <span class="menu-plan-badge ${bc}">${bt}</span>
+          <a href="pricing.html" class="menu-plan-badge ${bc}" style="text-decoration:none;cursor:pointer;">${bt}</a>
           ${memberLine}
         </div>
       </div>
