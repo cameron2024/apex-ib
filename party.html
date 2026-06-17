@@ -1521,8 +1521,9 @@ function showSessionQuestion(question, index, total) {
   // Timer
   clearTimer();
   clearReadingBuffer();
-  startReadingBuffer(readingBufferSec);
-  if (timeLimitSec) startTimer(timeLimitSec);
+  startReadingBuffer(readingBufferSec, () => {
+    if (timeLimitSec) startTimer(timeLimitSec);
+  });
   updateWaitingCount();
 }
 
@@ -1550,12 +1551,21 @@ function hidePauseOverlay() {
   }
   const btn = document.getElementById('pauseBtn');
   if (btn) btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause`;
-  // Resume timer + reading buffer with remaining time intact
+  if (submitted) return;
+
+  // Resume in the correct sequence: reading buffer first, then the main timer.
+  // questionStartedAt is shifted forward by the pause duration on the server,
+  // so elapsedSinceStart only counts time the question was actually active.
   const elapsedSinceStart = Math.floor(Date.now()/1000) - questionStartedAt;
   const readingRemaining = readingBufferSec - elapsedSinceStart;
-  if (readingRemaining > 0 && !submitted) startReadingBuffer(readingRemaining);
-  if (timeLimitSec && !submitted) {
-    const timeRemaining = timeLimitSec - elapsedSinceStart;
+  if (readingRemaining > 0) {
+    // Still mid-reading-period — resume the clock, chain into the timer after
+    startReadingBuffer(readingRemaining, () => {
+      if (timeLimitSec) startTimer(timeLimitSec);
+    });
+  } else if (timeLimitSec) {
+    // Reading period already finished before the pause — resume the timer directly
+    const timeRemaining = timeLimitSec - (elapsedSinceStart - readingBufferSec);
     if (timeRemaining > 0) startTimer(timeRemaining);
   }
 }
@@ -1585,11 +1595,11 @@ async function setNextQuestionTime() {
 }
 
 // ── READING BUFFER CLOCK ──
-function startReadingBuffer(secs) {
+function startReadingBuffer(secs, onComplete) {
   const wrap = document.getElementById('readingBufferWrap');
   const arc = document.getElementById('readingClockArc');
   const clockWrap = document.getElementById('readingClockSvgWrap');
-  if (!wrap || secs <= 0) { if(wrap) wrap.style.display = 'none'; return; }
+  if (!wrap || secs <= 0) { if(wrap) wrap.style.display = 'none'; if (onComplete) onComplete(); return; }
   wrap.style.display = 'flex';
   const total = secs * 1000;
   const circumference = 97.4; // 2 * PI * 15.5
@@ -1604,6 +1614,7 @@ function startReadingBuffer(secs) {
     arc.setAttribute('stroke-dashoffset', String(circumference * (1 - pct)));
     if (remaining <= 0) {
       wrap.style.display = 'none';
+      if (onComplete) onComplete();
       return;
     }
     readingBufferInterval = requestAnimationFrame(tick);
