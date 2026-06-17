@@ -1068,7 +1068,7 @@
     </div>
 
     <!-- INPUT MODE TOGGLE -->
-    <div class="input-mode-toggle" style="position:relative;">
+    <div class="input-mode-toggle" style="position:relative;display:flex;align-items:center;gap:10px;">
       <button class="mode-btn" id="modeVoice" onclick="switchMode('voice')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         Voice
@@ -1076,6 +1076,10 @@
       <button class="mode-btn" id="modeText" onclick="switchMode('text')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         Text
+      </button>
+      <button id="scratchToggleBtn" onclick="toggleScratchPaper()" style="margin-left:auto;display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:white;font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/><path d="M14.06 6.19l3.75 3.75"/></svg>
+        Scratch Paper
       </button>
     </div>
 
@@ -1202,6 +1206,33 @@
         <div class="textarea-footer">
           <span class="word-count" id="wordCount">0 words</span>
         </div>
+      </div>
+    </div>
+
+    <!-- SCRATCH PAPER / WHITEBOARD PANEL -->
+    <div class="answer-panel" id="scratchPanel" style="display:none;">
+      <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:white;">
+        <div style="display:flex;align-items:center;gap:16px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="scratch-tool-btn active" id="scratchPencilBtn" onclick="setScratchTool('pencil')" title="Pencil" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--bg);cursor:pointer;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+            </button>
+            <button class="scratch-tool-btn" id="scratchEraserBtn" onclick="setScratchTool('eraser')" title="Eraser" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:white;cursor:pointer;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M20 20H7l-5-5a2 2 0 010-2.83l9.17-9.17a2 2 0 012.83 0l5.66 5.66a2 2 0 010 2.83L13.5 18"/></svg>
+            </button>
+          </div>
+          <div id="scratchColorRow" style="display:flex;align-items:center;gap:7px;">
+            <button class="scratch-color-btn active" data-color="#000000" onclick="setScratchColor('#000000', this)" style="width:22px;height:22px;border-radius:50%;background:#000000;border:2px solid var(--text-primary);cursor:pointer;"></button>
+            <button class="scratch-color-btn" data-color="#ff2c22" onclick="setScratchColor('#ff2c22', this)" style="width:22px;height:22px;border-radius:50%;background:#ff2c22;border:2px solid transparent;cursor:pointer;"></button>
+            <button class="scratch-color-btn" data-color="#0000ff" onclick="setScratchColor('#0000ff', this)" style="width:22px;height:22px;border-radius:50%;background:#0000ff;border:2px solid transparent;cursor:pointer;"></button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:140px;">
+            <span style="font-size:11.5px;color:var(--text-tertiary);white-space:nowrap;" id="scratchSizeLabel">Size: 3px</span>
+            <input type="range" id="scratchSizeSlider" min="1" max="40" value="3" oninput="setScratchSize(this.value)" style="flex:1;max-width:140px;">
+          </div>
+          <button onclick="clearScratchPaper()" style="margin-left:auto;font-size:12px;color:var(--text-secondary);background:none;border:none;cursor:pointer;text-decoration:underline;">Clear</button>
+        </div>
+        <canvas id="scratchCanvas" style="display:block;width:100%;height:380px;cursor:crosshair;touch-action:none;"></canvas>
       </div>
     </div>
 
@@ -1372,6 +1403,163 @@
 
 
   // ─── MODE SWITCH ──────────────────────────────────────────
+  // ── SCRATCH PAPER / WHITEBOARD ──
+  let scratchVisible = false;
+  let scratchPrevPanel = 'text'; // which answer panel was showing before scratch opened
+  let scratchCtx = null;
+  let scratchDrawing = false;
+  let scratchTool = 'pencil';
+  let scratchColor = '#000000';
+  let scratchSize = 3;
+  let scratchEraserSize = 18;
+  let scratchStrokes = []; // saved as vector strokes so canvas can resize without losing content
+
+  function getScratchCanvas() {
+    return document.getElementById('scratchCanvas');
+  }
+
+  function setupScratchCanvas() {
+    const canvas = getScratchCanvas();
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    scratchCtx = canvas.getContext('2d');
+    scratchCtx.scale(dpr, dpr);
+    redrawScratch();
+
+    if (!canvas._scratchBound) {
+      canvas._scratchBound = true;
+      const getPos = (e) => {
+        const r = canvas.getBoundingClientRect();
+        const p = e.touches ? e.touches[0] : e;
+        return { x: p.clientX - r.left, y: p.clientY - r.top };
+      };
+      const start = (e) => {
+        e.preventDefault();
+        scratchDrawing = true;
+        const pos = getPos(e);
+        scratchStrokes.push({
+          tool: scratchTool,
+          color: scratchTool === 'eraser' ? '#FFFFFF' : scratchColor,
+          size: scratchTool === 'eraser' ? scratchEraserSize : scratchSize,
+          points: [pos]
+        });
+      };
+      const move = (e) => {
+        if (!scratchDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        scratchStrokes[scratchStrokes.length - 1].points.push(pos);
+        redrawScratch();
+      };
+      const end = () => { scratchDrawing = false; };
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      canvas.addEventListener('mouseup', end);
+      canvas.addEventListener('mouseleave', end);
+      canvas.addEventListener('touchstart', start, {passive:false});
+      canvas.addEventListener('touchmove', move, {passive:false});
+      canvas.addEventListener('touchend', end);
+    }
+  }
+
+  function redrawScratch() {
+    const canvas = getScratchCanvas();
+    if (!canvas || !scratchCtx) return;
+    const rect = canvas.getBoundingClientRect();
+    scratchCtx.clearRect(0, 0, rect.width, rect.height);
+    scratchCtx.fillStyle = '#FFFFFF';
+    scratchCtx.fillRect(0, 0, rect.width, rect.height);
+    scratchStrokes.forEach(stroke => {
+      if (stroke.points.length < 1) return;
+      scratchCtx.strokeStyle = stroke.color;
+      scratchCtx.lineWidth = stroke.size;
+      scratchCtx.lineCap = 'round';
+      scratchCtx.lineJoin = 'round';
+      scratchCtx.beginPath();
+      scratchCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      stroke.points.forEach(p => scratchCtx.lineTo(p.x, p.y));
+      scratchCtx.stroke();
+    });
+  }
+
+  function setScratchTool(tool) {
+    scratchTool = tool;
+    document.getElementById('scratchPencilBtn').classList.toggle('active', tool === 'pencil');
+    document.getElementById('scratchEraserBtn').classList.toggle('active', tool === 'eraser');
+    document.getElementById('scratchPencilBtn').style.background = tool === 'pencil' ? 'var(--bg)' : 'white';
+    document.getElementById('scratchEraserBtn').style.background = tool === 'eraser' ? 'var(--bg)' : 'white';
+    document.getElementById('scratchColorRow').style.opacity = tool === 'eraser' ? '0.4' : '1';
+    document.getElementById('scratchColorRow').style.pointerEvents = tool === 'eraser' ? 'none' : 'auto';
+    const slider = document.getElementById('scratchSizeSlider');
+    const label = document.getElementById('scratchSizeLabel');
+    if (tool === 'eraser') {
+      slider.max = 60; slider.value = scratchEraserSize;
+      label.textContent = 'Eraser size: ' + scratchEraserSize + 'px';
+    } else {
+      slider.max = 40; slider.value = scratchSize;
+      label.textContent = 'Size: ' + scratchSize + 'px';
+    }
+  }
+
+  function setScratchColor(color, btnEl) {
+    scratchColor = color;
+    document.querySelectorAll('.scratch-color-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.border = '2px solid transparent';
+    });
+    btnEl.classList.add('active');
+    btnEl.style.border = '2px solid var(--text-primary)';
+  }
+
+  function setScratchSize(val) {
+    const n = parseInt(val);
+    if (scratchTool === 'eraser') {
+      scratchEraserSize = n;
+      document.getElementById('scratchSizeLabel').textContent = 'Eraser size: ' + n + 'px';
+    } else {
+      scratchSize = n;
+      document.getElementById('scratchSizeLabel').textContent = 'Size: ' + n + 'px';
+    }
+  }
+
+  function clearScratchPaper() {
+    scratchStrokes = [];
+    redrawScratch();
+  }
+
+  // Wipe the whiteboard for a brand new question (called on question change)
+  function resetScratchPaperForNewQuestion() {
+    scratchStrokes = [];
+    if (scratchVisible) redrawScratch();
+  }
+
+  function toggleScratchPaper() {
+    const btn = document.getElementById('scratchToggleBtn');
+    if (!scratchVisible) {
+      // Remember which panel (voice/text) was showing so we can restore it
+      scratchPrevPanel = document.getElementById('voicePanel').classList.contains('visible') ? 'voice' : 'text';
+      document.getElementById('voicePanel').classList.remove('visible');
+      document.getElementById('textPanel').classList.remove('visible');
+      document.getElementById('scratchPanel').style.display = 'block';
+      scratchVisible = true;
+      btn.style.background = 'var(--text-primary)';
+      btn.style.color = 'white';
+      btn.style.borderColor = 'var(--text-primary)';
+      setTimeout(setupScratchCanvas, 0);
+    } else {
+      document.getElementById('scratchPanel').style.display = 'none';
+      scratchVisible = false;
+      btn.style.background = 'white';
+      btn.style.color = 'var(--text-secondary)';
+      btn.style.borderColor = 'var(--border)';
+      // Restore whichever input mode was active before (voice/text), respecting voice lock for free/guest
+      switchMode(scratchPrevPanel);
+    }
+  }
+
   function switchMode(mode) {
     const plan = window._userPlan || 'free';
     // Free and guest users can't use voice mode
@@ -2331,6 +2519,8 @@ Your response must be raw JSON only — no other text.`;
     const q = filteredQuestions[currentIndex];
     // Always clear answer box and reset UI on every question load
     document.getElementById('answerTextarea').value = '';
+    if (scratchVisible) toggleScratchPaper();
+    resetScratchPaperForNewQuestion();
     document.getElementById('feedbackPanel').classList.remove('visible');
     document.getElementById('submitRow').style.display = 'flex';
     // Ensure question text is always visible (guard against any prior hidden state)
