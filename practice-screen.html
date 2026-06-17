@@ -1498,9 +1498,11 @@
     if (tool === 'eraser') {
       slider.max = 60; slider.value = scratchEraserSize;
       label.textContent = 'Eraser size: ' + scratchEraserSize + 'px';
+      slider.style.accentColor = '#9E9890';
     } else {
       slider.max = 40; slider.value = scratchSize;
       label.textContent = 'Size: ' + scratchSize + 'px';
+      slider.style.accentColor = scratchColor;
     }
   }
 
@@ -1512,6 +1514,7 @@
     });
     btnEl.classList.add('active');
     btnEl.style.border = '2px solid var(--text-primary)';
+    if (scratchTool !== 'eraser') document.getElementById('scratchSizeSlider').style.accentColor = color;
   }
 
   function setScratchSize(val) {
@@ -1543,6 +1546,8 @@
       scratchPrevPanel = document.getElementById('voicePanel').classList.contains('visible') ? 'voice' : 'text';
       document.getElementById('voicePanel').classList.remove('visible');
       document.getElementById('textPanel').classList.remove('visible');
+      document.getElementById('modeVoice').classList.remove('active');
+      document.getElementById('modeText').classList.remove('active');
       document.getElementById('scratchPanel').style.display = 'block';
       scratchVisible = true;
       btn.style.background = 'var(--text-primary)';
