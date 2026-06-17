@@ -204,7 +204,11 @@ async function initDB() {
         current_question_index INT DEFAULT 0,
         created_at BIGINT,
         started_at BIGINT,
-        completed_at BIGINT
+        completed_at BIGINT,
+        is_paused BOOLEAN DEFAULT false,
+        paused_at BIGINT,
+        question_started_at BIGINT,
+        pending_time_limit_sec INT
       );
       CREATE TABLE IF NOT EXISTS party_members (
         party_id TEXT,
@@ -253,6 +257,10 @@ async function initDB() {
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS consecutive_high INT DEFAULT 0;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS mastery_stage TEXT;
       ALTER TABLE question_results ADD COLUMN IF NOT EXISTS next_due BIGINT;
+      ALTER TABLE study_parties ADD COLUMN IF NOT EXISTS is_paused BOOLEAN DEFAULT false;
+      ALTER TABLE study_parties ADD COLUMN IF NOT EXISTS paused_at BIGINT;
+      ALTER TABLE study_parties ADD COLUMN IF NOT EXISTS question_started_at BIGINT;
+      ALTER TABLE study_parties ADD COLUMN IF NOT EXISTS pending_time_limit_sec INT;
     `);
     // Performance indexes
     await client.query(`
@@ -2369,6 +2377,9 @@ const server = http.createServer(async (req, res) => {
           topic: party.topic, timeLimitSec: party.time_limit_sec,
           currentQuestionIndex: party.current_question_index,
           totalQuestions: party.question_ids ? party.question_ids.length : 0,
+          isPaused: !!party.is_paused,
+          questionStartedAt: party.question_started_at,
+          pendingTimeLimitSec: party.pending_time_limit_sec,
         },
         currentQuestion: currentQ ? {id:currentQId, question:currentQ.question, topic:currentQ.topic} : null,
         members: membersR.rows,
@@ -2399,9 +2410,10 @@ const server = http.createServer(async (req, res) => {
         eligibleIds = Object.keys(QUESTIONS_BY_ID);
       }
       const questionIds = shuffle(eligibleIds).slice(0, n);
+      const startedAt = nowSec();
       await pool.query(
-        `UPDATE study_parties SET status='active', question_ids=$1, current_question_index=0, started_at=$2 WHERE id=$3`,
-        [JSON.stringify(questionIds), nowSec(), code]
+        `UPDATE study_parties SET status='active', question_ids=$1, current_question_index=0, started_at=$2, question_started_at=$2 WHERE id=$3`,
+        [JSON.stringify(questionIds), startedAt, code]
       );
       const firstQ = QUESTIONS_BY_ID[questionIds[0]];
       broadcastToParty(code, {
@@ -2409,6 +2421,9 @@ const server = http.createServer(async (req, res) => {
         currentQuestionIndex: 0,
         totalQuestions: questionIds.length,
         question: { id: questionIds[0], question: firstQ?.question, topic: firstQ?.topic },
+        questionStartedAt: startedAt,
+        timeLimitSec: party.time_limit_sec,
+        readingBufferSec: 20,
       });
       return json(res,200,{ok:true, totalQuestions: questionIds.length});
     } catch(e){return json(res,500,{error:e.message});}
@@ -2529,7 +2544,11 @@ const server = http.createServer(async (req, res) => {
         }
         return json(res,200,{ok:true, complete:true});
       }
-      await pool.query('UPDATE study_parties SET current_question_index=$1 WHERE id=$2', [nextIndex, code]);
+      await pool.query(
+        'UPDATE study_parties SET current_question_index=$1, question_started_at=$2, time_limit_sec=COALESCE(pending_time_limit_sec, time_limit_sec), pending_time_limit_sec=NULL WHERE id=$3',
+        [nextIndex, nowSec(), code]
+      );
+      const updatedParty = await pool.query('SELECT time_limit_sec, question_started_at FROM study_parties WHERE id=$1', [code]);
       const nextQId = party.question_ids[nextIndex];
       const nextQ = QUESTIONS_BY_ID[nextQId];
       broadcastToParty(code, {
@@ -2537,8 +2556,74 @@ const server = http.createServer(async (req, res) => {
         currentQuestionIndex: nextIndex,
         totalQuestions: party.question_ids.length,
         question: { id: nextQId, question: nextQ?.question, topic: nextQ?.topic },
+        questionStartedAt: updatedParty.rows[0].question_started_at,
+        timeLimitSec: updatedParty.rows[0].time_limit_sec,
+        readingBufferSec: 20,
       });
       return json(res,200,{ok:true, complete:false, nextIndex});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/party/pause — host pauses the session
+  if (req.method==='POST' && url==='/api/party/pause') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {code} = await readBody(req);
+      if (!code) return json(res,400,{error:'code required'});
+      const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      if (party.host_id != user.userId) return json(res,403,{error:'Only the host can pause'});
+      if (party.status !== 'active') return json(res,400,{error:'Party not active'});
+      await pool.query('UPDATE study_parties SET is_paused=true, paused_at=$1 WHERE id=$2', [nowSec(), code]);
+      broadcastToParty(code, { type: 'party_paused' });
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/party/resume — host resumes the session
+  if (req.method==='POST' && url==='/api/party/resume') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {code} = await readBody(req);
+      if (!code) return json(res,400,{error:'code required'});
+      const partyR = await pool.query('SELECT * FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      const party = partyR.rows[0];
+      if (party.host_id != user.userId) return json(res,403,{error:'Only the host can resume'});
+      if (!party.is_paused) return json(res,400,{error:'Party is not paused'});
+      // Shift question_started_at forward by however long the pause lasted,
+      // so remaining time on the current question is preserved
+      const pauseDuration = party.paused_at ? (nowSec() - party.paused_at) : 0;
+      await pool.query(
+        `UPDATE study_parties SET is_paused=false, paused_at=NULL,
+         question_started_at = COALESCE(question_started_at, $1) + $2
+         WHERE id=$3`,
+        [nowSec(), pauseDuration, code]
+      );
+      const refreshed = await pool.query('SELECT question_started_at, time_limit_sec FROM study_parties WHERE id=$1', [code]);
+      broadcastToParty(code, {
+        type: 'party_resumed',
+        questionStartedAt: refreshed.rows[0]?.question_started_at,
+        timeLimitSec: refreshed.rows[0]?.time_limit_sec
+      });
+      return json(res,200,{ok:true});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // POST /api/party/set-next-time — host sets time limit for the NEXT question only
+  if (req.method==='POST' && url==='/api/party/set-next-time') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {code, timeLimitSec} = await readBody(req);
+      if (!code) return json(res,400,{error:'code required'});
+      const partyR = await pool.query('SELECT host_id FROM study_parties WHERE id=$1', [code]);
+      if (!partyR.rows[0]) return json(res,404,{error:'Party not found'});
+      if (partyR.rows[0].host_id != user.userId) return json(res,403,{error:'Only the host can change time settings'});
+      const tl = (parseInt(timeLimitSec)||0) > 0 ? parseInt(timeLimitSec) : null;
+      await pool.query('UPDATE study_parties SET pending_time_limit_sec=$1 WHERE id=$2', [tl, code]);
+      broadcastToParty(code, { type: 'next_time_updated', pendingTimeLimitSec: tl });
+      return json(res,200,{ok:true});
     } catch(e){return json(res,500,{error:e.message});}
   }
 

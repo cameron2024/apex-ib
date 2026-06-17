@@ -998,12 +998,16 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Time limit per question <span>(optional — leave blank for no limit)</span></label>
-        <div style="display:flex;align-items:center;gap:10px;">
+        <label class="form-label">Time limit per question</label>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <input type="checkbox" id="infiniteTimeCheckbox" onchange="toggleInfiniteTime()" style="width:16px;height:16px;cursor:pointer;">
+          <label for="infiniteTimeCheckbox" style="font-size:13.5px;color:var(--text-secondary);cursor:pointer;">Infinite time — no countdown, host advances manually</label>
+        </div>
+        <div id="timeLimitInputWrap" style="display:flex;align-items:center;gap:10px;">
           <input class="form-input" type="number" id="createTimeLimitInput" placeholder="e.g. 90" min="10" max="900" style="width:120px;">
           <span style="font-size:13.5px;color:var(--text-secondary);">seconds per question</span>
         </div>
-        <div style="font-size:12px;color:var(--text-tertiary);margin-top:6px;">Host advances manually if blank. Suggested: 60–180 seconds.</div>
+        <div style="font-size:12px;color:var(--text-tertiary);margin-top:6px;">You can pause the session and adjust this for upcoming questions at any time.</div>
       </div>
 
       <button class="btn-primary" onclick="createParty()" id="createBtn">
@@ -1110,7 +1114,7 @@
 
   <!-- ── SESSION VIEW ── -->
   <div class="view" id="view-session">
-    <div class="fade-1">
+    <div class="fade-1" style="position:relative;">
       <div class="session-header">
         <div class="session-progress">
           <div class="session-progress-label">
@@ -1124,6 +1128,20 @@
         <div class="session-topic-badge" id="sessionTopicBadge">—</div>
       </div>
 
+      <!-- Reading buffer clock — shows while the 20s reading window is active -->
+      <div id="readingBufferWrap" style="display:none;align-items:center;gap:10px;margin-bottom:14px;padding:9px 14px;background:#F0EEE8;border:1px solid var(--border);border-radius:10px;">
+        <div id="readingClockSvgWrap" style="position:relative;width:30px;height:30px;flex-shrink:0;cursor:help;" title="">
+          <svg viewBox="0 0 36 36" width="30" height="30" style="transform:rotate(-90deg);">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#E0DCD3" stroke-width="3"/>
+            <circle id="readingClockArc" cx="18" cy="18" r="15.5" fill="none" stroke="#D97706" stroke-width="3"
+              stroke-dasharray="97.4" stroke-dashoffset="0" stroke-linecap="round" style="transition:stroke-dashoffset 1s linear;"/>
+          </svg>
+        </div>
+        <div style="font-size:12.5px;color:#92400E;line-height:1.4;">
+          <strong>Take your time reading</strong> — this is extra processing time. You can answer whenever you're ready.
+        </div>
+      </div>
+
       <!-- Timer (when time limit set) -->
       <div id="timerBar" style="display:none;margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
@@ -1135,12 +1153,25 @@
         </div>
       </div>
 
+      <!-- Pause overlay -->
+      <div id="pauseOverlay" style="display:none;position:absolute;inset:0;z-index:50;background:rgba(247,246,243,0.96);border-radius:inherit;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32" style="opacity:0.5;"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        <div style="font-family:'DM Serif Display',serif;font-size:19px;">Paused by host</div>
+        <div style="font-size:13px;color:var(--text-secondary);">Hang tight — the session will resume shortly.</div>
+      </div>
+
       <div class="question-card">
         <div class="question-number" id="sessionQuestionNum">Question 1 of 10</div>
         <div class="question-text" id="sessionQuestionText">Loading…</div>
       </div>
 
       <div class="answer-area" id="answerArea">
+        <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;">
+          <button type="button" id="voiceMicBtn" onclick="toggleVoiceInput()" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--border);border-radius:99px;background:white;font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .15s;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            <span id="voiceMicLabel">Speak answer</span>
+          </button>
+        </div>
         <textarea class="answer-textarea" id="answerTextarea" placeholder="Type your answer here…"></textarea>
         <div class="answer-submit-row">
           <button class="party-submit-btn" id="submitAnswerBtn" onclick="submitAnswer()">
@@ -1170,12 +1201,22 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             Next Question
           </button>
+          <button class="host-btn-ghost" onclick="togglePause()" id="pauseBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            Pause
+          </button>
           <div class="host-skip-wrap">
             <select class="host-skip-select" id="skipMemberSelect">
               <option value="">Force submit for…</option>
             </select>
             <button class="host-btn-ghost" onclick="skipMember()">Submit blank</button>
           </div>
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-secondary);">
+          <span>Time for upcoming questions:</span>
+          <input type="number" id="nextTimeInput" placeholder="seconds, blank = infinite" min="10" max="900" style="width:170px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12.5px;">
+          <button class="host-btn-ghost" style="padding:5px 12px;font-size:12px;" onclick="setNextQuestionTime()">Apply</button>
+          <span id="nextTimeConfirm" style="display:none;color:var(--accent-green);font-weight:600;">Saved — applies to next question</span>
         </div>
       </div>
     </div>
@@ -1222,6 +1263,10 @@ let totalQuestions = 0;
 let timeLimitSec = null;
 let timerInterval = null;
 let timerStarted = null;
+let isPaused = false;
+let readingBufferInterval = null;
+let readingBufferSec = 20;
+let questionStartedAt = null; // server epoch seconds
 let membersOnline = new Set();
 let answeredMembers = new Set();
 let allMembers = [];
@@ -1266,6 +1311,11 @@ function getSelectedTopics() {
   return [...document.querySelectorAll('#topicBlocks .topic-block.selected')].map(b => b.dataset.topic);
 }
 
+function toggleInfiniteTime() {
+  const checked = document.getElementById('infiniteTimeCheckbox').checked;
+  document.getElementById('timeLimitInputWrap').style.display = checked ? 'none' : 'flex';
+}
+
 // ── CREATE PARTY ──
 async function createParty() {
   const btn = document.getElementById('createBtn');
@@ -1274,8 +1324,9 @@ async function createParty() {
   const topics = getSelectedTopics();
   // Pass as comma-joined string; server picks randomly from these topics
   const topic = topics.length === 1 ? topics[0] : topics.length > 1 ? topics.join(',') : null;
+  const isInfinite = document.getElementById('infiniteTimeCheckbox').checked;
   const timeLimitRaw = parseInt(document.getElementById('createTimeLimitInput').value) || 0;
-  const timeLimitSec = timeLimitRaw >= 10 ? timeLimitRaw : null;
+  const timeLimitSec = isInfinite ? null : (timeLimitRaw >= 10 ? timeLimitRaw : null);
   try {
     const r = await fetch('/api/party/create', {
       method:'POST',
@@ -1406,7 +1457,10 @@ function handleWSMessage(msg) {
       currentQuestionIndex = msg.currentQuestionIndex;
       totalQuestions = msg.totalQuestions;
       currentQuestion = msg.question;
-      timeLimitSec = msg.timeLimitSec || timeLimitSec;
+      timeLimitSec = msg.timeLimitSec !== undefined ? msg.timeLimitSec : timeLimitSec;
+      questionStartedAt = msg.questionStartedAt || Math.floor(Date.now()/1000);
+      readingBufferSec = msg.readingBufferSec || 20;
+      isPaused = false;
       showSessionQuestion(msg.question, msg.currentQuestionIndex, msg.totalQuestions);
       showView('view-session');
       break;
@@ -1420,6 +1474,25 @@ function handleWSMessage(msg) {
       break;
     case 'party_complete':
       showFinalResults(msg.finalScores);
+      break;
+    case 'party_paused':
+      isPaused = true;
+      showPauseOverlay();
+      break;
+    case 'party_resumed':
+      isPaused = false;
+      questionStartedAt = msg.questionStartedAt || questionStartedAt;
+      timeLimitSec = msg.timeLimitSec !== undefined ? msg.timeLimitSec : timeLimitSec;
+      hidePauseOverlay();
+      break;
+    case 'next_time_updated':
+      if (isHost) {
+        const confirmEl = document.getElementById('nextTimeConfirm');
+        if (confirmEl) {
+          confirmEl.style.display = 'inline';
+          setTimeout(() => confirmEl.style.display = 'none', 2500);
+        }
+      }
       break;
   }
 }
@@ -1447,8 +1520,100 @@ function showSessionQuestion(question, index, total) {
   }
   // Timer
   clearTimer();
+  clearReadingBuffer();
+  startReadingBuffer(readingBufferSec);
   if (timeLimitSec) startTimer(timeLimitSec);
   updateWaitingCount();
+}
+
+// ── PAUSE / RESUME ──
+function showPauseOverlay() {
+  clearTimer();
+  clearReadingBuffer();
+  if (partyListening) stopPartyVoice();
+  document.getElementById('pauseOverlay').style.display = 'flex';
+  document.getElementById('answerTextarea').disabled = true;
+  document.getElementById('submitAnswerBtn').disabled = true;
+  document.getElementById('voiceMicBtn').disabled = true;
+  const btn = document.getElementById('pauseBtn');
+  if (btn) btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg> Resume`;
+  if (btn) btn.setAttribute('onclick', 'togglePause()');
+}
+function hidePauseOverlay() {
+  document.getElementById('pauseOverlay').style.display = 'none';
+  const ta = document.getElementById('answerTextarea');
+  const submitted = document.getElementById('submittedMsg').style.display === 'flex';
+  if (!submitted) {
+    ta.disabled = false;
+    document.getElementById('submitAnswerBtn').disabled = false;
+    document.getElementById('voiceMicBtn').disabled = false;
+  }
+  const btn = document.getElementById('pauseBtn');
+  if (btn) btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause`;
+  // Resume timer + reading buffer with remaining time intact
+  const elapsedSinceStart = Math.floor(Date.now()/1000) - questionStartedAt;
+  const readingRemaining = readingBufferSec - elapsedSinceStart;
+  if (readingRemaining > 0 && !submitted) startReadingBuffer(readingRemaining);
+  if (timeLimitSec && !submitted) {
+    const timeRemaining = timeLimitSec - elapsedSinceStart;
+    if (timeRemaining > 0) startTimer(timeRemaining);
+  }
+}
+async function togglePause() {
+  const btn = document.getElementById('pauseBtn');
+  btn.disabled = true;
+  try {
+    const endpoint = isPaused ? '/api/party/resume' : '/api/party/pause';
+    await fetch(endpoint, {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({code: partyCode})
+    });
+  } catch(e) { console.error('Pause/resume error', e); }
+  btn.disabled = false;
+}
+
+// ── SET TIME FOR NEXT QUESTION (host) ──
+async function setNextQuestionTime() {
+  const raw = parseInt(document.getElementById('nextTimeInput').value) || 0;
+  const timeLimitSecVal = raw >= 10 ? raw : null;
+  try {
+    await fetch('/api/party/set-next-time', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({code: partyCode, timeLimitSec: timeLimitSecVal})
+    });
+  } catch(e) { console.error('Set next time error', e); }
+}
+
+// ── READING BUFFER CLOCK ──
+function startReadingBuffer(secs) {
+  const wrap = document.getElementById('readingBufferWrap');
+  const arc = document.getElementById('readingClockArc');
+  const clockWrap = document.getElementById('readingClockSvgWrap');
+  if (!wrap || secs <= 0) { if(wrap) wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  const total = secs * 1000;
+  const circumference = 97.4; // 2 * PI * 15.5
+  const bufferStart = Date.now();
+  function tick() {
+    if (isPaused) return;
+    const elapsed = Date.now() - bufferStart;
+    const remaining = Math.max(0, total - elapsed);
+    const secsLeft = Math.ceil(remaining / 1000);
+    clockWrap.title = `${secsLeft}s left to read`;
+    const pct = remaining / total;
+    arc.setAttribute('stroke-dashoffset', String(circumference * (1 - pct)));
+    if (remaining <= 0) {
+      wrap.style.display = 'none';
+      return;
+    }
+    readingBufferInterval = requestAnimationFrame(tick);
+  }
+  readingBufferInterval = requestAnimationFrame(tick);
+}
+function clearReadingBuffer() {
+  if (readingBufferInterval) { cancelAnimationFrame(readingBufferInterval); readingBufferInterval = null; }
+  const wrap = document.getElementById('readingBufferWrap');
+  if (wrap) wrap.style.display = 'none';
 }
 
 function startTimer(secs) {
@@ -1494,7 +1659,75 @@ function updateWaitingCount() {
 }
 
 // ── SUBMIT ANSWER ──
+// ── VOICE INPUT (transcribes into the textarea, same as practice screen) ──
+const PartySpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let partyRecognition = null;
+let partyListening = false;
+let partyVoiceBaseText = '';
+
+if (PartySpeechRecognition) {
+  partyRecognition = new PartySpeechRecognition();
+  partyRecognition.continuous = true;
+  partyRecognition.interimResults = true;
+  partyRecognition.lang = 'en-US';
+  partyRecognition.maxAlternatives = 1;
+
+  partyRecognition.onresult = (event) => {
+    let finalChunk = '', interimChunk = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalChunk += t + ' ';
+      else interimChunk += t;
+    }
+    if (finalChunk) partyVoiceBaseText += finalChunk;
+    const ta = document.getElementById('answerTextarea');
+    if (ta) ta.value = (partyVoiceBaseText + interimChunk).trim();
+  };
+
+  partyRecognition.onerror = (event) => {
+    console.error('Party speech recognition error:', event.error);
+    stopPartyVoice();
+  };
+
+  partyRecognition.onend = () => {
+    if (partyListening) {
+      try { partyRecognition.start(); } catch(e) {}
+    }
+  };
+}
+
+function toggleVoiceInput() {
+  if (!PartySpeechRecognition) {
+    alert('Voice input isn\'t supported in this browser. Try Chrome or Edge.');
+    return;
+  }
+  if (partyListening) stopPartyVoice();
+  else startPartyVoice();
+}
+
+function startPartyVoice() {
+  const ta = document.getElementById('answerTextarea');
+  partyVoiceBaseText = ta.value ? ta.value + ' ' : '';
+  partyListening = true;
+  try { partyRecognition.start(); } catch(e) {}
+  const btn = document.getElementById('voiceMicBtn');
+  const label = document.getElementById('voiceMicLabel');
+  btn.style.background = '#FEE2E2'; btn.style.borderColor = '#FCA5A5'; btn.style.color = '#DC2626';
+  label.textContent = 'Listening… tap to stop';
+}
+
+function stopPartyVoice() {
+  partyListening = false;
+  try { partyRecognition.stop(); } catch(e) {}
+  const btn = document.getElementById('voiceMicBtn');
+  const label = document.getElementById('voiceMicLabel');
+  if (btn) { btn.style.background = 'white'; btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-secondary)'; }
+  if (label) label.textContent = 'Speak answer';
+}
+
 async function submitAnswer() {
+  if (partyListening) stopPartyVoice();
+  clearReadingBuffer();
   const text = document.getElementById('answerTextarea').value.trim();
   document.getElementById('answerTextarea').disabled = true;
   document.getElementById('submitAnswerBtn').disabled = true;
