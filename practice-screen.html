@@ -1374,8 +1374,8 @@
   // ─── MODE SWITCH ──────────────────────────────────────────
   function switchMode(mode) {
     const plan = window._userPlan || 'free';
-    // Free users can't use voice mode
-    if (mode === 'voice' && plan === 'free') {
+    // Free and guest users can't use voice mode
+    if (mode === 'voice' && (plan === 'free' || plan === 'guest')) {
       // Switch to voice tab visually but show lock overlay
       currentMode = 'voice';
       document.getElementById('modeVoice').classList.add('active');
@@ -1394,13 +1394,15 @@
     document.getElementById('textPanel').classList.toggle('visible', mode === 'text');
   }
 
-  // Show voice lock overlay on load for free users (voice is default active tab)
+  // Set the correct default input mode once plan is known:
+  // guests + free → text (voice locked), monthly + pass → voice
   function initVoiceLock() {
     const plan = window._userPlan || 'free';
-    if (plan === 'free') {
-      // Switch to text mode by default for free users
+    if (plan === 'free' || plan === 'guest') {
       document.getElementById('voiceLockOverlay').style.display = 'none';
       switchMode('text');
+    } else {
+      switchMode('voice');
     }
   }
 
