@@ -31,6 +31,8 @@ const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 const STRIPE_MONTHLY_PRICE_ID = process.env.STRIPE_MONTHLY_PRICE_ID || '';
 const STRIPE_PASS_PRICE_ID = process.env.STRIPE_PASS_PRICE_ID || '';
+const STRIPE_MONTHLY_WEEKLY_PRICE_ID = process.env.STRIPE_MONTHLY_WEEKLY_PRICE_ID || '';
+const STRIPE_PASS_WEEKLY_PRICE_ID = process.env.STRIPE_PASS_WEEKLY_PRICE_ID || '';
 const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 const FREE_DAILY_LIMIT = 5;
 const FREE_MOCK_LIMIT = 1;        // lifetime
@@ -1575,8 +1577,13 @@ const server = http.createServer(async (req, res) => {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     if(!STRIPE_SECRET_KEY) return json(res,503,{error:'Stripe not configured'});
     try {
-      const {plan} = await readBody(req);
-      const priceId = plan==='pass' ? STRIPE_PASS_PRICE_ID : STRIPE_MONTHLY_PRICE_ID;
+      const {plan, period} = await readBody(req);
+      let priceId;
+      if (period === 'weekly') {
+        priceId = plan==='pass' ? STRIPE_PASS_WEEKLY_PRICE_ID : STRIPE_MONTHLY_WEEKLY_PRICE_ID;
+      } else {
+        priceId = plan==='pass' ? STRIPE_PASS_PRICE_ID : STRIPE_MONTHLY_PRICE_ID;
+      }
       if(!priceId) return json(res,400,{error:'Invalid plan or price not configured'});
       const userR = await pool.query('SELECT email,stripe_customer_id FROM users WHERE id=$1',[user.userId]);
       const dbUser = userR.rows[0];
@@ -1638,6 +1645,25 @@ const server = http.createServer(async (req, res) => {
       if(event.type==='customer.subscription.deleted'){
         await pool.query('UPDATE users SET plan=$1,stripe_subscription_id=NULL WHERE stripe_subscription_id=$2',['free',obj.id]);
         console.log(`Subscription ${obj.id} cancelled — downgraded to free`);
+      }
+      if(event.type==='customer.subscription.updated'){
+        const priceId = obj.items?.data?.[0]?.price?.id;
+        const status   = obj.status;
+        if(priceId && status === 'active'){
+          let newPlan = null;
+          if(priceId === STRIPE_MONTHLY_PRICE_ID || priceId === STRIPE_MONTHLY_WEEKLY_PRICE_ID) newPlan = 'monthly';
+          else if(priceId === STRIPE_PASS_PRICE_ID || priceId === STRIPE_PASS_WEEKLY_PRICE_ID) newPlan = 'pass';
+          if(newPlan){
+            await pool.query('UPDATE users SET plan=$1 WHERE stripe_subscription_id=$2',[newPlan,obj.id]);
+            console.log(`Subscription ${obj.id} updated to ${newPlan}`);
+          }
+        }
+        if(status === 'canceled'){
+          await pool.query('UPDATE users SET plan=$1,stripe_subscription_id=NULL WHERE stripe_subscription_id=$2',['free',obj.id]);
+        }
+      }
+      if(event.type==='invoice.payment_failed'){
+        console.log(`Payment failed for subscription ${obj.subscription}`);
       }
       return json(res,200,{ok:true});
     } catch(e){console.error('Webhook error:',e.message);return json(res,400,{error:e.message});}

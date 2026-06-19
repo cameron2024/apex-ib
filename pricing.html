@@ -614,6 +614,14 @@
   <p class="hero-sub">One tool. One recruiting cycle. No guessing when interviews start.</p>
 </div>
 
+<!-- BILLING PERIOD TOGGLE -->
+<div style="display:flex;justify-content:center;margin-bottom:28px;">
+  <div style="display:inline-flex;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:4px;gap:2px;">
+    <button id="billingMonthlyBtn" onclick="setBillingPeriod('monthly')" style="padding:8px 20px;border-radius:99px;border:none;background:var(--text-primary);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;">Monthly</button>
+    <button id="billingWeeklyBtn" onclick="setBillingPeriod('weekly')" style="padding:8px 20px;border-radius:99px;border:none;background:transparent;color:var(--text-secondary);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;">Weekly</button>
+  </div>
+</div>
+
 <!-- PRICING CARDS -->
 <div class="cards-wrapper">
 
@@ -732,8 +740,8 @@
         <span style="font-size:10px;font-weight:700;color:#16A34A;background:#D1FAE5;padding:2px 6px;border-radius:4px;letter-spacing:.03em;">33% OFF</span>
       </div>
       <div class="card-price">
-        <span class="price-amount">$19.99</span>
-        <span class="price-period">/ month</span>
+        <span class="price-amount" id="proPriceAmount">$19.99</span>
+        <span class="price-period" id="proPricePeriod">/ month</span>
       </div>
       <div class="price-note">Cancel anytime</div>
       <p class="card-description">Full access while you're actively prepping. Good for early-stage candidates building their foundation over time.</p>
@@ -835,8 +843,8 @@
         <span class="card-tier-name">Recruiting Pass</span>
       </div>
       <div class="card-price">
-        <span class="price-amount">$39.99</span>
-        <span class="price-period">/ month</span>
+        <span class="price-amount" id="passPriceAmount">$39.99</span>
+        <span class="price-period" id="passPricePeriod">/ month</span>
       </div>
       <div class="price-note">Cancel anytime</div>
       <p class="card-description">For active recruiting. Unlimited mocks, voice mode for live-feel practice, and early access to new question packs as they drop.</p>
@@ -1175,12 +1183,35 @@ function showPricingToast(msg) {
   }, 3500);
 }
 
+let billingPeriod = 'monthly';
+const PRICES = {
+  monthly: { monthly: '$19.99', monthlyPeriod: '/ month', pass: '$39.99', passPeriod: '/ month' },
+  weekly:  { monthly: '$6.99',  monthlyPeriod: '/ week',  pass: '$11.99', passPeriod: '/ week' },
+};
+function setBillingPeriod(period) {
+  billingPeriod = period;
+  const p = PRICES[period];
+  document.getElementById('proPriceAmount').textContent = p.monthly;
+  document.getElementById('proPricePeriod').textContent = p.monthlyPeriod;
+  document.getElementById('passPriceAmount').textContent = p.pass;
+  document.getElementById('passPricePeriod').textContent = p.passPeriod;
+  const mBtn = document.getElementById('billingMonthlyBtn');
+  const wBtn = document.getElementById('billingWeeklyBtn');
+  if (period === 'monthly') {
+    mBtn.style.background = 'var(--text-primary)'; mBtn.style.color = 'white';
+    wBtn.style.background = 'transparent'; wBtn.style.color = 'var(--text-secondary)';
+  } else {
+    wBtn.style.background = 'var(--text-primary)'; wBtn.style.color = 'white';
+    mBtn.style.background = 'transparent'; mBtn.style.color = 'var(--text-secondary)';
+  }
+}
+
 function getPricingDest(targetPlan) {
   const token = localStorage.getItem('apex_token');
   if (!token) {
     return targetPlan === 'free'
       ? 'auth.html?mode=register'
-      : `auth.html?mode=register&plan=${targetPlan}`;
+      : `auth.html?mode=register&plan=${targetPlan}&period=${billingPeriod}`;
   }
   if (targetPlan === 'free') return 'dashboard.html';
   return null; // logged-in + paid plan → use Stripe directly
@@ -1215,7 +1246,7 @@ async function launchWhirlpoolSmart(plan) {
     const r = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ plan })
+      body: JSON.stringify({ plan, period: billingPeriod })
     });
     const data = await r.json();
     if (data.url) {
