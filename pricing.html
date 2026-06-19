@@ -598,6 +598,7 @@
     <span class="logo-name">Apex</span>
   </a>
   <div class="nav-links">
+    <a href="landing.html" class="nav-link">Home</a>
     <a href="practice-screen.html" class="nav-link">Practice</a>
     <a href="dashboard.html" class="nav-link">Dashboard</a>
     <a href="auth.html?mode=register" class="nav-cta">Get started free</a>
@@ -735,9 +736,15 @@
       <div class="card-tier-row">
         <span class="card-tier-name">Pro</span>
       </div>
-      <div style="margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+      <div id="proDiscountRow" style="margin-bottom:4px;display:flex;align-items:center;gap:6px;">
         <span style="font-size:12px;text-decoration:line-through;color:var(--text-tertiary);">$30/mo</span>
         <span style="font-size:10px;font-weight:700;color:#16A34A;background:#D1FAE5;padding:2px 6px;border-radius:4px;letter-spacing:.03em;">33% OFF</span>
+      </div>
+      <div id="proLimitedOfferRow" style="display:none;margin-bottom:4px;">
+        <span style="font-size:10px;font-weight:700;color:white;background:#DC2626;padding:3px 8px;border-radius:4px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:4px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="9" height="9"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          LIMITED OFFER
+        </span>
       </div>
       <div class="card-price">
         <span class="price-amount" id="proPriceAmount">$19.99</span>
@@ -841,6 +848,12 @@
     <div class="card-header">
       <div class="card-tier-row">
         <span class="card-tier-name">Recruiting Pass</span>
+      </div>
+      <div id="passLimitedOfferRow" style="display:none;margin-bottom:4px;">
+        <span style="font-size:10px;font-weight:700;color:white;background:#DC2626;padding:3px 8px;border-radius:4px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:4px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="9" height="9"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          LIMITED OFFER
+        </span>
       </div>
       <div class="card-price">
         <span class="price-amount" id="passPriceAmount">$39.99</span>
@@ -1195,6 +1208,9 @@ function setBillingPeriod(period) {
   document.getElementById('proPricePeriod').textContent = p.monthlyPeriod;
   document.getElementById('passPriceAmount').textContent = p.pass;
   document.getElementById('passPricePeriod').textContent = p.passPeriod;
+  document.getElementById('proDiscountRow').style.display = period === 'monthly' ? 'flex' : 'none';
+  document.getElementById('proLimitedOfferRow').style.display = period === 'weekly' ? 'block' : 'none';
+  document.getElementById('passLimitedOfferRow').style.display = period === 'weekly' ? 'block' : 'none';
   const mBtn = document.getElementById('billingMonthlyBtn');
   const wBtn = document.getElementById('billingWeeklyBtn');
   if (period === 'monthly') {
