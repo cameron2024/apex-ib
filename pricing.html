@@ -582,10 +582,7 @@
   /* Price switching */
   /* end pricing styles */
 .limited-offer-tooltip {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
+  position: fixed;
   width: 220px;
   background: #1A1814;
   color: white;
@@ -598,23 +595,14 @@
   box-shadow: 0 8px 24px rgba(0,0,0,.25);
   opacity: 0;
   pointer-events: none;
-  transition: opacity .15s ease, transform .15s ease;
-  z-index: 50;
+  transition: opacity .15s ease;
+  z-index: 9999;
   white-space: normal;
   text-transform: none;
 }
-.limited-offer-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: #1A1814;
-}
-.limited-offer-badge:hover .limited-offer-tooltip {
+.limited-offer-tooltip.visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
 }
 </style>
 </head>
@@ -776,10 +764,9 @@
         <span style="font-size:10px;font-weight:700;color:#16A34A;background:#D1FAE5;padding:2px 6px;border-radius:4px;letter-spacing:.03em;">33% OFF</span>
       </div>
       <div id="proLimitedOfferRow" style="display:none;margin-bottom:4px;">
-        <span class="limited-offer-badge" style="position:relative;font-size:10px;font-weight:700;color:white;background:#DC2626;padding:3px 8px;border-radius:4px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:4px;cursor:help;">
+        <span class="limited-offer-badge" style="font-size:10px;font-weight:700;color:white;background:#DC2626;padding:3px 8px;border-radius:4px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:4px;cursor:help;">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="9" height="9"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           LIMITED OFFER
-          <span class="limited-offer-tooltip">It's time for a new recruiting cycle. Utilize this weekly billing offer for more flexible studying.</span>
         </span>
       </div>
       <div class="card-price">
@@ -886,10 +873,9 @@
         <span class="card-tier-name">Recruiting Pass</span>
       </div>
       <div id="passLimitedOfferRow" style="display:none;margin-bottom:4px;">
-        <span class="limited-offer-badge" style="position:relative;font-size:10px;font-weight:700;color:white;background:#DC2626;padding:3px 8px;border-radius:4px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:4px;cursor:help;">
+        <span class="limited-offer-badge" style="font-size:10px;font-weight:700;color:white;background:#DC2626;padding:3px 8px;border-radius:4px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:4px;cursor:help;">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="9" height="9"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           LIMITED OFFER
-          <span class="limited-offer-tooltip">It's time for a new recruiting cycle. Utilize this weekly billing offer for more flexible studying.</span>
         </span>
       </div>
       <div class="card-price">
@@ -1723,6 +1709,34 @@ function launchFreeWash(dest) {
   setTimeout(() => { label.style.opacity = '1'; }, 350);
 }
 
+</script>
+<div class="limited-offer-tooltip" id="limitedOfferTooltip">It's time for a new recruiting cycle. Utilize this weekly billing offer for more flexible studying.</div>
+<script>
+(function() {
+  const tip = document.getElementById('limitedOfferTooltip');
+  let hideTimeout = null;
+  function position(e) {
+    const x = Math.min(e.clientX + 14, window.innerWidth - 234);
+    const y = Math.max(e.clientY - 70, 10);
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function show(e) {
+    clearTimeout(hideTimeout);
+    position(e);
+    tip.classList.add('visible');
+  }
+  function hide() {
+    hideTimeout = setTimeout(() => tip.classList.remove('visible'), 80);
+  }
+  document.querySelectorAll('.limited-offer-badge').forEach(badge => {
+    badge.addEventListener('mouseenter', show);
+    badge.addEventListener('mousemove', position);
+    badge.addEventListener('mouseleave', hide);
+  });
+  tip.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+  tip.addEventListener('mouseleave', hide);
+})();
 </script>
 </body>
 </html>
