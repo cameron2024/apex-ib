@@ -1267,9 +1267,10 @@
   }
 
   // ── WHIRLPOOL LOOP (infinite — no redirect, used while awaiting Stripe) ──
-  var _whirlpoolActive = false;
+  
+  window.window._whirlpoolActive = false;
   function startLandingWhirlpoolLoop(plan) {
-    _whirlpoolActive = true;
+    window._whirlpoolActive = true;
     var canvas = document.getElementById('landingWhirlpoolCanvas');
     var isPro = plan === 'monthly';
     var color1 = isPro ? '#2563EB' : '#D97706';
@@ -1283,7 +1284,7 @@
       return { angle: frac*Math.PI*2*5, radius: 80+Math.random()*(Math.max(W,H)*.7), speed: 2+Math.random()*3, size: 2+Math.random()*5, alpha: .4+Math.random()*.6, color:[color1,color2,color3][Math.floor(Math.random()*3)], trail:[] };
     });
     function draw(now) {
-      if (!_whirlpoolActive) return;
+      if (!window._whirlpoolActive) return;
       var elapsed = Math.min(now - start, 1600), tRaw = elapsed/1600;
       var tIn = tRaw*tRaw*tRaw, tFade = 1-Math.pow(1-Math.min(elapsed/400,1),2);
       var spinBoost = 1+tIn*6, shrink = Math.max(1-tIn*.92,.08);
@@ -1336,11 +1337,11 @@
         var wait = Math.max(0, MIN_ANIM_MS - elapsed);
         setTimeout(function() { window.location.href = data.url; }, wait);
       } else {
-        _whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
+        window._whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
         showLandingToast(data.error || 'Could not start checkout. Please try again.');
       }
     } catch(e) {
-      _whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
+      window._whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
       showLandingToast('Something went wrong. Please try again.');
     }
   };
@@ -1382,7 +1383,7 @@
 
   // Reset on bfcache
   window.addEventListener('pageshow', function(e) {
-    _whirlpoolActive = false;
+    window._whirlpoolActive = false;
     _vigCurrent=0; _vigTarget=0;
     ['landingWhirlpoolOverlay','landingFreeWashOverlay','landingVignetteOverlay'].forEach(function(id) {
       var el=document.getElementById(id); if(el){ el.style.display='none'; el.style.opacity='0'; }
