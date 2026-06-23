@@ -1311,6 +1311,7 @@
     var overlay = document.getElementById('landingWhirlpoolOverlay');
     var label   = document.getElementById('landingWhirlpoolText');
     overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
     void overlay.offsetHeight; // force reflow so display:flex paints before rAF
     setTimeout(function() { label.style.opacity = '1'; }, 300);
     startLandingWhirlpoolLoop(plan);
@@ -1354,6 +1355,7 @@
     var canvas  = document.getElementById('landingFreeWashCanvas');
     var label   = document.getElementById('landingFreeWashText');
     overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
     void overlay.offsetHeight;
     var W = canvas.width = window.innerWidth, H = canvas.height = window.innerHeight;
     var ctx = canvas.getContext('2d'), DURATION = 1800, start = performance.now();
@@ -1385,7 +1387,7 @@
     _whirlpoolActive = false;
     _vigCurrent=0; _vigTarget=0;
     ['landingWhirlpoolOverlay','landingFreeWashOverlay','landingVignetteOverlay'].forEach(function(id) {
-      var el=document.getElementById(id); if(el){ el.style.display='none'; el.style.opacity='0'; }
+      var el=document.getElementById(id); if(el){ el.style.display='none'; el.style.opacity=''; }
     });
     var wl=document.getElementById('landingWhirlpoolText'); if(wl) wl.style.opacity='0';
     var fl=document.getElementById('landingFreeWashText'); if(fl) fl.style.opacity='0';
