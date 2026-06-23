@@ -1268,8 +1268,8 @@
 
   // ── WHIRLPOOL LOOP (infinite — no redirect, used while awaiting Stripe) ──
   
-  window.window._whirlpoolActive = false;
-  function startLandingWhirlpoolLoop(plan) {
+  window._whirlpoolActive = false;
+  window.startLandingWhirlpoolLoop = function(plan) {
     window._whirlpoolActive = true;
     var canvas = document.getElementById('landingWhirlpoolCanvas');
     var isPro = plan === 'monthly';
@@ -1314,7 +1314,7 @@
     overlay.style.display = 'flex';
     void overlay.offsetHeight; // force reflow so display:flex paints before rAF
     setTimeout(function() { label.style.opacity = '1'; }, 300);
-    startLandingWhirlpoolLoop(plan);
+    window.startLandingWhirlpoolLoop(plan);
 
     var animStart = Date.now();
     var MIN_ANIM_MS = 2800;
