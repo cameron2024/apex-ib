@@ -1193,14 +1193,13 @@
 </section>
 
 <script>
-(function() {
   var PRICES = {
     monthly: { pro: '$19.99', proPeriod: '/ month — cancel anytime', pass: '$39.99', passPeriod: '/ month — cancel anytime' },
     weekly:  { pro: '$6.99',  proPeriod: '/ week — cancel anytime',  pass: '$11.99', passPeriod: '/ week — cancel anytime' }
   };
   var _landingBillingPeriod = 'monthly';
 
-  window.setLandingBilling = function(period) {
+  function setLandingBilling(period) {
     _landingBillingPeriod = period;
     var p = PRICES[period];
     document.getElementById('landingProAmount').textContent = p.pro;
@@ -1235,13 +1234,13 @@
   // ── VIGNETTE ──
   var _vigTarget = 0, _vigCurrent = 0, _vigPlan = null;
 
-  window.landingShowVignette = function(plan) {
+  function landingShowVignette(plan) {
     _vigPlan = plan; _vigTarget = 1;
     document.getElementById('landingVignetteOverlay').style.display = 'block';
     _drawLandingVignette();
     requestAnimationFrame(_animateLandingVignette);
   };
-  window.landingHideVignette = function() { _vigTarget = 0; };
+  function landingHideVignette() { _vigTarget = 0; };
 
   function _animateLandingVignette() {
     _vigCurrent += (_vigTarget - _vigCurrent) * 0.1;
@@ -1268,9 +1267,9 @@
 
   // ── WHIRLPOOL LOOP (infinite — no redirect, used while awaiting Stripe) ──
   
-  window._whirlpoolActive = false;
-  window.startLandingWhirlpoolLoop = function(plan) {
-    window._whirlpoolActive = true;
+  _whirlpoolActive = false;
+  function startLandingWhirlpoolLoop(plan) {
+    _whirlpoolActive = true;
     var canvas = document.getElementById('landingWhirlpoolCanvas');
     var isPro = plan === 'monthly';
     var color1 = isPro ? '#2563EB' : '#D97706';
@@ -1284,7 +1283,7 @@
       return { angle: frac*Math.PI*2*5, radius: 80+Math.random()*(Math.max(W,H)*.7), speed: 2+Math.random()*3, size: 2+Math.random()*5, alpha: .4+Math.random()*.6, color:[color1,color2,color3][Math.floor(Math.random()*3)], trail:[] };
     });
     function draw(now) {
-      if (!window._whirlpoolActive) return;
+      if (!_whirlpoolActive) return;
       var elapsed = Math.min(now - start, 1600), tRaw = elapsed/1600;
       var tIn = tRaw*tRaw*tRaw, tFade = 1-Math.pow(1-Math.min(elapsed/400,1),2);
       var spinBoost = 1+tIn*6, shrink = Math.max(1-tIn*.92,.08);
@@ -1304,7 +1303,7 @@
   }
 
   // ── SMART WHIRLPOOL (async Stripe fetch) ──
-  window.landingLaunchWhirlpool = async function(plan) {
+  async function landingLaunchWhirlpool(plan) {
     var token = localStorage.getItem('apex_token');
     var currentPlan = localStorage.getItem('apex_plan') || 'free';
     if (token && currentPlan === 'pass') { showLandingToast('You already have the Recruiting Pass — the highest tier.'); return; }
@@ -1314,7 +1313,7 @@
     overlay.style.display = 'flex';
     void overlay.offsetHeight; // force reflow so display:flex paints before rAF
     setTimeout(function() { label.style.opacity = '1'; }, 300);
-    window.startLandingWhirlpoolLoop(plan);
+    startLandingWhirlpoolLoop(plan);
 
     var animStart = Date.now();
     var MIN_ANIM_MS = 2800;
@@ -1337,11 +1336,11 @@
         var wait = Math.max(0, MIN_ANIM_MS - elapsed);
         setTimeout(function() { window.location.href = data.url; }, wait);
       } else {
-        window._whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
+        _whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
         showLandingToast(data.error || 'Could not start checkout. Please try again.');
       }
     } catch(e) {
-      window._whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
+      _whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
       showLandingToast('Something went wrong. Please try again.');
     }
   };
@@ -1349,7 +1348,7 @@
   // ── FREE WASH ──
   var FINANCE_SYMBOLS = ['$','€','£','¥','%','∑','∂','π','∫','±','×','÷','IRR','NPV','EBITDA','DCF','P/E','EV','ROI','WACC','β','α','Δ','√','≈','∞','LBO','M&A','IPO','10x','2.5x','8%','15%','3.2x'];
 
-  window.landingLaunchFreeWash = function() {
+  function landingLaunchFreeWash() {
     var dest = 'dashboard.html';
     var overlay = document.getElementById('landingFreeWashOverlay');
     var canvas  = document.getElementById('landingFreeWashCanvas');
@@ -1383,7 +1382,7 @@
 
   // Reset on bfcache
   window.addEventListener('pageshow', function(e) {
-    window._whirlpoolActive = false;
+    _whirlpoolActive = false;
     _vigCurrent=0; _vigTarget=0;
     ['landingWhirlpoolOverlay','landingFreeWashOverlay','landingVignetteOverlay'].forEach(function(id) {
       var el=document.getElementById(id); if(el){ el.style.display='none'; el.style.opacity='0'; }
@@ -1391,7 +1390,6 @@
     var wl=document.getElementById('landingWhirlpoolText'); if(wl) wl.style.opacity='0';
     var fl=document.getElementById('landingFreeWashText'); if(fl) fl.style.opacity='0';
   });
-})();
 </script>
 
 <!-- ── FAQ ─────────────────────── -->
