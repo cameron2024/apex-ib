@@ -1284,14 +1284,14 @@
     });
     function draw(now) {
       if (!_whirlpoolActive) return;
-      var elapsed = Math.min(now - start, 1600), tRaw = elapsed/1600;
+      var elapsed = Math.min(now - start, 1800), tRaw = elapsed/1800;
       var tIn = tRaw*tRaw*tRaw, tFade = 1-Math.pow(1-Math.min(elapsed/400,1),2);
-      var spinBoost = 1+tIn*6, shrink = Math.max(1-tIn*.92,.08);
+      var spinBoost = 1+tIn*4, shrink = Math.max(1-tIn*.7,.25);
       ctx.fillStyle=bgBase; ctx.globalAlpha=tFade*.92; ctx.fillRect(0,0,W,H); ctx.globalAlpha=1;
       var gr = tIn*220;
       if (gr>0) { var grd=ctx.createRadialGradient(cx,cy,0,cx,cy,gr); grd.addColorStop(0,color2+'cc'); grd.addColorStop(.4,color1+'66'); grd.addColorStop(1,'transparent'); ctx.globalAlpha=tIn*.7; ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(cx,cy,gr,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; }
       particles.forEach(function(p) {
-        p.angle += p.speed*.025*spinBoost;
+        p.angle += p.speed*.018*spinBoost;
         var r=p.radius*shrink, x=cx+Math.cos(p.angle)*r, y=cy+Math.sin(p.angle)*r;
         p.trail.push({x:x,y:y}); if(p.trail.length>10) p.trail.shift();
         if(p.trail.length>1){ ctx.beginPath(); ctx.moveTo(p.trail[0].x,p.trail[0].y); for(var t=1;t<p.trail.length;t++) ctx.lineTo(p.trail[t].x,p.trail[t].y); ctx.strokeStyle=p.color; ctx.lineWidth=p.size*.6; ctx.globalAlpha=p.alpha*tFade; ctx.stroke(); ctx.globalAlpha=1; }
@@ -1317,7 +1317,7 @@
     startLandingWhirlpoolLoop(plan);
 
     var animStart = Date.now();
-    var MIN_ANIM_MS = 2800;
+    var MIN_ANIM_MS = 2000;
 
     // Not logged in → go to auth with plan param
     if (!token) {
