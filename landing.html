@@ -512,19 +512,6 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* Free banner — static warm grain */
-  .price-card-banner.free-banner {
-    background: #EDEAE4;
-  }
-  .price-card-banner.free-banner::after {
-    content: '';
-    position: absolute; inset: 0;
-    background-image:
-      radial-gradient(circle at 20% 50%, rgba(180,170,155,.4) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(200,195,185,.3) 0%, transparent 40%);
-  }
-
-  /* Vignette overlay */
   #landingVignetteOverlay {
     display: none; position: fixed; inset: 0;
     z-index: 100; pointer-events: none;
@@ -543,6 +530,7 @@
     letter-spacing: -.3px; text-shadow: 0 2px 20px rgba(0,0,0,.5);
     opacity: 0; transition: opacity .4s ease .3s;
   }
+  /* Card banner strip — base */
   .price-card-banner {
     display: none;
     height: 90px; margin: -28px -26px 24px;
@@ -556,6 +544,18 @@
     background: radial-gradient(ellipse at 50% 120%, rgba(255,255,255,.12) 0%, transparent 60%);
   }
   .price-card.has-banner .price-card-banner { display: block; }
+
+  /* Free banner */
+  .price-card-banner.free-banner {
+    background: #EDEAE4;
+  }
+  .price-card-banner.free-banner::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(180,170,155,.4) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(200,195,185,.3) 0%, transparent 40%);
+  }
 
   .price-card-banner.pro-banner {
     background: linear-gradient(135deg, #1e3a8a, #3b82f6, #6366f1, #1e40af, #1e3a8a);
