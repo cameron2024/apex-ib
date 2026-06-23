@@ -1311,6 +1311,7 @@
     var overlay = document.getElementById('landingWhirlpoolOverlay');
     var label   = document.getElementById('landingWhirlpoolText');
     overlay.style.display = 'flex';
+    void overlay.offsetHeight; // force reflow so display:flex paints before rAF
     setTimeout(function() { label.style.opacity = '1'; }, 300);
     startLandingWhirlpoolLoop(plan);
 
@@ -1353,6 +1354,7 @@
     var canvas  = document.getElementById('landingFreeWashCanvas');
     var label   = document.getElementById('landingFreeWashText');
     overlay.style.display = 'flex';
+    void overlay.offsetHeight;
     var W = canvas.width = window.innerWidth, H = canvas.height = window.innerHeight;
     var ctx = canvas.getContext('2d'), DURATION = 1800, start = performance.now();
     var symbols = Array.from({length:60}, function() {
