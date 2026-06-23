@@ -1275,6 +1275,8 @@ async function launchWhirlpoolSmart(plan) {
   const overlay = document.getElementById('whirlpoolOverlay');
   const label   = document.getElementById('whirlpoolText');
   overlay.style.display = 'flex';
+  overlay.style.opacity = '1';
+  void overlay.offsetHeight;
   setTimeout(() => { label.style.opacity = '1'; }, 300);
   startWhirlpoolLoop(plan);
 
@@ -1294,11 +1296,13 @@ async function launchWhirlpoolSmart(plan) {
       const wait = Math.max(0, MIN_ANIM_MS - elapsed);
       setTimeout(() => { window.location.href = data.url; }, wait);
     } else {
+      _whirlpoolActive = false;
       overlay.style.display = 'none';
       label.style.opacity = '0';
       showPricingToast(data.error || 'Could not start checkout. Please try again.');
     }
   } catch(e) {
+    _whirlpoolActive = false;
     overlay.style.display = 'none';
     label.style.opacity = '0';
     showPricingToast('Something went wrong. Please try again.');
@@ -1323,7 +1327,9 @@ function launchFreeWashSmart() {
 }
 
 // Runs the whirlpool canvas indefinitely (no redirect) — used for async Stripe checkout
+var _whirlpoolActive = false;
 function startWhirlpoolLoop(plan) {
+  _whirlpoolActive = true;
   const canvas = document.getElementById('whirlpoolCanvas');
   const isPro  = plan === 'monthly';
   const color1 = isPro ? '#2563EB' : '#D97706';
@@ -1351,7 +1357,7 @@ function startWhirlpoolLoop(plan) {
   });
 
   function draw(now) {
-    if (document.getElementById('whirlpoolOverlay').style.display === 'none') return;
+    if (!_whirlpoolActive) return;
     const elapsed = Math.min(now - start, 1600);
     const tRaw  = elapsed / 1600;
     const tIn   = tRaw * tRaw * tRaw;
@@ -1403,6 +1409,8 @@ function launchWhirlpool(plan, dest) {
   const canvas  = document.getElementById('whirlpoolCanvas');
   const label   = document.getElementById('whirlpoolText');
   overlay.style.display = 'flex';
+  overlay.style.opacity = '1';
+  void overlay.offsetHeight;
 
   // Colors
   const isPro  = plan === 'monthly';
@@ -1538,9 +1546,10 @@ function launchWhirlpool(plan, dest) {
 
 // Reset overlays when user navigates back (bfcache)
 window.addEventListener('pageshow', function(e) {
+  _whirlpoolActive = false;
   ['whirlpoolOverlay','freeWashOverlay','vignetteOverlay'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) { el.style.display = 'none'; el.style.opacity = '0'; }
+    if (el) { el.style.display = 'none'; el.style.opacity = ''; }
   });
   const label = document.getElementById('whirlpoolText');
   if (label) label.style.opacity = '0';
@@ -1644,6 +1653,8 @@ function launchFreeWash(dest) {
   const canvas  = document.getElementById('freeWashCanvas');
   const label   = document.getElementById('freeWashText');
   overlay.style.display = 'flex';
+  overlay.style.opacity = '1';
+  void overlay.offsetHeight;
 
   const W = canvas.width  = window.innerWidth;
   const H = canvas.height = window.innerHeight;
