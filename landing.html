@@ -543,10 +543,12 @@
     letter-spacing: -.3px; text-shadow: 0 2px 20px rgba(0,0,0,.5);
     opacity: 0; transition: opacity .4s ease .3s;
   }
+  .price-card-banner {
     display: none;
     height: 90px; margin: -28px -26px 24px;
     border-radius: 13px 13px 0 0;
     position: relative; overflow: hidden;
+    pointer-events: none;
   }
   .price-card-banner::after {
     content: '';
@@ -1265,7 +1267,9 @@
   }
 
   // ── WHIRLPOOL LOOP (infinite — no redirect, used while awaiting Stripe) ──
+  var _whirlpoolActive = false;
   function startLandingWhirlpoolLoop(plan) {
+    _whirlpoolActive = true;
     var canvas = document.getElementById('landingWhirlpoolCanvas');
     var isPro = plan === 'monthly';
     var color1 = isPro ? '#2563EB' : '#D97706';
@@ -1279,7 +1283,7 @@
       return { angle: frac*Math.PI*2*5, radius: 80+Math.random()*(Math.max(W,H)*.7), speed: 2+Math.random()*3, size: 2+Math.random()*5, alpha: .4+Math.random()*.6, color:[color1,color2,color3][Math.floor(Math.random()*3)], trail:[] };
     });
     function draw(now) {
-      if (document.getElementById('landingWhirlpoolOverlay').style.display === 'none') return;
+      if (!_whirlpoolActive) return;
       var elapsed = Math.min(now - start, 1600), tRaw = elapsed/1600;
       var tIn = tRaw*tRaw*tRaw, tFade = 1-Math.pow(1-Math.min(elapsed/400,1),2);
       var spinBoost = 1+tIn*6, shrink = Math.max(1-tIn*.92,.08);
@@ -1331,11 +1335,11 @@
         var wait = Math.max(0, MIN_ANIM_MS - elapsed);
         setTimeout(function() { window.location.href = data.url; }, wait);
       } else {
-        overlay.style.display = 'none'; label.style.opacity = '0';
+        _whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
         showLandingToast(data.error || 'Could not start checkout. Please try again.');
       }
     } catch(e) {
-      overlay.style.display = 'none'; label.style.opacity = '0';
+      _whirlpoolActive = false; overlay.style.display = 'none'; label.style.opacity = '0';
       showLandingToast('Something went wrong. Please try again.');
     }
   };
@@ -1344,8 +1348,7 @@
   var FINANCE_SYMBOLS = ['$','€','£','¥','%','∑','∂','π','∫','±','×','÷','IRR','NPV','EBITDA','DCF','P/E','EV','ROI','WACC','β','α','Δ','√','≈','∞','LBO','M&A','IPO','10x','2.5x','8%','15%','3.2x'];
 
   window.landingLaunchFreeWash = function() {
-    var token = localStorage.getItem('apex_token');
-    var dest = token ? 'dashboard.html' : 'auth.html?mode=register';
+    var dest = 'dashboard.html';
     var overlay = document.getElementById('landingFreeWashOverlay');
     var canvas  = document.getElementById('landingFreeWashCanvas');
     var label   = document.getElementById('landingFreeWashText');
@@ -1376,13 +1379,14 @@
   };
 
   // Reset on bfcache
-  window.addEventListener('pageshow', function() {
+  window.addEventListener('pageshow', function(e) {
+    _whirlpoolActive = false;
+    _vigCurrent=0; _vigTarget=0;
     ['landingWhirlpoolOverlay','landingFreeWashOverlay','landingVignetteOverlay'].forEach(function(id) {
       var el=document.getElementById(id); if(el){ el.style.display='none'; el.style.opacity='0'; }
     });
     var wl=document.getElementById('landingWhirlpoolText'); if(wl) wl.style.opacity='0';
     var fl=document.getElementById('landingFreeWashText'); if(fl) fl.style.opacity='0';
-    _vigCurrent=0; _vigTarget=0;
   });
 })();
 </script>
