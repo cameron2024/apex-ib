@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conference — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.conf-header {
+  display: flex; align-items: center; gap: 20px;
+  margin-bottom: 32px;
+}
+.conf-logo-wrap {
+  width: 64px; height: 64px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.conf-logo-wrap img { width: 44px; height: 44px; object-fit: contain; }
+.conf-title { font-family: 'DM Serif Display', serif; font-size: 28px; letter-spacing: -.4px; }
+.conf-subtitle { font-size: 13.5px; color: var(--text-secondary); margin-top: 3px; }
+
+/* KPI strip */
+.conf-kpis {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 28px;
+}
+.conf-kpi {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  position: relative; overflow: hidden;
+}
+.conf-kpi::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; border-radius: 0 0 var(--radius) var(--radius);
+}
+.conf-kpi.blue::after   { background: var(--accent-blue); }
+.conf-kpi.green::after  { background: var(--accent-green); }
+.conf-kpi.amber::after  { background: var(--accent-amber); }
+.conf-kpi.purple::after { background: #7C3AED; }
+.conf-kpi-label { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; }
+.conf-kpi-value { font-family: 'DM Serif Display', serif; font-size: 30px; letter-spacing: -.4px; line-height: 1; margin-bottom: 3px; }
+.conf-kpi-sub   { font-size: 11.5px; color: var(--text-tertiary); }
+
+/* School grid */
+.schools-section-title {
+  font-size: 13px; font-weight: 600; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.schools-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px; margin-bottom: 32px;
+}
+.school-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s;
+  text-decoration: none; display: block;
+}
+.school-card:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,.07); }
+.school-card.my-school { border-width: 2px; }
+
+.school-card-banner {
+  height: 56px; position: relative; overflow: hidden;
+  background-size: 300% 300%;
+  animation: schoolShimmer 5s ease infinite;
+}
+.school-card-banner::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 120%, rgba(255,255,255,.15) 0%, transparent 60%);
+}
+@keyframes schoolShimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.school-card-body { padding: 14px 16px; }
+.school-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.school-card-rank {
+  font-family: 'DM Serif Display', serif; font-size: 18px;
+  color: var(--text-tertiary); width: 24px; flex-shrink: 0;
+}
+.school-card-name { font-size: 14px; font-weight: 600; flex: 1; }
+.school-card-you  { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: var(--text-primary); color: white; }
+
+.school-card-metrics {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.school-metric { text-align: center; }
+.school-metric-val { font-family: 'DM Serif Display', serif; font-size: 18px; letter-spacing: -.3px; line-height: 1; }
+.school-metric-lbl { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+
+/* IB placement table */
+.placement-table {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 28px;
+}
+.placement-table-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.placement-table-title { font-size: 13px; font-weight: 600; }
+.placement-source { font-size: 11px; color: var(--text-tertiary); }
+
+table.pt { width: 100%; border-collapse: collapse; }
+table.pt th {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-tertiary); padding: 10px 20px; text-align: left;
+  border-bottom: 1px solid var(--border); background: var(--bg);
+}
+table.pt td { padding: 12px 20px; font-size: 13px; border-bottom: 1px solid var(--border); }
+table.pt tr:last-child td { border-bottom: none; }
+table.pt tr:hover td { background: var(--bg); }
+.pt-school-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-weight: 500;
+}
+.pt-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pt-highlight { font-weight: 700; color: var(--accent-green); }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 4px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+@media (max-width: 768px) {
+  .conf-kpis { grid-template-columns: repeat(2, 1fr); }
+  .schools-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body data-page="feed">
+<div id="sidebar-mount"></div>
+<main class="main">
+
+  <div class="conf-header fade-1" id="confHeader">
+    <div class="conf-logo-wrap"><div class="skeleton" style="width:44px;height:44px;border-radius:8px;"></div></div>
+    <div>
+      <div class="conf-title" id="confTitle">—</div>
+      <div class="conf-subtitle" id="confSubtitle">Loading…</div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="conf-kpis fade-2" id="confKpis">
+    <div class="conf-kpi blue"><div class="conf-kpi-label">Apex Users</div><div class="conf-kpi-value skeleton" style="height:30px;width:60px;">&nbsp;</div></div>
+    <div class="conf-kpi green"><div class="conf-kpi-label">Avg Score</div><div class="conf-kpi-value skeleton" style="height:30px;width:60px;">&nbsp;</div></div>
+    <div class="conf-kpi amber"><div class="conf-kpi-label">Total Answers</div><div class="conf-kpi-value skeleton" style="height:30px;width:60px;">&nbsp;</div></div>
+    <div class="conf-kpi purple"><div class="conf-kpi-label">Active This Week</div><div class="conf-kpi-value skeleton" style="height:30px;width:60px;">&nbsp;</div></div>
+  </div>
+
+  <!-- School leaderboard -->
+  <div class="schools-section-title fade-2">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    School Rankings — Apex Performance
+  </div>
+  <div class="schools-grid fade-2" id="schoolsGrid">
+    ${[1,2,3,4].map(()=>`<div class="school-card"><div class="school-card-banner" style="background:#EDEAE4;"></div><div class="school-card-body"><div class="skeleton" style="height:14px;width:60%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;"></div></div></div>`).join('')}
+  </div>
+
+  <!-- IB Placement table -->
+  <div class="placement-table fade-3">
+    <div class="placement-table-header">
+      <div class="placement-table-title">IB &amp; Finance Placement — Estimated Historical Rates</div>
+      <div class="placement-source">Source: LinkedIn, Glassdoor, school data (estimated)</div>
+    </div>
+    <table class="pt" id="placementTable">
+      <thead><tr>
+        <th>School</th>
+        <th>Finance placement %</th>
+        <th>BB IB placement %</th>
+        <th>PE / Buyside %</th>
+        <th>Avg starting comp</th>
+        <th>Top feeder to</th>
+      </tr></thead>
+      <tbody id="placementBody"></tbody>
+    </table>
+  </div>
+
+</main>
+<script src="sidebar.js"></script>
+<script>
+const token = localStorage.getItem('apex_token');
+if (!token) window.location.href = 'auth.html';
+
+const CONF_NAME = new URLSearchParams(location.search).get('name') || 'NESCAC';
+
+// ── School color palette — extensible ──────────────────────
+const SCHOOL_COLORS = {
+  'Amherst College':      { c1:'#3f1f69', c2:'#7C5CBF', c3:'#311a4d' },
+  'Williams College':     { c1:'#500082', c2:'#FFD700', c3:'#3a0060' },
+  'Middlebury College':   { c1:'#003087', c2:'#6FA8DC', c3:'#001f5b' },
+  'Bowdoin College':      { c1:'#000000', c2:'#FFFFFF', c3:'#222222' },
+  'Colby College':        { c1:'#004B8D', c2:'#AAAAAA', c3:'#003366' },
+  'Hamilton College':     { c1:'#003087', c2:'#D4AF37', c3:'#001f5b' },
+  'Trinity College':      { c1:'#003087', c2:'#8B8B00', c3:'#001f5b' },
+  'Wesleyan University':  { c1:'#CC0000', c2:'#000000', c3:'#990000' },
+  'Tufts University':     { c1:'#3E8EDE', c2:'#4F2D7F', c3:'#1a6cc0' },
+  'Bates College':        { c1:'#820000', c2:'#FFFFFF', c3:'#5c0000' },
+  'Connecticut College':  { c1:'#003087', c2:'#8B0000', c3:'#001f5b' },
+  // Ivy League
+  'Harvard University':   { c1:'#A51C30', c2:'#000000', c3:'#7a1323' },
+  'Yale University':      { c1:'#00356B', c2:'#ADB3C1', c3:'#001f40' },
+  'Princeton University': { c1:'#FF6600', c2:'#000000', c3:'#cc5200' },
+  'Columbia University':  { c1:'#003087', c2:'#69B3E7', c3:'#001f5b' },
+  'Dartmouth College':    { c1:'#00693E', c2:'#FFFFFF', c3:'#004d2d' },
+  'Brown University':     { c1:'#4E3629', c2:'#C00404', c3:'#3a2a20' },
+  'Cornell University':   { c1:'#B31B1B', c2:'#222222', c3:'#8a1414' },
+  'University of Pennsylvania': { c1:'#011F5B', c2:'#990000', c3:'#000f30' },
+};
+
+// Estimated IB placement data — extensible object
+const PLACEMENT_DATA = {
+  NESCAC: [
+    { school:'Amherst College',     finance:28, bb_ib:8,  pe:4,  comp:'$150–185k', top_feeder:'Goldman Sachs, JPMorgan' },
+    { school:'Williams College',    finance:32, bb_ib:10, pe:5,  comp:'$155–190k', top_feeder:'Goldman Sachs, Evercore' },
+    { school:'Middlebury College',  finance:18, bb_ib:5,  pe:2,  comp:'$140–170k', top_feeder:'JPMorgan, Morgan Stanley' },
+    { school:'Bowdoin College',     finance:16, bb_ib:4,  pe:2,  comp:'$135–165k', top_feeder:'Morgan Stanley, Citi' },
+    { school:'Tufts University',    finance:20, bb_ib:6,  pe:3,  comp:'$145–175k', top_feeder:'Goldman Sachs, Lazard' },
+    { school:'Colby College',       finance:14, bb_ib:3,  pe:1,  comp:'$130–160k', top_feeder:'JPMorgan, BMO' },
+    { school:'Hamilton College',    finance:15, bb_ib:4,  pe:2,  comp:'$135–165k', top_feeder:'Citi, Jefferies' },
+    { school:'Wesleyan University', finance:17, bb_ib:4,  pe:2,  comp:'$140–170k', top_feeder:'Morgan Stanley, Barclays' },
+    { school:'Trinity College',     finance:13, bb_ib:3,  pe:1,  comp:'$125–155k', top_feeder:'Citi, Deutsche Bank' },
+    { school:'Bates College',       finance:12, bb_ib:2,  pe:1,  comp:'$120–150k', top_feeder:'JPMorgan, UBS' },
+    { school:'Connecticut College', finance:11, bb_ib:2,  pe:1,  comp:'$115–145k', top_feeder:'BMO, Piper Sandler' },
+  ]
+};
+
+// Conference logo map
+const CONF_LOGOS = {
+  'NESCAC': 'https://upload.wikimedia.org/wikipedia/en/thumb/5/58/NESCAC_logo.svg/320px-NESCAC_logo.svg.png',
+};
+
+function scoreColor(s) {
+  if (!s || s === 0) return 'var(--text-tertiary)';
+  if (s >= 80) return 'var(--accent-green)';
+  if (s >= 60) return 'var(--accent-amber)';
+  return 'var(--accent-red)';
+}
+
+function schoolBannerStyle(name) {
+  const c = SCHOOL_COLORS[name] || { c1:'#444', c2:'#888', c3:'#222' };
+  return `background:linear-gradient(135deg,${c.c1},${c.c2},${c.c3},${c.c1});background-size:300% 300%;`;
+}
+
+async function init() {
+  const [confR, progressR] = await Promise.all([
+    fetch(`/api/conference/page?name=${encodeURIComponent(CONF_NAME)}`, { headers:{'Authorization':'Bearer '+token}}),
+    fetch('/api/progress/load', { headers:{'Authorization':'Bearer '+token}})
+  ]);
+  const conf = await confR.json();
+  const progress = await progressR.json();
+
+  if (window.initSidebarMenu) initSidebarMenu(progress.plan, progress.gradedToday);
+
+  // Header
+  const logoUrl = CONF_LOGOS[CONF_NAME];
+  document.getElementById('confTitle').textContent = CONF_NAME;
+  document.getElementById('confSubtitle').textContent =
+    `${conf.schools?.length || 0} member schools · New England Small College Athletic Conference`;
+  document.querySelector('.conf-logo-wrap').innerHTML = logoUrl
+    ? `<img src="${logoUrl}" alt="${CONF_NAME}" onerror="this.outerHTML='<span style=font-size:22px;font-weight:700>${CONF_NAME[0]}</span>'">`
+    : `<span style="font-size:22px;font-weight:700;">${CONF_NAME[0]}</span>`;
+
+  // KPIs
+  const t = conf.totals || {};
+  const weeklyActive = conf.schools?.reduce((s,sc)=>s+parseInt(sc.answers_this_week||0),0) || 0;
+  document.getElementById('confKpis').innerHTML = `
+    <div class="conf-kpi blue">
+      <div class="conf-kpi-label">Apex Users</div>
+      <div class="conf-kpi-value">${parseInt(t.total_users||0).toLocaleString()}</div>
+      <div class="conf-kpi-sub">across all schools</div>
+    </div>
+    <div class="conf-kpi green">
+      <div class="conf-kpi-label">Avg Score</div>
+      <div class="conf-kpi-value" style="color:${scoreColor(t.avg_score)}">${t.avg_score||'—'}<span style="font-size:14px;opacity:.6;font-family:'DM Sans',sans-serif;">/100</span></div>
+      <div class="conf-kpi-sub">conference average</div>
+    </div>
+    <div class="conf-kpi amber">
+      <div class="conf-kpi-label">Total Answers</div>
+      <div class="conf-kpi-value">${parseInt(t.total_answers||0).toLocaleString()}</div>
+      <div class="conf-kpi-sub">graded submissions</div>
+    </div>
+    <div class="conf-kpi purple">
+      <div class="conf-kpi-label">Active This Week</div>
+      <div class="conf-kpi-value">${weeklyActive.toLocaleString()}</div>
+      <div class="conf-kpi-sub">answers submitted</div>
+    </div>`;
+
+  // School cards
+  const schools = conf.schools || [];
+  const mySchool = conf.mySchool;
+  document.getElementById('schoolsGrid').innerHTML = schools.map((sc, i) => {
+    const isMine = sc.name === mySchool;
+    const borderColor = isMine && SCHOOL_COLORS[sc.name] ? SCHOOL_COLORS[sc.name].c1 : '';
+    return `
+      <a class="school-card${isMine ? ' my-school' : ''}" href="school.html?name=${encodeURIComponent(sc.name)}"
+         style="${isMine && borderColor ? `border-color:${borderColor};` : ''}">
+        <div class="school-card-banner" style="${schoolBannerStyle(sc.name)}"></div>
+        <div class="school-card-body">
+          <div class="school-card-top">
+            <div class="school-card-rank">#${i+1}</div>
+            <div class="school-card-name">${sc.name}</div>
+            ${isMine ? `<span class="school-card-you">You</span>` : ''}
+          </div>
+          <div class="school-card-metrics">
+            <div class="school-metric">
+              <div class="school-metric-val" style="color:${scoreColor(sc.avg_score)}">${sc.avg_score||'—'}</div>
+              <div class="school-metric-lbl">Avg Score</div>
+            </div>
+            <div class="school-metric">
+              <div class="school-metric-val">${parseInt(sc.total_answers||0).toLocaleString()}</div>
+              <div class="school-metric-lbl">Answers</div>
+            </div>
+            <div class="school-metric">
+              <div class="school-metric-val">${parseInt(sc.apex_users||0)}</div>
+              <div class="school-metric-lbl">Users</div>
+            </div>
+          </div>
+        </div>
+      </a>`;
+  }).join('');
+
+  // Placement table
+  const placementRows = PLACEMENT_DATA[CONF_NAME] || [];
+  document.getElementById('placementBody').innerHTML = placementRows
+    .sort((a,b) => b.bb_ib - a.bb_ib)
+    .map(r => {
+      const c = SCHOOL_COLORS[r.school];
+      const dot = c ? `<span class="pt-dot" style="background:${c.c1};"></span>` : '';
+      const isMe = r.school === mySchool;
+      return `<tr${isMe ? ' style="background:rgba(0,0,0,.02);"' : ''}>
+        <td><span class="pt-school-badge">${dot}${r.school}${isMe ? ' <span class="school-card-you" style="margin-left:4px;">You</span>' : ''}</span></td>
+        <td>${r.finance}%</td>
+        <td class="${r.bb_ib >= 8 ? 'pt-highlight' : ''}">${r.bb_ib}%</td>
+        <td>${r.pe}%</td>
+        <td>${r.comp}</td>
+        <td style="font-size:12px;color:var(--text-secondary);">${r.top_feeder}</td>
+      </tr>`;
+    }).join('');
+}
+
+init().catch(e => console.error(e));
+</script>
+</body>
+</html>

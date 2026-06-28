@@ -57,10 +57,27 @@
 .profile-school-tag {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 12.5px;
-  color: var(--text-secondary);
+  gap: 6px;
   margin-bottom: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.school-pill, .conf-pill {
+  display: inline-flex; align-items: center;
+  font-size: 12px; font-weight: 600;
+  padding: 4px 12px; border-radius: 99px;
+  cursor: pointer; text-decoration: none;
+  background-size: 300% 300%;
+  transition: opacity .15s, transform .1s;
+  color: white; border: none;
+}
+.school-pill:hover, .conf-pill:hover { opacity: .88; transform: translateY(-1px); }
+
+@keyframes schoolPillShimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .profile-plan-badge {
@@ -491,7 +508,7 @@
         <div class="profile-avatar-xl" id="profileAvatar">?</div>
         <div class="profile-name-lg" id="profileName">—</div>
         <div class="profile-school-tag" id="profileSchool" style="display:none;">
-          🎓 <span id="profileSchoolName"></span>
+          <span id="profileSchoolName"></span>
         </div>
         <div id="profilePlanBadge"></div>
         <div style="font-size:12px;color:var(--text-tertiary);margin-top:8px;" id="profileMemberSince"></div>
@@ -604,7 +621,36 @@ function renderProfileCard(profile, progress, school) {
 
   if (school) {
     document.getElementById('profileSchool').style.display = 'inline-flex';
-    const _logoHtml = school.logo_url ? `<img src="${school.logo_url}" alt="${school.conference}" style="width:16px;height:16px;object-fit:contain;" onerror="this.outerHTML='🎓'">` : '🎓'; document.getElementById('profileSchoolName').innerHTML = _logoHtml + ' ' + school.name + (school.conference ? ' · ' + school.conference : '');
+    const SCHOOL_COLORS = {
+      'Amherst College':      { c1:'#3f1f69', c2:'#7C5CBF', c3:'#311a4d' },
+      'Williams College':     { c1:'#500082', c2:'#FFD700', c3:'#3a0060' },
+      'Middlebury College':   { c1:'#003087', c2:'#6FA8DC', c3:'#001f5b' },
+      'Bowdoin College':      { c1:'#1a1a1a', c2:'#555555', c3:'#111111' },
+      'Colby College':        { c1:'#004B8D', c2:'#AAAAAA', c3:'#003366' },
+      'Hamilton College':     { c1:'#003087', c2:'#D4AF37', c3:'#001f5b' },
+      'Trinity College':      { c1:'#003087', c2:'#8B8B00', c3:'#001f5b' },
+      'Wesleyan University':  { c1:'#CC0000', c2:'#333333', c3:'#990000' },
+      'Tufts University':     { c1:'#3E8EDE', c2:'#4F2D7F', c3:'#1a6cc0' },
+      'Bates College':        { c1:'#820000', c2:'#444444', c3:'#5c0000' },
+      'Connecticut College':  { c1:'#003087', c2:'#8B0000', c3:'#001f5b' },
+      'Harvard University':   { c1:'#A51C30', c2:'#222222', c3:'#7a1323' },
+      'Yale University':      { c1:'#00356B', c2:'#ADB3C1', c3:'#001f40' },
+      'Princeton University': { c1:'#FF6600', c2:'#111111', c3:'#cc5200' },
+      'Columbia University':  { c1:'#003087', c2:'#69B3E7', c3:'#001f5b' },
+      'Dartmouth College':    { c1:'#00693E', c2:'#444444', c3:'#004d2d' },
+      'Brown University':     { c1:'#4E3629', c2:'#C00404', c3:'#3a2a20' },
+      'Cornell University':   { c1:'#B31B1B', c2:'#333333', c3:'#8a1414' },
+      'University of Pennsylvania': { c1:'#011F5B', c2:'#990000', c3:'#000f30' },
+    };
+    const sc = SCHOOL_COLORS[school.name] || { c1:'#444', c2:'#888', c3:'#222' };
+    const schoolPillStyle = `background:linear-gradient(135deg,${sc.c1},${sc.c2},${sc.c3},${sc.c1});background-size:300% 300%;animation:schoolPillShimmer 5s ease infinite;`;
+    // NESCAC is navy + white
+    const confPillStyle = `background:linear-gradient(135deg,#0a1f44,#1a3a7a,#0d2d5e,#0a1f44);background-size:300% 300%;animation:schoolPillShimmer 6s ease infinite;`;
+    let html = `<a class="school-pill" href="school.html?name=${encodeURIComponent(school.name)}" style="${schoolPillStyle}">${school.name}</a>`;
+    if (school.conference) {
+      html += `<a class="conf-pill" href="conference.html?name=${encodeURIComponent(school.conference)}" style="${confPillStyle}">${school.conference}</a>`;
+    }
+    document.getElementById('profileSchoolName').innerHTML = html;
   }
 
   const planMap = {

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School — Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* Banner */
+.school-banner {
+  height: 120px; border-radius: var(--radius); margin-bottom: 24px;
+  position: relative; overflow: hidden;
+  background-size: 300% 300%;
+  animation: schoolBannerShimmer 5s ease infinite;
+}
+.school-banner::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 120%, rgba(255,255,255,.15) 0%, transparent 60%);
+}
+@keyframes schoolBannerShimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.school-banner-inner {
+  position: absolute; inset: 0; display: flex; align-items: center; padding: 0 28px; gap: 16px;
+}
+.school-banner-name {
+  font-family: 'DM Serif Display', serif; font-size: 26px; letter-spacing: -.4px;
+  color: white; text-shadow: 0 1px 8px rgba(0,0,0,.3);
+}
+.school-banner-conf {
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8);
+  background: rgba(255,255,255,.18); padding: 3px 10px; border-radius: 99px;
+  backdrop-filter: blur(6px);
+  cursor: pointer; transition: background .15s;
+  text-decoration: none;
+}
+.school-banner-conf:hover { background: rgba(255,255,255,.28); color: white; }
+.school-banner-you {
+  font-size: 11px; font-weight: 700; color: white;
+  background: rgba(0,0,0,.3); padding: 3px 10px; border-radius: 99px;
+}
+
+/* KPIs */
+.school-kpis {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 28px;
+}
+.school-kpi {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  position: relative; overflow: hidden;
+}
+.school-kpi::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; border-radius: 0 0 var(--radius) var(--radius);
+}
+.school-kpi.green::after  { background: var(--accent-green); }
+.school-kpi.blue::after   { background: var(--accent-blue); }
+.school-kpi.amber::after  { background: var(--accent-amber); }
+.school-kpi.purple::after { background: #7C3AED; }
+.kpi-label { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; }
+.kpi-value { font-family: 'DM Serif Display', serif; font-size: 30px; letter-spacing: -.4px; line-height: 1; margin-bottom: 3px; }
+.kpi-sub   { font-size: 11.5px; color: var(--text-tertiary); }
+
+.school-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+
+/* Topic breakdown */
+.section-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
+}
+.section-card-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-card-sub { font-size: 11.5px; color: var(--text-tertiary); font-weight: 400; }
+
+.topic-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 20px; border-bottom: 1px solid var(--border);
+}
+.topic-row:last-child { border-bottom: none; }
+.topic-name { font-size: 13px; font-weight: 500; width: 150px; flex-shrink: 0; }
+.topic-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.topic-bar-fill { height: 100%; border-radius: 99px; }
+.topic-score { font-size: 13px; font-weight: 600; width: 44px; text-align: right; }
+
+/* Leaderboard */
+.lb-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+  transition: background .1s;
+}
+.lb-item:last-child { border-bottom: none; }
+.lb-item:hover { background: var(--bg); }
+.lb-rank { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text-tertiary); width: 22px; flex-shrink: 0; }
+.lb-rank.gold   { color: #D97706; }
+.lb-rank.silver { color: #9CA3AF; }
+.lb-rank.bronze { color: #B45309; }
+.lb-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: white; flex-shrink: 0;
+  text-decoration: none;
+}
+.lb-name { font-size: 13.5px; font-weight: 500; flex: 1; color: var(--text-primary); text-decoration: none; }
+.lb-name:hover { color: var(--accent-blue); }
+.lb-score { font-family: 'DM Serif Display', serif; font-size: 17px; letter-spacing: -.2px; }
+.lb-answers { font-size: 11px; color: var(--text-tertiary); text-align: right; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 4px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+@media (max-width: 900px) {
+  .school-layout { grid-template-columns: 1fr; }
+  .school-kpis { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body data-page="feed">
+<div id="sidebar-mount"></div>
+<main class="main">
+
+  <div class="school-banner fade-1" id="schoolBanner">
+    <div class="school-banner-inner">
+      <div>
+        <div class="school-banner-name" id="bannerName">—</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <a class="school-banner-conf" id="bannerConf" href="#">—</a>
+          <span class="school-banner-you" id="bannerYou" style="display:none;">Your School</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="school-kpis fade-2" id="schoolKpis">
+    ${['green','blue','amber','purple'].map(()=>`
+    <div class="school-kpi"><div class="kpi-label skeleton" style="height:10px;width:60%;margin-bottom:8px;"></div><div class="kpi-value skeleton" style="height:28px;width:50%;"></div></div>`).join('')}
+  </div>
+
+  <div class="school-layout fade-3">
+    <div>
+      <!-- Topic breakdown -->
+      <div class="section-card" id="topicCard">
+        <div class="section-card-header">
+          Topic Performance <span class="section-card-sub">School average</span>
+        </div>
+        <div id="topicRows"><div style="padding:20px;color:var(--text-tertiary);font-size:13.5px;">Loading…</div></div>
+      </div>
+    </div>
+
+    <div>
+      <!-- Leaderboard -->
+      <div class="section-card">
+        <div class="section-card-header">Top Students</div>
+        <div id="leaderboard"><div style="padding:20px;color:var(--text-tertiary);font-size:13.5px;">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+<script src="sidebar.js"></script>
+<script>
+const token = localStorage.getItem('apex_token');
+if (!token) window.location.href = 'auth.html';
+
+const SCHOOL_NAME = new URLSearchParams(location.search).get('name');
+if (!SCHOOL_NAME) window.location.href = 'feed.html';
+
+const SCHOOL_COLORS = {
+  'Amherst College':      { c1:'#3f1f69', c2:'#7C5CBF', c3:'#311a4d' },
+  'Williams College':     { c1:'#500082', c2:'#FFD700', c3:'#3a0060' },
+  'Middlebury College':   { c1:'#003087', c2:'#6FA8DC', c3:'#001f5b' },
+  'Bowdoin College':      { c1:'#1a1a1a', c2:'#555555', c3:'#111111' },
+  'Colby College':        { c1:'#004B8D', c2:'#AAAAAA', c3:'#003366' },
+  'Hamilton College':     { c1:'#003087', c2:'#D4AF37', c3:'#001f5b' },
+  'Trinity College':      { c1:'#003087', c2:'#8B8B00', c3:'#001f5b' },
+  'Wesleyan University':  { c1:'#CC0000', c2:'#333333', c3:'#990000' },
+  'Tufts University':     { c1:'#3E8EDE', c2:'#4F2D7F', c3:'#1a6cc0' },
+  'Bates College':        { c1:'#820000', c2:'#444444', c3:'#5c0000' },
+  'Connecticut College':  { c1:'#003087', c2:'#8B0000', c3:'#001f5b' },
+  'Harvard University':   { c1:'#A51C30', c2:'#222222', c3:'#7a1323' },
+  'Yale University':      { c1:'#00356B', c2:'#ADB3C1', c3:'#001f40' },
+  'Princeton University': { c1:'#FF6600', c2:'#111111', c3:'#cc5200' },
+  'Columbia University':  { c1:'#003087', c2:'#69B3E7', c3:'#001f5b' },
+  'Dartmouth College':    { c1:'#00693E', c2:'#444444', c3:'#004d2d' },
+  'Brown University':     { c1:'#4E3629', c2:'#C00404', c3:'#3a2a20' },
+  'Cornell University':   { c1:'#B31B1B', c2:'#333333', c3:'#8a1414' },
+  'University of Pennsylvania': { c1:'#011F5B', c2:'#990000', c3:'#000f30' },
+};
+
+const TOPIC_LABELS = {
+  Accounting:'Accounting', Enterprise_Value:'Enterprise Value',
+  Valuation:'Valuation', DCF:'DCF', Mergers_MA:'M&A', LBO:'LBO'
+};
+
+function scoreColor(s) {
+  if (!s || s === 0) return 'var(--text-tertiary)';
+  if (s >= 80) return 'var(--accent-green)';
+  if (s >= 60) return 'var(--accent-amber)';
+  return 'var(--accent-red)';
+}
+
+function initials(name) {
+  return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function rankClass(i) {
+  return ['gold','silver','bronze'][i] || '';
+}
+
+async function init() {
+  const [schoolR, progressR] = await Promise.all([
+    fetch(`/api/school/page?name=${encodeURIComponent(SCHOOL_NAME)}`, { headers:{'Authorization':'Bearer '+token}}),
+    fetch('/api/progress/load', { headers:{'Authorization':'Bearer '+token}})
+  ]);
+  const data = await schoolR.json();
+  const progress = await progressR.json();
+
+  if (schoolR.status === 404) {
+    document.getElementById('bannerName').textContent = 'School not found';
+    return;
+  }
+
+  if (window.initSidebarMenu) initSidebarMenu(progress.plan, progress.gradedToday);
+
+  const { school, stats, topUsers, isMySchool } = data;
+  const colors = SCHOOL_COLORS[school.name] || { c1:'#444', c2:'#888', c3:'#222' };
+
+  // Banner
+  document.title = `${school.name} — Apex`;
+  const banner = document.getElementById('schoolBanner');
+  banner.style.background = `linear-gradient(135deg,${colors.c1},${colors.c2},${colors.c3},${colors.c1})`;
+  banner.style.backgroundSize = '300% 300%';
+  document.getElementById('bannerName').textContent = school.name;
+  const confLink = document.getElementById('bannerConf');
+  confLink.textContent = school.conference || '—';
+  if (school.conference) confLink.href = `conference.html?name=${encodeURIComponent(school.conference)}`;
+  if (isMySchool) document.getElementById('bannerYou').style.display = 'inline-block';
+
+  // KPIs
+  document.getElementById('schoolKpis').innerHTML = `
+    <div class="school-kpi green">
+      <div class="kpi-label">Avg Score</div>
+      <div class="kpi-value" style="color:${scoreColor(stats.avg_score)}">${stats.avg_score||'—'}<span style="font-size:14px;opacity:.6;font-family:'DM Sans',sans-serif;">/100</span></div>
+      <div class="kpi-sub">across all users</div>
+    </div>
+    <div class="school-kpi blue">
+      <div class="kpi-label">Apex Users</div>
+      <div class="kpi-value">${parseInt(stats.apex_users||0)}</div>
+      <div class="kpi-sub">from ${school.name.split(' ')[0]}</div>
+    </div>
+    <div class="school-kpi amber">
+      <div class="kpi-label">Total Answers</div>
+      <div class="kpi-value">${parseInt(stats.total_answers||0).toLocaleString()}</div>
+      <div class="kpi-sub">graded submissions</div>
+    </div>
+    <div class="school-kpi purple">
+      <div class="kpi-label">This Week</div>
+      <div class="kpi-value">${parseInt(stats.answers_this_week||0).toLocaleString()}</div>
+      <div class="kpi-sub">answers submitted</div>
+    </div>`;
+
+  // Topic rows
+  const topics = [
+    { key:'dcf_score',       label:'DCF' },
+    { key:'lbo_score',       label:'LBO' },
+    { key:'valuation_score', label:'Valuation' },
+    { key:'ma_score',        label:'M&A' },
+  ];
+  const topicHtml = topics.map(t => {
+    const val = parseInt(stats[t.key]||0);
+    return val > 0 ? `
+      <div class="topic-row">
+        <div class="topic-name">${t.label}</div>
+        <div class="topic-bar-wrap"><div class="topic-bar-fill" style="width:${val}%;background:${scoreColor(val)};"></div></div>
+        <div class="topic-score" style="color:${scoreColor(val)}">${val}%</div>
+      </div>` : '';
+  }).filter(Boolean).join('');
+
+  document.getElementById('topicRows').innerHTML = topicHtml ||
+    `<div style="padding:20px;color:var(--text-tertiary);font-size:13.5px;">No topic data yet — be the first to practice!</div>`;
+
+  // Leaderboard
+  const users = topUsers || [];
+  document.getElementById('leaderboard').innerHTML = users.length === 0
+    ? `<div style="padding:20px;color:var(--text-tertiary);font-size:13.5px;">No users yet.</div>`
+    : users.map((u,i) => `
+      <div class="lb-item">
+        <div class="lb-rank ${rankClass(i)}">#${i+1}</div>
+        <a href="profile.html?id=${u.id}" class="lb-avatar">${initials(u.name)}</a>
+        <a href="profile.html?id=${u.id}" class="lb-name">${u.name}</a>
+        <div>
+          <div class="lb-score" style="color:${scoreColor(u.avg_score)}">${u.avg_score||'—'}</div>
+          <div class="lb-answers">${parseInt(u.total_answers||0)} ans</div>
+        </div>
+      </div>`).join('');
+}
+
+init().catch(e => console.error(e));
+</script>
+</body>
+</html>

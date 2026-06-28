@@ -2220,8 +2220,100 @@ const server = http.createServer(async (req, res) => {
     } catch(e){return json(res,500,{error:e.message});}
   }
 
+  // GET /api/school/page?name=Amherst+College  — school page data
+  if (req.method==='GET' && url.startsWith('/api/school/page')) {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const name = params.get('name');
+      if (!name) return json(res,400,{error:'name required'});
+      const schoolR = await pool.query('SELECT * FROM schools WHERE name=$1', [name]);
+      if (!schoolR.rows.length) return json(res,404,{error:'School not found'});
+      const school = schoolR.rows[0];
+      const statsR = await pool.query(
+        `SELECT
+           COUNT(DISTINCT sm.user_id) as apex_users,
+           COALESCE(AVG(qr.score),0)::INT as avg_score,
+           COUNT(qr.id) as total_answers,
+           COALESCE(AVG(qr.score) FILTER (WHERE qr.topic='DCF'),0)::INT as dcf_score,
+           COALESCE(AVG(qr.score) FILTER (WHERE qr.topic='LBO'),0)::INT as lbo_score,
+           COALESCE(AVG(qr.score) FILTER (WHERE qr.topic='Valuation'),0)::INT as valuation_score,
+           COALESCE(AVG(qr.score) FILTER (WHERE qr.topic='Mergers_MA'),0)::INT as ma_score,
+           COUNT(qr.id) FILTER (WHERE qr.created_at > extract(epoch from now()-interval '7 days')) as answers_this_week
+         FROM school_memberships sm
+         LEFT JOIN question_results qr ON qr.user_id=sm.user_id
+         WHERE sm.school_id=$1`,
+        [school.id]
+      );
+      // Top users from this school
+      const topUsersR = await pool.query(
+        `SELECT u.id, u.name, u.plan,
+                COUNT(qr.id) as total_answers,
+                COALESCE(AVG(qr.score),0)::INT as avg_score
+         FROM school_memberships sm
+         JOIN users u ON u.id=sm.user_id
+         LEFT JOIN question_results qr ON qr.user_id=u.id
+         WHERE sm.school_id=$1
+         GROUP BY u.id ORDER BY avg_score DESC LIMIT 10`,
+        [school.id]
+      );
+      // Check if viewer is from this school
+      const memberR = await pool.query(
+        'SELECT 1 FROM school_memberships sm JOIN schools s ON s.id=sm.school_id WHERE sm.user_id=$1 AND s.name=$2',
+        [user.userId, name]
+      );
+      return json(res,200,{
+        school, stats: statsR.rows[0], topUsers: topUsersR.rows,
+        isMySchool: memberR.rows.length > 0
+      });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  // GET /api/conference/page?name=NESCAC  — conference page data
+  if (req.method==='GET' && url.startsWith('/api/conference/page')) {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const params = new URLSearchParams(req.url.split('?')[1]||'');
+      const name = params.get('name');
+      if (!name) return json(res,400,{error:'name required'});
+      const r = await pool.query(
+        `SELECT s.id, s.name, s.domain, s.logo_url,
+                COUNT(DISTINCT sm.user_id) as apex_users,
+                COALESCE(AVG(qr.score),0)::INT as avg_score,
+                COUNT(qr.id) as total_answers,
+                COUNT(qr.id) FILTER (WHERE qr.created_at > extract(epoch from now()-interval '7 days')) as answers_this_week
+         FROM schools s
+         LEFT JOIN school_memberships sm ON sm.school_id=s.id
+         LEFT JOIN question_results qr ON qr.user_id=sm.user_id
+         WHERE s.conference=$1
+         GROUP BY s.id ORDER BY avg_score DESC`,
+        [name]
+      );
+      const totals = await pool.query(
+        `SELECT COUNT(DISTINCT sm.user_id) as total_users,
+                COALESCE(AVG(qr.score),0)::INT as avg_score,
+                COUNT(qr.id) as total_answers
+         FROM schools s
+         JOIN school_memberships sm ON sm.school_id=s.id
+         LEFT JOIN question_results qr ON qr.user_id=sm.user_id
+         WHERE s.conference=$1`,
+        [name]
+      );
+      // My school in this conference
+      const mySchoolR = await pool.query(
+        `SELECT s.name FROM school_memberships sm JOIN schools s ON s.id=sm.school_id
+         WHERE sm.user_id=$1 AND s.conference=$2`,
+        [user.userId, name]
+      );
+      return json(res,200,{
+        conference: name, schools: r.rows,
+        totals: totals.rows[0],
+        mySchool: mySchoolR.rows[0]?.name || null
+      });
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
   // GET /api/school/leaderboard?conference=NESCAC
-  if (req.method==='GET' && url==='/api/school/leaderboard') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
