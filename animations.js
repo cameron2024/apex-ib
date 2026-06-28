@@ -91,6 +91,18 @@ function _apexStartWhirlpoolLoop(plan) {
 // ── WHIRLPOOL PUBLIC (async Stripe fetch) ─────────────────────
 // showToast(msg) — pass page-specific toast function
 async function apexLaunchWhirlpool(plan, billingPeriod, token, showToast) {
+  var currentPlan = localStorage.getItem('apex_plan') || 'free';
+
+  // Guard: already on pass → dashboard regardless of what they clicked
+  if (token && currentPlan === 'pass') {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+  // Guard: pro clicking pro → dashboard
+  if (token && currentPlan === 'monthly' && plan === 'monthly') {
+    window.location.href = 'dashboard.html';
+    return;
+  }
   var overlay = document.getElementById('apexWhirlpoolOverlay');
   var label   = document.getElementById('apexWhirlpoolText');
   if (!overlay) return;
