@@ -2314,6 +2314,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // GET /api/school/leaderboard?conference=NESCAC
+  if (req.method==='GET' && url==='/api/school/leaderboard') {
     const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
     try {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
