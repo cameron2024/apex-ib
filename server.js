@@ -2014,7 +2014,7 @@ const server = http.createServer(async (req, res) => {
       const schoolOnly = params.get('school') === '1';
       let q, vals;
       if (schoolOnly) {
-        q = `SELECT u.id, u.name, u.plan, s.name as school_name, s.conference,
+        q = `SELECT u.id, u.name, u.plan, u.avatar_data, s.name as school_name, s.conference,
                (SELECT COUNT(*) FROM follows WHERE following_id=u.id) as followers,
                (SELECT COUNT(*) FROM follows WHERE follower_id=u.id) as following
              FROM users u
@@ -2024,7 +2024,7 @@ const server = http.createServer(async (req, res) => {
              ORDER BY u.created_at DESC LIMIT 50`;
         vals = [user.userId];
       } else {
-        q = `SELECT u.id, u.name, u.plan, s.name as school_name, s.conference,
+        q = `SELECT u.id, u.name, u.plan, u.avatar_data, s.name as school_name, s.conference,
                (SELECT COUNT(*) FROM follows WHERE following_id=u.id) as followers,
                (SELECT COUNT(*) FROM follows WHERE follower_id=u.id) as following
              FROM users u
@@ -2049,7 +2049,7 @@ const server = http.createServer(async (req, res) => {
       const q = (params.get('q')||'').trim();
       if (!q || q.length < 2) return json(res,400,{error:'Query too short'});
       const r = await pool.query(
-        `SELECT u.id, u.name, u.plan, s.name as school_name, s.conference
+        `SELECT u.id, u.name, u.plan, u.avatar_data, s.name as school_name, s.conference
          FROM users u
          LEFT JOIN school_memberships sm ON sm.user_id=u.id
          LEFT JOIN schools s ON s.id=sm.school_id
@@ -2080,7 +2080,7 @@ const server = http.createServer(async (req, res) => {
       }
       const r = await pool.query(
         `SELECT fe.id, fe.user_id, fe.type, fe.payload, fe.created_at,
-                u.name as user_name, u.plan as user_plan
+                u.name as user_name, u.plan as user_plan, u.avatar_data as user_avatar
          FROM feed_events fe
          JOIN users u ON u.id=fe.user_id
          WHERE ${whereClause} ${before ? 'AND fe.created_at < $3' : ''}
@@ -2149,7 +2149,7 @@ const server = http.createServer(async (req, res) => {
       const eventId = params.get('eventId');
       if (!eventId) return json(res,400,{error:'eventId required'});
       const r = await pool.query(
-        `SELECT fc.id, fc.body, fc.created_at, u.id as user_id, u.name as user_name
+        `SELECT fc.id, fc.body, fc.created_at, u.id as user_id, u.name as user_name, u.avatar_data as user_avatar
          FROM feed_comments fc JOIN users u ON u.id=fc.user_id
          WHERE fc.event_id=$1 ORDER BY fc.created_at ASC`,
         [eventId]
@@ -2252,7 +2252,7 @@ const server = http.createServer(async (req, res) => {
       );
       // Top users from this school
       const topUsersR = await pool.query(
-        `SELECT u.id, u.name, u.plan,
+        `SELECT u.id, u.name, u.plan, u.avatar_data,
                 COALESCE((SELECT SUM(questions_answered) FROM activity WHERE user_id=u.id),0) as total_answers,
                 COALESCE(AVG(qr.score),0)::INT as avg_score
          FROM school_memberships sm

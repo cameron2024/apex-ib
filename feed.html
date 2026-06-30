@@ -105,6 +105,7 @@
   flex-shrink: 0;
   cursor: pointer;
   text-decoration: none;
+  overflow: hidden;
 }
 
 .event-avatar:hover { opacity: 0.85; }
@@ -301,6 +302,7 @@
   color: white;
   flex-shrink: 0;
   margin-top: 1px;
+  overflow: hidden;
 }
 
 .comment-content { flex: 1; }
@@ -511,6 +513,7 @@
   font-weight: 600;
   color: white;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .suggested-info { flex: 1; min-width: 0; }
@@ -720,7 +723,7 @@ function renderEvent(event) {
   div.dataset.eventId = event.id;
   div.innerHTML = `
     <div class="event-header">
-      <a href="profile.html?id=${event.user_id}" class="event-avatar">${initials(event.user_name)}</a>
+      <a href="profile.html?id=${event.user_id}" class="event-avatar">${event.user_avatar ? `<img src="${event.user_avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials(event.user_name)}</a>
       <div class="event-meta">
         <a href="profile.html?id=${event.user_id}" class="event-name">${event.user_name}</a>
         <div class="event-time">${timeAgo(event.created_at)}</div>
@@ -767,7 +770,7 @@ async function loadFeed(reset = false) {
         list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">` +
           users.map(u => `
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;gap:12px;align-items:center;transition:border-color .15s;" onmouseenter="this.style.borderColor='var(--border-strong)'" onmouseleave="this.style.borderColor='var(--border)'">
-            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white;flex-shrink:0;cursor:pointer;" onclick="window.location.href='profile.html?id=${u.id}'">${initials(u.name)}</div>
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white;flex-shrink:0;cursor:pointer;overflow:hidden;" onclick="window.location.href='profile.html?id=${u.id}'">${u.avatar_data ? `<img src="${u.avatar_data}" style="width:100%;height:100%;object-fit:cover;">` : initials(u.name)}</div>
             <div style="flex:1;min-width:0;cursor:pointer;" onclick="window.location.href='profile.html?id=${u.id}'">
               <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name}</div>
               <div style="font-size:12px;color:var(--text-tertiary);">${u.school_name ? u.school_name : (u.followers + ' followers')}</div>
@@ -934,7 +937,7 @@ async function toggleComments(eventId, btn) {
 function renderComments(container, eventId, comments) {
   container.innerHTML = comments.map(c=>`
     <div class="comment-item">
-      <div class="comment-avatar" style="cursor:pointer;" onclick="window.location.href='profile.html?id='+c.user_id">${initials(c.user_name)}</div>
+      <div class="comment-avatar" style="cursor:pointer;overflow:hidden;" onclick="window.location.href='profile.html?id='+c.user_id">${c.user_avatar ? `<img src="${c.user_avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials(c.user_name)}</div>
       <div class="comment-content">
         <a href="profile.html?id=${c.user_id}" style="text-decoration:none;color:inherit;" class="comment-author">${c.user_name}</a>
         <span class="comment-body">${c.body}</span>
@@ -1022,7 +1025,7 @@ async function loadSuggested() {
     }
     document.getElementById('suggestedList').innerHTML = users.map(u=>`
       <div class="suggested-user">
-        <div class="suggested-avatar">${initials(u.name)}</div>
+        <div class="suggested-avatar">${u.avatar_data ? `<img src="${u.avatar_data}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials(u.name)}</div>
         <div class="suggested-info">
           <div class="suggested-name">${u.name}</div>
           <div class="suggested-school">${u.school_name||'Apex user'}</div>
