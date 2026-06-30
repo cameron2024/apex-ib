@@ -443,29 +443,44 @@
   margin-bottom: 14px;
 }
 
-/* School card */
-.school-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+/* School card — shimmer banner, clickable */
+.school-card-link {
+  display: block; text-decoration: none; color: inherit;
+  border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--border); margin-bottom: 14px;
+  transition: border-color .15s, transform .15s;
+}
+.school-card-link:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+
+.school-card-banner-mini {
+  height: 40px; position: relative; overflow: hidden;
+  background-size: 300% 300%;
+  animation: schoolWidgetShimmer 5s ease infinite;
+}
+.school-card-banner-mini::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 130%, rgba(255,255,255,.15) 0%, transparent 60%);
+}
+@keyframes schoolWidgetShimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.school-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
+.school-card-body-mini { padding: 10px 12px; }
+.school-name { font-size: 13.5px; font-weight: 600; }
+.school-conf-link {
+  font-size: 11.5px; color: var(--text-secondary); margin-top: 2px;
+  display: inline-block; text-decoration: none;
 }
+.school-conf-link:hover { color: var(--accent-blue); text-decoration: underline; }
 
-.school-name { font-size: 14px; font-weight: 600; }
-.school-conf { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.widget-title-link {
+  display: flex; align-items: center; justify-content: space-between;
+  text-decoration: none; cursor: pointer;
+}
+.widget-title-link:hover .widget-title { color: var(--text-secondary); }
+.widget-title-arrow { font-size: 11px; color: var(--text-tertiary); }
 
 .conf-rank {
   display: flex;
@@ -594,7 +609,10 @@
       <div class="sidebar-widget" id="schoolWidget" style="display:none;">
         <div class="widget-title">My School</div>
         <div id="schoolCard"></div>
-        <div class="widget-title" style="margin-top:14px;">Conference Rankings</div>
+        <a class="widget-title-link" id="confRankingsLink" href="#" style="margin-top:14px;">
+          <div class="widget-title" style="margin-bottom:14px;">Conference Rankings</div>
+          <span class="widget-title-arrow">View all →</span>
+        </a>
         <div id="confRankings"></div>
       </div>
 
@@ -971,6 +989,28 @@ async function submitComment(eventId) {
 }
 
 // ── SCHOOL WIDGET ──
+const SCHOOL_COLORS = {
+  'Amherst College':      { c1:'#3f1f69', c2:'#7C5CBF', c3:'#311a4d' },
+  'Williams College':     { c1:'#500082', c2:'#FFD700', c3:'#3a0060' },
+  'Middlebury College':   { c1:'#003087', c2:'#6FA8DC', c3:'#001f5b' },
+  'Bowdoin College':      { c1:'#1a1a1a', c2:'#555555', c3:'#111111' },
+  'Colby College':        { c1:'#004B8D', c2:'#AAAAAA', c3:'#003366' },
+  'Hamilton College':     { c1:'#003087', c2:'#D4AF37', c3:'#001f5b' },
+  'Trinity College':      { c1:'#003087', c2:'#8B8B00', c3:'#001f5b' },
+  'Wesleyan University':  { c1:'#CC0000', c2:'#333333', c3:'#990000' },
+  'Tufts University':     { c1:'#3E8EDE', c2:'#4F2D7F', c3:'#1a6cc0' },
+  'Bates College':        { c1:'#820000', c2:'#444444', c3:'#5c0000' },
+  'Connecticut College':  { c1:'#003087', c2:'#8B0000', c3:'#001f5b' },
+  'Harvard University':   { c1:'#A51C30', c2:'#222222', c3:'#7a1323' },
+  'Yale University':      { c1:'#00356B', c2:'#ADB3C1', c3:'#001f40' },
+  'Princeton University': { c1:'#FF6600', c2:'#111111', c3:'#cc5200' },
+  'Columbia University':  { c1:'#003087', c2:'#69B3E7', c3:'#001f5b' },
+  'Dartmouth College':    { c1:'#00693E', c2:'#444444', c3:'#004d2d' },
+  'Brown University':     { c1:'#4E3629', c2:'#C00404', c3:'#3a2a20' },
+  'Cornell University':   { c1:'#B31B1B', c2:'#333333', c3:'#8a1414' },
+  'University of Pennsylvania': { c1:'#011F5B', c2:'#990000', c3:'#000f30' },
+};
+
 async function loadSchoolWidget() {
   try {
     const [schoolR, meR] = await Promise.all([
@@ -980,28 +1020,26 @@ async function loadSchoolWidget() {
     const school = (await schoolR.json()).school;
     if (!school) return;
     document.getElementById('schoolWidget').style.display = '';
+    const c = SCHOOL_COLORS[school.name] || { c1:'#444', c2:'#888', c3:'#222' };
     document.getElementById('schoolCard').innerHTML = `
-      <div class="school-card">
-        <div class="school-logo">
-          ${school.logo_url
-            ? `<img src="${school.logo_url}" alt="${school.conference}" style="width:36px;height:36px;object-fit:contain;" onerror="this.parentNode.textContent='🎓'">`
-            : '🎓'}
-        </div>
-        <div>
+      <a class="school-card-link" href="school.html?name=${encodeURIComponent(school.name)}">
+        <div class="school-card-banner-mini" style="background:linear-gradient(135deg,${c.c1},${c.c2},${c.c3},${c.c1});"></div>
+        <div class="school-card-body-mini">
           <div class="school-name">${school.name}</div>
-          <div class="school-conf">${school.conference}</div>
         </div>
-      </div>`;
+      </a>
+      <a class="school-conf-link" href="conference.html?name=${encodeURIComponent(school.conference)}">${school.conference} →</a>`;
+    document.getElementById('confRankingsLink').href = `conference.html?name=${encodeURIComponent(school.conference)}`;
     // Load conference leaderboard
     const lbR = await fetch(`/api/school/leaderboard?conference=${encodeURIComponent(school.conference)}`, { headers: {'Authorization':'Bearer '+token}});
     const lb = await lbR.json();
     const schools = (lb.schools||[]).slice(0,5);
     document.getElementById('confRankings').innerHTML = schools.map((s,i)=>`
-      <div class="conf-rank">
+      <a href="school.html?name=${encodeURIComponent(s.name)}" class="conf-rank" style="text-decoration:none;color:inherit;">
         <div class="conf-rank-pos ${i<3?'top':''}">${i+1}</div>
         <div class="conf-rank-name" style="${s.name===school.name?'font-weight:600;':''}">${s.name}</div>
         <div class="conf-rank-score">${s.avg_score}%</div>
-      </div>`).join('');
+      </a>`).join('');
   } catch(e) {}
 }
 
