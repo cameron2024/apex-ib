@@ -123,6 +123,19 @@ async function apexLaunchWhirlpool(plan, billingPeriod, token, showToast) {
     return;
   }
 
+  // Running inside the native iOS/Android shell → use platform IAP (RevenueCat)
+  // instead of Stripe Checkout. Web visitors fall through to the existing flow.
+  if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+    try {
+      await apexNativePurchase(plan, billingPeriod, token, animStart, MIN_ANIM_MS, overlay, label, showToast);
+    } catch(e) {
+      _apexWhirlpoolActive = false;
+      overlay.style.display = 'none'; label.style.opacity = '0';
+      if (showToast) showToast('Could not start checkout. Please try again.');
+    }
+    return;
+  }
+
   try {
     var r = await fetch('/api/stripe/checkout', {
       method: 'POST',
@@ -143,6 +156,80 @@ async function apexLaunchWhirlpool(plan, billingPeriod, token, showToast) {
     overlay.style.display = 'none'; label.style.opacity = '0';
     if (showToast) showToast('Something went wrong. Please try again.');
   }
+}
+
+// ── NATIVE IAP (RevenueCat, iOS/Android app only) ───────────────
+// PRODUCT_MAP must match the product identifiers you create in App Store
+// Connect / Play Console, and the entitlement/offering setup in the
+// RevenueCat dashboard. monthly = Pro, pass = Recruiting Pass.
+var APEX_RC_PRODUCT_MAP = {
+  monthly: { week: 'pro_weekly', month: 'pro_monthly' },
+  pass:    { week: 'pass_weekly', month: 'pass_monthly' }
+};
+
+// Call once at app boot (e.g. in dashboard.html / on auth) so RevenueCat
+// ties purchases to the same user id your backend already uses — this is
+// what lets the webhook map a purchase back to the right account.
+async function apexConfigureRevenueCat(token, userId) {
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) return;
+  var Purchases = window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+  if (!Purchases || !userId) return;
+  try {
+    await Purchases.configure({
+      apiKey: 'YOUR_REVENUECAT_PUBLIC_IOS_API_KEY', // from RevenueCat dashboard → Project Settings → API Keys
+      appUserID: String(userId)
+    });
+  } catch(e) { /* already configured, or plugin unavailable — non-fatal */ }
+}
+
+async function apexNativePurchase(plan, billingPeriod, token, animStart, MIN_ANIM_MS, overlay, label, showToast) {
+  var Purchases = window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+  if (!Purchases) throw new Error('Purchases plugin unavailable');
+
+  // pricing.html doesn't load sidebar.js (which normally configures
+  // RevenueCat on boot), so make sure it's configured before purchasing.
+  try {
+    var payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    if (payload && payload.userId) {
+      await Purchases.configure({
+        apiKey: 'YOUR_REVENUECAT_PUBLIC_IOS_API_KEY',
+        appUserID: String(payload.userId)
+      });
+    }
+  } catch(e) { /* may already be configured from another page — non-fatal */ }
+
+  var period = billingPeriod === 'weekly' ? 'week' : 'month';
+  var productId = (APEX_RC_PRODUCT_MAP[plan] || {})[period];
+  if (!productId) throw new Error('Unknown product for ' + plan + '/' + billingPeriod);
+
+  var offerings = await Purchases.getOfferings();
+  var pkg = null;
+  var current = offerings && offerings.current;
+  if (current && current.availablePackages) {
+    pkg = current.availablePackages.find(function(p) {
+      return p.product && p.product.identifier === productId;
+    });
+  }
+  if (!pkg) throw new Error('Product not found in offerings: ' + productId);
+
+  var result = await Purchases.purchasePackage({ aPackage: pkg });
+  // result.customerInfo.entitlements tells us what unlocked — confirm with
+  // our backend immediately for instant UI feedback (the RevenueCat webhook
+  // is the durable source of truth for renewals/cancellations/refunds).
+  try {
+    await fetch('/api/iap/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        plan: plan,
+        productId: productId,
+        rcAppUserId: result.customerInfo ? result.customerInfo.originalAppUserId : null
+      })
+    });
+  } catch(e) { /* webhook will still reconcile this within seconds */ }
+
+  var elapsed = Date.now() - animStart;
+  setTimeout(function() { window.location.href = 'dashboard.html?upgraded=1'; }, Math.max(0, MIN_ANIM_MS - elapsed));
 }
 
 // ── FREE WASH ─────────────────────────────────────────────────

@@ -166,7 +166,24 @@
       }
       if (cachedPlan) initSidebarMenu(cachedPlan, cachedGrad);
       else if (!localStorage.getItem('apex_token')) initSidebarMenu('guest', 0);
+
+      // Native iOS/Android app only: tie RevenueCat purchases to this user's
+      // existing id so the webhook can map a purchase back to their account.
+      // No-op on regular web visits (window.Capacitor won't exist).
+      _apexConfigureNativeIAP();
     } catch(e) {}
+  }
+
+  // ── NATIVE IAP CONFIGURE (RevenueCat, iOS/Android app only) ─
+  function _apexConfigureNativeIAP() {
+    if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) return;
+    var Purchases = window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+    var uid = getSidebarUserId();
+    if (!Purchases || !uid) return;
+    Purchases.configure({
+      apiKey: 'YOUR_REVENUECAT_PUBLIC_IOS_API_KEY', // RevenueCat dashboard → Project Settings → API Keys
+      appUserID: String(uid)
+    }).catch(function() { /* already configured — non-fatal */ });
   }
 
   // ── AVATAR HELPERS ────────────────────────────────────────

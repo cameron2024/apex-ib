@@ -29,6 +29,15 @@ const JWT_SECRET = process.env.JWT_SECRET || 'apex-ib-secret-change-in-prod';
 const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+// RevenueCat webhook auth header value — set this exact string in the
+// RevenueCat dashboard under Project Settings → Webhooks → Authorization Header.
+const REVENUECAT_WEBHOOK_AUTH = process.env.REVENUECAT_WEBHOOK_AUTH || '';
+// RevenueCat product identifier -> Apex plan. Must match App Store Connect /
+// RevenueCat dashboard product setup.
+const RC_PRODUCT_TO_PLAN = {
+  pro_weekly: 'monthly', pro_monthly: 'monthly',
+  pass_weekly: 'pass', pass_monthly: 'pass'
+};
 const STRIPE_MONTHLY_PRICE_ID = process.env.STRIPE_MONTHLY_PRICE_ID || '';
 const STRIPE_PASS_PRICE_ID = process.env.STRIPE_PASS_PRICE_ID || '';
 const STRIPE_MONTHLY_WEEKLY_PRICE_ID = process.env.STRIPE_MONTHLY_WEEKLY_PRICE_ID || '';
@@ -108,6 +117,9 @@ async function initDB() {
         generated_at BIGINT
       );
       CREATE TABLE IF NOT EXISTS stripe_events (
+        id TEXT PRIMARY KEY, processed_at BIGINT
+      );
+      CREATE TABLE IF NOT EXISTS revenuecat_events (
         id TEXT PRIMARY KEY, processed_at BIGINT
       );
     `);
@@ -246,6 +258,7 @@ async function initDB() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'free';
       ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS iap_provider TEXT;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS interview_date BIGINT;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS weak_topics TEXT;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT;
@@ -1747,6 +1760,68 @@ const server = http.createServer(async (req, res) => {
       }
       return json(res,200,{ok:true});
     } catch(e){console.error('Webhook error:',e.message);return json(res,400,{error:e.message});}
+  }
+
+  // ── IAP (RevenueCat / Apple In-App Purchase) ─────────────────
+  // Called from the iOS app immediately after a successful native purchase,
+  // for instant UI feedback. The RevenueCat webhook below is the durable
+  // source of truth (handles renewals, cancellations, refunds, billing
+  // retries) — this endpoint just avoids the user staring at a stale plan
+  // for the few seconds before the webhook lands.
+  if (req.method==='POST' && url==='/api/iap/confirm') {
+    const user=getUser(req); if(!user) return json(res,401,{error:'Unauthorized'});
+    try {
+      const {plan, productId, rcAppUserId} = await readBody(req);
+      const resolvedPlan = RC_PRODUCT_TO_PLAN[productId] || plan;
+      if (!resolvedPlan || !['monthly','pass'].includes(resolvedPlan)) {
+        return json(res,400,{error:'Unrecognized plan/product'});
+      }
+      await pool.query('UPDATE users SET plan=$1, iap_provider=$2 WHERE id=$3',
+        [resolvedPlan, 'revenuecat', user.userId]);
+      console.log(`(IAP confirm) user ${user.userId} -> ${resolvedPlan} via ${productId}`);
+      return json(res,200,{ok:true,plan:resolvedPlan});
+    } catch(e){return json(res,500,{error:e.message});}
+  }
+
+  if (req.method==='POST' && url==='/api/webhooks/revenuecat') {
+    if (!REVENUECAT_WEBHOOK_AUTH) return json(res,503,{error:'RevenueCat webhook not configured'});
+    try {
+      const authHeader = req.headers['authorization'] || '';
+      if (authHeader !== REVENUECAT_WEBHOOK_AUTH) return json(res,401,{error:'Unauthorized'});
+      const body = await readBody(req);
+      const event = body.event || {};
+      const eventId = event.id || (event.app_user_id + ':' + event.event_timestamp_ms);
+      if (!eventId) return json(res,400,{error:'Missing event id'});
+
+      const already = await pool.query('SELECT id FROM revenuecat_events WHERE id=$1',[eventId]);
+      if (already.rows.length > 0) return json(res,200,{ok:true,skipped:true});
+      await pool.query('INSERT INTO revenuecat_events (id,processed_at) VALUES ($1,$2)',[eventId,nowSec()]);
+
+      // app_user_id was set to our own users.id when the app called
+      // Purchases.configure() — so it maps straight back, no separate
+      // customer-id lookup table needed.
+      const userId = parseInt(event.app_user_id, 10);
+      const productId = event.product_id;
+      const type = event.type; // INITIAL_PURCHASE, RENEWAL, PRODUCT_CHANGE, CANCELLATION, EXPIRATION, BILLING_ISSUE, etc.
+
+      if (!userId) return json(res,200,{ok:true,skipped:'no user id'});
+
+      if (['INITIAL_PURCHASE','RENEWAL','PRODUCT_CHANGE','UNCANCELLATION'].includes(type)) {
+        const plan = RC_PRODUCT_TO_PLAN[productId];
+        if (plan) {
+          await pool.query('UPDATE users SET plan=$1, iap_provider=$2 WHERE id=$3', [plan, 'revenuecat', userId]);
+          console.log(`(RC webhook) user ${userId} -> ${plan} (${type})`);
+        }
+      } else if (['CANCELLATION','EXPIRATION'].includes(type)) {
+        await pool.query(`UPDATE users SET plan='free' WHERE id=$1 AND iap_provider='revenuecat'`, [userId]);
+        console.log(`(RC webhook) user ${userId} -> free (${type})`);
+      }
+      // BILLING_ISSUE: deliberately no-op — Apple/RevenueCat retries billing
+      // automatically; downgrading immediately on the first failed charge
+      // would be too aggressive.
+
+      return json(res,200,{ok:true});
+    } catch(e){console.error('RevenueCat webhook error:',e.message);return json(res,400,{error:e.message});}
   }
 
   // ── ADMIN ────────────────────────────────────────────────
