@@ -503,6 +503,17 @@
 .conf-rank-pos.top { color: var(--accent-amber); }
 
 .conf-rank-name { flex: 1; padding: 0 8px; }
+.conf-rank-name-shimmer {
+  background-size: 300% auto;
+  background-clip: text; -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: confRankTextShimmer 4s ease infinite;
+}
+@keyframes confRankTextShimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 .conf-rank-score { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 
 /* Suggested users */
@@ -1023,23 +1034,27 @@ async function loadSchoolWidget() {
     const c = SCHOOL_COLORS[school.name] || { c1:'#444', c2:'#888', c3:'#222' };
     document.getElementById('schoolCard').innerHTML = `
       <a class="school-card-link" href="school.html?name=${encodeURIComponent(school.name)}">
-        <div class="school-card-banner-mini" style="background:linear-gradient(135deg,${c.c1},${c.c2},${c.c3},${c.c1});"></div>
+        <div class="school-card-banner-mini" style="background:linear-gradient(135deg,${c.c1},${c.c2},${c.c3},${c.c1});background-size:300% 300%;"></div>
         <div class="school-card-body-mini">
           <div class="school-name">${school.name}</div>
         </div>
       </a>
       <a class="school-conf-link" href="conference.html?name=${encodeURIComponent(school.conference)}">${school.conference} →</a>`;
     document.getElementById('confRankingsLink').href = `conference.html?name=${encodeURIComponent(school.conference)}`;
-    // Load conference leaderboard
-    const lbR = await fetch(`/api/school/leaderboard?conference=${encodeURIComponent(school.conference)}`, { headers: {'Authorization':'Bearer '+token}});
+    // Load conference page data — same source as the Conference Scoresheet, sorted by avg_score
+    const lbR = await fetch(`/api/conference/page?name=${encodeURIComponent(school.conference)}`, { headers: {'Authorization':'Bearer '+token}});
     const lb = await lbR.json();
-    const schools = (lb.schools||[]).slice(0,5);
-    document.getElementById('confRankings').innerHTML = schools.map((s,i)=>`
+    const schools = (lb.schools||[]).slice().sort((a,b)=>(b.avg_score||0)-(a.avg_score||0)).slice(0,5);
+    document.getElementById('confRankings').innerHTML = schools.map((s,i)=>{
+      const sc = SCHOOL_COLORS[s.name] || { c1:'#444', c2:'#888', c3:'#222' };
+      const gradient = `linear-gradient(90deg,${sc.c1},${sc.c2},${sc.c3},${sc.c1})`;
+      return `
       <a href="school.html?name=${encodeURIComponent(s.name)}" class="conf-rank" style="text-decoration:none;color:inherit;">
         <div class="conf-rank-pos ${i<3?'top':''}">${i+1}</div>
-        <div class="conf-rank-name" style="${s.name===school.name?'font-weight:600;':''}">${s.name}</div>
+        <div class="conf-rank-name conf-rank-name-shimmer" style="background-image:${gradient};${s.name===school.name?'font-weight:600;':''}">${s.name}</div>
         <div class="conf-rank-score">${s.avg_score}%</div>
-      </a>`).join('');
+      </a>`;
+    }).join('');
   } catch(e) {}
 }
 
