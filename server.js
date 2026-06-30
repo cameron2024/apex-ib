@@ -2076,7 +2076,7 @@ const server = http.createServer(async (req, res) => {
       } else if (tab === 'school') {
         whereClause = `fe.user_id IN (SELECT sm2.user_id FROM school_memberships sm2 WHERE sm2.school_id = (SELECT school_id FROM school_memberships WHERE user_id=$1))`;
       } else {
-        whereClause = `(fe.user_id=$1 OR fe.user_id IN (SELECT following_id FROM follows WHERE follower_id=$1))`;
+        whereClause = `fe.user_id IN (SELECT following_id FROM follows WHERE follower_id=$1)`;
       }
       const r = await pool.query(
         `SELECT fe.id, fe.user_id, fe.type, fe.payload, fe.created_at,
