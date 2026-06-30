@@ -15,12 +15,12 @@
   margin-bottom: 32px;
 }
 .conf-logo-wrap {
-  width: 64px; height: 64px; border-radius: 14px;
+  width: 140px; height: 64px; border-radius: 14px;
   background: var(--surface); border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; overflow: hidden;
+  flex-shrink: 0; overflow: hidden; padding: 8px 14px;
 }
-.conf-logo-wrap img { width: 44px; height: 44px; object-fit: contain; }
+.conf-logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .conf-title { font-family: 'DM Serif Display', serif; font-size: 28px; letter-spacing: -.4px; }
 .conf-subtitle { font-size: 13.5px; color: var(--text-secondary); margin-top: 3px; }
 
@@ -96,32 +96,48 @@
 .school-metric-lbl { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
 
 /* IB placement table */
-.placement-table {
+.scoresheet {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); overflow: hidden; margin-bottom: 28px;
 }
-.placement-table-header {
+.scoresheet-header {
   padding: 14px 20px; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
 }
-.placement-table-title { font-size: 13px; font-weight: 600; }
-.placement-source { font-size: 11px; color: var(--text-tertiary); }
+.scoresheet-title { font-size: 13px; font-weight: 600; }
+.scoresheet-sub { font-size: 11px; color: var(--text-tertiary); }
 
-table.pt { width: 100%; border-collapse: collapse; }
-table.pt th {
+table.ss { width: 100%; border-collapse: collapse; }
+table.ss th {
   font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--text-tertiary); padding: 10px 20px; text-align: left;
+  color: var(--text-tertiary); padding: 10px 16px; text-align: left;
   border-bottom: 1px solid var(--border); background: var(--bg);
+  white-space: nowrap;
 }
-table.pt td { padding: 12px 20px; font-size: 13px; border-bottom: 1px solid var(--border); }
-table.pt tr:last-child td { border-bottom: none; }
-table.pt tr:hover td { background: var(--bg); }
-.pt-school-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-weight: 500;
+table.ss th.num, table.ss td.num { text-align: center; }
+table.ss td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+table.ss tr:last-child td { border-bottom: none; }
+table.ss tr:hover td { background: var(--bg); }
+.ss-rank {
+  font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text-tertiary);
+  width: 28px; text-align: center;
 }
-.pt-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.pt-highlight { font-weight: 700; color: var(--accent-green); }
+.ss-rank.gold   { color: #D97706; }
+.ss-rank.silver { color: #9CA3AF; }
+.ss-rank.bronze { color: #B45309; }
+.ss-school-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 600;
+}
+.ss-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.ss-you-tag {
+  font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 99px;
+  background: var(--text-primary); color: white; margin-left: 4px;
+}
+.ss-score-cell { font-family: 'DM Serif Display', serif; font-size: 16px; }
+.ss-bar-cell { display: flex; align-items: center; gap: 8px; }
+.ss-bar-wrap { width: 60px; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+.ss-bar-fill { height: 100%; border-radius: 99px; }
 
 .skeleton {
   background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
@@ -167,22 +183,22 @@ table.pt tr:hover td { background: var(--bg); }
     <div class="school-card"><div class="school-card-banner" style="background:#EDEAE4;"></div><div class="school-card-body"><div class="skeleton" style="height:14px;width:60%;margin-bottom:10px;">&nbsp;</div><div class="skeleton" style="height:40px;">&nbsp;</div></div></div>
   </div>
 
-  <!-- IB Placement table -->
-  <div class="placement-table fade-3">
-    <div class="placement-table-header">
-      <div class="placement-table-title">IB &amp; Finance Placement — Estimated Historical Rates</div>
-      <div class="placement-source">Source: LinkedIn, Glassdoor, school data (estimated)</div>
+  <!-- Apex conference scoresheet -->
+  <div class="scoresheet fade-3">
+    <div class="scoresheet-header">
+      <div class="scoresheet-title">Conference Scoresheet — Apex Performance</div>
+      <div class="scoresheet-sub">Ranked by average score</div>
     </div>
-    <table class="pt" id="placementTable">
+    <table class="ss" id="scoresheetTable">
       <thead><tr>
+        <th></th>
         <th>School</th>
-        <th>Finance placement %</th>
-        <th>BB IB placement %</th>
-        <th>PE / Buyside %</th>
-        <th>Avg starting comp</th>
-        <th>Top feeder to</th>
+        <th class="num">Avg Score</th>
+        <th class="num">Apex Users</th>
+        <th class="num">Total Answers</th>
+        <th class="num">This Week</th>
       </tr></thead>
-      <tbody id="placementBody"></tbody>
+      <tbody id="scoresheetBody"></tbody>
     </table>
   </div>
 
@@ -218,26 +234,9 @@ const SCHOOL_COLORS = {
   'University of Pennsylvania': { c1:'#011F5B', c2:'#990000', c3:'#000f30' },
 };
 
-// Estimated IB placement data — extensible object
-const PLACEMENT_DATA = {
-  NESCAC: [
-    { school:'Amherst College',     finance:28, bb_ib:8,  pe:4,  comp:'$150–185k', top_feeder:'Goldman Sachs, JPMorgan' },
-    { school:'Williams College',    finance:32, bb_ib:10, pe:5,  comp:'$155–190k', top_feeder:'Goldman Sachs, Evercore' },
-    { school:'Middlebury College',  finance:18, bb_ib:5,  pe:2,  comp:'$140–170k', top_feeder:'JPMorgan, Morgan Stanley' },
-    { school:'Bowdoin College',     finance:16, bb_ib:4,  pe:2,  comp:'$135–165k', top_feeder:'Morgan Stanley, Citi' },
-    { school:'Tufts University',    finance:20, bb_ib:6,  pe:3,  comp:'$145–175k', top_feeder:'Goldman Sachs, Lazard' },
-    { school:'Colby College',       finance:14, bb_ib:3,  pe:1,  comp:'$130–160k', top_feeder:'JPMorgan, BMO' },
-    { school:'Hamilton College',    finance:15, bb_ib:4,  pe:2,  comp:'$135–165k', top_feeder:'Citi, Jefferies' },
-    { school:'Wesleyan University', finance:17, bb_ib:4,  pe:2,  comp:'$140–170k', top_feeder:'Morgan Stanley, Barclays' },
-    { school:'Trinity College',     finance:13, bb_ib:3,  pe:1,  comp:'$125–155k', top_feeder:'Citi, Deutsche Bank' },
-    { school:'Bates College',       finance:12, bb_ib:2,  pe:1,  comp:'$120–150k', top_feeder:'JPMorgan, UBS' },
-    { school:'Connecticut College', finance:11, bb_ib:2,  pe:1,  comp:'$115–145k', top_feeder:'BMO, Piper Sandler' },
-  ]
-};
-
 // Conference logo map
 const CONF_LOGOS = {
-  'NESCAC': 'https://upload.wikimedia.org/wikipedia/en/thumb/5/58/NESCAC_logo.svg/320px-NESCAC_logo.svg.png',
+  'NESCAC': 'nescac_logo.webp',
 };
 
 function scoreColor(s) {
@@ -330,23 +329,31 @@ async function init() {
       </a>`;
   }).join('');
 
-  // Placement table
-  const placementRows = PLACEMENT_DATA[CONF_NAME] || [];
-  document.getElementById('placementBody').innerHTML = placementRows
-    .sort((a,b) => b.bb_ib - a.bb_ib)
-    .map(r => {
-      const c = SCHOOL_COLORS[r.school];
-      const dot = c ? `<span class="pt-dot" style="background:${c.c1};"></span>` : '';
-      const isMe = r.school === mySchool;
-      return `<tr${isMe ? ' style="background:rgba(0,0,0,.02);"' : ''}>
-        <td><span class="pt-school-badge">${dot}${r.school}${isMe ? ' <span class="school-card-you" style="margin-left:4px;">You</span>' : ''}</span></td>
-        <td>${r.finance}%</td>
-        <td class="${r.bb_ib >= 8 ? 'pt-highlight' : ''}">${r.bb_ib}%</td>
-        <td>${r.pe}%</td>
-        <td>${r.comp}</td>
-        <td style="font-size:12px;color:var(--text-secondary);">${r.top_feeder}</td>
-      </tr>`;
-    }).join('');
+  // Conference scoresheet — real Apex data, ranked by avg score
+  const maxAnswers = Math.max(...schools.map(s => parseInt(s.total_answers||0)), 1);
+  document.getElementById('scoresheetBody').innerHTML = schools.map((sc, i) => {
+    const c = SCHOOL_COLORS[sc.name];
+    const dot = c ? `<span class="ss-dot" style="background:${c.c1};"></span>` : '';
+    const isMine = sc.name === mySchool;
+    const answerPct = Math.round((parseInt(sc.total_answers||0) / maxAnswers) * 100);
+    return `<tr${isMine ? ' style="background:rgba(0,0,0,.02);"' : ''}>
+      <td class="ss-rank ${rankClass(i)}">#${i+1}</td>
+      <td><span class="ss-school-badge">${dot}${sc.name}${isMine ? '<span class="ss-you-tag">You</span>' : ''}</span></td>
+      <td class="num"><span class="ss-score-cell" style="color:${scoreColor(sc.avg_score)}">${sc.avg_score||'—'}</span></td>
+      <td class="num">${parseInt(sc.apex_users||0)}</td>
+      <td class="num">
+        <div class="ss-bar-cell" style="justify-content:center;">
+          <div class="ss-bar-wrap"><div class="ss-bar-fill" style="width:${answerPct}%;background:${c ? c.c1 : 'var(--text-tertiary)'};"></div></div>
+          <span>${parseInt(sc.total_answers||0).toLocaleString()}</span>
+        </div>
+      </td>
+      <td class="num">${parseInt(sc.answers_this_week||0)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function rankClass(i) {
+  return ['gold','silver','bronze'][i] || '';
 }
 
 init().catch(e => console.error(e));

@@ -2230,25 +2230,30 @@ const server = http.createServer(async (req, res) => {
       const schoolR = await pool.query('SELECT * FROM schools WHERE name=$1', [name]);
       if (!schoolR.rows.length) return json(res,404,{error:'School not found'});
       const school = schoolR.rows[0];
+      const sevenDaysAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().slice(0,10);
       const statsR = await pool.query(
         `SELECT
            COUNT(DISTINCT sm.user_id) as apex_users,
            COALESCE(AVG(qr.score),0)::INT as avg_score,
-           COUNT(qr.id) as total_answers,
+           COALESCE((SELECT SUM(act.questions_answered) FROM activity act
+                     JOIN school_memberships sm2 ON sm2.user_id=act.user_id
+                     WHERE sm2.school_id=$1),0) as total_answers,
            COALESCE(AVG(qr.score) FILTER (WHERE qr.topic='DCF'),0)::INT as dcf_score,
            COALESCE(AVG(qr.score) FILTER (WHERE qr.topic='LBO'),0)::INT as lbo_score,
            COALESCE(AVG(qr.score) FILTER (WHERE qr.topic='Valuation'),0)::INT as valuation_score,
            COALESCE(AVG(qr.score) FILTER (WHERE qr.topic='Mergers_MA'),0)::INT as ma_score,
-           COUNT(qr.id) FILTER (WHERE qr.created_at > extract(epoch from now()-interval '7 days')) as answers_this_week
+           COALESCE((SELECT SUM(act.questions_answered) FROM activity act
+                     JOIN school_memberships sm2 ON sm2.user_id=act.user_id
+                     WHERE sm2.school_id=$1 AND act.date >= $2),0) as answers_this_week
          FROM school_memberships sm
          LEFT JOIN question_results qr ON qr.user_id=sm.user_id
          WHERE sm.school_id=$1`,
-        [school.id]
+        [school.id, sevenDaysAgo]
       );
       // Top users from this school
       const topUsersR = await pool.query(
         `SELECT u.id, u.name, u.plan,
-                COUNT(qr.id) as total_answers,
+                COALESCE((SELECT SUM(questions_answered) FROM activity WHERE user_id=u.id),0) as total_answers,
                 COALESCE(AVG(qr.score),0)::INT as avg_score
          FROM school_memberships sm
          JOIN users u ON u.id=sm.user_id
@@ -2276,26 +2281,36 @@ const server = http.createServer(async (req, res) => {
       const params = new URLSearchParams(req.url.split('?')[1]||'');
       const name = params.get('name');
       if (!name) return json(res,400,{error:'name required'});
+      const sevenDaysAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().slice(0,10);
       const r = await pool.query(
         `SELECT s.id, s.name, s.domain, s.logo_url,
                 COUNT(DISTINCT sm.user_id) as apex_users,
-                COALESCE(AVG(qr.score),0)::INT as avg_score,
-                COUNT(qr.id) as total_answers,
-                COUNT(qr.id) FILTER (WHERE qr.created_at > extract(epoch from now()-interval '7 days')) as answers_this_week
+                COALESCE(AVG(scores.score),0)::INT as avg_score,
+                COALESCE(SUM(act.total_answers),0) as total_answers,
+                COALESCE(SUM(act.week_answers),0) as answers_this_week
          FROM schools s
          LEFT JOIN school_memberships sm ON sm.school_id=s.id
-         LEFT JOIN question_results qr ON qr.user_id=sm.user_id
+         LEFT JOIN question_results scores ON scores.user_id=sm.user_id
+         LEFT JOIN (
+           SELECT user_id,
+                  SUM(questions_answered) as total_answers,
+                  SUM(questions_answered) FILTER (WHERE date >= $2) as week_answers
+           FROM activity GROUP BY user_id
+         ) act ON act.user_id=sm.user_id
          WHERE s.conference=$1
          GROUP BY s.id ORDER BY avg_score DESC`,
-        [name]
+        [name, sevenDaysAgo]
       );
       const totals = await pool.query(
         `SELECT COUNT(DISTINCT sm.user_id) as total_users,
-                COALESCE(AVG(qr.score),0)::INT as avg_score,
-                COUNT(qr.id) as total_answers
+                COALESCE(AVG(scores.score),0)::INT as avg_score,
+                COALESCE(SUM(act.total_answers),0) as total_answers
          FROM schools s
-         JOIN school_memberships sm ON sm.school_id=s.id
-         LEFT JOIN question_results qr ON qr.user_id=sm.user_id
+         LEFT JOIN school_memberships sm ON sm.school_id=s.id
+         LEFT JOIN question_results scores ON scores.user_id=sm.user_id
+         LEFT JOIN (
+           SELECT user_id, SUM(questions_answered) as total_answers FROM activity GROUP BY user_id
+         ) act ON act.user_id=sm.user_id
          WHERE s.conference=$1`,
         [name]
       );
