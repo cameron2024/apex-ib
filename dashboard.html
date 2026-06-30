@@ -1176,6 +1176,7 @@
 
   // Compact question text lookup for weak spots panel
   let Q_TEXT = {};  // populated at boot from /api/questions
+  let Q_SUBTOPIC = {};  // id -> { subtopic, label } populated at boot
 
   // ── GREETING ──────────────────────────────────────────────
   function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '…' : (s || ''); }
@@ -1416,13 +1417,18 @@
       // Short question text - we only have the ID, link to practice that topic
       const rawText = Q_TEXT[q.id] || null;
       const qText = rawText || (topicLabel + ' question');
-      return `<a class="weak-spot-item" href="practice-screen.html?topic=${q.topic}" style="text-decoration:none;">
+      const subInfo = Q_SUBTOPIC[q.id] || {};
+      const subLabel = subInfo.label || topicLabel;
+      const drillHref = subInfo.subtopic
+        ? `practice-screen.html?mode=review_weak&topic=${q.topic}&subtopic=${encodeURIComponent(subInfo.subtopic)}`
+        : `practice-screen.html?topic=${q.topic}`;
+      return `<a class="weak-spot-item" href="${drillHref}" style="text-decoration:none;">
         <div class="weak-spot-rank ${rankClasses[i]}">${i+1}</div>
         <div class="weak-spot-body">
           <div class="weak-spot-q">${trunc(qText)}</div>
           <div class="weak-spot-meta">
             <span class="weak-spot-score ${scoreClass}">${scoreLabel}</span>
-            <span class="weak-spot-label">${attemptsLabel}</span>
+            <span class="weak-spot-label">${subLabel} · ${attemptsLabel}</span>
           </div>
         </div>
         <span class="weak-spot-arrow">→</span>
@@ -1485,7 +1491,7 @@
     try {
       const qRes = await fetch('/api/questions');
       const qData = await qRes.json();
-      qData.forEach(function(q) { Q_TEXT[q.id] = q.question; });
+      qData.forEach(function(q) { Q_TEXT[q.id] = q.question; Q_SUBTOPIC[q.id] = { subtopic: q.subtopic, label: q.subtopic_label }; });
     } catch(e) {}
 
     const token = localStorage.getItem('apex_token');

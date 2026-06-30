@@ -530,7 +530,7 @@
       <thead>
         <tr>
           <th>Question</th>
-          <th>Topic</th>
+          <th>Subtopic</th>
           <th>Last Score</th>
           <th>Attempts</th>
           <th></th>
@@ -558,6 +558,7 @@
   const TOTAL_QS = TOPICS.reduce((s,t) => s + t.total, 0);
 
   let Q_TEXT = {};  // populated at boot from /api/questions
+  let Q_SUBTOPIC = {};  // id -> { subtopic, subtopic_label } populated at boot
 
   // ── AUTH ──────────────────────────────────────────────────
   const token = localStorage.getItem('apex_token');
@@ -1004,12 +1005,17 @@
 
     tbody.innerHTML = rows.map(q => {
       const text = Q_TEXT[q.id] || (q.topic + ' question');
+      const subInfo = Q_SUBTOPIC[q.id] || {};
+      const subLabel = subInfo.label || topicLabel(q.topic);
+      const drillHref = subInfo.subtopic
+        ? `practice-screen.html?mode=review_weak&topic=${q.topic}&subtopic=${encodeURIComponent(subInfo.subtopic)}`
+        : `practice-screen.html?topic=${q.topic}`;
       return `<tr>
         <td class="q-cell"><div class="q-text-inner">${escHtml(trunc(text))}</div></td>
-        <td style="color:var(--text-secondary)">${topicLabel(q.topic)}</td>
+        <td style="color:var(--text-secondary)"><div>${escHtml(subLabel)}</div><div style="font-size:11px;color:var(--text-tertiary);">${topicLabel(q.topic)}</div></td>
         <td><span class="score-chip ${chipClass(q.latestScore)}">${q.latestScore}/100</span></td>
         <td style="color:var(--text-tertiary)">${q.attempts}</td>
-        <td><a href="practice-screen.html?topic=${q.topic}" style="color:var(--accent-blue);font-size:12px;text-decoration:none;">Drill →</a></td>
+        <td><a href="${drillHref}" style="color:var(--accent-blue);font-size:12px;text-decoration:none;">Drill →</a></td>
       </tr>`;
     }).join('');
   }
@@ -1081,7 +1087,7 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
         try {
           const qRes = await fetch('/api/questions');
           const qData = await qRes.json();
-          qData.forEach(function(q) { Q_TEXT[q.id] = q.question; });
+          qData.forEach(function(q) { Q_TEXT[q.id] = q.question; Q_SUBTOPIC[q.id] = { subtopic: q.subtopic, label: q.subtopic_label }; });
         } catch(e) { /* fall through with empty Q_TEXT */ }
         const res = await fetch('/api/progress/load', {
           headers: { 'Authorization': 'Bearer ' + token }
@@ -1175,8 +1181,11 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
         // Stash for the breakdown
         window._insightsForBreakdown = data;
       }
-      // Bias the CTA toward the weakest topic when we have one
-      if (data.weakestTopic) {
+      // Bias the CTA toward the weakest subtopic when we have one (falls back to topic)
+      if (data.weakestSubtopic && data.weakestTopic) {
+        const cta = document.getElementById('insightCta');
+        if (cta) cta.href = `practice-screen.html?mode=review_weak&topic=${encodeURIComponent(data.weakestTopic)}&subtopic=${encodeURIComponent(data.weakestSubtopic)}`;
+      } else if (data.weakestTopic) {
         const cta = document.getElementById('insightCta');
         if (cta) cta.href = `practice-screen.html?mode=review_weak&topic=${encodeURIComponent(data.weakestTopic)}`;
       }
@@ -1498,8 +1507,10 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
     document.getElementById('rbTitle').textContent = `Why ~${days} day${days !== 1 ? 's' : ''} to interview-ready`;
     document.getElementById('rbSubtitle').textContent = `At your current pace, you'd hit 85% around ${dateLabel}.`;
 
-    // Update CTA href to focus the weakest topic
-    if (d.weakestTopic) {
+    // Update CTA href to focus the weakest subtopic (falls back to topic)
+    if (d.weakestSubtopic && d.weakestTopic) {
+      document.getElementById('rbCta').href = `practice-screen.html?mode=review_weak&topic=${encodeURIComponent(d.weakestTopic)}&subtopic=${encodeURIComponent(d.weakestSubtopic)}`;
+    } else if (d.weakestTopic) {
       document.getElementById('rbCta').href = `practice-screen.html?mode=review_weak&topic=${encodeURIComponent(d.weakestTopic)}`;
     }
 
@@ -1574,6 +1585,21 @@ function trunc(s, n) { n = n || 88; return s && s.length > n ? s.slice(0, n) + '
             <div class="rb-topic-bar"><div class="rb-topic-bar-fill" style="width:${t.avg}%;background:${color};"></div></div>
             <div class="rb-topic-gap" style="color:${color};">${t.avg}% <span style="opacity:.6;font-weight:400;">−${tgap}</span></div>
           </div>`;
+        }).join('')}
+      </div>` : ''}
+
+      ${(d.subtopicAvgs && d.subtopicAvgs.filter(s => s.avg < 85).length > 0) ? `
+      <div class="rb-section">
+        <div class="rb-section-title">Sub-concepts holding you back</div>
+        ${d.subtopicAvgs.filter(s => s.avg < 85).slice(0, 5).map(s => {
+          const sgap = Math.max(0, 85 - s.avg);
+          const color = s.avg >= 80 ? '#D97706' : '#DC2626';
+          const href = `practice-screen.html?mode=review_weak&topic=${encodeURIComponent(s.topic)}&subtopic=${encodeURIComponent(s.subtopic)}`;
+          return `<a href="${href}" class="rb-topic-row" style="text-decoration:none;color:inherit;">
+            <div class="rb-topic-name">${escHtml(s.label)}</div>
+            <div class="rb-topic-bar"><div class="rb-topic-bar-fill" style="width:${s.avg}%;background:${color};"></div></div>
+            <div class="rb-topic-gap" style="color:${color};">${s.avg}% <span style="opacity:.6;font-weight:400;">−${sgap}</span></div>
+          </a>`;
         }).join('')}
       </div>` : ''}
 

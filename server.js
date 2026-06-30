@@ -449,7 +449,7 @@ function computeMastery(prevConsecHigh, newScore) {
 }
 
 // ── PRACTICE SET BUILDER ────────────────────────────────────
-async function buildPracticeSet(userId, n, topic, mode) {
+async function buildPracticeSet(userId, n, topic, mode, subtopic) {
   const now = nowSec();
   const userR = await pool.query('SELECT interview_date FROM users WHERE id=$1', [userId]);
   const interviewDate = userR.rows[0]?.interview_date;
@@ -559,14 +559,28 @@ async function buildPracticeSet(userId, n, topic, mode) {
 
   // Compute weak topics for new-question weighting
   const topicScores = {};
+  const subtopicScores = {};
   histR.rows.forEach(r => {
     if (!topicScores[r.topic]) topicScores[r.topic] = { sum: 0, count: 0 };
     topicScores[r.topic].sum += r.score;
     topicScores[r.topic].count++;
+    const sub = QUESTIONS_BY_ID[r.question_id] && QUESTIONS_BY_ID[r.question_id].subtopic;
+    if (sub) {
+      if (!subtopicScores[sub]) subtopicScores[sub] = { sum: 0, count: 0 };
+      subtopicScores[sub].sum += r.score;
+      subtopicScores[sub].count++;
+    }
   });
   const weakTopics = Object.entries(topicScores)
     .filter(([_, s]) => s.count >= 2 && s.sum / s.count < 80)
     .map(([t]) => t);
+  // Weak subtopics: same mastery bar (avg < 80, at least 2 attempts), but at
+  // sub-concept granularity so targeting can be more precise than topic-level.
+  const weakSubtopics = new Set(
+    Object.entries(subtopicScores)
+      .filter(([_, s]) => s.count >= 2 && s.sum / s.count < 80)
+      .map(([s]) => s)
+  );
 
   let result = [];
 
@@ -574,10 +588,22 @@ async function buildPracticeSet(userId, n, topic, mode) {
     const weakOnly = histR.rows
       .filter(r => r.mastery_stage === 'struggling' || r.mastery_stage === 'learning')
       .filter(r => !topic || topic === 'All' || r.topic === topic)
+      .filter(r => !subtopic || (QUESTIONS_BY_ID[r.question_id] && QUESTIONS_BY_ID[r.question_id].subtopic === subtopic))
       .sort((a,b) => (a.next_due||0) - (b.next_due||0));
-    result = weakOnly.slice(0, n).map(r => ({
+    let pool_ = weakOnly;
+    // If reviewing a specific weak subtopic but there's not enough review-due
+    // history yet, backfill with any unseen/seen questions in that subtopic
+    // so the drill is still meaningfully targeted rather than empty.
+    if (subtopic && pool_.length < n) {
+      const have = new Set(pool_.map(r => r.question_id));
+      const extra = eligibleIds
+        .filter(id => QUESTIONS_BY_ID[id].subtopic === subtopic && !have.has(id))
+        .map(id => ({ question_id: id, mastery_stage: null }));
+      pool_ = [...pool_, ...extra];
+    }
+    result = pool_.slice(0, n).map(r => ({
       id: r.question_id,
-      reason: r.mastery_stage === 'struggling' ? 'Struggling — needs work' : 'Learning',
+      reason: r.mastery_stage === 'struggling' ? 'Struggling — needs work' : r.mastery_stage === 'learning' ? 'Learning' : (subtopic ? `Targeted — ${(QUESTIONS_BY_ID[r.question_id]||{}).subtopic_label || 'weak subtopic'}` : 'Review'),
       stage: r.mastery_stage
     }));
   } else if (mode === 'random') {
@@ -600,17 +626,23 @@ async function buildPracticeSet(userId, n, topic, mode) {
       result.push({ id: r.id, reason, stage: r.stage });
     }
 
-    const unseenWeak = unseenOrdered.filter(id => weakTopics.includes(QUESTIONS_BY_ID[id].topic));
-    const unseenOther = unseenOrdered.filter(id => !weakTopics.includes(QUESTIONS_BY_ID[id].topic));
-    const pickFromWeak = Math.min(Math.floor(newCount * 0.7), unseenWeak.length);
-    const pickFromOther = newCount - pickFromWeak;
-    // Take from front (already sorted basic→intermediate→hard, shuffled within tier)
+    const unseenWeakSub = unseenOrdered.filter(id => weakSubtopics.has(QUESTIONS_BY_ID[id].subtopic));
+    const unseenWeakTopicOnly = unseenOrdered.filter(id => !weakSubtopics.has(QUESTIONS_BY_ID[id].subtopic) && weakTopics.includes(QUESTIONS_BY_ID[id].topic));
+    const unseenOther = unseenOrdered.filter(id => !weakSubtopics.has(QUESTIONS_BY_ID[id].subtopic) && !weakTopics.includes(QUESTIONS_BY_ID[id].topic));
+    const pickFromWeakSub = Math.min(Math.floor(newCount * 0.7), unseenWeakSub.length);
+    const pickFromWeakTopic = Math.min(Math.floor((newCount - pickFromWeakSub) * 0.7), unseenWeakTopicOnly.length);
+    const pickFromOther = newCount - pickFromWeakSub - pickFromWeakTopic;
+    // Take from front (already sorted basic→intermediate→hard, clustered by subtopic)
     const newPicks = [
-      ...unseenWeak.slice(0, pickFromWeak),
+      ...unseenWeakSub.slice(0, pickFromWeakSub),
+      ...unseenWeakTopicOnly.slice(0, pickFromWeakTopic),
       ...unseenOther.slice(0, pickFromOther)
     ];
     for (const id of newPicks) {
-      const reasonLabel = weakTopics.includes(QUESTIONS_BY_ID[id].topic) ? 'New — weak area' : 'New';
+      const q = QUESTIONS_BY_ID[id];
+      const reasonLabel = weakSubtopics.has(q.subtopic)
+        ? `New — weak in ${q.subtopic_label || q.topic}`
+        : weakTopics.includes(q.topic) ? 'New — weak area' : 'New';
       result.push({ id, reason: reasonLabel, stage: null });
     }
 
@@ -764,15 +796,35 @@ async function generateInsights(userId) {
   const overall = Math.round(all.reduce((s,r)=>s+r.score, 0) / all.length);
 
   const byTopic = {};
+  const bySubtopic = {};
   all.forEach(r => {
     if (!byTopic[r.topic]) byTopic[r.topic] = [];
     byTopic[r.topic].push(r.score);
+    const q = QUESTIONS_BY_ID[r.question_id];
+    const sub = q && q.subtopic;
+    if (sub) {
+      if (!bySubtopic[sub]) bySubtopic[sub] = { scores: [], label: q.subtopic_label || sub, topic: q.topic };
+      bySubtopic[sub].scores.push(r.score);
+    }
   });
   const topicAvgs = Object.entries(byTopic).map(([t, scores]) => ({
     topic: t,
     avg: Math.round(scores.reduce((s,x)=>s+x,0) / scores.length),
     count: scores.length
   })).sort((a,b) => b.avg - a.avg);
+
+  // Subtopic-level breakdown — only include sub-concepts with enough attempts
+  // (≥2) to be a meaningful signal, sorted weakest-first.
+  const subtopicAvgs = Object.entries(bySubtopic)
+    .filter(([_, d]) => d.scores.length >= 2)
+    .map(([sub, d]) => ({
+      subtopic: sub,
+      label: d.label,
+      topic: d.topic,
+      avg: Math.round(d.scores.reduce((s,x)=>s+x,0) / d.scores.length),
+      count: d.scores.length
+    }))
+    .sort((a,b) => a.avg - b.avg);
 
   const recent10 = recentR.rows.slice(0, 10);
   const prior10 = recentR.rows.slice(10, 20);
@@ -784,10 +836,14 @@ async function generateInsights(userId) {
   // For now, use weakest topics
   const weakestTopic = topicAvgs[topicAvgs.length - 1];
   const strongestTopic = topicAvgs[0];
+  const weakestSubtopic = subtopicAvgs.length > 0 ? subtopicAvgs[0] : null;
 
-  const statsLine = `Total questions answered: ${all.length}. Overall accuracy: ${overall}%. By topic: ${topicAvgs.map(t => `${t.topic.replace('_',' ')} ${t.avg}% (${t.count} attempts)`).join(', ')}. Recent ${recent10.length}: ${recentAvg}%. Prior ${prior10.length}: ${priorAvg}%. Trajectory: ${trajectory >= 0 ? '+' : ''}${trajectory} points.`;
+  const subtopicLine = subtopicAvgs.length > 0
+    ? ` Weakest sub-concepts: ${subtopicAvgs.slice(0, 3).map(s => `${s.label} ${s.avg}% (${s.count} attempts)`).join(', ')}.`
+    : '';
+  const statsLine = `Total questions answered: ${all.length}. Overall accuracy: ${overall}%. By topic: ${topicAvgs.map(t => `${t.topic.replace('_',' ')} ${t.avg}% (${t.count} attempts)`).join(', ')}.${subtopicLine} Recent ${recent10.length}: ${recentAvg}%. Prior ${prior10.length}: ${priorAvg}%. Trajectory: ${trajectory >= 0 ? '+' : ''}${trajectory} points.`;
 
-  const insightsPrompt = `You are an investment banking interview coach reviewing a candidate's practice history. Generate exactly three short paragraphs (~25-35 words each) as JSON. Be specific. Reference the actual numbers. No platitudes. No emoji.\n{"diagnosis": "Headline assessment + trajectory direction. Example: 'Your accuracy has climbed from 64% to 82% over the last two weeks — solid trajectory toward interview-ready.'", "weak_pattern": "The specific weak area with concrete framing. Example: 'The remaining gap is concentrated in DCF: at 64% you're below the 80% threshold for confidence on terminal value and WACC.'", "next_action": "ONE concrete action with rough time estimate. Example: 'Next: 8 questions targeted at DCF, about 15 minutes.'"}\n\nStats: ${statsLine}\n\nReturn JSON only, no markdown.`;
+  const insightsPrompt = `You are an investment banking interview coach reviewing a candidate's practice history. Generate exactly three short paragraphs (~25-35 words each) as JSON. Be specific — reference the weakest sub-concept by name when one is available, not just the broad topic. No platitudes. No emoji.\n{"diagnosis": "Headline assessment + trajectory direction. Example: 'Your accuracy has climbed from 64% to 82% over the last two weeks — solid trajectory toward interview-ready.'", "weak_pattern": "The specific weak sub-concept with concrete framing. Example: 'The remaining gap is concentrated in DCF: Terminal Value, where you're at 64%, below the 80% threshold for confidence.'", "next_action": "ONE concrete action with rough time estimate, naming the sub-concept if known. Example: 'Next: 8 questions targeted at DCF: Terminal Value, about 15 minutes.'"}\n\nStats: ${statsLine}\n\nReturn JSON only, no markdown.`;
 
   let insights;
   try {
@@ -812,12 +868,15 @@ async function generateInsights(userId) {
     ready: true,
     overall,
     topicAvgs,
+    subtopicAvgs: subtopicAvgs.slice(0, 8),
     trajectory,
     recentAvg,
     priorAvg,
     timeToMastery,
     weakestTopic: weakestTopic ? weakestTopic.topic : null,
     strongestTopic: strongestTopic ? strongestTopic.topic : null,
+    weakestSubtopic: weakestSubtopic ? weakestSubtopic.subtopic : null,
+    weakestSubtopicLabel: weakestSubtopic ? weakestSubtopic.label : null,
     ...insights
   };
 
@@ -1351,8 +1410,9 @@ const server = http.createServer(async (req, res) => {
       const n = Math.min(parseInt(params.get('n'))||10, 30);
       const topic = params.get('topic') || 'All';
       const mode = params.get('mode') || 'smart';
-      const set = await buildPracticeSet(user.userId, n, topic, mode);
-      return json(res,200,{set, mode, topic, requested:n, delivered:set.length});
+      const subtopic = params.get('subtopic') || null;
+      const set = await buildPracticeSet(user.userId, n, topic, mode, subtopic);
+      return json(res,200,{set, mode, topic, subtopic, requested:n, delivered:set.length});
     } catch(e){return json(res,500,{error:e.message});}
   }
 

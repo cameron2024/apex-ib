@@ -2914,9 +2914,11 @@ Generate 3 drill questions targeting this exact gap.`;
     const topicParam = params.get('topic');
     const modeParam = params.get('mode'); // 'smart' | 'review_weak' | null
     const focusParam = params.get('focus'); // a specific question id to jump to
+    const subtopicParam = params.get('subtopic'); // optional sub-concept filter for review_weak
     const validTopics = ['All', 'Accounting', 'Enterprise_Value', 'Valuation', 'DCF', 'Mergers_MA', 'LBO'];
     const startTopic = validTopics.includes(topicParam) ? topicParam : 'All';
     window._adaptiveMode = (modeParam === 'smart' || modeParam === 'review_weak') ? modeParam : null;
+    window._adaptiveSubtopic = subtopicParam || null;
     window._focusQid = focusParam;
 
     if (authToken) {
@@ -2933,7 +2935,8 @@ Generate 3 drill questions targeting this exact gap.`;
   async function loadAdaptiveSet(topic, mode) {
     if (!authToken) return null;
     try {
-      const r = await fetch(`/api/practice/next-set?n=15&topic=${encodeURIComponent(topic)}&mode=${mode}`, {
+      const subtopicQS = window._adaptiveSubtopic ? `&subtopic=${encodeURIComponent(window._adaptiveSubtopic)}` : '';
+      const r = await fetch(`/api/practice/next-set?n=15&topic=${encodeURIComponent(topic)}&mode=${mode}${subtopicQS}`, {
         headers: { 'Authorization': 'Bearer ' + authToken }
       });
       if (!r.ok) return null;
