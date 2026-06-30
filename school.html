@@ -10,6 +10,17 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <style>
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 500; color: var(--text-secondary);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 7px 13px;
+  cursor: pointer; margin-bottom: 16px;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color .15s, color .15s, transform .1s;
+}
+.back-btn:hover { border-color: var(--border-strong); color: var(--text-primary); transform: translateX(-1px); }
+
 /* Banner */
 .school-banner {
   height: 120px; border-radius: var(--radius); margin-bottom: 24px;
@@ -131,6 +142,11 @@
 <body data-page="feed">
 <div id="sidebar-mount"></div>
 <main class="main">
+
+  <button class="back-btn fade-1" onclick="if(document.referrer && document.referrer.includes(location.host)){history.back();}else{window.location.href='feed.html';}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back
+  </button>
 
   <div class="school-banner fade-1" id="schoolBanner">
     <div class="school-banner-inner">
