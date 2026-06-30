@@ -117,6 +117,13 @@
 }
 .scoresheet-title { font-size: 13px; font-weight: 600; }
 .scoresheet-sub { font-size: 11px; color: var(--text-tertiary); }
+.scoresheet-sort {
+  font-size: 11.5px; font-weight: 600; color: var(--text-primary);
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 8px;
+  font-family: 'DM Sans', sans-serif; cursor: pointer;
+}
+.scoresheet-sort:hover { border-color: var(--border-strong); }
 
 table.ss { width: 100%; border-collapse: collapse; }
 table.ss th {
@@ -203,7 +210,15 @@ table.ss tr:hover td { background: var(--bg); }
   <div class="scoresheet fade-3">
     <div class="scoresheet-header">
       <div class="scoresheet-title">Conference Scoresheet — Apex Performance</div>
-      <div class="scoresheet-sub">Ranked by average score</div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="scoresheet-sub">Ranked by</span>
+        <select id="scoresheetSort" class="scoresheet-sort" onchange="renderScoresheet()">
+          <option value="avg_score">Average Score</option>
+          <option value="apex_users">Apex Users</option>
+          <option value="total_answers">Total Answers</option>
+          <option value="answers_this_week">This Week</option>
+        </select>
+      </div>
     </div>
     <table class="ss" id="scoresheetTable">
       <thead><tr>
@@ -312,10 +327,10 @@ async function init() {
     </div>`;
 
   // School cards
-  const schools = conf.schools || [];
-  const mySchool = conf.mySchool;
-  document.getElementById('schoolsGrid').innerHTML = schools.map((sc, i) => {
-    const isMine = sc.name === mySchool;
+  schoolsData = conf.schools || [];
+  mySchoolName = conf.mySchool;
+  document.getElementById('schoolsGrid').innerHTML = schoolsData.map((sc, i) => {
+    const isMine = sc.name === mySchoolName;
     const borderColor = isMine && SCHOOL_COLORS[sc.name] ? SCHOOL_COLORS[sc.name].c1 : '';
     return `
       <a class="school-card${isMine ? ' my-school' : ''}" href="school.html?name=${encodeURIComponent(sc.name)}"
@@ -345,12 +360,20 @@ async function init() {
       </a>`;
   }).join('');
 
-  // Conference scoresheet — real Apex data, ranked by avg score
-  const maxAnswers = Math.max(...schools.map(s => parseInt(s.total_answers||0)), 1);
-  document.getElementById('scoresheetBody').innerHTML = schools.map((sc, i) => {
+  renderScoresheet();
+}
+
+let schoolsData = [];
+let mySchoolName = null;
+
+function renderScoresheet() {
+  const sortKey = document.getElementById('scoresheetSort').value;
+  const sorted = [...schoolsData].sort((a, b) => parseFloat(b[sortKey]||0) - parseFloat(a[sortKey]||0));
+  const maxAnswers = Math.max(...schoolsData.map(s => parseInt(s.total_answers||0)), 1);
+  document.getElementById('scoresheetBody').innerHTML = sorted.map((sc, i) => {
     const c = SCHOOL_COLORS[sc.name];
     const dot = c ? `<span class="ss-dot" style="background:${c.c1};"></span>` : '';
-    const isMine = sc.name === mySchool;
+    const isMine = sc.name === mySchoolName;
     const answerPct = Math.round((parseInt(sc.total_answers||0) / maxAnswers) * 100);
     return `<tr${isMine ? ' style="background:rgba(0,0,0,.02);"' : ''}>
       <td class="ss-rank ${rankClass(i)}">#${i+1}</td>
