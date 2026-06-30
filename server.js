@@ -330,6 +330,24 @@ function shuffle(arr) {
   return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
 }
 
+// Group question ids by subtopic, shuffle the order of subtopic clusters,
+// shuffle within each cluster, then concatenate — so consecutive new
+// questions tend to share a concept thread instead of jumping randomly
+// across unrelated subtopics within the same topic/difficulty tier.
+function shuffleBySubtopic(ids) {
+  const groups = {};
+  const order = [];
+  ids.forEach(id => {
+    const key = QUESTIONS_BY_ID[id].subtopic || QUESTIONS_BY_ID[id].topic;
+    if (!groups[key]) { groups[key] = []; order.push(key); }
+    groups[key].push(id);
+  });
+  const shuffledOrder = shuffle(order);
+  const result = [];
+  shuffledOrder.forEach(key => { result.push(...shuffle(groups[key])); });
+  return result;
+}
+
 // ── STRIPE HELPER ────────────────────────────────────────────
 function stripeRequest(method, path, body) {
   return new Promise((resolve, reject) => {
@@ -530,11 +548,13 @@ async function buildPracticeSet(userId, n, topic, mode) {
     const d = QUESTIONS_BY_ID[id].difficulty || 'basic';
     (unseenByDiff[d] = unseenByDiff[d] || []).push(id);
   });
-  // Shuffle within each tier, then concat in order
+  // Sort unseen: basic first, then intermediate, then hard within each difficulty,
+  // clustered by subtopic so a session stays on a connected thread instead of
+  // jumping randomly between unrelated concepts in the same tier.
   const unseenOrdered = [
-    ...shuffle(unseenByDiff.basic || []),
-    ...shuffle(unseenByDiff.intermediate || []),
-    ...shuffle(unseenByDiff.hard || []),
+    ...shuffleBySubtopic(unseenByDiff.basic || []),
+    ...shuffleBySubtopic(unseenByDiff.intermediate || []),
+    ...shuffleBySubtopic(unseenByDiff.hard || []),
   ];
 
   // Compute weak topics for new-question weighting
