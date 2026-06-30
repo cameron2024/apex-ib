@@ -660,7 +660,7 @@ function renderProfileCard(profile, progress, school) {
   };
   const pm = planMap[profile.plan] || planMap.free;
   document.getElementById('profilePlanBadge').innerHTML =
-    `<span class="profile-plan-badge ${pm.cls}">${pm.label}</span>`;
+    `<a href="pricing.html" class="profile-plan-badge ${pm.cls}" style="text-decoration:none;cursor:pointer;">${pm.label}</a>`;
 
   if (profile.memberSince) {
     document.getElementById('profileMemberSince').textContent =
