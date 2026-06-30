@@ -57,7 +57,7 @@
 .profile-school-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   margin-bottom: 6px;
   flex-wrap: wrap;
   justify-content: center;
@@ -645,7 +645,7 @@ function renderProfileCard(profile, progress, school) {
     const sc = SCHOOL_COLORS[school.name] || { c1:'#444', c2:'#888', c3:'#222' };
     const schoolPillStyle = `background:linear-gradient(135deg,${sc.c1},${sc.c2},${sc.c3},${sc.c1});background-size:300% 300%;animation:schoolPillShimmer 5s ease infinite;`;
     // NESCAC is navy + white
-    const confPillStyle = `background:linear-gradient(135deg,#0a1f44,#1a3a7a,#0d2d5e,#0a1f44);background-size:300% 300%;animation:schoolPillShimmer 6s ease infinite;`;
+    const confPillStyle = `background:linear-gradient(135deg,#0F4C33,#1B6E45,#0A3826,#0F4C33);background-size:300% 300%;animation:schoolPillShimmer 6s ease infinite;`;
     let html = `<a class="school-pill" href="school.html?name=${encodeURIComponent(school.name)}" style="${schoolPillStyle}">${school.name}</a>`;
     if (school.conference) {
       html += `<a class="conf-pill" href="conference.html?name=${encodeURIComponent(school.conference)}" style="${confPillStyle}">${school.conference}</a>`;
