@@ -2,7 +2,7 @@
 <html lang="en">
 <head><meta charset="UTF-8">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Practice — Apex</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,6 +63,21 @@
     position: sticky;
     top: 0;
     z-index: 5;
+  }
+
+  @media (max-width: 768px) {
+    .topbar {
+      position: static;   /* avoid sticky sliding back under the notch/hamburger on scroll */
+      flex-wrap: wrap;
+      height: auto;
+      min-height: 48px;
+      padding: 10px 16px;
+      gap: 8px;
+      margin: 0 -20px 16px -20px;  /* cancel .main's mobile side padding so topbar spans full width; leave top padding (safe-area clearance) untouched */
+    }
+    .topic-pill { display: none; }  /* redundant with breadcrumb topic name on narrow screens */
+    #btnBrowseQuestions { padding: 7px 10px !important; }
+    #btnBrowseQuestions .browse-label { display: none; }
   }
 
   .breadcrumb {
@@ -217,8 +232,16 @@
   .question-meta {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .question-card { padding: 20px 18px; }
+    .question-meta { row-gap: 10px; }
+    .q-number { margin-left: 0; }  /* let it wrap to its own line instead of forcing far-right */
+    .question-text { font-size: 19px; }
   }
 
   .q-tag {
@@ -1027,7 +1050,7 @@
     <div class="topbar-right">
       <button id="btnBrowseQuestions" onclick="openQuestionList()" title="Browse all questions in this topic" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;background:white;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;color:var(--text-secondary);cursor:pointer;transition:all .15s;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Browse questions
+        <span class="browse-label">Browse questions</span>
       </button>
     </div>
   </div>

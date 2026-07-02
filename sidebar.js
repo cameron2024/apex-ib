@@ -105,7 +105,19 @@
       </div>
     </div>
   </div>
-</aside>`;
+</aside>
+<button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Open menu" onclick="apexToggleMobileNav()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<div class="mobile-nav-backdrop" id="mobileNavBackdrop" onclick="apexCloseMobileNav()"></div>`;
+
+  // ── MOBILE NAV TOGGLE ────────────────────────────────────
+  window.apexToggleMobileNav = function() {
+    document.body.classList.toggle('mobile-nav-open');
+  };
+  window.apexCloseMobileNav = function() {
+    document.body.classList.remove('mobile-nav-open');
+  };
 
   // ── INJECT SIDEBAR ────────────────────────────────────────
   function injectSidebar() {
